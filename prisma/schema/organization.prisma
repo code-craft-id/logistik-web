@@ -176,6 +176,7 @@ model Agent {
   /// Prototype: AgentInitials.
   initials       String
   /// Prototype: AgentName.
+  /// PII (D-25)
   name           String
   /// Prototype: AgentCategory; classification remains a string.
   category       String
