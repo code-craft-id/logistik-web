@@ -1,0 +1,21 @@
+/// Prototype: company.CustomerWhatsappNotification (company/whatsapp_notification.go).
+/// DRAFT: rules TBD, D-18, D-24
+/// Do not use in routes, actions, or UI until scope and customer ownership are confirmed.
+model CustomerWhatsAppNotification {
+  /// Prototype: CustomerWhatsappNotificationID.
+  id         BigInt   @id @default(autoincrement())
+  /// Prototype: CompanyID; explicit relation approved in SCH-01.
+  companyId  BigInt   @map("company_id")
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: CustomerID; no Customer model exists in the reference folder.
+  /// DRAFT: customer target and relation TBD, D-18, D-24
+  /// PII (D-25)
+  customerId BigInt?  @map("customer_id")
+  /// Prototype: IsEnabled (default:true); notification toggle, not record activity.
+  isEnabled  Boolean  @default(true) @map("is_enabled")
+  /// Prototype: CreatedAt; no UpdatedAt or DeletedAt exists in source.
+  createdAt  DateTime @map("created_at")
+
+  @@index([companyId])
+  @@map("customer_whatsapp_notifications")
+}
