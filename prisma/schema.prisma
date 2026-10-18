@@ -1,9 +1,18 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../src/lib/db/generated"
-  moduleFormat = "esm"
+  provider            = "prisma-client"
+  output              = "../src/lib/db/generated"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+/// Prototype: master-data Status (Active/Inactive) and IsActive/Status booleans.
+enum RecordStatus {
+  ACTIVE
+  INACTIVE
+
+  @@map("record_status")
 }
