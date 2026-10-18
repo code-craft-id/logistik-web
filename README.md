@@ -1,5 +1,40 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Local setup
+
+Use Node.js 24.15.0 (`.nvmrc`) and npm with the checked-in `package-lock.json`.
+
+1. Run `npm ci`.
+2. Copy `.env.example` to `.env` (PowerShell: `Copy-Item .env.example .env`; Linux: `cp .env.example .env`).
+3. Start PostgreSQL through Laragon. Pin PostgreSQL major **18**: the running local binary reports 18.3.
+4. Keep the existing development database `logistik_web`. Create the separate test database manually:
+
+   ```sql
+   CREATE DATABASE "logistik_web_test";
+   ```
+
+5. Validate and generate the client without changing either database:
+
+   ```sh
+   npx prisma validate
+   npx prisma generate
+   npm run check
+   npm run build
+   ```
+
+6. Explicitly opt into the read-only test database smoke test:
+
+   ```sh
+   npm run test:integration
+   ```
+
+The CLI and integration tests load `.env`; existing process variables take precedence.
+`TEST_DATABASE_URL` must name a PostgreSQL database containing `test` and must not target the development database.
+Default `npm test` and `npm run check` run only database-free tests.
+The smoke test runs only `SELECT 1`; it creates no tables or databases.
+Generated Prisma files are ignored; rerun `npx prisma generate` after installation or schema changes.
+Do not run migrations, introspection, or `db push` for this foundation-only schema.
+
 ## Getting Started
 
 First, run the development server:
