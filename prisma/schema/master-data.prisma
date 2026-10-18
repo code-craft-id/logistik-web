@@ -1,0 +1,302 @@
+/// DRAFT: hierarchy TBD, D-27
+model Province {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("provinces")
+}
+
+/// DRAFT: hierarchy TBD, D-27
+model Regency {
+  customers  Customer[]
+  consignees Consignee[]
+  deletedAt  DateTime?    @map("deleted_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(100)
+  status     RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("regencies")
+}
+
+/// DRAFT: hierarchy TBD, D-27
+model District {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("districts")
+}
+
+/// DRAFT: hierarchy TBD, D-27
+model Village {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("villages")
+}
+
+/// DRAFT: hierarchy TBD, D-27
+model PostalCode {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  code      String       @db.VarChar(10)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("postal_codes")
+}
+
+model Driver {
+  deletedAt           DateTime?    @map("deleted_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+  createdAt           DateTime     @default(now()) @map("created_at")
+  id                  Int          @id @default(autoincrement())
+  name                String       @db.VarChar(100)
+  address             String
+  nationalIdNumber    String       @map("national_id_number") @db.VarChar(20)
+  driverLicenseNumber String       @map("driver_license_number") @db.VarChar(20)
+  phone               String       @db.VarChar(20)
+  branchId            Int?         @map("branch_id")
+  branch              Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status              RecordStatus @default(ACTIVE)
+
+  @@index([branchId])
+  @@index([status])
+  @@map("drivers")
+}
+
+model Courier {
+  deletedAt        DateTime?    @map("deleted_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  id               Int          @id @default(autoincrement())
+  name             String       @db.VarChar(100)
+  address          String
+  nationalIdNumber String       @map("national_id_number") @db.VarChar(20)
+  phone            String       @db.VarChar(20)
+  branchId         Int?         @map("branch_id")
+  branch           Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status           RecordStatus @default(ACTIVE)
+
+  @@index([branchId])
+  @@index([status])
+  @@map("couriers")
+}
+
+model TransportMode {
+  deletedAt        DateTime?         @map("deleted_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  id               Int               @id @default(autoincrement())
+  name             String            @db.VarChar(100)
+  /// DRAFT: numeric type TBD, D-26
+  divider          String            @db.VarChar(100)
+  status           RecordStatus      @default(ACTIVE)
+  deliveryServices DeliveryService[]
+
+  @@index([status])
+  @@map("transport_modes")
+}
+
+model ServiceCategory {
+  deletedAt        DateTime?         @map("deleted_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  id               Int               @id @default(autoincrement())
+  name             String            @db.VarChar(100)
+  status           RecordStatus      @default(ACTIVE)
+  deliveryServices DeliveryService[]
+
+  @@index([status])
+  @@map("service_categories")
+}
+
+/// Service dictionary only; this is not an operational delivery model.
+model DeliveryService {
+  deletedAt         DateTime?        @map("deleted_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  id                Int              @id @default(autoincrement())
+  name              String           @db.VarChar(100)
+  serviceCategoryId Int?             @map("service_category_id")
+  serviceCategory   ServiceCategory? @relation(fields: [serviceCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId   Int?             @map("transport_mode_id")
+  transportMode     TransportMode?   @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status            RecordStatus     @default(ACTIVE)
+
+  @@index([serviceCategoryId])
+  @@index([transportModeId])
+  @@index([status])
+  @@map("delivery_services")
+}
+
+model GoodsType {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("goods_types")
+}
+
+model CostType {
+  customers Customer[]
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("cost_types")
+}
+
+model Term {
+  customers   Customer[]
+  deletedAt   DateTime?    @map("deleted_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(100)
+  description String       @db.VarChar(100)
+  status      RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("terms")
+}
+
+model Vehicle {
+  deletedAt              DateTime?     @map("deleted_at")
+  updatedAt              DateTime      @updatedAt @map("updated_at")
+  createdAt              DateTime      @default(now()) @map("created_at")
+  id                     Int           @id @default(autoincrement())
+  name                   String        @db.VarChar(100)
+  truckingTypeId         Int?          @map("trucking_type_id")
+  truckingType           TruckingType? @relation(fields: [truckingTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  year                   Int
+  licensePlate           String        @map("license_plate") @db.VarChar(20)
+  registrationHolderName String        @map("registration_holder_name") @db.VarChar(100)
+  registrationNumber     String        @map("registration_number") @db.VarChar(50)
+  registrationDate       DateTime?     @map("registration_date") @db.Date
+  cylinderCapacity       String        @map("cylinder_capacity") @db.VarChar(50)
+  color                  String        @db.VarChar(50)
+  insuranceName          String        @map("insurance_name") @db.VarChar(100)
+  insuranceExpiry        DateTime?     @map("insurance_expiry") @db.Date
+  description            String
+  chassisNumber          String        @map("chassis_number") @db.VarChar(100)
+  engineNumber           String        @map("engine_number") @db.VarChar(100)
+  status                 RecordStatus  @default(ACTIVE)
+  serviceTrucking        Boolean       @default(false) @map("service_trucking")
+  branchId               Int?          @map("branch_id")
+  branch                 Branch?       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([truckingTypeId])
+  @@index([branchId])
+  @@index([status])
+  @@map("vehicles")
+}
+
+/// Orphan dictionary retained for full port coverage; necessity TBD, D-22, D-24.
+model VehicleType {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("vehicle_types")
+}
+
+model TruckingType {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+  vehicles  Vehicle[]
+
+  @@index([status])
+  @@map("trucking_types")
+}
+
+/// Dictionary only; no shipment model, transition matrix, or history is invented.
+model ShipmentStatus {
+  deletedAt DateTime?    @map("deleted_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  id        Int          @id @default(autoincrement())
+  code      String       @db.VarChar(20)
+  name      String       @db.VarChar(100)
+  status    RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("shipment_statuses")
+}
+
+model Vendor {
+  deletedAt   DateTime?         @map("deleted_at")
+  id          Int               @id @default(autoincrement())
+  name        String
+  address1    String
+  address2    String
+  city        String
+  postalCode  String            @map("postal_code")
+  phone       String
+  fax         String
+  email       String
+  contactName String            @map("contact_name")
+  branch      String
+  status      RecordStatus      @default(ACTIVE)
+  taxProfile  VendorTaxProfile?
+  accounting  VendorAccounting?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("vendors")
+}
+
+/// DRAFT: rules TBD, D-24
+/// Tax-ID scope remains unconfirmed. Do not use in routes, actions, or UI.
+model VendorTaxProfile {
+  deletedAt      DateTime? @map("deleted_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  id             Int       @id @default(autoincrement())
+  vendorId       Int       @unique @map("vendor_id")
+  vendor         Vendor    @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  taxNumber      String    @map("tax_number")
+  registeredName String    @map("registered_name")
+  address1       String
+  address2       String
+  city           String
+  postalCode     String    @map("postal_code")
+
+  @@map("vendor_tax_profiles")
+}

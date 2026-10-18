@@ -1,0 +1,203 @@
+/// DRAFT: rules TBD, D-13
+model Ledger {
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  code      String    @unique @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  accounts  Account[]
+
+  @@map("ledgers")
+}
+
+/// DRAFT: rules TBD, D-13
+model AccountCategory {
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  accounts  Account[]
+
+  @@map("account_categories")
+}
+
+/// DRAFT: rules TBD, D-14
+model ProfitLossCategory {
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  code      String    @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  accounts  Account[]
+
+  @@map("profit_loss_categories")
+}
+
+/// DRAFT: rules TBD, D-13
+model CashflowCategory {
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  accounts  Account[]
+
+  @@map("cashflow_categories")
+}
+
+/// DRAFT: rules TBD, D-13, D-24
+/// Deliberately distinct from company.Branch; no inferred organization relation.
+model AccountingBranch {
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  code      String    @unique @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  accounts  Account[]
+
+  @@map("account_branches")
+}
+
+/// DRAFT: rules TBD, D-13, D-14
+/// No financial postings, classification checks, or reporting formulas are approved.
+model Account {
+  customerDebitSettings   CustomerAccounting[] @relation("CustomerDebitAccount")
+  customerPayableSettings CustomerAccounting[] @relation("CustomerPayableAccount")
+  customerRevenueSettings CustomerAccounting[] @relation("CustomerRevenueAccount")
+  deletedAt               DateTime?            @map("deleted_at")
+  id                      Int                  @id @default(autoincrement())
+  accountCode             String               @unique @map("account_code") @db.VarChar(20)
+  initials                String               @db.VarChar(50)
+  name                    String               @db.VarChar(100)
+  parentId                Int?                 @map("parent_id")
+  parent                  Account?             @relation("AccountHierarchy", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  children                Account[]            @relation("AccountHierarchy")
+  ledgerId                Int                  @map("ledger_id")
+  ledger                  Ledger               @relation(fields: [ledgerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountCategoryId       Int                  @map("account_category_id")
+  accountCategory         AccountCategory      @relation(fields: [accountCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  position                String               @db.VarChar(20)
+  normalBalance           String               @map("normal_balance") @db.VarChar(10)
+  visibility              String               @default("Show") @db.VarChar(10)
+  categoryKind            String               @map("category_kind") @db.VarChar(20)
+  profitLossCategoryId    Int?                 @map("profit_loss_category_id")
+  profitLossCategory      ProfitLossCategory?  @relation(fields: [profitLossCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cashflowCategoryId      Int?                 @map("cashflow_category_id")
+  cashflowCategory        CashflowCategory?    @relation(fields: [cashflowCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountingBranchId      Int?                 @map("accounting_branch_id")
+  accountingBranch        AccountingBranch?    @relation(fields: [accountingBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status                  RecordStatus         @default(ACTIVE)
+  createdAt               DateTime             @default(now()) @map("created_at")
+  updatedAt               DateTime             @updatedAt @map("updated_at")
+  vendorDebitSettings     VendorAccounting[]   @relation("VendorDebitAccount")
+  vendorPayableSettings   VendorAccounting[]   @relation("VendorPayableAccount")
+  vendorRevenueSettings   VendorAccounting[]   @relation("VendorRevenueAccount")
+
+  @@index([parentId])
+  @@index([ledgerId])
+  @@index([accountCategoryId])
+  @@index([profitLossCategoryId])
+  @@index([cashflowCategoryId])
+  @@index([accountingBranchId])
+  @@index([status])
+  @@map("accounts")
+}
+
+/// DRAFT: field applicability, financial and posting rules TBD, D-11, D-13
+/// Nullable VendorAccounting-shaped storage; no inferred receivable/payable behavior.
+model CustomerAccounting {
+  id                     Int       @id @default(autoincrement())
+  customerId             Int       @unique @map("customer_id")
+  customer               Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debitAccountId         Int?      @map("debit_account_id")
+  debitAccount           Account?  @relation("CustomerDebitAccount", fields: [debitAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditPayableAccountId Int?      @map("credit_payable_account_id")
+  creditPayableAccount   Account?  @relation("CustomerPayableAccount", fields: [creditPayableAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditRevenueAccountId Int?      @map("credit_revenue_account_id")
+  creditRevenueAccount   Account?  @relation("CustomerRevenueAccount", fields: [creditRevenueAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  revenueSharePercent    Decimal?  @map("revenue_share_percent") @db.Decimal(5, 2)
+  commissionPercent      Decimal?  @map("commission_percent") @db.Decimal(5, 2)
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  deletedAt              DateTime? @map("deleted_at")
+
+  @@index([debitAccountId])
+  @@index([creditPayableAccountId])
+  @@index([creditRevenueAccountId])
+  @@map("customer_accounting")
+}
+
+/// DRAFT: rules TBD, D-11, D-13
+model VendorAccounting {
+  deletedAt              DateTime? @map("deleted_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  id                     Int       @id @default(autoincrement())
+  vendorId               Int       @unique @map("vendor_id")
+  vendor                 Vendor    @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debitAccountId         Int       @map("debit_account_id")
+  debitAccount           Account   @relation("VendorDebitAccount", fields: [debitAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditPayableAccountId Int       @map("credit_payable_account_id")
+  creditPayableAccount   Account   @relation("VendorPayableAccount", fields: [creditPayableAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditRevenueAccountId Int       @map("credit_revenue_account_id")
+  creditRevenueAccount   Account   @relation("VendorRevenueAccount", fields: [creditRevenueAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  revenueSharePercent    Decimal   @default(0) @map("revenue_share_percent") @db.Decimal(5, 2)
+  commissionPercent      Decimal   @default(0) @map("commission_percent") @db.Decimal(5, 2)
+
+  @@index([debitAccountId])
+  @@index([creditPayableAccountId])
+  @@index([creditRevenueAccountId])
+  @@map("vendor_accounting")
+}
+
+/// DRAFT: rules TBD, D-24
+model CompanyBank {
+  deletedAt   DateTime? @map("deleted_at")
+  id          Int       @id @default(autoincrement())
+  companyId   Int       @map("company_id")
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@map("company_banks")
+}
+
+/// DRAFT: rules TBD, D-12, D-24
+model CompanyInvoiceSettings {
+  deletedAt         DateTime? @map("deleted_at")
+  id                Int       @id @default(autoincrement())
+  companyId         Int       @map("company_id")
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  invoiceFormat     String?   @map("invoice_format")
+  signatoryName     String?   @map("signatory_name")
+  signatoryPosition String?   @map("signatory_position")
+  invoiceMessage    String?   @map("invoice_message")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@map("company_invoices")
+}
+
+/// DRAFT: rules TBD, D-24
+model CompanyDigitalWallet {
+  deletedAt         DateTime? @map("deleted_at")
+  id                Int       @id @default(autoincrement())
+  companyId         Int       @map("company_id")
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  provider          String?
+  accountName       String?   @map("account_name")
+  accountNumber     String?   @map("account_number")
+  verificationEmail String?   @map("verification_email")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@index([companyId])
+  @@map("company_digital_wallets")
+}

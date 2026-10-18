@@ -1,9 +1,17 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../src/lib/db/generated"
-  moduleFormat = "esm"
+  provider            = "prisma-client"
+  output              = "../src/lib/db/generated"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum RecordStatus {
+  ACTIVE
+  INACTIVE
+
+  @@map("record_status")
 }

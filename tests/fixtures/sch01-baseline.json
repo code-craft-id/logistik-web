@@ -1,0 +1,365 @@
+{
+  "models": [
+    {
+      "table": "ledgers",
+      "fields": ["id", "code", "name"]
+    },
+    {
+      "table": "account_categories",
+      "fields": ["id", "name"]
+    },
+    {
+      "table": "profit_loss_categories",
+      "fields": ["id", "code", "name"]
+    },
+    {
+      "table": "cashflow_categories",
+      "fields": ["id", "name"]
+    },
+    {
+      "table": "account_branches",
+      "fields": ["id", "code", "name"]
+    },
+    {
+      "table": "accounts",
+      "fields": [
+        "id",
+        "accountCode",
+        "initials",
+        "name",
+        "parentId",
+        "ledgerId",
+        "accountCategoryId",
+        "position",
+        "normalBalance",
+        "visibility",
+        "categoryKind",
+        "profitLossCategoryId",
+        "cashflowCategoryId",
+        "accountingBranchId",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "table": "vendor_accounting",
+      "fields": [
+        "id",
+        "vendorId",
+        "debitAccountId",
+        "creditPayableAccountId",
+        "creditRevenueAccountId",
+        "revenueSharePercent",
+        "commissionPercent"
+      ]
+    },
+    {
+      "table": "company_banks",
+      "fields": ["id", "companyId", "description", "createdAt", "updatedAt"]
+    },
+    {
+      "table": "company_invoices",
+      "fields": [
+        "id",
+        "companyId",
+        "invoiceFormat",
+        "signatoryName",
+        "signatoryPosition",
+        "invoiceMessage",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "table": "company_digital_wallets",
+      "fields": [
+        "id",
+        "companyId",
+        "provider",
+        "accountName",
+        "accountNumber",
+        "verificationEmail",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "table": "users",
+      "fields": [
+        "id",
+        "name",
+        "username",
+        "email",
+        "passwordHash",
+        "role",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "table": "refresh_tokens",
+      "fields": [
+        "id",
+        "userId",
+        "tokenHash",
+        "expiresAt",
+        "revokedAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "table": "customer_whatsapp_notifications",
+      "fields": ["id", "companyId", "customerId", "isEnabled", "createdAt"]
+    },
+    {
+      "table": "provinces",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "regencies",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "districts",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "villages",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "postal_codes",
+      "fields": ["id", "code", "status"]
+    },
+    {
+      "table": "drivers",
+      "fields": [
+        "id",
+        "name",
+        "address",
+        "nationalIdNumber",
+        "driverLicenseNumber",
+        "phone",
+        "branchId",
+        "status"
+      ]
+    },
+    {
+      "table": "couriers",
+      "fields": [
+        "id",
+        "name",
+        "address",
+        "nationalIdNumber",
+        "phone",
+        "branchId",
+        "status"
+      ]
+    },
+    {
+      "table": "transport_modes",
+      "fields": ["id", "name", "divider", "status"]
+    },
+    {
+      "table": "service_categories",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "delivery_services",
+      "fields": ["id", "name", "serviceCategoryId", "transportModeId", "status"]
+    },
+    {
+      "table": "goods_types",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "cost_types",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "terms",
+      "fields": ["id", "name", "description", "status"]
+    },
+    {
+      "table": "vehicles",
+      "fields": [
+        "id",
+        "name",
+        "truckingTypeId",
+        "year",
+        "licensePlate",
+        "registrationHolderName",
+        "registrationNumber",
+        "registrationDate",
+        "cylinderCapacity",
+        "color",
+        "insuranceName",
+        "insuranceExpiry",
+        "description",
+        "chassisNumber",
+        "engineNumber",
+        "status",
+        "serviceTrucking",
+        "branchId"
+      ]
+    },
+    {
+      "table": "vehicle_types",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "trucking_types",
+      "fields": ["id", "name", "status"]
+    },
+    {
+      "table": "shipment_statuses",
+      "fields": ["id", "code", "name", "status"]
+    },
+    {
+      "table": "vendors",
+      "fields": [
+        "id",
+        "name",
+        "address1",
+        "address2",
+        "city",
+        "postalCode",
+        "phone",
+        "fax",
+        "email",
+        "contactName",
+        "branch",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    {
+      "table": "vendor_tax_profiles",
+      "fields": [
+        "id",
+        "vendorId",
+        "taxNumber",
+        "registeredName",
+        "address1",
+        "address2",
+        "city",
+        "postalCode"
+      ]
+    },
+    {
+      "table": "companies",
+      "fields": [
+        "id",
+        "name",
+        "address",
+        "city",
+        "postalCode",
+        "phoneNumber",
+        "faxNumber",
+        "directorName",
+        "taxId",
+        "website",
+        "email",
+        "isDepositAgent",
+        "showPriceOnPrint",
+        "logo",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"
+      ]
+    },
+    {
+      "table": "offices",
+      "fields": [
+        "id",
+        "companyId",
+        "code",
+        "name",
+        "address",
+        "city",
+        "phoneNumber",
+        "email",
+        "managerName",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"
+      ]
+    },
+    {
+      "table": "branches",
+      "fields": [
+        "id",
+        "officeId",
+        "code",
+        "name",
+        "address",
+        "city",
+        "phoneNumber",
+        "managerName",
+        "managerContact",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"
+      ]
+    },
+    {
+      "table": "departments",
+      "fields": [
+        "id",
+        "code",
+        "name",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"
+      ]
+    },
+    {
+      "table": "agents",
+      "fields": [
+        "id",
+        "branchId",
+        "departmentId",
+        "code",
+        "initials",
+        "name",
+        "category",
+        "phoneNumber",
+        "managerName",
+        "mobileNumber",
+        "balance",
+        "commissionRate",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"
+      ]
+    },
+    {
+      "table": "marketing_people",
+      "fields": [
+        "id",
+        "name",
+        "address",
+        "nationalIdNumber",
+        "phone",
+        "branchId",
+        "status"
+      ]
+    }
+  ],
+  "migrations": {
+    "20261018000100_sch01_organization": "41b7f0d8d7eda3565d48e4390112a7de2de15396ef642a6aa514fb25b43c194e",
+    "20261018000200_sch01_identity": "17074ec2f60f987151b194ab32e908f304f3c650716f440247513f5cbb0df0b4",
+    "20261018000300_sch01_master_data": "980903c73a7b7198a56a578c7a67479d3cc67d5c174437237b7f17a12d68d507",
+    "20261018000400_sch01_sales": "16328a5bb6da05586297064a92484ea62829de39a7084fbf3bc1d08c7815fc79",
+    "20261018000500_sch01_accounting": "2850ee7d3882330d77010f23c25cde394bf9b2d970685995843769372ee8cca7",
+    "20261018000600_sch01_integration": "792bab3caa0d0638daab5797043da0ebedf704ffa99267253bba5e1c4dfb172b"
+  }
+}

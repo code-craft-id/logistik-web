@@ -1,0 +1,19 @@
+/// DRAFT: rules TBD, D-18, D-24
+/// Legacy company/customer integration settings; behavior remains unapproved.
+/// Do not use in routes, actions, or UI until integration semantics are confirmed.
+model CustomerWhatsAppNotification {
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deletedAt  DateTime? @map("deleted_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  id         Int       @id @default(autoincrement())
+  companyId  Int       @map("company_id")
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// DRAFT: notification applicability and cardinality TBD, D-18, D-24
+  customerId Int?      @map("customer_id")
+  isEnabled  Boolean   @default(true) @map("is_enabled")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([companyId])
+  @@index([customerId])
+  @@map("customer_whatsapp_notifications")
+}

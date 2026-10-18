@@ -1,0 +1,120 @@
+model Company {
+  id                    Int                            @id @default(autoincrement())
+  name                  String                         @map("name")
+  address               String?
+  city                  String?
+  postalCode            String?                        @map("postal_code")
+  phoneNumber           String?                        @map("phone_number")
+  faxNumber             String?                        @map("fax_number")
+  directorName          String?                        @map("director_name")
+  taxId                 String?                        @map("tax_id")
+  website               String?
+  email                 String?
+  isDepositAgent        Boolean                        @map("is_deposit_agent")
+  showPriceOnPrint      Boolean                        @map("show_price_on_print")
+  logo                  String?
+  createdAt             DateTime                       @default(now()) @map("created_at")
+  updatedAt             DateTime                       @updatedAt @map("updated_at")
+  deletedAt             DateTime?                      @map("deleted_at")
+  offices               Office[]
+  banks                 CompanyBank[]
+  invoiceSettings       CompanyInvoiceSettings[]
+  digitalWallets        CompanyDigitalWallet[]
+  whatsappNotifications CustomerWhatsAppNotification[]
+
+  @@map("companies")
+}
+
+model Office {
+  id          Int          @id @default(autoincrement())
+  companyId   Int          @map("company_id")
+  code        String
+  name        String
+  address     String?
+  city        String?
+  phoneNumber String?      @map("phone_number")
+  email       String?
+  managerName String?      @map("manager_name")
+  status      RecordStatus
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  deletedAt   DateTime?    @map("deleted_at")
+  branches    Branch[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("offices")
+}
+
+model Branch {
+  customers       Customer[]
+  consignees      Consignee[]
+  id              Int               @id @default(autoincrement())
+  officeId        Int               @map("office_id")
+  code            String
+  name            String
+  address         String?
+  city            String?
+  phoneNumber     String?           @map("phone_number")
+  managerName     String?           @map("manager_name")
+  managerContact  String?           @map("manager_contact")
+  status          RecordStatus
+  office          Office            @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  deletedAt       DateTime?         @map("deleted_at")
+  agents          Agent[]
+  drivers         Driver[]
+  couriers        Courier[]
+  vehicles        Vehicle[]
+  marketingPeople MarketingPerson[]
+
+  @@index([officeId])
+  @@index([status])
+  @@map("branches")
+}
+
+/// DRAFT: rules TBD, D-24
+/// Department versus division remains unconfirmed. Do not use in routes, actions, or UI.
+model Department {
+  id        Int          @id @default(autoincrement())
+  code      String
+  name      String
+  status    RecordStatus
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  deletedAt DateTime?    @map("deleted_at")
+  agents    Agent[]
+
+  @@index([status])
+  @@map("departments")
+}
+
+model Agent {
+  id             Int          @id @default(autoincrement())
+  branchId       Int          @map("branch_id")
+  departmentId   Int?         @map("department_id")
+  code           String
+  initials       String
+  name           String
+  category       String
+  phoneNumber    String?      @map("phone_number")
+  managerName    String?      @map("manager_name")
+  mobileNumber   String?      @map("mobile_number")
+  /// DRAFT: currency, precision, and rounding TBD, D-11, D-24
+  balance        Decimal      @db.Decimal(19, 2)
+  /// DRAFT: rate unit, precision, and rounding TBD, D-11
+  commissionRate Decimal      @map("commission_rate") @db.Decimal(9, 4)
+  status         RecordStatus
+  branch         Branch       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  department     Department?  @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  deletedAt      DateTime?    @map("deleted_at")
+
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([status])
+  @@map("agents")
+}
