@@ -1,9 +1,9 @@
 /// Prototype: company.Company (company/company.go).
 model Company {
   /// Prototype: CompanyID.
-  id               BigInt    @id @default(autoincrement())
+  id               BigInt                   @id @default(autoincrement())
   /// Prototype: CompanyName.
-  name             String    @map("name")
+  name             String                   @map("name")
   /// Prototype: Address.
   /// PII (D-25)
   address          String?
@@ -12,37 +12,40 @@ model Company {
   city             String?
   /// Prototype: PostalCode.
   /// PII (D-25)
-  postalCode       String?   @map("postal_code")
+  postalCode       String?                  @map("postal_code")
   /// Prototype: PhoneNumber.
   /// PII (D-25)
-  phoneNumber      String?   @map("phone_number")
+  phoneNumber      String?                  @map("phone_number")
   /// Prototype: FaxNumber.
   /// PII (D-25)
-  faxNumber        String?   @map("fax_number")
+  faxNumber        String?                  @map("fax_number")
   /// Prototype: DirectorName.
   /// PII (D-25)
-  directorName     String?   @map("director_name")
+  directorName     String?                  @map("director_name")
   /// Prototype: TaxID.
   /// PII (D-25)
-  taxId            String?   @map("tax_id")
+  taxId            String?                  @map("tax_id")
   /// Prototype: Website.
   website          String?
   /// Prototype: Email.
   /// PII (D-25)
   email            String?
   /// Prototype: IsDepositAgent.
-  isDepositAgent   Boolean   @map("is_deposit_agent")
+  isDepositAgent   Boolean                  @map("is_deposit_agent")
   /// Prototype: ShowPriceOnPrint.
-  showPriceOnPrint Boolean   @map("show_price_on_print")
+  showPriceOnPrint Boolean                  @map("show_price_on_print")
   /// Prototype: Logo.
   logo             String?
   /// Prototype: BaseModel.CreatedAt.
-  createdAt        DateTime  @default(now()) @map("created_at")
+  createdAt        DateTime                 @default(now()) @map("created_at")
   /// Prototype: BaseModel.UpdatedAt.
-  updatedAt        DateTime  @updatedAt @map("updated_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
   /// Prototype: BaseModel.DeletedAt; soft deletion only.
-  deletedAt        DateTime? @map("deleted_at")
+  deletedAt        DateTime?                @map("deleted_at")
   offices          Office[]
+  banks            CompanyBank[]
+  invoiceSettings  CompanyInvoiceSettings[]
+  digitalWallets   CompanyDigitalWallet[]
 
   @@map("companies")
 }

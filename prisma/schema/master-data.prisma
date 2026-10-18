@@ -357,6 +357,8 @@ model Vendor {
   status      RecordStatus      @default(ACTIVE)
   /// Prototype: Npwp (foreignKey:VendorID); inverse optional, child existence not enforced by source.
   taxProfile  VendorTaxProfile?
+  /// Prototype: Accounting (foreignKey:VendorID); inverse optional.
+  accounting  VendorAccounting?
   /// Prototype: CreatedAt.
   createdAt   DateTime          @map("created_at")
   /// Prototype: UpdatedAt.
