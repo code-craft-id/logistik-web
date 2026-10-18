@@ -9,7 +9,6 @@ datasource db {
   provider = "postgresql"
 }
 
-/// Prototype: master-data Status (Active/Inactive) and IsActive/Status booleans.
 enum RecordStatus {
   ACTIVE
   INACTIVE

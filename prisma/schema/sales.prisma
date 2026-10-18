@@ -1,28 +1,103 @@
-/// Prototype: logistics.Marketing (logistics/logistic.go).
 /// Personnel fields only. Sales workflows remain TBD, D-10.
 model MarketingPerson {
-  /// Prototype: ID.
-  id               BigInt       @id @default(autoincrement())
-  /// Prototype: Name.
-  /// PII (D-25)
+  customers        Customer[]
+  deletedAt        DateTime?    @map("deleted_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  id               Int          @id @default(autoincrement())
   name             String       @db.VarChar(100)
-  /// Prototype: Address.
-  /// PII (D-25)
   address          String
-  /// Prototype: KTP.
-  /// PII (D-25)
   nationalIdNumber String       @map("national_id_number") @db.VarChar(20)
-  /// Prototype: Phone.
-  /// PII (D-25)
   phone            String       @db.VarChar(20)
-  /// Prototype: BranchID.
-  branchId         BigInt?      @map("branch_id")
-  /// Prototype: Branch (*BranchRef, foreignKey:BranchID); real company.Branch relation.
+  branchId         Int?         @map("branch_id")
   branch           Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: Status (default:Active).
   status           RecordStatus @default(ACTIVE)
 
   @@index([branchId])
   @@index([status])
   @@map("marketing_people")
+}
+
+/// Approved provider form inventory. Workflows remain D-10; requiredness D-25/D-30.
+model Customer {
+  id                          Int                            @id @default(autoincrement())
+  name                        String
+  address                     String?
+  regencyId                   Int?                           @map("regency_id")
+  regency                     Regency?                       @relation(fields: [regencyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  phone                       String?
+  fax                         String?
+  contactPerson               String?                        @map("contact_person")
+  email                       String?
+  marketingPersonId           Int?                           @map("marketing_person_id")
+  marketingPerson             MarketingPerson?               @relation(fields: [marketingPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  branchId                    Int?                           @map("branch_id")
+  branch                      Branch?                        @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  termId                      Int?                           @map("term_id")
+  term                        Term?                          @relation(fields: [termId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  podRequired                 Boolean?                       @map("pod_required")
+  costTypeId                  Int?                           @map("cost_type_id")
+  costType                    CostType?                      @relation(fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// DRAFT: preference versus legacy notification semantics TBD, D-18, D-24
+  /// Raw form value only; no default, synchronization, or sending behavior.
+  whatsAppNotificationEnabled Boolean?                       @map("whatsapp_notification_enabled")
+  consignees                  Consignee[]
+  taxProfile                  CustomerTaxProfile?
+  accounting                  CustomerAccounting?
+  whatsappNotifications       CustomerWhatsAppNotification[]
+  createdAt                   DateTime                       @default(now()) @map("created_at")
+  updatedAt                   DateTime                       @updatedAt @map("updated_at")
+  deletedAt                   DateTime?                      @map("deleted_at")
+
+  @@index([regencyId])
+  @@index([marketingPersonId])
+  @@index([branchId])
+  @@index([termId])
+  @@index([costTypeId])
+  @@map("customers")
+}
+
+/// Approved provider form inventory; branch authorization is PLT-01.
+model Consignee {
+  id         Int          @id @default(autoincrement())
+  name       String
+  address1   String?
+  address2   String?
+  regencyId  Int?         @map("regency_id")
+  regency    Regency?     @relation(fields: [regencyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  phone      String?
+  pic        String?
+  customerId Int?         @map("customer_id")
+  customer   Customer?    @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  branchId   Int?         @map("branch_id")
+  branch     Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status     RecordStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  deletedAt  DateTime?    @map("deleted_at")
+
+  @@index([regencyId])
+  @@index([customerId])
+  @@index([branchId])
+  @@index([status])
+  @@map("consignees")
+}
+
+/// DRAFT: tax validation, applicability and privacy rules TBD, D-24, D-25
+/// VendorTaxProfile storage pattern only; no tax calculations.
+model CustomerTaxProfile {
+  id             Int       @id @default(autoincrement())
+  customerId     Int       @unique @map("customer_id")
+  customer       Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  taxNumber      String?   @map("tax_number")
+  registeredName String?   @map("registered_name")
+  address1       String?
+  address2       String?
+  city           String?
+  postalCode     String?   @map("postal_code")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  @@map("customer_tax_profiles")
 }

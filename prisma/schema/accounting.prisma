@@ -1,125 +1,101 @@
-/// Prototype: models.Ledger (account.go); account group, not a journal posting.
 /// DRAFT: rules TBD, D-13
 model Ledger {
-  /// Prototype: ID.
-  id       BigInt    @id @default(autoincrement())
-  /// Prototype: Kode (uniqueIndex).
-  code     String    @unique @db.VarChar(20)
-  /// Prototype: Nama.
-  name     String    @db.VarChar(100)
-  accounts Account[]
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  code      String    @unique @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  accounts  Account[]
 
   @@map("ledgers")
 }
 
-/// Prototype: models.AccountCategory (account.go).
 /// DRAFT: rules TBD, D-13
 model AccountCategory {
-  /// Prototype: ID.
-  id       BigInt    @id @default(autoincrement())
-  /// Prototype: Nama.
-  name     String    @db.VarChar(100)
-  accounts Account[]
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  accounts  Account[]
 
   @@map("account_categories")
 }
 
-/// Prototype: models.ProfitLossCategory (account.go).
 /// DRAFT: rules TBD, D-14
 model ProfitLossCategory {
-  /// Prototype: ID.
-  id       BigInt    @id @default(autoincrement())
-  /// Prototype: Kode; not unique in the source.
-  code     String    @db.VarChar(20)
-  /// Prototype: Nama.
-  name     String    @db.VarChar(100)
-  accounts Account[]
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  code      String    @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  accounts  Account[]
 
   @@map("profit_loss_categories")
 }
 
-/// Prototype: models.CashflowCategory (account.go).
 /// DRAFT: rules TBD, D-13
 model CashflowCategory {
-  /// Prototype: ID.
-  id       BigInt    @id @default(autoincrement())
-  /// Prototype: Nama.
-  name     String    @db.VarChar(100)
-  accounts Account[]
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  accounts  Account[]
 
   @@map("cashflow_categories")
 }
 
-/// Prototype: models.Branch (account.go), TableName account_branches.
 /// DRAFT: rules TBD, D-13, D-24
 /// Deliberately distinct from company.Branch; no inferred organization relation.
 model AccountingBranch {
-  /// Prototype: ID.
-  id       BigInt    @id @default(autoincrement())
-  /// Prototype: Kode (uniqueIndex).
-  code     String    @unique @db.VarChar(20)
-  /// Prototype: Nama.
-  name     String    @db.VarChar(100)
-  accounts Account[]
+  deletedAt DateTime? @map("deleted_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  id        Int       @id @default(autoincrement())
+  code      String    @unique @db.VarChar(20)
+  name      String    @db.VarChar(100)
+  accounts  Account[]
 
   @@map("account_branches")
 }
 
-/// Prototype: models.Account (account.go); chart-of-account master only.
 /// DRAFT: rules TBD, D-13, D-14
 /// No financial postings, classification checks, or reporting formulas are approved.
 model Account {
-  /// Prototype: ID.
-  id                    BigInt              @id @default(autoincrement())
-  /// Prototype: KodeRekening (uniqueIndex).
-  accountCode           String              @unique @map("account_code") @db.VarChar(20)
-  /// Prototype: InisialAkun.
-  initials              String              @db.VarChar(50)
-  /// Prototype: NamaRekening.
-  name                  String              @db.VarChar(100)
-  /// Prototype: IndukID.
-  parentId              BigInt?             @map("parent_id")
-  /// Prototype: Induk (foreignKey:IndukID).
-  parent                Account?            @relation("AccountHierarchy", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: Children (foreignKey:IndukID).
-  children              Account[]           @relation("AccountHierarchy")
-  /// Prototype: LedgerID.
-  ledgerId              BigInt              @map("ledger_id")
-  /// Prototype: Ledger (foreignKey:LedgerID).
-  ledger                Ledger              @relation(fields: [ledgerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: KategoriAkunID.
-  accountCategoryId     BigInt              @map("account_category_id")
-  /// Prototype: KategoriAkun (foreignKey:KategoriAkunID).
-  accountCategory       AccountCategory     @relation(fields: [accountCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: Posisi; observed constants Neraca / Rugi Laba, retained as a string.
-  position              String              @db.VarChar(20)
-  /// Prototype: NormalBalance; observed constants Debet / Kredit.
-  normalBalance         String              @map("normal_balance") @db.VarChar(10)
-  /// Prototype: Tampil; observed constants Show / Hide, default Show.
-  visibility            String              @default("Show") @db.VarChar(10)
-  /// Prototype: JenisKategori; observed constants Parent / Child.
-  categoryKind          String              @map("category_kind") @db.VarChar(20)
-  /// Prototype: RugiLabaID.
-  profitLossCategoryId  BigInt?             @map("profit_loss_category_id")
-  /// Prototype: RugiLaba (foreignKey:RugiLabaID).
-  profitLossCategory    ProfitLossCategory? @relation(fields: [profitLossCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: KategoriCashflowID.
-  cashflowCategoryId    BigInt?             @map("cashflow_category_id")
-  /// Prototype: KategoriCashflow (foreignKey:KategoriCashflowID).
-  cashflowCategory      CashflowCategory?   @relation(fields: [cashflowCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: CabangID; null means Nasional in source comments, not an approved scope rule.
-  accountingBranchId    BigInt?             @map("accounting_branch_id")
-  /// Prototype: Cabang (*models.Branch, foreignKey:CabangID).
-  accountingBranch      AccountingBranch?   @relation(fields: [accountingBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: Status (bool, default:true).
-  status                RecordStatus        @default(ACTIVE)
-  /// Prototype: CreatedAt.
-  createdAt             DateTime            @map("created_at")
-  /// Prototype: UpdatedAt.
-  updatedAt             DateTime            @map("updated_at")
-  vendorDebitSettings   VendorAccounting[]  @relation("VendorDebitAccount")
-  vendorPayableSettings VendorAccounting[]  @relation("VendorPayableAccount")
-  vendorRevenueSettings VendorAccounting[]  @relation("VendorRevenueAccount")
+  customerDebitSettings   CustomerAccounting[] @relation("CustomerDebitAccount")
+  customerPayableSettings CustomerAccounting[] @relation("CustomerPayableAccount")
+  customerRevenueSettings CustomerAccounting[] @relation("CustomerRevenueAccount")
+  deletedAt               DateTime?            @map("deleted_at")
+  id                      Int                  @id @default(autoincrement())
+  accountCode             String               @unique @map("account_code") @db.VarChar(20)
+  initials                String               @db.VarChar(50)
+  name                    String               @db.VarChar(100)
+  parentId                Int?                 @map("parent_id")
+  parent                  Account?             @relation("AccountHierarchy", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  children                Account[]            @relation("AccountHierarchy")
+  ledgerId                Int                  @map("ledger_id")
+  ledger                  Ledger               @relation(fields: [ledgerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountCategoryId       Int                  @map("account_category_id")
+  accountCategory         AccountCategory      @relation(fields: [accountCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  position                String               @db.VarChar(20)
+  normalBalance           String               @map("normal_balance") @db.VarChar(10)
+  visibility              String               @default("Show") @db.VarChar(10)
+  categoryKind            String               @map("category_kind") @db.VarChar(20)
+  profitLossCategoryId    Int?                 @map("profit_loss_category_id")
+  profitLossCategory      ProfitLossCategory?  @relation(fields: [profitLossCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cashflowCategoryId      Int?                 @map("cashflow_category_id")
+  cashflowCategory        CashflowCategory?    @relation(fields: [cashflowCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountingBranchId      Int?                 @map("accounting_branch_id")
+  accountingBranch        AccountingBranch?    @relation(fields: [accountingBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status                  RecordStatus         @default(ACTIVE)
+  createdAt               DateTime             @default(now()) @map("created_at")
+  updatedAt               DateTime             @updatedAt @map("updated_at")
+  vendorDebitSettings     VendorAccounting[]   @relation("VendorDebitAccount")
+  vendorPayableSettings   VendorAccounting[]   @relation("VendorPayableAccount")
+  vendorRevenueSettings   VendorAccounting[]   @relation("VendorRevenueAccount")
 
   @@index([parentId])
   @@index([ledgerId])
@@ -131,30 +107,46 @@ model Account {
   @@map("accounts")
 }
 
-/// Prototype: models.Accounting (accounting.go); vendor accounting settings.
+/// DRAFT: field applicability, financial and posting rules TBD, D-11, D-13
+/// Nullable VendorAccounting-shaped storage; no inferred receivable/payable behavior.
+model CustomerAccounting {
+  id                     Int       @id @default(autoincrement())
+  customerId             Int       @unique @map("customer_id")
+  customer               Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debitAccountId         Int?      @map("debit_account_id")
+  debitAccount           Account?  @relation("CustomerDebitAccount", fields: [debitAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditPayableAccountId Int?      @map("credit_payable_account_id")
+  creditPayableAccount   Account?  @relation("CustomerPayableAccount", fields: [creditPayableAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditRevenueAccountId Int?      @map("credit_revenue_account_id")
+  creditRevenueAccount   Account?  @relation("CustomerRevenueAccount", fields: [creditRevenueAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  revenueSharePercent    Decimal?  @map("revenue_share_percent") @db.Decimal(5, 2)
+  commissionPercent      Decimal?  @map("commission_percent") @db.Decimal(5, 2)
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  deletedAt              DateTime? @map("deleted_at")
+
+  @@index([debitAccountId])
+  @@index([creditPayableAccountId])
+  @@index([creditRevenueAccountId])
+  @@map("customer_accounting")
+}
+
 /// DRAFT: rules TBD, D-11, D-13
 model VendorAccounting {
-  /// Prototype: ID.
-  id                     BigInt  @id @default(autoincrement())
-  /// Prototype: VendorID (uniqueIndex); at most one settings row per vendor.
-  vendorId               BigInt  @unique @map("vendor_id")
-  vendor                 Vendor  @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: DebitAccountID.
-  debitAccountId         BigInt  @map("debit_account_id")
-  /// Prototype: DebitAccount (foreignKey:DebitAccountID).
-  debitAccount           Account @relation("VendorDebitAccount", fields: [debitAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: CreditHutangAccountID.
-  creditPayableAccountId BigInt  @map("credit_payable_account_id")
-  /// Prototype: CreditHutangAccount (foreignKey:CreditHutangAccountID).
-  creditPayableAccount   Account @relation("VendorPayableAccount", fields: [creditPayableAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: CreditPendapatanAccountID.
-  creditRevenueAccountId BigInt  @map("credit_revenue_account_id")
-  /// Prototype: CreditPendapatanAccount (foreignKey:CreditPendapatanAccountID).
-  creditRevenueAccount   Account @relation("VendorRevenueAccount", fields: [creditRevenueAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: BagiHasilPercent (float64, decimal(5,2), default:0).
-  revenueSharePercent    Decimal @default(0) @map("revenue_share_percent") @db.Decimal(5, 2)
-  /// Prototype: KomisiPercent (float64, decimal(5,2), default:0).
-  commissionPercent      Decimal @default(0) @map("commission_percent") @db.Decimal(5, 2)
+  deletedAt              DateTime? @map("deleted_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  id                     Int       @id @default(autoincrement())
+  vendorId               Int       @unique @map("vendor_id")
+  vendor                 Vendor    @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debitAccountId         Int       @map("debit_account_id")
+  debitAccount           Account   @relation("VendorDebitAccount", fields: [debitAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditPayableAccountId Int       @map("credit_payable_account_id")
+  creditPayableAccount   Account   @relation("VendorPayableAccount", fields: [creditPayableAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  creditRevenueAccountId Int       @map("credit_revenue_account_id")
+  creditRevenueAccount   Account   @relation("VendorRevenueAccount", fields: [creditRevenueAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  revenueSharePercent    Decimal   @default(0) @map("revenue_share_percent") @db.Decimal(5, 2)
+  commissionPercent      Decimal   @default(0) @map("commission_percent") @db.Decimal(5, 2)
 
   @@index([debitAccountId])
   @@index([creditPayableAccountId])
@@ -162,76 +154,49 @@ model VendorAccounting {
   @@map("vendor_accounting")
 }
 
-/// Prototype: company.CompanyBank (company/bank.go).
 /// DRAFT: rules TBD, D-24
 model CompanyBank {
-  /// Prototype: CompanyBankID.
-  id          BigInt   @id @default(autoincrement())
-  /// Prototype: CompanyID; explicit relation approved in SCH-01.
-  companyId   BigInt   @map("company_id")
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: BankDescription; may contain financial identifiers.
-  /// PII (D-25)
+  deletedAt   DateTime? @map("deleted_at")
+  id          Int       @id @default(autoincrement())
+  companyId   Int       @map("company_id")
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   description String?
-  /// Prototype: CreatedAt.
-  createdAt   DateTime @map("created_at")
-  /// Prototype: UpdatedAt.
-  updatedAt   DateTime @map("updated_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   @@index([companyId])
   @@map("company_banks")
 }
 
-/// Prototype: company.CompanyInvoice (company/invoice.go); print settings, not issued invoices.
 /// DRAFT: rules TBD, D-12, D-24
 model CompanyInvoiceSettings {
-  /// Prototype: CompanyInvoiceID.
-  id                BigInt   @id @default(autoincrement())
-  /// Prototype: CompanyID; explicit relation approved in SCH-01, not unique in source.
-  companyId         BigInt   @map("company_id")
-  company           Company  @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: InvoiceFormat.
-  invoiceFormat     String?  @map("invoice_format")
-  /// Prototype: SignatoryName.
-  /// PII (D-25)
-  signatoryName     String?  @map("signatory_name")
-  /// Prototype: SignatoryPosition.
-  /// PII (D-25)
-  signatoryPosition String?  @map("signatory_position")
-  /// Prototype: InvoiceMessage.
-  invoiceMessage    String?  @map("invoice_message")
-  /// Prototype: CreatedAt.
-  createdAt         DateTime @map("created_at")
-  /// Prototype: UpdatedAt.
-  updatedAt         DateTime @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+  id                Int       @id @default(autoincrement())
+  companyId         Int       @map("company_id")
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  invoiceFormat     String?   @map("invoice_format")
+  signatoryName     String?   @map("signatory_name")
+  signatoryPosition String?   @map("signatory_position")
+  invoiceMessage    String?   @map("invoice_message")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   @@index([companyId])
   @@map("company_invoices")
 }
 
-/// Prototype: company.CompanyDigitalWallet (company/wallet.go).
 /// DRAFT: rules TBD, D-24
 model CompanyDigitalWallet {
-  /// Prototype: CompanyDigitalWalletID.
-  id                BigInt   @id @default(autoincrement())
-  /// Prototype: CompanyID; explicit relation approved in SCH-01.
-  companyId         BigInt   @map("company_id")
-  company           Company  @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  /// Prototype: WalletProvider; no provider enum invented.
+  deletedAt         DateTime? @map("deleted_at")
+  id                Int       @id @default(autoincrement())
+  companyId         Int       @map("company_id")
+  company           Company   @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   provider          String?
-  /// Prototype: AccountName.
-  /// PII (D-25)
-  accountName       String?  @map("account_name")
-  /// Prototype: AccountNumber; preserve identifier formatting.
-  /// PII (D-25)
-  accountNumber     String?  @map("account_number")
-  /// Prototype: VerificationEmail.
-  /// PII (D-25)
-  verificationEmail String?  @map("verification_email")
-  /// Prototype: CreatedAt.
-  createdAt         DateTime @map("created_at")
-  /// Prototype: UpdatedAt.
-  updatedAt         DateTime @map("updated_at")
+  accountName       String?   @map("account_name")
+  accountNumber     String?   @map("account_number")
+  verificationEmail String?   @map("verification_email")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   @@index([companyId])
   @@map("company_digital_wallets")
