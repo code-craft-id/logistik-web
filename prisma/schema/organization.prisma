@@ -92,42 +92,43 @@ model Office {
 /// Prototype: company.Branch (company/branch.go); not models.Branch in account.go.
 model Branch {
   /// Prototype: BranchID.
-  id             BigInt       @id @default(autoincrement())
+  id              BigInt            @id @default(autoincrement())
   /// Prototype: OfficeID.
-  officeId       BigInt       @map("office_id")
+  officeId        BigInt            @map("office_id")
   /// Prototype: BranchCode.
-  code           String
+  code            String
   /// Prototype: BranchName.
-  name           String
+  name            String
   /// Prototype: Address.
   /// PII (D-25)
-  address        String?
+  address         String?
   /// Prototype: City.
   /// PII (D-25)
-  city           String?
+  city            String?
   /// Prototype: PhoneNumber.
   /// PII (D-25)
-  phoneNumber    String?      @map("phone_number")
+  phoneNumber     String?           @map("phone_number")
   /// Prototype: BranchManager.
   /// PII (D-25)
-  managerName    String?      @map("manager_name")
+  managerName     String?           @map("manager_name")
   /// Prototype: ManagerContact.
   /// PII (D-25)
-  managerContact String?      @map("manager_contact")
+  managerContact  String?           @map("manager_contact")
   /// Prototype: IsActive; no source default.
-  status         RecordStatus
+  status          RecordStatus
   /// Prototype: Office.
-  office         Office       @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  office          Office            @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   /// Prototype: BaseModel.CreatedAt.
-  createdAt      DateTime     @default(now()) @map("created_at")
+  createdAt       DateTime          @default(now()) @map("created_at")
   /// Prototype: BaseModel.UpdatedAt.
-  updatedAt      DateTime     @updatedAt @map("updated_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
   /// Prototype: BaseModel.DeletedAt; soft deletion only.
-  deletedAt      DateTime?    @map("deleted_at")
-  agents         Agent[]
-  drivers        Driver[]
-  couriers       Courier[]
-  vehicles       Vehicle[]
+  deletedAt       DateTime?         @map("deleted_at")
+  agents          Agent[]
+  drivers         Driver[]
+  couriers        Courier[]
+  vehicles        Vehicle[]
+  marketingPeople MarketingPerson[]
 
   @@index([officeId])
   @@index([status])

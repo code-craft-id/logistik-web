@@ -1,0 +1,28 @@
+/// Prototype: logistics.Marketing (logistics/logistic.go).
+/// Personnel fields only. Sales workflows remain TBD, D-10.
+model MarketingPerson {
+  /// Prototype: ID.
+  id               BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  /// PII (D-25)
+  name             String       @db.VarChar(100)
+  /// Prototype: Address.
+  /// PII (D-25)
+  address          String
+  /// Prototype: KTP.
+  /// PII (D-25)
+  nationalIdNumber String       @map("national_id_number") @db.VarChar(20)
+  /// Prototype: Phone.
+  /// PII (D-25)
+  phone            String       @db.VarChar(20)
+  /// Prototype: BranchID.
+  branchId         BigInt?      @map("branch_id")
+  /// Prototype: Branch (*BranchRef, foreignKey:BranchID); real company.Branch relation.
+  branch           Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: Status (default:Active).
+  status           RecordStatus @default(ACTIVE)
+
+  @@index([branchId])
+  @@index([status])
+  @@map("marketing_people")
+}
