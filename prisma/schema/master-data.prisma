@@ -1,0 +1,398 @@
+/// Prototype: logistics.Province (logistics/logistic.go).
+/// DRAFT: hierarchy TBD, D-27
+model Province {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("provinces")
+}
+
+/// Prototype: logistics.Regency (logistics/logistic.go).
+/// DRAFT: hierarchy TBD, D-27
+model Regency {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("regencies")
+}
+
+/// Prototype: logistics.District (logistics/logistic.go).
+/// DRAFT: hierarchy TBD, D-27
+model District {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("districts")
+}
+
+/// Prototype: logistics.Village (logistics/logistic.go).
+/// DRAFT: hierarchy TBD, D-27
+model Village {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("villages")
+}
+
+/// Prototype: logistics.PostalCode (logistics/logistic.go).
+/// DRAFT: hierarchy TBD, D-27
+model PostalCode {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Code; preserve leading zeroes.
+  code   String       @db.VarChar(10)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("postal_codes")
+}
+
+/// Prototype: logistics.Driver (logistics/logistic.go).
+model Driver {
+  /// Prototype: ID.
+  id                  BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  /// PII (D-25)
+  name                String       @db.VarChar(100)
+  /// Prototype: Address.
+  /// PII (D-25)
+  address             String
+  /// Prototype: KTP.
+  /// PII (D-25)
+  nationalIdNumber    String       @map("national_id_number") @db.VarChar(20)
+  /// Prototype: SIM.
+  /// PII (D-25)
+  driverLicenseNumber String       @map("driver_license_number") @db.VarChar(20)
+  /// Prototype: Phone.
+  /// PII (D-25)
+  phone               String       @db.VarChar(20)
+  /// Prototype: BranchID.
+  branchId            BigInt?      @map("branch_id")
+  /// Prototype: Branch (*BranchRef, foreignKey:BranchID); real company.Branch relation.
+  branch              Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: Status (default:Active).
+  status              RecordStatus @default(ACTIVE)
+
+  @@index([branchId])
+  @@index([status])
+  @@map("drivers")
+}
+
+/// Prototype: logistics.Courier (logistics/logistic.go).
+model Courier {
+  /// Prototype: ID.
+  id               BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  /// PII (D-25)
+  name             String       @db.VarChar(100)
+  /// Prototype: Address.
+  /// PII (D-25)
+  address          String
+  /// Prototype: KTP.
+  /// PII (D-25)
+  nationalIdNumber String       @map("national_id_number") @db.VarChar(20)
+  /// Prototype: Phone.
+  /// PII (D-25)
+  phone            String       @db.VarChar(20)
+  /// Prototype: BranchID.
+  branchId         BigInt?      @map("branch_id")
+  /// Prototype: Branch (*BranchRef, foreignKey:BranchID); real company.Branch relation.
+  branch           Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: Status (default:Active).
+  status           RecordStatus @default(ACTIVE)
+
+  @@index([branchId])
+  @@index([status])
+  @@map("couriers")
+}
+
+/// Prototype: logistics.Mode (logistics/logistic.go).
+model TransportMode {
+  /// Prototype: ID.
+  id               BigInt            @id @default(autoincrement())
+  /// Prototype: Name.
+  name             String            @db.VarChar(100)
+  /// Prototype: Divider; mirror the source string without guessing units.
+  /// DRAFT: numeric type TBD, D-26
+  divider          String            @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status           RecordStatus      @default(ACTIVE)
+  deliveryServices DeliveryService[]
+
+  @@index([status])
+  @@map("transport_modes")
+}
+
+/// Prototype: logistics.ServiceCategory (logistics/logistic.go).
+model ServiceCategory {
+  /// Prototype: ID.
+  id               BigInt            @id @default(autoincrement())
+  /// Prototype: Name.
+  name             String            @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status           RecordStatus      @default(ACTIVE)
+  deliveryServices DeliveryService[]
+
+  @@index([status])
+  @@map("service_categories")
+}
+
+/// Prototype: logistics.DeliveryService (logistics/logistic.go).
+/// Service dictionary only; this is not an operational delivery model.
+model DeliveryService {
+  /// Prototype: ID.
+  id                BigInt           @id @default(autoincrement())
+  /// Prototype: Name.
+  name              String           @db.VarChar(100)
+  /// Prototype: ServiceCategoryID.
+  serviceCategoryId BigInt?          @map("service_category_id")
+  /// Prototype: ServiceCategory (foreignKey:ServiceCategoryID).
+  serviceCategory   ServiceCategory? @relation(fields: [serviceCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: ModaID.
+  transportModeId   BigInt?          @map("transport_mode_id")
+  /// Prototype: Moda (foreignKey:ModaID).
+  transportMode     TransportMode?   @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: Status (default:Active).
+  status            RecordStatus     @default(ACTIVE)
+
+  @@index([serviceCategoryId])
+  @@index([transportModeId])
+  @@index([status])
+  @@map("delivery_services")
+}
+
+/// Prototype: logistics.GoodsType (logistics/logistic.go).
+model GoodsType {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("goods_types")
+}
+
+/// Prototype: logistics.CostType (logistics/logistic.go).
+model CostType {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("cost_types")
+}
+
+/// Prototype: logistics.Term (logistics/logistic.go).
+model Term {
+  /// Prototype: ID.
+  id          BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name        String       @db.VarChar(100)
+  /// Prototype: Keterangan (column:description).
+  description String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status      RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("terms")
+}
+
+/// Prototype: logistics.Vehicle (logistics/logistic.go).
+model Vehicle {
+  /// Prototype: ID.
+  id                     BigInt        @id @default(autoincrement())
+  /// Prototype: Name.
+  name                   String        @db.VarChar(100)
+  /// Prototype: JenisTruckingID.
+  truckingTypeId         BigInt?       @map("trucking_type_id")
+  /// Prototype: JenisTrucking (foreignKey:JenisTruckingID).
+  truckingType           TruckingType? @relation(fields: [truckingTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: Year.
+  year                   Int
+  /// Prototype: NoPolisi.
+  /// PII (D-25)
+  licensePlate           String        @map("license_plate") @db.VarChar(20)
+  /// Prototype: STNKName.
+  /// PII (D-25)
+  registrationHolderName String        @map("registration_holder_name") @db.VarChar(100)
+  /// Prototype: STNKNumber.
+  /// PII (D-25)
+  registrationNumber     String        @map("registration_number") @db.VarChar(50)
+  /// Prototype: STNKDate (*string); date-only conversion approved for SCH-01.
+  registrationDate       DateTime?     @map("registration_date") @db.Date
+  /// Prototype: CylinderCapacity; numeric-looking text, unit/type not confirmed.
+  cylinderCapacity       String        @map("cylinder_capacity") @db.VarChar(50)
+  /// Prototype: Color.
+  color                  String        @db.VarChar(50)
+  /// Prototype: InsuranceName.
+  insuranceName          String        @map("insurance_name") @db.VarChar(100)
+  /// Prototype: InsuranceExpiry (*string); date-only conversion approved for SCH-01.
+  insuranceExpiry        DateTime?     @map("insurance_expiry") @db.Date
+  /// Prototype: Description.
+  description            String
+  /// Prototype: ChassisNumber.
+  /// PII (D-25)
+  chassisNumber          String        @map("chassis_number") @db.VarChar(100)
+  /// Prototype: EngineNumber.
+  /// PII (D-25)
+  engineNumber           String        @map("engine_number") @db.VarChar(100)
+  /// Prototype: IsActive (default:true).
+  status                 RecordStatus  @default(ACTIVE)
+  /// Prototype: ServiceTrucking (default:false); business toggle, not activity status.
+  serviceTrucking        Boolean       @default(false) @map("service_trucking")
+  /// Prototype: BranchID.
+  branchId               BigInt?       @map("branch_id")
+  /// Prototype: Branch (*BranchRef, foreignKey:BranchID); real company.Branch relation.
+  branch                 Branch?       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([truckingTypeId])
+  @@index([branchId])
+  @@index([status])
+  @@map("vehicles")
+}
+
+/// Prototype: logistics.VehicleType (logistics/logistic.go).
+/// Orphan dictionary retained for full port coverage; necessity TBD, D-22, D-24.
+model VehicleType {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("vehicle_types")
+}
+
+/// Prototype: logistics.TruckingType (logistics/logistic.go).
+model TruckingType {
+  /// Prototype: ID.
+  id       BigInt       @id @default(autoincrement())
+  /// Prototype: Name.
+  name     String       @db.VarChar(100)
+  /// Prototype: Status (default:Active).
+  status   RecordStatus @default(ACTIVE)
+  vehicles Vehicle[]
+
+  @@index([status])
+  @@map("trucking_types")
+}
+
+/// Prototype: logistics.ShipmentStatus (logistics/logistic.go).
+/// Dictionary only; no shipment model, transition matrix, or history is invented.
+model ShipmentStatus {
+  /// Prototype: ID.
+  id     BigInt       @id @default(autoincrement())
+  /// Prototype: Code.
+  code   String       @db.VarChar(20)
+  /// Prototype: Name.
+  name   String       @db.VarChar(100)
+  /// Prototype: Status (default:Active); record activity, not shipment progress.
+  status RecordStatus @default(ACTIVE)
+
+  @@index([status])
+  @@map("shipment_statuses")
+}
+
+/// Prototype: models.Vendor (vendor.go).
+model Vendor {
+  /// Prototype: ID.
+  id          BigInt            @id @default(autoincrement())
+  /// Prototype: Name.
+  name        String
+  /// Prototype: Address1.
+  /// PII (D-25)
+  address1    String
+  /// Prototype: Address2.
+  /// PII (D-25)
+  address2    String
+  /// Prototype: City.
+  /// PII (D-25)
+  city        String
+  /// Prototype: CodePos.
+  /// PII (D-25)
+  postalCode  String            @map("postal_code")
+  /// Prototype: NoHp.
+  /// PII (D-25)
+  phone       String
+  /// Prototype: Fax.
+  /// PII (D-25)
+  fax         String
+  /// Prototype: Email.
+  /// PII (D-25)
+  email       String
+  /// Prototype: NamaKontak.
+  /// PII (D-25)
+  contactName String            @map("contact_name")
+  /// Prototype: Branch; free text, not a declared foreign key.
+  branch      String
+  /// Prototype: Status (default:Active).
+  status      RecordStatus      @default(ACTIVE)
+  /// Prototype: Npwp (foreignKey:VendorID); inverse optional, child existence not enforced by source.
+  taxProfile  VendorTaxProfile?
+  /// Prototype: CreatedAt.
+  createdAt   DateTime          @map("created_at")
+  /// Prototype: UpdatedAt.
+  updatedAt   DateTime          @map("updated_at")
+
+  @@index([status])
+  @@map("vendors")
+}
+
+/// Prototype: models.Npwp (npwp.go).
+/// DRAFT: rules TBD, D-24
+/// Tax-ID scope remains unconfirmed. Do not use in routes, actions, or UI.
+model VendorTaxProfile {
+  /// Prototype: ID.
+  id             BigInt @id @default(autoincrement())
+  /// Prototype: VendorID (uniqueIndex); at most one tax profile per vendor.
+  vendorId       BigInt @unique @map("vendor_id")
+  vendor         Vendor @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Prototype: NoNpwp.
+  /// PII (D-25)
+  taxNumber      String @map("tax_number")
+  /// Prototype: NamaNpwp.
+  /// PII (D-25)
+  registeredName String @map("registered_name")
+  /// Prototype: Address1.
+  /// PII (D-25)
+  address1       String
+  /// Prototype: Address2.
+  /// PII (D-25)
+  address2       String
+  /// Prototype: City.
+  /// PII (D-25)
+  city           String
+  /// Prototype: CodePos.
+  /// PII (D-25)
+  postalCode     String @map("postal_code")
+
+  @@map("vendor_tax_profiles")
+}

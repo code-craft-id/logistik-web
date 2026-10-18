@@ -125,6 +125,9 @@ model Branch {
   /// Prototype: BaseModel.DeletedAt; soft deletion only.
   deletedAt      DateTime?    @map("deleted_at")
   agents         Agent[]
+  drivers        Driver[]
+  couriers       Courier[]
+  vehicles       Vehicle[]
 
   @@index([officeId])
   @@index([status])
