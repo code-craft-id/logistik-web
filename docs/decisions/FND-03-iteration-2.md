@@ -373,7 +373,7 @@ Inspected only that vendor image and the coordinator-specified Kurir Kota DRS sc
 
 | Criterion | Result |
 |---|---|
-| Agent runs lint now | PASS: `rtk bypass npm run lint`, exit 0; 48 files, no fixes |
+| Agent runs lint now | PASS: `rtk bypass npm run lint`, exit 0; final 53 files, no fixes |
 | Agent runs typecheck now | PASS: `rtk bypass npm run typecheck`, exit 0 |
 | Agent runs test now | PASS: `rtk bypass npm test`, exit 0; 4 files, 64 tests |
 | Agent runs build now | PASS: `rtk bypass npm run build`, exit 0; static `/`, `/ui-examples`, framework not-found |
@@ -399,3 +399,5 @@ The UI commit adopts existing FND-03 package/configuration, shell, primitives, p
 Tooling review excludes `.impeccable/hook.cache.json` (session/cache state) and `.impeccable/config.local.json` (local consent). `live-browser-session.js` is reusable source code, not session data. The bundled Impeccable 0.1.15 Windows executable is 19,672,464 bytes; it is an intentional runtime asset, not a cache. Source, JSON, launchers and local synthetic review captures are reviewed for secrets/provider data before staging. No binary decompilation or external provenance certification is claimed.
 
 Final scan result: 146 candidate files, 25,191,561 bytes. No `JKT` followed by digits, private-key headers or assigned-secret patterns were found. A credential-prefix pattern matched inside `.agents/skills/impeccable/scripts/bin/windows-x64/impeccable.exe`; the value was neither displayed nor copied. This is a credential-like finding, not a confirmed credential or a cleared false positive. Per the supplied safety rule, **skip the entire tooling commit** and leave `.agents/`, `.codex/` and `.impeccable/` unstaged. Resolving or including that binary requires coordinator input. The other candidate text content passed these pattern checks; 33 synthetic local UI images were visually reviewed together. Pattern scans do not prove the absence of every possible secret. Commit only the UI and docs groups; this tooling exception does not weaken FND-03's supplied DONE conditions.
+
+Final validation after evidence became tracked exposed missing terminal newlines in four evidence JSON files. Added newlines only, preserving every recorded value. Final lint checks 53 files; all four required gates were rerun. A separate docs formatting commit records this correction; the tooling commit remains skipped.
