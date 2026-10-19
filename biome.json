@@ -10,9 +10,15 @@
     "includes": [
       "**",
       "!node_modules",
+      "!.agents",
+      "!.codex",
+      "!.git",
+      "!.impeccable",
+      "!.docs",
       "!.next",
       "!dist",
-      "!build",
+      "!dist",
+      "!public",
       "!prisma/migrations",
       "!src/lib/db/generated"
     ]
@@ -37,6 +43,18 @@
       "react": "recommended"
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/components/ui/table.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noNoninteractiveTabindex": "off"
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "actions": {
       "source": {

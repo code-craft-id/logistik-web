@@ -34,7 +34,7 @@ Fixed:
 
 **Decided:** schema validation with Zod, self-hosted deployment, Better Auth with its Prisma-compatible identity schema (SCH-01 refinement), and the tooling selected in `docs/decisions/FND-01.md` (Prisma, Vitest, Node version, npm) once that note is reviewed. Better Auth replaces prototype User/RefreshToken storage; authentication behavior, RBAC, and branch scoping belong to PLT-01. The SCH-01 refinement supersedes the older auth recommendation and prototype-comment convention in FND-01.
 
-**TBD by team decision** (do not introduce without justification): component library (shadcn/ui proposed). Pin and verify the Better Auth version and adapter schema before implementing the identity refinement; provider selection is already approved.
+**Decided for FND-03:** shadcn/ui, explicitly approved by the project coordinator. Use source-owned Radix-based primitives under `src/components/ui/`, configured by `components.json`. Pin and verify the Better Auth version and adapter schema before implementing the identity refinement; provider selection is already approved.
 
 ## 3. Ownership and shared work
 
@@ -95,6 +95,12 @@ Tailwind v4 and tokens:
 - Features must not define their own color, spacing, or breakpoint tokens. If a token is missing, propose it in `globals.css` via PR.
 - Prefer tokens and utilities over arbitrary values, one-off colors, or scattered custom CSS. Custom CSS is fine when utilities are insufficient or for shared app-level styles.
 - Shared primitives live in `components/ui/`. Domain-specific components stay in their feature module. Extract a component when a pattern repeats.
+- shadcn/ui source belongs in `src/components/ui/`; shared compositions belong in `src/components/patterns/`, navigation in `src/components/shell/`, and synthetic demonstrations in `src/components/examples/`. Domain compositions remain inside their feature folders.
+- `components.json` uses RSC, the `@/` aliases, and an empty Tailwind config path. Reconcile CLI output with `@/lib/utils`; never let component installation overwrite established global styles. `globals.css` owns all shared tokens and Tailwind imports.
+- Keep pages and layouts as Server Components. Isolate sidebar, mobile Sheet, and example interactions in Client Components. Use Radix Dialog/Sheet for focus containment, Escape dismissal, and trigger focus restoration; keep table scrolling keyboard reachable. Follow `DESIGN.md` and `docs/decisions/FND-03-surface.md`.
+- Provider navigation lives in the single typed `src/components/shell/navigation.ts` config. Preserve observed top-level order with Dashboard first and observed provider labels for domain inventory. Use at most two disclosure levels (top-level group, then section), one open branch per level, with bounded indentation and explicit `aria-expanded`. Show and expand the active route's full path on load. A local menu filter searches all documented leaves and shows their full provider paths; unavailable results remain unlinked text. Keep undocumented groups top-level, retain all observed leaves, and record `?` evidence as open questions. Schema readiness never decides menu visibility or authorizes a route. This label presentation does not resolve D-19.
+- Shared create/update form layout lives in `components/patterns/form-layout.tsx`: use Radix tabs for the observed three-part vendor-style grouping, persistent mounted fields, hidden inactive panels, and a shared action row outside panels. Callers own workflow and validation. Synthetic examples must state local-only behavior and must not consume DRAFT models.
+- Only implemented routes are links. Unavailable domain destinations are labeled presentation content, never placeholder links or permission claims. Examples explicitly state that no records are saved. D-19 remains open; no new locale/timezone policy is implied by English examples.
 
 Responsive:
 - Mobile-first. Unprefixed utilities are the default layout, `sm:`, `md:`, `lg:`, `xl:` progressively enhance. Never treat mobile as a later refinement.

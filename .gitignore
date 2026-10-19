@@ -44,6 +44,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Private provider evidence (contains real personal and shipment data)
+/docs/reference/app-provider/
+# Keep local hook state out of shared tooling
+/.impeccable/hook.cache.json
+/.impeccable/config.local.json
+
 # Each developer installs local agent tooling
 /.agents/
 /.codex/
