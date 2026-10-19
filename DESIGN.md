@@ -188,7 +188,7 @@ The work region is fluid, with a maximum width of 80rem and minimum-width contai
 
 The desktop sidebar appears from 64rem, occupies 16rem when expanded and 5rem when collapsed, and scrolls vertically within the viewport. Its icon-only state retains accessible route names and the active state. Smaller screens use a focus-managed Sheet. The header wraps at narrow widths; its baseline minimum height is 5rem.
 
-Filters wrap with their labels and actions. Side-by-side example sections start at the extra-large breakpoint. Tables retain columns within a named, keyboard-focusable horizontal scroll region; page-level horizontal overflow is not the table strategy. The locally exercised viewports are 375px, 768px and 1440px; evidence is in the FND-03 note and `.impeccable/review/`.
+Filters wrap with their labels and actions. Side-by-side example sections start at the extra-large breakpoint. Tables retain columns within a named, keyboard-focusable horizontal scroll region; page-level horizontal overflow is not the table strategy. The locally exercised viewports are 375px, 768px and 1440px; shared evidence is in the FND-03 note and `docs/decisions/evidence/`. Historical `.impeccable/review/` captures are local, ignored tooling artifacts.
 
 ## Elevation & Depth
 

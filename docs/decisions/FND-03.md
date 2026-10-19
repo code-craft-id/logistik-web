@@ -4,6 +4,8 @@ Status: **DONE (2026-10-19)**; coordinator-reported acceptance, recorded in FND-
 
 ## Iteration 2 supersedes the navigation fallback
 
+Coordinator cleanup decision, 2026-10-19: `.agents/`, `.codex/` and `.impeccable/` are local, ignored tooling; each developer installs the skills they need. References below to tooling captures, metadata and scripts describe historical local verification, not repository dependencies. Shared evidence lives under `docs/decisions/evidence/` and in the iteration 2 note.
+
 The iteration 1 record below is historical. Provider notes now exist, and the PRD fallback has been replaced. Current decisions, complete evidence inventory, per-leaf schema readiness and verification are in [FND-03 iteration 2](FND-03-iteration-2.md). Final closure records FND-03 DONE with coordinator-reported acceptance and fresh local gates; no criterion is waived.
 
 ## Scope and evidence

@@ -353,6 +353,8 @@ The working tree was already dirty. Existing tracked changes include dependencie
 
 ## Final closure
 
+Subsequent coordinator cleanup decision, 2026-10-19: ignore `.agents/`, `.codex/` and `.impeccable/`; each developer installs the skills they need. This supersedes the earlier tooling inclusion proposal below. Historical local-tooling references are not repository dependencies. Tooling contents, including the previously flagged binary, are excluded from the PR; that binary finding is not a cleared false positive.
+
 2026-10-19. **DONE** under the coordinator's supplied closure rule. This section supersedes earlier pending statuses and the unchecked historical checklist. Coordinator statements below are coordinator-reported, not this agent's independent verification. PLT-01 remains untouched.
 
 ### Provider evidence inspected in this pass
