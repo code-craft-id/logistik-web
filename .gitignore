@@ -43,3 +43,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Each developer installs local agent tooling
+/.agents/
+/.codex/
+/.impeccable/

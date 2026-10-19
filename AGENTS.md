@@ -12,6 +12,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## 1. Purpose and source of truth
 
+`.agents/`, `.codex/` and `.impeccable/` are local and ignored; each developer installs the skills they need.
+
 Build a secure, auditable, multi-branch Logistics Management System (LMS). Three-person, **full-stack, feature-owned** team: every feature owner builds UI, server logic, validation and tests.
 
 Read in this order: `AGENTS.md` (engineering rules), `docs/PRD.md` (approved scope), `docs/ROADMAP.md` (sequence and ownership), then relevant source and tests.
