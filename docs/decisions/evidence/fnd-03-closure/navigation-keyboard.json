@@ -1,0 +1,52 @@
+[
+  {
+    "width": 375,
+    "group": "true",
+    "section": "true",
+    "focus": {
+      "outline": "2px",
+      "outlineColor": "rgb(36, 89, 184)",
+      "text": "M. Logistik / Area Logistik5"
+    },
+    "navSize": {
+      "clientWidth": 265,
+      "scrollWidth": 265
+    },
+    "routeDismissal": {
+      "dialog": false,
+      "path": "/"
+    }
+  },
+  {
+    "width": 768,
+    "group": "true",
+    "section": "true",
+    "focus": {
+      "outline": "2px",
+      "outlineColor": "rgb(36, 89, 184)",
+      "text": "M. Logistik / Area Logistik5"
+    },
+    "navSize": {
+      "clientWidth": 368,
+      "scrollWidth": 368
+    },
+    "routeDismissal": {
+      "dialog": false,
+      "path": "/"
+    }
+  },
+  {
+    "width": 1440,
+    "group": "true",
+    "section": "true",
+    "focus": {
+      "outline": "2px",
+      "outlineColor": "rgb(36, 89, 184)",
+      "text": "M. Logistik / Area Logistik5"
+    },
+    "navSize": {
+      "clientWidth": 240,
+      "scrollWidth": 240
+    }
+  }
+]

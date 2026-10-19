@@ -51,7 +51,9 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The foundation page lives in `src/app/(dashboard)/page.tsx`; shared UI examples are available at `/ui-examples`. Pages and layouts stay Server Components; interactive shell controls and synthetic examples are isolated in Client Components.
+
+FND-03 establishes source-owned shadcn/ui primitives in `src/components/ui/`, compositions in `src/components/patterns/`, and tokens in `src/app/globals.css`. Follow `DESIGN.md` and `AGENTS.md` when building future screens. Examples do not load or save operational records. Provider menu evidence and acceptance gates remain pending; see `docs/decisions/FND-03.md` for the matrix, exact checks, and browser capture paths.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

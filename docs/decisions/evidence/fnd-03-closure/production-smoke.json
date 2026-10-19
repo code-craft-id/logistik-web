@@ -1,0 +1,90 @@
+[
+  {
+    "width": 375,
+    "route": "/",
+    "clientWidth": 360,
+    "scrollWidth": 360,
+    "forwardTrap": true,
+    "reverseTrap": true,
+    "escapeRestoresTrigger": true
+  },
+  {
+    "width": 375,
+    "route": "/ui-examples",
+    "clientWidth": 360,
+    "scrollWidth": 360,
+    "forwardTrap": true,
+    "reverseTrap": true,
+    "escapeRestoresTrigger": true,
+    "ArrowRight": "true",
+    "End": "true",
+    "Home": "true",
+    "tableBefore": {
+      "clientWidth": 326,
+      "scrollLeft": 0,
+      "scrollWidth": 682,
+      "tabIndex": 0
+    },
+    "tableAfter": {
+      "scrollLeft": 40
+    }
+  },
+  {
+    "width": 768,
+    "route": "/",
+    "clientWidth": 768,
+    "scrollWidth": 768,
+    "forwardTrap": true,
+    "reverseTrap": true,
+    "escapeRestoresTrigger": true
+  },
+  {
+    "width": 768,
+    "route": "/ui-examples",
+    "clientWidth": 753,
+    "scrollWidth": 753,
+    "forwardTrap": true,
+    "reverseTrap": true,
+    "escapeRestoresTrigger": true,
+    "ArrowRight": "true",
+    "End": "true",
+    "Home": "true",
+    "tableBefore": {
+      "clientWidth": 687,
+      "scrollLeft": 0,
+      "scrollWidth": 687,
+      "tabIndex": 0
+    },
+    "tableAfter": {
+      "scrollLeft": 0
+    }
+  },
+  {
+    "width": 1440,
+    "route": "/",
+    "clientWidth": 1440,
+    "scrollWidth": 1440,
+    "collapsedActive": "page",
+    "recovered": true
+  },
+  {
+    "width": 1440,
+    "route": "/ui-examples",
+    "clientWidth": 1425,
+    "scrollWidth": 1425,
+    "collapsedActive": "page",
+    "recovered": true,
+    "ArrowRight": "true",
+    "End": "true",
+    "Home": "true",
+    "tableBefore": {
+      "clientWidth": 1103,
+      "scrollLeft": 0,
+      "scrollWidth": 1103,
+      "tabIndex": 0
+    },
+    "tableAfter": {
+      "scrollLeft": 0
+    }
+  }
+]
