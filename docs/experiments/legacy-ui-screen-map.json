@@ -58,7 +58,6 @@
     "routeImplemented": true,
     "backend": "unavailable",
     "views": [
-      "Perusahaan",
       "Perusahaan / Data Perusahaan",
       "Perusahaan / Tanda Tangan Invoice",
       "Perusahaan / Data Bank",
@@ -354,7 +353,14 @@
     "kind": "workspace",
     "routeImplemented": true,
     "backend": "unavailable",
-    "views": ["Laporan AR", "Laporan AP"]
+    "views": [
+      "Laporan AR",
+      "Laporan AR / Belum Lunas",
+      "Laporan AR / Lunas",
+      "Laporan AP",
+      "Laporan AP / Belum Lunas",
+      "Laporan AP / Lunas"
+    ]
   },
   {
     "path": "/customer-reports",
@@ -372,7 +378,7 @@
     "source": "src/pages/master-data/Perkiraan.jsx",
     "domain": "accounting",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Perkiraan"]
   },
@@ -382,7 +388,7 @@
     "source": "src/pages/akunting/Akunting.jsx",
     "domain": "accounting",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Ledger", "Kategori Akun", "Rugi Laba", "Kategori Cashflow"]
   },
@@ -392,7 +398,7 @@
     "source": "src/pages/akunting/LedgerPage.jsx",
     "domain": "accounting",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Ledger"]
   },
@@ -402,7 +408,7 @@
     "source": "src/pages/akunting/KategoriAkunPage.jsx",
     "domain": "accounting",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Kategori Akun"]
   },
@@ -412,7 +418,7 @@
     "source": "src/pages/akunting/RugiLabaPage.jsx",
     "domain": "accounting",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Rugi Laba"]
   },
@@ -422,7 +428,7 @@
     "source": "src/pages/akunting/CashflowPage.jsx",
     "domain": "accounting",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Kategori Cashflow"]
   },
@@ -432,7 +438,7 @@
     "source": "src/pages/ticketting/Ticketting.jsx",
     "domain": "ticketing",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Ticket Support", "Persetujuan Ticketing"]
   },

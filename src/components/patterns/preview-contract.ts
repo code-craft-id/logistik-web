@@ -6,6 +6,7 @@ export type PreviewField = {
   required?: boolean;
   options?: readonly string[];
   group?: string;
+  section?: string;
   table?: boolean;
 };
 export type PreviewColumn = { key: string; label: string; type?: string };
@@ -30,6 +31,9 @@ export type PreviewView = {
   supplementalViews?: readonly PreviewView[];
   detailLabels?: readonly string[];
   fixtureStatus?: string;
+  attachments?: boolean;
+  readOnlyFields?: readonly PreviewField[];
+  actionForms?: Readonly<Record<string, PreviewView>>;
 };
 export type PreviewScreen = {
   path: string;

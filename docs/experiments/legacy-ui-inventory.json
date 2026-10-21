@@ -2807,6 +2807,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -2829,6 +2830,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -2851,6 +2853,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -2873,6 +2876,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -2895,6 +2899,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           }
         ]
@@ -2966,6 +2971,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3028,6 +3034,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3082,6 +3089,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           }
         ]
@@ -3129,6 +3137,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3151,6 +3160,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3189,6 +3199,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3211,6 +3222,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3233,6 +3245,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3263,6 +3276,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           }
         ]
@@ -3422,6 +3436,7 @@
                 "options": []
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3444,6 +3459,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -3466,6 +3482,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           }
         ]
@@ -3655,6 +3672,7 @@
                 "options": ["Active", "Inactive"]
               }
             ],
+            "actions": [],
             "tabs": []
           }
         ]
@@ -4088,6 +4106,7 @@
           {
             "label": "Perusahaan",
             "fields": [],
+            "actions": [],
             "tabs": [
               {
                 "label": "Data Perusahaan",
@@ -4197,6 +4216,7 @@
                     "options": []
                   }
                 ],
+                "actions": [],
                 "tabs": []
               },
               {
@@ -4235,6 +4255,7 @@
                     "options": []
                   }
                 ],
+                "actions": [],
                 "tabs": []
               },
               {
@@ -4249,6 +4270,7 @@
                     "options": []
                   }
                 ],
+                "actions": [],
                 "tabs": []
               },
               {
@@ -4287,6 +4309,7 @@
                     "options": []
                   }
                 ],
+                "actions": [],
                 "tabs": []
               },
               {
@@ -4309,6 +4332,7 @@
                     "options": []
                   }
                 ],
+                "actions": ["Lihat Pesan WhatsApp"],
                 "tabs": []
               }
             ]
@@ -4389,6 +4413,7 @@
                 "options": []
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -4467,6 +4492,7 @@
                 "options": []
               }
             ],
+            "actions": [],
             "tabs": []
           },
           {
@@ -4569,6 +4595,7 @@
                 "options": []
               }
             ],
+            "actions": [],
             "tabs": []
           }
         ]

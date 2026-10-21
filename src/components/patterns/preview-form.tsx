@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs } from "radix-ui";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { PreviewRow } from "@/components/examples/legacy-fixtures";
 import { Button } from "@/components/ui/button";
 import type { PreviewView } from "./preview-contract";
@@ -43,27 +43,54 @@ export function PreviewForm({
   );
   const [invalid, setInvalid] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  const nextPicture = useRef(1);
+  const [pictures, setPictures] = useState([
+    { id: 0, file: "", detail: "", url: "" },
+  ]);
   function fields(group?: string) {
     const items = view.fields.filter(
       (field) => !group || (field.group ?? groups[0]) === group,
     );
+    function renderFields(fields: typeof items) {
+      return (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {fields.map((field) => (
+            <PreviewField
+              key={field.key}
+              field={field}
+              id={`${prefix}-${encodeURIComponent(field.key)}`}
+              value={values[field.key] ?? ""}
+              onChange={(value) => {
+                setValues((current) => ({ ...current, [field.key]: value }));
+                setChecked(false);
+              }}
+              invalid={invalid === field.key}
+              readOnly={readOnly}
+            />
+          ))}
+        </div>
+      );
+    }
+    const sections = [
+      ...new Set(
+        items
+          .map((field) => field.section)
+          .filter((section): section is string => !!section),
+      ),
+    ];
     return items.length ? (
-      <div className="grid gap-4 sm:grid-cols-2">
-        {items.map((field) => (
-          <PreviewField
-            key={field.key}
-            field={field}
-            id={`${prefix}-${encodeURIComponent(field.key)}`}
-            value={values[field.key] ?? ""}
-            onChange={(value) => {
-              setValues((current) => ({ ...current, [field.key]: value }));
-              setChecked(false);
-            }}
-            invalid={invalid === field.key}
-            readOnly={readOnly}
-          />
-        ))}
-      </div>
+      sections.length ? (
+        <div className="space-y-5">
+          {sections.map((section) => (
+            <fieldset key={section} className="space-y-4 rounded-lg border p-4">
+              <legend className="px-2 text-sm font-semibold">{section}</legend>
+              {renderFields(items.filter((field) => field.section === section))}
+            </fieldset>
+          ))}
+        </div>
+      ) : (
+        renderFields(items)
+      )
     ) : (
       <p className="rounded-lg border border-dashed bg-muted/50 p-6 text-sm text-muted-foreground">
         The legacy tab is a placeholder. No additional fields or rules are
@@ -126,6 +153,79 @@ export function PreviewForm({
         </Tabs.Root>
       ) : (
         fields()
+      )}
+      {view.attachments && (
+        <section aria-label="Gambar" className="space-y-4 border-t pt-4">
+          <h3 className="text-sm font-semibold">Gambar</h3>
+          {readOnly ? (
+            <p className="text-sm text-muted-foreground">
+              No files attached to this synthetic preview record.
+            </p>
+          ) : (
+            <>
+              {pictures.map((picture, index) => (
+                <fieldset
+                  key={picture.id}
+                  className="space-y-3 rounded-lg border p-4"
+                >
+                  <legend className="px-2 text-sm">Gambar {index + 1}</legend>
+                  {(
+                    [
+                      ["file", "Upload gambar", "file"],
+                      ["detail", "Detail gambar", "text"],
+                      ["url", "URL gambar", "url"],
+                    ] as const
+                  ).map(([key, label, type]) => (
+                    <PreviewField
+                      key={key}
+                      field={{ key, label, type }}
+                      id={`${prefix}-picture-${picture.id}-${key}`}
+                      value={picture[key]}
+                      onChange={(value) =>
+                        setPictures((current) =>
+                          current.map((item) =>
+                            item.id === picture.id
+                              ? { ...item, [key]: value }
+                              : item,
+                          ),
+                        )
+                      }
+                    />
+                  ))}
+                  {pictures.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="min-h-11"
+                      aria-label={`Hapus gambar ${index + 1}`}
+                      onClick={() =>
+                        setPictures((current) =>
+                          current.filter((item) => item.id !== picture.id),
+                        )
+                      }
+                    >
+                      Hapus gambar
+                    </Button>
+                  )}
+                </fieldset>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                onClick={() => {
+                  const id = nextPicture.current++;
+                  setPictures((current) => [
+                    ...current,
+                    { id, file: "", detail: "", url: "" },
+                  ]);
+                }}
+              >
+                Tambah Gambar
+              </Button>
+            </>
+          )}
+        </section>
       )}
       <div className="flex flex-wrap items-center gap-3 border-t pt-4">
         {!readOnly && (

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 C:/Development/logistik-web
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  12:00:25
+   Duration  554ms (transform 175ms, setup 0ms, import 229ms, tests 15ms, environment 0ms)
+

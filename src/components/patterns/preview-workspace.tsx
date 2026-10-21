@@ -251,7 +251,7 @@ function PreviewList({ view }: { view: PreviewView }) {
           formGroups: [],
           fields: [{ key: "trucking", label: "Trucking", required: true }],
         }
-      : view;
+      : (view.actionForms?.[overlay?.action ?? ""] ?? view);
   return (
     <div className="space-y-4">
       {view.inlineForm && (
@@ -299,11 +299,13 @@ function PreviewList({ view }: { view: PreviewView }) {
                 id={`${id}-${slug(tool)}`}
                 variant="outline"
                 className="min-h-11"
-                disabled={!/import data/i.test(tool)}
+                disabled={
+                  !/import data/i.test(tool) && !view.actionForms?.[tool]
+                }
                 onClick={() => open(tool, undefined, `${id}-${slug(tool)}`)}
               >
                 {tool}
-                {!/import data/i.test(tool) && (
+                {!/import data/i.test(tool) && !view.actionForms?.[tool] && (
                   <span className="sr-only"> — unavailable</span>
                 )}
               </Button>
@@ -690,14 +692,23 @@ function PreviewList({ view }: { view: PreviewView }) {
                 view={{
                   ...formView,
                   fields: formView.fields.length
-                    ? formView.fields
+                    ? [
+                        ...formView.fields,
+                        ...(/detail|lihat/i.test(overlay.action) &&
+                        !view.actionForms?.[overlay.action]
+                          ? (formView.readOnlyFields ?? [])
+                          : []),
+                      ]
                     : view.columns.map((column) => ({
                         ...column,
                         type: "text",
                       })),
                 }}
                 row={overlay.row}
-                readOnly={/detail|lihat/i.test(overlay.action)}
+                readOnly={
+                  /detail|lihat/i.test(overlay.action) &&
+                  !view.actionForms?.[overlay.action]
+                }
               />
             ))}
         </DialogContent>

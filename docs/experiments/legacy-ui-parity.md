@@ -1,4 +1,4 @@
-# Legacy UI parity — first batch
+# Legacy UI parity — full presentation migration
 
 ## Full migration continuation (2026-10-21)
 
@@ -26,9 +26,23 @@ with demonstrated unrelated failures. Initial slice ready for local checkpoint.
 
 ### Current inventory and batch checkpoints
 
+- Batch 5: **43/43 route UIs implemented; zero routes remain.** Accounting's
+  four tab layouts and four dormant accounting pages, Perkiraan and Ticketing
+  complete the route inventory. This is UI coverage, not production readiness.
+  Ticket support preserves date/status filters, read-only details, blocked
+  approval/revision and repeated local picture fields. Ticket approval retains
+  its source columns and unavailable link action. Office WA Notifikasi now has
+  the source message editor: three mounted tabs, sender/recipient sections,
+  message text and status controls. No messages are sent or files uploaded.
+  Corrected category tables/forms to omit Kode where the source omits it.
+  Browser checks at 375/1440 show no page overflow; mobile dialogs are 343px.
+  Keyboard picture addition and message-tab switching work. Typecheck and 21 UI
+  tests pass; owned-file Biome passes. A test-only narrowing error was fixed
+  before this checkpoint. Evidence: `batch5-*`. Dashboard illustrations and
+  exhaustive cross-screen validation remain pending before final completion.
 - Initial shell/dashboard checkpoint: `121a561`.
 - Exhaustive source audit: **34 declared routes + nine dormant page entrypoints
-  = 43 screens**, with **68 leaf workspace views** and 133 JS/JSX modules read.
+  = 43 screens**, with **72 leaf workspace views** and 133 JS/JSX modules read.
   All three public SVG assets have unverified usage rights and were not copied.
   Login/Profile are separate screens; ticket support/approval and report/company
   subsections are embedded views. Nine dormant pages receive supplemental routes,

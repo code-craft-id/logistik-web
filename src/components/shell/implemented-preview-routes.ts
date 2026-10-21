@@ -141,6 +141,34 @@ export const implementedPreviewRoutes = [
     label: "Customer Reports",
   },
   {
+    href: "/perkiraan",
+    label: "Perkiraan",
+  },
+  {
+    href: "/akunting",
+    label: "Akunting",
+  },
+  {
+    href: "/akunting/ledger",
+    label: "Ledger",
+  },
+  {
+    href: "/akunting/kategori-akun",
+    label: "Kategori Akun",
+  },
+  {
+    href: "/akunting/rugi-laba",
+    label: "Rugi Laba",
+  },
+  {
+    href: "/akunting/kategori-cashflow",
+    label: "Kategori Cashflow",
+  },
+  {
+    href: "/ticketting",
+    label: "Ticketing",
+  },
+  {
     href: "/",
     label: "Filter",
   },

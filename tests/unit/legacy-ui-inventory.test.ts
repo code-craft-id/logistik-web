@@ -23,6 +23,8 @@ describe("legacy inventory coverage and presentation routing", () => {
         ),
       ).toBe(true);
     expect(new Set(screenMap.map((screen) => screen.path)).size).toBe(43);
+    expect(screenMap.every((screen) => screen.routeImplemented)).toBe(true);
+    expect(implementedPreviewRoutes).toHaveLength(43);
   });
   it("preserves source menu ordering and only links concrete implemented pages", () => {
     expect(

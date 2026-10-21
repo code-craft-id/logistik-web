@@ -12,7 +12,9 @@ export function makePreviewRows(view: PreviewView): PreviewRow[] {
     const number = String(index + 1).padStart(2, "0");
     const values: Record<string, string> = {};
     for (const column of view.columns) {
-      const field = view.fields.find((item) => item.key === column.key);
+      const field = [...view.fields, ...(view.readOnlyFields ?? [])].find(
+        (item) => item.key === column.key,
+      );
       values[column.key] =
         column.type === "currency" ||
         column.type === "percent" ||

@@ -349,6 +349,7 @@ function inspect(file) {
     return (items ?? []).map((t) => ({
       label: t.label,
       fields: sanitizeFields(t.fields),
+      actions: (t.actions ?? []).map((action) => action.label).filter(Boolean),
       tabs: configTabs(t.tabs),
     }));
   }

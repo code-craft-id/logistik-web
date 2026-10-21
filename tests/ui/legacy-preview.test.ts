@@ -7,7 +7,9 @@ import { PreviewWorkspace } from "../../src/components/patterns/preview-workspac
 import { MenuAccessPreview } from "../../src/features/identity/components/menu-access-preview";
 import { screens as identity } from "../../src/features/identity/preview/screens";
 import { screens as masters } from "../../src/features/master-data/preview/screens";
+import { screens as office } from "../../src/features/organization/preview/screens";
 import { screens as reports } from "../../src/features/reports/preview/screens";
+import { screens as tickets } from "../../src/features/ticketing/preview/screens";
 
 let root: Root;
 let host: HTMLDivElement;
@@ -32,6 +34,41 @@ const button = (label: string) => {
 };
 
 describe("isolated legacy presentation interactions", () => {
+  it("adds and removes local ticket pictures while saving remains unavailable", async () => {
+    await act(async () =>
+      root.render(
+        createElement(PreviewForm, { view: tickets["/ticketting"].views[0] }),
+      ),
+    );
+    expect(host.querySelectorAll('input[type="file"]')).toHaveLength(2);
+    await act(async () => button("Tambah Gambar").click());
+    expect(host.querySelectorAll('input[type="file"]')).toHaveLength(3);
+    await act(async () => button("Hapus gambar 1").click());
+    expect(host.querySelectorAll('input[type="file"]')).toHaveLength(2);
+    expect(button("Simpan — unavailable").disabled).toBe(true);
+    expect(host.querySelector('[aria-required="true"]')).not.toBeNull();
+  });
+  it("retains three WhatsApp message panels and sender/recipient sections without sending", async () => {
+    const view = office["/office"].views
+      .flatMap((view) => ("children" in view ? (view.children ?? []) : []))
+      .find((view) => view.label === "WA Notifikasi");
+    if (!view || !("actionForms" in view))
+      throw Error("Missing WhatsApp action");
+    const messageView = view.actionForms?.["Lihat Pesan WhatsApp"];
+    if (!messageView) throw Error("Missing message form");
+    await act(async () =>
+      root.render(
+        createElement(PreviewForm, {
+          view: messageView,
+        }),
+      ),
+    );
+    expect(host.querySelectorAll('[role="tabpanel"]')).toHaveLength(3);
+    expect(host.querySelectorAll("textarea")).toHaveLength(4);
+    expect(host.textContent).toContain("Pengirim");
+    expect(host.textContent).toContain("Message WA Delivery Sheet");
+    expect(button("Simpan — unavailable").disabled).toBe(true);
+  });
   it("preserves AR/AP aging columns and paid/unpaid detail tabs without calculating financial totals", async () => {
     await act(async () =>
       root.render(

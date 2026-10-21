@@ -93,6 +93,42 @@ function crudTab(tab) {
     tab.fields ?? [],
   );
   if (tab.tabs?.length) view.children = tab.tabs.map(crudTab);
+  if (tab.actions?.includes("Lihat Pesan WhatsApp")) {
+    view.tools = tab.actions;
+    view.actionForms = {
+      "Lihat Pesan WhatsApp": {
+        ...base("Pesan WhatsApp"),
+        fields: [
+          ["transaksi", "Message WA Transaksi", ["Pengirim", "Penerima"]],
+          ["shipment", "Message WA Shipment Status", ["Pengirim"]],
+          ["delivery", "Message WA Delivery Sheet", ["Penerima"]],
+        ].flatMap(([key, group, sections]) =>
+          sections.flatMap((section) => [
+            {
+              key: `${key}.${section}.recipient`,
+              label: "Penerima",
+              group,
+              section,
+            },
+            {
+              key: `${key}.${section}.message`,
+              label: "Message",
+              type: "textarea",
+              group,
+              section,
+            },
+            {
+              key: `${key}.${section}.status`,
+              label: "Status",
+              type: "checkbox",
+              group,
+              section,
+            },
+          ]),
+        ),
+      },
+    };
+  }
   if (/Tanda Tangan|Data Bank|Dompet|WA Notif/.test(tab.label))
     view.filters = [
       {
@@ -262,8 +298,16 @@ for (const route of inventory.routes) {
     ];
   }
   if (route.path === "/akunting")
-    screen.views = info.tabs.map((tab) =>
-      base(tab, columns("pages/akunting/Akunting.jsx"), info.fields),
+    screen.views = info.tabs.map((tab, index) =>
+      base(
+        tab,
+        columns("pages/akunting/Akunting.jsx").filter(
+          (field) => index % 2 === 0 || !/kode/i.test(field.label),
+        ),
+        info.fields
+          .filter((field) => index % 2 === 0 || !/kode/i.test(field.label))
+          .map((field) => ({ ...field, required: true })),
+      ),
     );
   if (route.path === "/perkiraan")
     screen.views = [
@@ -507,10 +551,41 @@ for (const route of inventory.routes) {
         ...base(
           "Ticket Support",
           columns("pages/ticketting/TicketSupport.jsx"),
-          fields("pages/ticketting/TicketFormModal.jsx"),
+          fields("pages/ticketting/TicketFormModal.jsx").flatMap((field) => [
+            {
+              ...field,
+              required: ["tanggal", "subject", "priority"].includes(field.key),
+            },
+            ...(field.key === "subject"
+              ? [{ key: "file", label: "Upload File", type: "file" }]
+              : []),
+          ]),
         ),
-        filters: fields("pages/ticketting/TicketSupport.jsx"),
-        actions: ["Detail", "Edit", "Selesai", "Revisi", "Close"],
+        searchLabel: "No. Ticket",
+        attachments: true,
+        readOnlyFields: [
+          {
+            key: "Status",
+            label: "Status",
+            type: "select",
+            options: ["Pending", "Revisi", "Selesai"],
+          },
+        ],
+        filters: fields("pages/ticketting/TicketSupport.jsx")
+          .filter((field) => field.label !== "No. Ticket")
+          .map((field) => ({
+            ...field,
+            key:
+              field.label === "Dari"
+                ? "dateFrom"
+                : field.label === "Sampai"
+                  ? "dateTo"
+                  : "Status",
+            options: field.options?.filter(
+              (option) => option !== "Semua Status",
+            ),
+          })),
+        actions: ["Lihat", "Approve Finish", "Revisi"],
       },
       {
         ...base(
@@ -518,7 +593,7 @@ for (const route of inventory.routes) {
           columns("pages/ticketting/TicketApproval.jsx"),
           [],
         ),
-        actions: ["Detail", "Buka Link"],
+        actions: ["Buka Link"],
       },
     ];
   }
@@ -576,6 +651,14 @@ for (const [domain, screens] of Object.entries(domains)) {
   );
 }
 const screenList = Object.values(domains).flatMap(Object.values);
+function leafViews(views, prefix = "") {
+  return views.flatMap((view) => [
+    ...(view.children?.length
+      ? leafViews(view.children, `${prefix}${view.label} / `)
+      : [`${prefix}${view.label}`]),
+    ...leafViews(view.supplementalViews ?? [], `${prefix}${view.label} / `),
+  ]);
+}
 writeFileSync(
   "docs/experiments/legacy-ui-screen-map.json",
   `${JSON.stringify(
@@ -593,17 +676,14 @@ writeFileSync(
         ),
       ),
       backend: "unavailable",
-      views: s.views.flatMap((v) => [
-        v.label,
-        ...(v.children ?? []).map((c) => `${v.label} / ${c.label}`),
-      ]),
+      views: leafViews(s.views),
     })),
     null,
     2,
   )}\n`,
 );
 console.log(
-  `${screenList.length} screen contracts:34 routed +9 dormant; ${screenList.reduce((n, s) => n + s.views.reduce((m, v) => m + (v.children?.length ?? 1), 0), 0)} leaf workspace views.`,
+  `${screenList.length} screen contracts:34 routed +9 dormant; ${screenList.reduce((n, s) => n + leafViews(s.views).length, 0)} leaf workspace views.`,
 );
 const batch = process.argv[2];
 if (batch) {
