@@ -5,7 +5,7 @@
 next.config.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·type·{·NextConfig·}·from·"next";␍
      2    │ - ␍
      3    │ - const·nextConfig:·NextConfig·=·{␍
@@ -25,7 +25,7 @@ next.config.ts format ━━━━━━━━━━━━━━━━━━━�
     17    │ - ␍
     18    │ - export·default·nextConfig;␍
         1 │ + import·type·{·NextConfig·}·from·"next";
-        2 │ + 
+        2 │ +
         3 │ + const·nextConfig:·NextConfig·=·{
         4 │ + ··/*·config·options·here·*/
         5 │ + ··cacheComponents:·true,
@@ -40,15 +40,15 @@ next.config.ts format ━━━━━━━━━━━━━━━━━━━�
        14 │ + ····},
        15 │ + ··},
        16 │ + };
-       17 │ + 
+       17 │ +
        18 │ + export·default·nextConfig;
-    19 19 │   
-  
+    19 19 │
+
 
 prisma.config.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·"dotenv/config";␍
      2    │ - import·{·defineConfig·}·from·"prisma/config";␍
      3    │ - ␍
@@ -64,7 +64,7 @@ prisma.config.ts format ━━━━━━━━━━━━━━━━━━�
     13    │ - });␍
         1 │ + import·"dotenv/config";
         2 │ + import·{·defineConfig·}·from·"prisma/config";
-        3 │ + 
+        3 │ +
         4 │ + export·default·defineConfig({
         5 │ + ··schema:·"prisma",
         6 │ + ··migrations:·{
@@ -75,13 +75,13 @@ prisma.config.ts format ━━━━━━━━━━━━━━━━━━�
        11 │ + ····url:·process.env.DATABASE_URL,
        12 │ + ··},
        13 │ + });
-    14 14 │   
-  
+    14 14 │
+
 
 prisma\local-database.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - /**·Validate·before·creating·any·database·client·or·launching·Prisma·Migrate.·*/␍
      2    │ - export·function·localDatabaseUrl(value,·{·purpose,·nodeEnv·}·=·{})·{␍
      3    │ - ··if·(!["seed",·"migrate"].includes(purpose))·{␍
@@ -148,13 +148,13 @@ prisma\local-database.mjs format ━━━━━━━━━━━━━━━�
        31 │ + ··}
        32 │ + ··return·value;
        33 │ + }
-    34 34 │   
-  
+    34 34 │
+
 
 prisma\migrate-local.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·"dotenv/config";␍
      2    │ - import·{·spawnSync·}·from·"node:child_process";␍
      3    │ - import·{·createRequire·}·from·"node:module";␍
@@ -191,7 +191,7 @@ prisma\migrate-local.mjs format ━━━━━━━━━━━━━━━━
         3 │ + import·{·createRequire·}·from·"node:module";
         4 │ + import·{·dirname,·resolve·}·from·"node:path";
         5 │ + import·{·localDatabaseUrl·}·from·"./local-database.mjs";
-        6 │ + 
+        6 │ +
         7 │ + try·{
         8 │ + ··const·connectionString·=·localDatabaseUrl(process.env.DATABASE_URL,·{
         9 │ + ····purpose:·"migrate",
@@ -217,13 +217,13 @@ prisma\migrate-local.mjs format ━━━━━━━━━━━━━━━━
        29 │ + ··);
        30 │ + ··process.exitCode·=·1;
        31 │ + }
-    32 32 │   
-  
+    32 32 │
+
 
 prisma\migrate-test.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·"dotenv/config";␍
      2    │ - import·{·spawnSync·}·from·"node:child_process";␍
      3    │ - import·{·createRequire·}·from·"node:module";␍
@@ -265,7 +265,7 @@ prisma\migrate-test.mjs format ━━━━━━━━━━━━━━━━�
         3 │ + import·{·createRequire·}·from·"node:module";
         4 │ + import·{·dirname,·resolve·}·from·"node:path";
         5 │ + import·{·testDatabaseUrl·}·from·"../tests/support/test-database-url.ts";
-        6 │ + 
+        6 │ +
         7 │ + try·{
         8 │ + ··const·connectionString·=·testDatabaseUrl(
         9 │ + ····process.env.TEST_DATABASE_URL,
@@ -296,26 +296,26 @@ prisma\migrate-test.mjs format ━━━━━━━━━━━━━━━━�
        34 │ + ··);
        35 │ + ··process.exitCode·=·1;
        36 │ + }
-    37 37 │   
-  
+    37 37 │
+
 
 prisma\seed-data.d.mts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
     1   │ - import·type·{·Prisma·}·from·"../src/lib/db/generated/client";␍
     2   │ - ␍
     3   │ - export·function·seedFakeRecords(tx:·Prisma.TransactionClient):·Promise<void>;␍
       1 │ + import·type·{·Prisma·}·from·"../src/lib/db/generated/client";
-      2 │ + 
+      2 │ +
       3 │ + export·function·seedFakeRecords(tx:·Prisma.TransactionClient):·Promise<void>;
-    4 4 │   
-  
+    4 4 │
+
 
 prisma\seed-data.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
       1     │ - //·Stable·fake·fixtures.·No·credentials·or·financial·behavior.␍
       2     │ - const·firstId·=·9_100_001;␍
       3     │ - async·function·ensureFakeRecord(delegate,·data)·{␍
@@ -467,12 +467,12 @@ prisma\seed-data.mjs format ━━━━━━━━━━━━━━━━━�
     149     │ - ······status,␍
     150     │ - ····});␍
   263 more lines truncated
-  
+
 
 prisma\seed.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·"dotenv/config";␍
      2    │ - import·{·localDatabaseUrl·}·from·"./local-database.mjs";␍
      3    │ - ␍
@@ -508,9 +508,9 @@ prisma\seed.mjs format ━━━━━━━━━━━━━━━━━━━
     33    │ - }␍
         1 │ + import·"dotenv/config";
         2 │ + import·{·localDatabaseUrl·}·from·"./local-database.mjs";
-        3 │ + 
+        3 │ +
         4 │ + import·{·seedFakeRecords·}·from·"./seed-data.mjs";
-        5 │ + 
+        5 │ +
         6 │ + let·prisma;
         7 │ + try·{
         8 │ + ··const·connectionString·=·localDatabaseUrl(process.env.DATABASE_URL,·{
@@ -525,7 +525,7 @@ prisma\seed.mjs format ━━━━━━━━━━━━━━━━━━━
        17 │ + ··prisma·=·new·PrismaClient({
        18 │ + ····adapter:·new·PrismaPg({·connectionString,·connectionTimeoutMillis:·3000·}),
        19 │ + ··});
-       20 │ + 
+       20 │ +
        21 │ + ··await·prisma.$transaction(seedFakeRecords,·{·timeout:·30000·});
        22 │ + ··console.log(
        23 │ + ····"Fake·development·seed·complete:·30·fixtures·per·list·entity;·existing·rows·unchanged.",
@@ -539,13 +539,13 @@ prisma\seed.mjs format ━━━━━━━━━━━━━━━━━━━
        31 │ + }·finally·{
        32 │ + ··if·(prisma)·await·prisma.$disconnect();
        33 │ + }
-    34 34 │   
-  
+    34 34 │
+
 
 src\lib\auth\schema-options.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·type·{·BetterAuthOptions·}·from·"better-auth";␍
      2    │ - import·{·prismaAdapter·}·from·"better-auth/adapters/prisma";␍
      3    │ - import·type·{·PrismaClient·}·from·"../db/generated/client";␍
@@ -561,7 +561,7 @@ src\lib\auth\schema-options.ts format ━━━━━━━━━━━━━━
         1 │ + import·type·{·BetterAuthOptions·}·from·"better-auth";
         2 │ + import·{·prismaAdapter·}·from·"better-auth/adapters/prisma";
         3 │ + import·type·{·PrismaClient·}·from·"../db/generated/client";
-        4 │ + 
+        4 │ +
         5 │ + /**·Schema/adapter·contract·only.·PLT-01·owns·runtime·auth·and·route·activation.·*/
         6 │ + export·function·authSchemaOptions(client:·PrismaClient)·{
         7 │ + ··return·{
@@ -570,13 +570,13 @@ src\lib\auth\schema-options.ts format ━━━━━━━━━━━━━━
        10 │ + ····account:·{·modelName:·"authAccount"·},
        11 │ + ··}·satisfies·BetterAuthOptions;
        12 │ + }
-    13 13 │   
-  
+    13 13 │
+
 
 src\lib\db\index.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·"server-only";␍
      2    │ - import·{·PrismaPg·}·from·"@prisma/adapter-pg";␍
      3    │ - import·{·PrismaClient·}·from·"./generated/client";␍
@@ -600,30 +600,30 @@ src\lib\db\index.ts format ━━━━━━━━━━━━━━━━━�
         1 │ + import·"server-only";
         2 │ + import·{·PrismaPg·}·from·"@prisma/adapter-pg";
         3 │ + import·{·PrismaClient·}·from·"./generated/client";
-        4 │ + 
+        4 │ +
         5 │ + const·globalForPrisma·=·globalThis·as·unknown·as·{
         6 │ + ··prisma:·PrismaClient·|·undefined;
         7 │ + };
-        8 │ + 
+        8 │ +
         9 │ + function·createClient()·{
        10 │ + ··const·connectionString·=·process.env.DATABASE_URL;
        11 │ + ··if·(!connectionString)·throw·new·Error("DATABASE_URL·is·required.");
-       12 │ + 
+       12 │ +
        13 │ + ··return·new·PrismaClient({
        14 │ + ····adapter:·new·PrismaPg({·connectionString·}),
        15 │ + ··});
        16 │ + }
-       17 │ + 
+       17 │ +
        18 │ + export·const·prisma·=·globalForPrisma.prisma·??·createClient();
-       19 │ + 
+       19 │ +
        20 │ + if·(process.env.NODE_ENV·!==·"production")·globalForPrisma.prisma·=·prisma;
-    21 21 │   
-  
+    21 21 │
+
 
 tests\integration\database.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·{·PrismaPg·}·from·"@prisma/adapter-pg";␍
      2    │ - import·{·expect,·it·}·from·"vitest";␍
      3    │ - import·{·PrismaClient·}·from·"../../src/lib/db/generated/client";␍
@@ -653,7 +653,7 @@ tests\integration\database.test.ts format ━━━━━━━━━━━━�
         2 │ + import·{·expect,·it·}·from·"vitest";
         3 │ + import·{·PrismaClient·}·from·"../../src/lib/db/generated/client";
         4 │ + import·{·testDatabaseUrl·}·from·"../support/test-database-url";
-        5 │ + 
+        5 │ +
         6 │ + it("runs·SELECT·1·against·the·explicitly·selected·test·database",·async·()·=>·{
         7 │ + ··//·Validate·before·creating·an·adapter,·client,·or·connection·pool.
         8 │ + ··const·connectionString·=·testDatabaseUrl(
@@ -663,7 +663,7 @@ tests\integration\database.test.ts format ━━━━━━━━━━━━�
        12 │ + ··const·client·=·new·PrismaClient({
        13 │ + ····adapter:·new·PrismaPg({·connectionString,·connectionTimeoutMillis:·5_000·}),
        14 │ + ··});
-       15 │ + 
+       15 │ +
        16 │ + ··try·{
        17 │ + ····const·rows·=·await·client.$queryRaw<Array<{·result:·number·}>>`
        18 │ + ······SELECT·1·AS·result
@@ -674,13 +674,13 @@ tests\integration\database.test.ts format ━━━━━━━━━━━━�
        23 │ + ····await·client.$disconnect();
        24 │ + ··}
        25 │ + });
-    26 26 │   
-  
+    26 26 │
+
 
 tests\integration\sch01.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
       1     │ - import·{·PrismaPg·}·from·"@prisma/adapter-pg";␍
       2     │ - import·{·afterAll,·describe,·expect,·it·}·from·"vitest";␍
       3     │ - import·{·seedFakeRecords·}·from·"../../prisma/seed-data.mjs";␍
@@ -832,12 +832,12 @@ tests\integration\sch01.test.ts format ━━━━━━━━━━━━━�
     149     │ - ····).rejects.toBe(rollback);␍
     150     │ - ··});␍
   153 more lines truncated
-  
+
 
 tests\support\test-database-url.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - function·parseDatabaseUrl(value:·string·|·undefined,·name:·string)·{␍
      2    │ - ··if·(!value)·throw·new·Error(`${name}·is·required.`);␍
      3    │ - ␍
@@ -900,7 +900,7 @@ tests\support\test-database-url.ts format ━━━━━━━━━━━━�
     60    │ - }␍
         1 │ + function·parseDatabaseUrl(value:·string·|·undefined,·name:·string)·{
         2 │ + ··if·(!value)·throw·new·Error(`${name}·is·required.`);
-        3 │ + 
+        3 │ +
         4 │ + ··let·url:·URL;
         5 │ + ··try·{
         6 │ + ····url·=·new·URL(value);
@@ -908,7 +908,7 @@ tests\support\test-database-url.ts format ━━━━━━━━━━━━�
         8 │ + ··}·catch·{
         9 │ + ····throw·new·Error(`${name}·must·be·a·valid·PostgreSQL·URL.`);
        10 │ + ··}
-       11 │ + 
+       11 │ +
        12 │ + ··if·(
        13 │ + ····!["postgres:",·"postgresql:"].includes(url.protocol)·||
        14 │ + ····!url.hostname·||
@@ -921,17 +921,17 @@ tests\support\test-database-url.ts format ━━━━━━━━━━━━�
        21 │ + ······`${name}·must·be·a·PostgreSQL·URL·without·query·or·fragment.`,
        22 │ + ····);
        23 │ + ··}
-       24 │ + 
+       24 │ +
        25 │ + ··return·url;
        26 │ + }
-       27 │ + 
+       27 │ +
        28 │ + function·target(url:·URL)·{
        29 │ + ··const·host·=·["localhost",·"127.0.0.1",·"[::1]"].includes(url.hostname)
        30 │ + ····?·"loopback"
        31 │ + ····:·url.hostname.toLowerCase();
        32 │ + ··return·`${host}:${url.port·||·"5432"}/${decodeURIComponent(url.pathname.slice(1))}`;
        33 │ + }
-       34 │ + 
+       34 │ +
        35 │ + export·function·testDatabaseUrl(
        36 │ + ··testUrl:·string·|·undefined,
        37 │ + ··developmentUrl:·string·|·undefined,
@@ -948,23 +948,23 @@ tests\support\test-database-url.ts format ━━━━━━━━━━━━�
        48 │ + ··if·(!["localhost",·"127.0.0.1",·"[::1]"].includes(parsed.hostname))·{
        49 │ + ····throw·new·Error("TEST_DATABASE_URL·requires·a·loopback·host.");
        50 │ + ··}
-       51 │ + 
+       51 │ +
        52 │ + ··if·(
        53 │ + ····developmentUrl·&&
        54 │ + ····target(parsed)·===·target(parseDatabaseUrl(developmentUrl,·"DATABASE_URL"))
        55 │ + ··)·{
        56 │ + ····throw·new·Error("TEST_DATABASE_URL·must·not·target·DATABASE_URL.");
        57 │ + ··}
-       58 │ + 
+       58 │ +
        59 │ + ··return·parsed.href;
        60 │ + }
-    61 61 │   
-  
+    61 61 │
+
 
 tests\unit\local-database.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·{·describe,·expect,·it·}·from·"vitest";␍
      2    │ - import·{·localDatabaseUrl·}·from·"../../prisma/local-database.mjs";␍
      3    │ - ␍
@@ -1043,7 +1043,7 @@ tests\unit\local-database.test.ts format ━━━━━━━━━━━━━
     76    │ - });␍
         1 │ + import·{·describe,·expect,·it·}·from·"vitest";
         2 │ + import·{·localDatabaseUrl·}·from·"../../prisma/local-database.mjs";
-        3 │ + 
+        3 │ +
         4 │ + describe("SCH-01·local·database·guards",·()·=>·{
         5 │ + ··it.each([
         6 │ + ····"seed",
@@ -1054,13 +1054,13 @@ tests\unit\local-database.test.ts format ━━━━━━━━━━━━━
        11 │ + ······value,
        12 │ + ····);
        13 │ + ··});
-       14 │ + 
+       14 │ +
        15 │ + ··it("allows·localhost·only·for·seed",·()·=>·{
        16 │ + ····const·value·=·"postgres://fake:fake@localhost/logistik_web";
        17 │ + ····expect(localDatabaseUrl(value,·{·purpose:·"seed"·})).toBe(value);
        18 │ + ····expect(()·=>·localDatabaseUrl(value,·{·purpose:·"migrate"·})).toThrow();
        19 │ + ··});
-       20 │ + 
+       20 │ +
        21 │ + ··it.each(["seed",·"migrate"])("refuses·production·for·%s",·(purpose)·=>·{
        22 │ + ····expect(()·=>
        23 │ + ······localDatabaseUrl("postgresql://127.0.0.1/logistik_web",·{
@@ -1069,7 +1069,7 @@ tests\unit\local-database.test.ts format ━━━━━━━━━━━━━
        26 │ + ······}),
        27 │ + ····).toThrow("production");
        28 │ + ··});
-       29 │ + 
+       29 │ +
        30 │ + ··it.each([
        31 │ + ····undefined,
        32 │ + ····"",
@@ -1099,13 +1099,13 @@ tests\unit\local-database.test.ts format ━━━━━━━━━━━━━
        56 │ + ······expect(()·=>·localDatabaseUrl(value,·{·purpose·})).toThrow();
        57 │ + ····}
        58 │ + ··});
-       59 │ + 
+       59 │ +
        60 │ + ··it("refuses·missing·or·unexpected·purpose",·()·=>·{
        61 │ + ····const·value·=·"postgresql://127.0.0.1/logistik_web";
        62 │ + ····expect(()·=>·localDatabaseUrl(value)).toThrow();
        63 │ + ····expect(()·=>·localDatabaseUrl(value,·{·purpose:·"reset"·})).toThrow();
        64 │ + ··});
-       65 │ + 
+       65 │ +
        66 │ + ··it("never·exposes·credentials·in·rejection·errors",·()·=>·{
        67 │ + ····const·value·=·"postgresql://fake:DO-NOT-EXPOSE@remote.invalid/production";
        68 │ + ····try·{
@@ -1116,12 +1116,12 @@ tests\unit\local-database.test.ts format ━━━━━━━━━━━━━
        73 │ + ······expect(String(error)).not.toContain(value);
        74 │ + ····}
   3 more lines truncated
-  
+
 
 tests\unit\sch01-schema.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·{·createHash·}·from·"node:crypto";␍
      2    │ - import·{·readdirSync,·readFileSync·}·from·"node:fs";␍
      3    │ - import·{·getAuthTables·}·from·"better-auth/db";␍
@@ -1231,12 +1231,12 @@ tests\unit\sch01-schema.test.ts format ━━━━━━━━━━━━━�
        10 │ + ··Vehicle,
        11 │ + }·from·"../../src/lib/db/generated/client";
        12 │ + import·baseline·from·"../fixtures/sch01-baseline.json";
-       13 │ + 
+       13 │ +
        14 │ + const·source·=·readdirSync("prisma/schema")
        15 │ + ··.map((name)·=>·readFileSync(`prisma/schema/${name}`,·"utf8"))
        16 │ + ··.join("\n");
        17 │ + const·models·=·[...source.matchAll(/model·(\w+)·\{([\s\S]*?)\n\}/g)];
-       18 │ + 
+       18 │ +
        19 │ + describe("SCH-01·preservation·and·adapter·contract",·()·=>·{
        20 │ + ··it("preserves·every·baseline·scalar·field·and·all·applied·migration·bytes",·()·=>·{
        21 │ + ····for·(const·{·table,·fields·}·of·baseline.models)·{
@@ -1258,7 +1258,7 @@ tests\unit\sch01-schema.test.ts format ━━━━━━━━━━━━━�
        37 │ + ······).toBe(checksum);
        38 │ + ····}
        39 │ + ··});
-       40 │ + 
+       40 │ +
        41 │ + ··it("keeps·domain·lifecycles,·narrow·keys,·draft·guards·and·auth·exceptions",·()·=>·{
        42 │ + ····expect(source).not.toMatch(/\bBigInt\b|\/\/\/·(?:Prototype:|PII)/);
        43 │ + ····for·(const·[,·name,·body]·of·models)·{
@@ -1273,12 +1273,12 @@ tests\unit\sch01-schema.test.ts format ━━━━━━━━━━━━━�
        52 │ + ····}
        53 │ + ····expect(source).toMatch(/DRAFT:.*D-27/);
   45 more lines truncated
-  
+
 
 tests\unit\test-database-url.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·{·describe,·expect,·it·}·from·"vitest";␍
      2    │ - import·{·testDatabaseUrl·}·from·"../support/test-database-url";␍
      3    │ - ␍
@@ -1332,21 +1332,21 @@ tests\unit\test-database-url.test.ts format ━━━━━━━━━━━━
     51    │ - });␍
         1 │ + import·{·describe,·expect,·it·}·from·"vitest";
         2 │ + import·{·testDatabaseUrl·}·from·"../support/test-database-url";
-        3 │ + 
+        3 │ +
         4 │ + const·development·=·"postgresql://postgres@127.0.0.1:5432/logistik_web";
         5 │ + const·valid·=·"postgresql://postgres@127.0.0.1:5432/logistik_web_test";
-        6 │ + 
+        6 │ +
         7 │ + describe("integration·database·safety",·()·=>·{
         8 │ + ··it("accepts·a·separate·test·database",·()·=>·{
         9 │ + ····expect(testDatabaseUrl(valid,·development)).toBe(valid);
        10 │ + ··});
-       11 │ + 
+       11 │ +
        12 │ + ··it("refuses·production·before·any·connection",·()·=>·{
        13 │ + ····expect(()·=>·testDatabaseUrl(valid,·development,·"production")).toThrow(
        14 │ + ······"refuse·NODE_ENV=production",
        15 │ + ····);
        16 │ + ··});
-       17 │ + 
+       17 │ +
        18 │ + ··it.each([
        19 │ + ····undefined,
        20 │ + ····"",
@@ -1366,7 +1366,7 @@ tests\unit\test-database-url.test.ts format ━━━━━━━━━━━━
        34 │ + ··])("rejects·unsafe·test·URL·%s",·(value)·=>·{
        35 │ + ····expect(()·=>·testDatabaseUrl(value,·development)).toThrow();
        36 │ + ··});
-       37 │ + 
+       37 │ +
        38 │ + ··it.each([
        39 │ + ····valid,
        40 │ + ····"postgres://other@localhost/logistik_web_test",
@@ -1376,18 +1376,18 @@ tests\unit\test-database-url.test.ts format ━━━━━━━━━━━━
        44 │ + ······"must·not·target·DATABASE_URL",
        45 │ + ····);
        46 │ + ··});
-       47 │ + 
+       47 │ +
        48 │ + ··it("rejects·an·invalid·development·URL·instead·of·bypassing·comparison",·()·=>·{
        49 │ + ····expect(()·=>·testDatabaseUrl(valid,·"invalid")).toThrow();
        50 │ + ··});
        51 │ + });
-    52 52 │   
-  
+    52 52 │
+
 
 vitest.integration.config.mts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Formatter would have printed the following content:
-  
+
      1    │ - import·"dotenv/config";␍
      2    │ - import·{·defineConfig·}·from·"vitest/config";␍
      3    │ - ␍
@@ -1400,7 +1400,7 @@ vitest.integration.config.mts format ━━━━━━━━━━━━━━�
     10    │ - });␍
         1 │ + import·"dotenv/config";
         2 │ + import·{·defineConfig·}·from·"vitest/config";
-        3 │ + 
+        3 │ +
         4 │ + export·default·defineConfig({
         5 │ + ··test:·{
         6 │ + ····environment:·"node",
@@ -1408,13 +1408,11 @@ vitest.integration.config.mts format ━━━━━━━━━━━━━━�
         8 │ + ····testTimeout:·15_000,
         9 │ + ··},
        10 │ + });
-    11 11 │   
-  
+    11 11 │
+
 
 Checked 63 files in 196ms. No fixes applied.
 Found 17 errors.
 check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   × Some errors were emitted while running checks.
-  
-

@@ -193,6 +193,11 @@ Evidence: `phase0-line-endings.json`, `baseline-check.json`, `phase0-lint-before
 `phase0-lint-after.log`, `phase0-test.log`, `final-test.log`.
 The user explicitly permits verified local commits with demonstrated unrelated
 baseline failures. These limitations are not hidden or treated as passing gates.
+Saved command logs have LF endings, trimmed trailing whitespace and one terminal
+newline where the branch diff check diagnosed emitted whitespace. Diagnostic
+text and result counts are retained; source-byte evidence lives in the checksum
+JSON records, rather than whitespace in formatter output. The final full-branch
+diff check passes after this evidence-only normalization.
 
 ## Visual findings, differences and acceptance limits
 
