@@ -172,7 +172,7 @@
     "source": "src/pages/module/Marketing.jsx",
     "domain": "sales",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Customer", "Consignee"]
   },
@@ -182,7 +182,7 @@
     "source": "src/pages/module/Transaction.jsx",
     "domain": "shipments",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["On Site Outbound"]
   },
@@ -192,7 +192,7 @@
     "source": "src/pages/module/Booking.jsx",
     "domain": "shipments",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Kelola Booking"]
   },
@@ -202,7 +202,7 @@
     "source": "src/pages/module/Manifest.jsx",
     "domain": "shipments",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Manifest"]
   },
@@ -212,7 +212,7 @@
     "source": "src/pages/module/Operations.jsx",
     "domain": "shipments",
     "kind": "heading",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": []
   },
@@ -222,7 +222,7 @@
     "source": "src/pages/module/CustomerService.jsx",
     "domain": "shipments",
     "kind": "heading",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": []
   },

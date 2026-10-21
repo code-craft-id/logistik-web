@@ -21,6 +21,9 @@ export type PreviewView = {
   tools?: readonly string[];
   inlineForm?: boolean;
   summaries?: readonly string[];
+  createLabel?: string;
+  searchLabel?: string;
+  toolsAsMenu?: boolean;
 };
 export type PreviewScreen = {
   path: string;

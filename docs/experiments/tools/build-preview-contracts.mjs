@@ -43,12 +43,6 @@ const branchFilter = {
   type: "select",
   options: ["Preview A", "Preview B"],
 };
-const statusField = {
-  key: "status",
-  label: "Status",
-  type: "select",
-  options: ["Active", "Inactive"],
-};
 const base = (label, cols = [], form = []) => ({
   id: slug(label),
   label,
@@ -196,11 +190,13 @@ for (const route of inventory.routes) {
         formGroups: customerForm.tabs,
         actions: ["Detail", ...customer.actions],
         tools: customer.tools,
+        toolsAsMenu: true,
       },
       {
         ...base("Consignee", consignee.columns, consignee.fields),
         actions: ["Detail", ...consignee.actions],
         tools: consignee.tools,
+        toolsAsMenu: true,
       },
     ];
   }
@@ -213,18 +209,10 @@ for (const route of inventory.routes) {
     screen.views = [
       {
         ...base(title, columns(`features/${feature}/constants/columns.js`), fs),
-        filters:
-          route.path === "/transactions"
-            ? [...dateFilters, { ...statusField }]
-            : [
-                ...dateFilters,
-                {
-                  key: "courier",
-                  label: "Kurir",
-                  type: "select",
-                  options: ["Preview A", "Preview B"],
-                },
-              ],
+        filters: [],
+        searchLabel: "Search",
+        createLabel:
+          route.path === "/transactions" ? "Tambah AWB" : "Tambah Booking",
         tools:
           route.path === "/transactions"
             ? ["Template Import", "Import Data"]
@@ -243,14 +231,10 @@ for (const route of inventory.routes) {
           fields("features/manifest/components/ManifestForm.jsx"),
         ),
         inlineForm: true,
+        searchLabel: "Search Manifest No",
         filters: [
-          ...dateFilters,
-          {
-            key: "status",
-            label: "Status",
-            type: "select",
-            options: ["Open", "Closed"],
-          },
+          { key: "dateFrom", label: "Filter Periode - Dari", type: "date" },
+          { key: "dateTo", label: "Filter Periode - Sampai", type: "date" },
         ],
         tools: ["Export Excel"],
       },

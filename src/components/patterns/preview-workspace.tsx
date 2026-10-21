@@ -43,6 +43,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ImportPreview } from "./import-preview";
 import type { PreviewScreen, PreviewView } from "./preview-contract";
 import { PreviewField } from "./preview-field";
 import { PreviewForm } from "./preview-form";
@@ -257,21 +258,47 @@ function PreviewList({ view }: { view: PreviewView }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-base font-semibold">{view.label}</h2>
         <div className="flex flex-wrap gap-2">
-          {(view.tools ?? []).map((tool) => (
-            <Button
-              key={tool}
-              id={`${id}-${slug(tool)}`}
-              variant="outline"
-              className="min-h-11"
-              disabled={!/import data/i.test(tool)}
-              onClick={() => open(tool, undefined, `${id}-${slug(tool)}`)}
-            >
-              {tool}
-              {!/import data/i.test(tool) && (
-                <span className="sr-only"> — unavailable</span>
-              )}
-            </Button>
-          ))}
+          {view.toolsAsMenu ? (
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  id={`${id}-tools`}
+                  variant="outline"
+                  className="min-h-11"
+                >
+                  Tools
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {(view.tools ?? []).map((tool) => (
+                  <DropdownMenuItem
+                    key={tool}
+                    disabled={!/import data/i.test(tool)}
+                    onSelect={() => open(tool, undefined, `${id}-tools`)}
+                  >
+                    {tool}
+                    {!/import data/i.test(tool) && " — unavailable"}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            (view.tools ?? []).map((tool) => (
+              <Button
+                key={tool}
+                id={`${id}-${slug(tool)}`}
+                variant="outline"
+                className="min-h-11"
+                disabled={!/import data/i.test(tool)}
+                onClick={() => open(tool, undefined, `${id}-${slug(tool)}`)}
+              >
+                {tool}
+                {!/import data/i.test(tool) && (
+                  <span className="sr-only"> — unavailable</span>
+                )}
+              </Button>
+            ))
+          )}
           {view.fields.length > 0 && !view.inlineForm && (
             <Button
               id={`${id}-add`}
@@ -279,7 +306,8 @@ function PreviewList({ view }: { view: PreviewView }) {
               onClick={() => open("Tambah")}
             >
               <Plus aria-hidden="true" />
-              Tambah <span className="sr-only">{view.label} preview</span>
+              {view.createLabel ?? "Tambah"}{" "}
+              <span className="sr-only">{view.label} preview</span>
             </Button>
           )}
         </div>
@@ -306,7 +334,9 @@ function PreviewList({ view }: { view: PreviewView }) {
           }}
         >
           <div className="min-w-0 flex-1 basis-52 space-y-2">
-            <Label htmlFor={`${id}-search`}>Pencarian</Label>
+            <Label htmlFor={`${id}-search`}>
+              {view.searchLabel ?? "Pencarian"}
+            </Label>
             <Input
               id={`${id}-search`}
               type="search"
@@ -564,16 +594,7 @@ function PreviewList({ view }: { view: PreviewView }) {
                 <Button disabled>{overlay.action} — unavailable</Button>
               </div>
             ) : /import data/i.test(overlay.action) ? (
-              <div className="space-y-4">
-                <Label htmlFor={`${id}-file`}>
-                  Choose import file (local filename preview only)
-                </Label>
-                <Input id={`${id}-file`} type="file" className="min-h-11" />
-                <p className="text-sm text-muted-foreground">
-                  No file parsing, upload or import is performed.
-                </p>
-                <Button disabled>Import — unavailable</Button>
-              </div>
+              <ImportPreview />
             ) : (
               <PreviewForm
                 key={`${overlay.action}-${overlay.row?.id ?? "new"}`}

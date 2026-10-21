@@ -199,6 +199,7 @@ export const screens = {
           "Delete",
         ],
         tools: ["Download Import Template", "Import Data", "Export Data"],
+        toolsAsMenu: true,
       },
       {
         id: "consignee",
@@ -273,6 +274,7 @@ export const screens = {
         ],
         actions: ["Detail", "Edit", "Delete"],
         tools: ["Download Import Template", "Import Data", "Export Data"],
+        toolsAsMenu: true,
       },
     ],
   },

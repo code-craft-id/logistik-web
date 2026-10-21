@@ -74,8 +74,23 @@ with demonstrated unrelated failures. Initial slice ready for local checkpoint.
   Typecheck, 15 UI tests and two inventory tests pass; lint remains only the
   unrelated config format error. Evidence: `batch2-*`.
 
-Next: operations → reports/accounting/tickets → dashboard visual and cross-screen
-verification. Runtime/legacy pixel comparison is still unverified.
+- Batch 2 checkpoint committed: `f2f13aa`.
+- Batch 3: Customer/Consignee with source fields/tools and pricing/trucking
+  previews, Booking (14 source columns), On Site Outbound (12), Manifest (15)
+  with inline entry, and the two dormant operational headings. **22/43 route UIs
+  implemented; 21 remain.** Search-only booking/outbound controls were confirmed
+  in source; no speculative date/status filters retained. Manifest preserves its
+  period controls. Import has local filename/extension validation, accessible
+  file selection/drop area, unavailable progress/results and disabled upload;
+  no XLSX dependency, parsing, simulated success or network operation. Marketing
+  Tools remains a dropdown. All 17 UI tests pass, including import behavior and
+  keyboard row-menu → edit dialog → Escape/focus restoration. Typecheck passes;
+  lint remains only the unrelated config format difference. Browser evidence
+  `batch3-*` checks 375/1440 with no page overflow across customers, outbound
+  and manifest. No operations connect to backend services.
+
+Next: reports/accounting/tickets → dashboard visual and cross-screen verification.
+Runtime/legacy pixel comparison is still unverified.
 
 Date: 2026-10-21. Owner: Codex, presentation migration requested by coordinator.
 Branch: `feat/legacy-ui-parity`, created from clean `main` at

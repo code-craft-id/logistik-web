@@ -1,6 +1,7 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { ImportPreview } from "../../src/components/patterns/import-preview";
 import { PreviewForm } from "../../src/components/patterns/preview-form";
 import { PreviewWorkspace } from "../../src/components/patterns/preview-workspace";
 import { MenuAccessPreview } from "../../src/features/identity/components/menu-access-preview";
@@ -30,6 +31,70 @@ const button = (label: string) => {
 };
 
 describe("isolated legacy presentation interactions", () => {
+  it("validates only an import filename and never simulates an upload or import result", async () => {
+    await act(async () => root.render(createElement(ImportPreview)));
+    const input = host.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) throw Error("Missing import input");
+    await act(async () => {
+      Object.defineProperty(input, "files", {
+        configurable: true,
+        value: [new File([""], "fictional.txt")],
+      });
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain(
+      ".xlsx",
+    );
+    await act(async () => {
+      Object.defineProperty(input, "files", {
+        configurable: true,
+        value: [new File([""], "fictional.xlsx")],
+      });
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(host.querySelector('[role="alert"]')).toBeNull();
+    expect(host.querySelector("output")?.textContent).toContain(
+      "fictional.xlsx",
+    );
+    expect(host.querySelector("progress")?.value).toBe(0);
+    expect(button("Upload — unavailable").disabled).toBe(true);
+    expect(
+      Array.from(host.querySelectorAll("dd")).map((e) => e.textContent),
+    ).toEqual(["Unavailable", "Unavailable", "Unavailable"]);
+  });
+
+  it("opens an edit preview from its keyboard menu and restores focus without saving a row", async () => {
+    await act(async () =>
+      root.render(
+        createElement(PreviewWorkspace, { screen: identity["/group-user"] }),
+      ),
+    );
+    const trigger = host.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="menu"]',
+    );
+    if (!trigger) throw Error("Missing row menu");
+    trigger.focus();
+    await act(async () =>
+      trigger.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+      ),
+    );
+    const edit = Array.from(
+      document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+    ).find((e) => e.textContent === "Edit");
+    if (!edit) throw Error("Missing edit action");
+    await act(async () => edit.click());
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(button("Simpan — unavailable").disabled).toBe(true);
+    await act(async () =>
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+      ),
+    );
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    expect(host.textContent).toContain("24 preview rows");
+  });
   it("paginates, sorts, applies search explicitly and resets fixtures without mutating them", async () => {
     await act(async () =>
       root.render(

@@ -61,6 +61,30 @@ export const implementedPreviewRoutes = [
     label: "Satuan",
   },
   {
+    href: "/marketing",
+    label: "Pemasaran/Penjualan",
+  },
+  {
+    href: "/transactions",
+    label: "On Site Outbound",
+  },
+  {
+    href: "/bookings",
+    label: "Kelola Booking",
+  },
+  {
+    href: "/manifest",
+    label: "Daftar Manifest",
+  },
+  {
+    href: "/operations",
+    label: "Operasional",
+  },
+  {
+    href: "/customer-service",
+    label: "Layanan Pelanggan",
+  },
+  {
     href: "/",
     label: "Filter",
   },
