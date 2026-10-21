@@ -34,14 +34,22 @@ import {
 import { cn } from "@/lib/utils";
 import {
   activeFoundationRoute,
+  isNavigationSection,
   type NavigationGroup,
   type NavigationLeaf,
   navigation,
+  navigationDestinations,
+  navigationEntries,
   navigationPath,
 } from "./navigation";
 
 const groupIcons = {
   "System Settings": Settings,
+  "Sistem Setting": Settings,
+  Kantor: Building2,
+  Akunting: ChartNoAxesCombined,
+  Laporan: ChartNoAxesCombined,
+  Modul: Folder,
   Office: Building2,
   "Master Data": ListTree,
   Modules: Folder,
@@ -65,7 +73,9 @@ export function Navigation({
   const pathname = usePathname();
   const current = navigationPath(pathname, groups);
   const [openGroup, setOpenGroup] = useState(
-    current?.section ? current.group.label : null,
+    current && navigationEntries(current.group).length
+      ? current.group.label
+      : null,
   );
   const [openSection, setOpenSection] = useState(
     current?.section?.label ?? null,
@@ -83,23 +93,11 @@ export function Navigation({
   }, [collapsed, groups, id]);
   const [query, setQuery] = useState("");
   const search = query.trim().toLowerCase();
-  const results = groups
-    .flatMap((group) => [
-      ...(group.href || !group.sections
-        ? [{ item: group, path: group.providerLabel }]
-        : []),
-      ...(group.sections?.flatMap((section) =>
-        section.items.map((item) => ({
-          item,
-          path: [group.providerLabel, ...section.providerPath].join(" / "),
-        })),
-      ) ?? []),
-    ])
-    .filter(({ item, path }) =>
-      `${path} ${item.label} ${item.providerLabel}`
-        .toLowerCase()
-        .includes(search),
-    );
+  const results = navigationDestinations(groups).filter(({ item, path }) =>
+    `${path} ${item.label} ${item.providerLabel}`
+      .toLowerCase()
+      .includes(search),
+  );
   const routeLink = (item: NavigationLeaf, compact = false) => {
     if (!item.href) return null;
     const Icon = item.href === "/" ? Home : PanelsTopLeft;
@@ -206,7 +204,7 @@ export function Navigation({
               return <div key={group.label}>{routeLink(group, collapsed)}</div>;
             }
             if (collapsed)
-              return group.sections ? (
+              return navigationEntries(group).length ? (
                 <Button
                   key={group.label}
                   type="button"
@@ -235,7 +233,7 @@ export function Navigation({
                   </span>
                 </p>
               );
-            if (!group.sections)
+            if (!navigationEntries(group).length)
               return (
                 <p
                   key={group.label}
@@ -279,7 +277,21 @@ export function Navigation({
                   hidden={!expanded}
                   className="ml-3 border-l pl-2"
                 >
-                  {group.sections.map((section, sectionIndex) => {
+                  {navigationEntries(group).map((entry, sectionIndex) => {
+                    if (!isNavigationSection(entry))
+                      return (
+                        <div key={entry.label} className="py-1">
+                          {entry.href ? (
+                            routeLink(entry)
+                          ) : (
+                            <p className="px-3 py-2 text-sm text-muted-foreground">
+                              {entry.providerLabel}
+                              <span className="sr-only"> — unavailable</span>
+                            </p>
+                          )}
+                        </div>
+                      );
+                    const section = entry;
                     const sectionOpen = openSection === section.label;
                     const sectionId = `${groupId}-${sectionIndex}`;
                     return (

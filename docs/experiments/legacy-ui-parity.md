@@ -24,9 +24,45 @@ No assertions or safeguards were weakened. Logs: `phase0-test.log`,
 `phase0-build.log`. The user explicitly authorizes committing verified owned work
 with demonstrated unrelated failures. Initial slice ready for local checkpoint.
 
-Next: exhaustive route/component inventory, typed presentation contracts, then
-identity → organization/master data → operations → reports/accounting/tickets →
-dashboard/navigation reconciliation. Completion counts remain pending inventory.
+### Current inventory and batch checkpoints
+
+- Initial shell/dashboard checkpoint: `121a561`.
+- Exhaustive source audit: **34 declared routes + nine dormant page entrypoints
+  = 43 screens**, with **68 leaf workspace views** and 133 JS/JSX modules read.
+  All three public SVG assets have unverified usage rights and were not copied.
+  Login/Profile are separate screens; ticket support/approval and report/company
+  subsections are embedded views. Nine dormant pages receive supplemental routes,
+  rather than an unapproved exclusion. Full field/column/control provenance and
+  SHA-256 source hashes: `legacy-ui-inventory.json`; per-screen map:
+  `legacy-ui-screen-map.json`. No legacy rows, credentials, related-record choices,
+  endpoints or service code are copied. AST extraction never executes legacy JS.
+- Batch 1: **6/43 route UIs implemented**, including the initial dashboard and
+  five identity screens. Login inputs/sign-in are explicitly disabled; profile
+  matches its heading-only legacy source. Groups/users use the full source field
+  and column layouts. Menu rights has 19 × 4 local checkboxes; none grant access.
+  All writes remain unavailable, never simulated as successful.
+- Shared pattern note: source-owned Radix dropdown, tabs and Dialog compose
+  PreviewWorkspace, PreviewForm and PreviewField. An isolated typed fixture
+  generator supports real local filtering, sorting, page sizing/pagination,
+  details and draft editing. Save/delete/approval/import/export remain unavailable.
+  Form tabs stay mounted; only observed UI requiredness is checked locally.
+  These are repeated legacy patterns, not domain services or backend contracts.
+- Primary navigation now follows legacy MENU ordering/hierarchy, progressively
+  linking only concrete implemented preview pages. All 68 original provider
+  leaves remain in a supplementary two-level Provider inventory. More previews
+  exposes dormant/auxiliary screens. This resolves the earlier UI-source mismatch
+  under the user's explicit full-migration instruction without changing AGENTS,
+  permissions or roadmap status. Provider inventory tests retain their original
+  strict 68-leaf/unavailable assertions; primary-menu coverage tests are added.
+- Batch 1 checks: 15 UI tests + two inventory tests pass; typecheck and build
+  pass. Lint has only the separately owned next.config quote-format difference;
+  SQL checksum limitation is unchanged. No new failure accepted. Browser captures
+  at 375/1440 for login, groups and rights show no page overflow. Permission
+  matrix creates 76 preview checkboxes with save disabled; create dialog has
+  accessible title/description and initial field focus. Evidence: `batch1-*`.
+
+Next: organization/master data → operations → reports/accounting/tickets →
+dashboard visual and cross-screen verification. Remaining route UIs: **37**.
 
 Date: 2026-10-21. Owner: Codex, presentation migration requested by coordinator.
 Branch: `feat/legacy-ui-parity`, created from clean `main` at

@@ -4,7 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FoundationExamples } from "../../src/components/examples/foundation-examples";
 import { VendorFormExample } from "../../src/components/examples/vendor-form-example";
 import { AppShell, Navigation } from "../../src/components/shell/app-shell";
-import { navigation } from "../../src/components/shell/navigation";
+import { implementedPreviewRoutes } from "../../src/components/shell/implemented-preview-routes";
+import {
+  navigation,
+  providerNavigation,
+} from "../../src/components/shell/navigation";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/ui-examples" }));
 
@@ -52,7 +56,7 @@ describe("FND-03 local interaction contracts", () => {
     expect(container.textContent).toContain("Master Data");
     expect(
       container.querySelectorAll('nav[aria-label="Main navigation"] a'),
-    ).toHaveLength(2);
+    ).toHaveLength(implementedPreviewRoutes.length + 1);
   });
 
   it("associates local validation feedback and moves focus to the invalid field", async () => {
@@ -109,19 +113,19 @@ describe("FND-03 local interaction contracts", () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
   });
-  it("preserves every provider leaf behind two disclosure levels with no operational links", async () => {
+  it("preserves every provider inventory leaf behind two disclosure levels with no operational links", async () => {
     await act(async () =>
-      root.render(createElement(AppShell, null, "Example content")),
+      root.render(createElement(Navigation, { groups: providerNavigation })),
     );
     const nav = container.querySelector('nav[aria-label="Main navigation"]');
     expect(navigation[0].label).toBe("Dashboard");
     expect(
-      navigation.flatMap(
+      providerNavigation.flatMap(
         (group) => group.sections?.flatMap((section) => section.items) ?? [],
       ),
     ).toHaveLength(68);
     expect(nav?.querySelectorAll("button[aria-expanded]")).toHaveLength(22);
-    for (const group of navigation) {
+    for (const group of providerNavigation) {
       for (const section of group.sections ?? []) {
         for (const leaf of section.items) {
           expect(nav?.textContent).toContain(leaf.providerLabel);
@@ -140,7 +144,7 @@ describe("FND-03 local interaction contracts", () => {
 
   it("opens only one group and section at a time and keeps their controlled lists hidden otherwise", async () => {
     await act(async () =>
-      root.render(createElement(AppShell, null, "Example content")),
+      root.render(createElement(Navigation, { groups: providerNavigation })),
     );
     const panel = (name: string) => {
       const control = button(name);
@@ -248,7 +252,7 @@ describe("FND-03 local interaction contracts", () => {
 
   it("finds provider and English labels with full paths, keeps unavailable results unlinked, and clears an empty search", async () => {
     await act(async () =>
-      root.render(createElement(AppShell, null, "Example content")),
+      root.render(createElement(Navigation, { groups: providerNavigation })),
     );
     const search = container.querySelector<HTMLInputElement>(
       'input[type="search"]',

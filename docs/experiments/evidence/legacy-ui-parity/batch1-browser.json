@@ -1,0 +1,44 @@
+[
+  {
+    "clientWidth": 375,
+    "heading": "Masuk Sistem",
+    "route": "/login",
+    "scrollWidth": 375,
+    "width": 375
+  },
+  {
+    "clientWidth": 1440,
+    "heading": "Masuk Sistem",
+    "route": "/login",
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "heading": "Grup User",
+    "route": "/group-user",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "heading": "Grup User",
+    "route": "/group-user",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "clientWidth": 375,
+    "heading": "Hak Akses Menu",
+    "route": "/hak-akses-menu",
+    "scrollWidth": 375,
+    "width": 375
+  },
+  {
+    "clientWidth": 1440,
+    "heading": "Hak Akses Menu",
+    "route": "/hak-akses-menu",
+    "scrollWidth": 1440,
+    "width": 1440
+  }
+]
