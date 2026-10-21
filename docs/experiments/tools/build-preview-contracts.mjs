@@ -222,7 +222,12 @@ for (const route of inventory.routes) {
   if (route.path === "/user-management")
     screen.views = [
       base("User", columns("pages/setting/UserManagement.jsx"), [
-        ...info.fields,
+        ...info.fields.map((field) => ({
+          ...field,
+          required:
+            ["codeInitial", "username", "password"].includes(field.key) ||
+            field.required,
+        })),
         { key: "active", label: "Aktif", type: "checkbox" },
       ]),
     ];
@@ -245,13 +250,13 @@ for (const route of inventory.routes) {
       {
         ...base("Customer", customer.columns, customerForm.fields),
         formGroups: customerForm.tabs,
-        actions: ["Detail", ...customer.actions],
+        actions: customer.actions,
         tools: customer.tools,
         toolsAsMenu: true,
       },
       {
         ...base("Consignee", consignee.columns, consignee.fields),
-        actions: ["Detail", ...consignee.actions],
+        actions: consignee.actions,
         tools: consignee.tools,
         toolsAsMenu: true,
       },
@@ -274,7 +279,7 @@ for (const route of inventory.routes) {
           route.path === "/transactions"
             ? ["Template Import", "Import Data"]
             : [],
-        actions: ["Detail", "Edit", "Delete"],
+        actions: ["Edit", "Delete"],
       },
     ];
   }
@@ -288,6 +293,7 @@ for (const route of inventory.routes) {
           fields("features/manifest/components/ManifestForm.jsx"),
         ),
         inlineForm: true,
+        actions: [],
         searchLabel: "Search Manifest No",
         filters: [
           { key: "dateFrom", label: "Filter Periode - Dari", type: "date" },

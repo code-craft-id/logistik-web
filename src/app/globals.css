@@ -21,6 +21,11 @@
   --sidebar: #ffffff;
   --workspace: #f8fafc;
   --overlay: #17233480;
+  /* Legacy chart palette; values are illustration tokens, never financial data. */
+  --chart-1: #0f5c4c;
+  --chart-2: #d99717;
+  --chart-3: #2188a5;
+  --chart-4: #526176;
   --radius: 0.5rem;
 }
 
@@ -42,6 +47,10 @@
   --color-sidebar: var(--sidebar);
   --color-workspace: var(--workspace);
   --color-overlay: var(--overlay);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

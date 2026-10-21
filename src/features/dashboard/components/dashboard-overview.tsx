@@ -19,7 +19,24 @@ import Link from "next/link";
 import { DashboardPanel } from "@/components/patterns/dashboard-panel";
 import { PageHeading } from "@/components/patterns/page-heading";
 import { Button } from "@/components/ui/button";
+import { DashboardChart } from "./dashboard-chart";
 import { DashboardFilters } from "./dashboard-filters";
+
+const quickDestinations: Record<string, string> = {
+  Booking: "/bookings",
+  "Entry AWB": "/transactions",
+  "Shipment Status": "/shipment-status",
+  "Tracking AWB": "/transactions",
+  Manifest: "/manifest",
+  Transit: "/manifest",
+  "Inbound Manifest": "/manifest",
+  "Delivery Sheet": "/branch-reports/delivery",
+  Invoice: "/akunting",
+  "Invoice Paid": "/akunting",
+  "Report Detail Transaksi": "/branch-reports/transaction-details",
+  "Rekap Transaksi": "/branch-reports/daily-turnover-summary",
+  "Report AR": "/financial-reports",
+};
 
 const quickActions = [
   { title: "Booking", icon: CalendarDays, items: ["Booking"] },
@@ -98,17 +115,6 @@ function MetricGroup({
   );
 }
 
-function UnavailableChart({ description }: { description: string }) {
-  return (
-    <div className="flex min-h-60 items-center justify-center rounded-lg bg-muted/50 p-6 text-center">
-      <div className="max-w-prose space-y-2">
-        <p className="text-sm font-medium">Chart unavailable</p>
-        <p className="text-sm leading-6 text-muted-foreground">{description}</p>
-      </div>
-    </div>
-  );
-}
-
 export function DashboardOverview() {
   return (
     <>
@@ -126,15 +132,15 @@ export function DashboardOverview() {
       />
       <p className="rounded-lg border bg-background px-4 py-3 text-sm leading-6 text-muted-foreground">
         UI preview · Legacy dashboard layout. Operational data, account access
-        and workflow destinations are unavailable. No records are loaded or
-        saved.
+        are unavailable. Links open presentation previews. No records are loaded
+        or saved.
       </p>
       <DashboardPanel title="Filter">
         <DashboardFilters />
       </DashboardPanel>
       <DashboardPanel
         title="Quick Action"
-        description="Akses cepat menu favorit Anda · Destinations unavailable until their feature is implemented."
+        description="Akses cepat menu favorit Anda · Links open UI previews; operational actions remain unavailable."
       >
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {quickActions.map(({ title, icon: Icon, items }) => (
@@ -151,12 +157,14 @@ export function DashboardOverview() {
               </h3>
               <ul className="flex flex-wrap gap-2">
                 {items.map((item) => (
-                  <li
-                    key={item}
-                    className="rounded-md border bg-muted/50 px-3 py-2 text-xs text-muted-foreground"
-                  >
-                    {item}
-                    <span className="sr-only"> — unavailable</span>
+                  <li key={item}>
+                    <Link
+                      href={quickDestinations[item]}
+                      className="flex min-h-11 items-center rounded-md border bg-muted/50 px-3 py-2 text-xs hover:bg-accent hover:text-primary"
+                    >
+                      {item}
+                      <span className="sr-only"> — UI preview</span>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -170,17 +178,17 @@ export function DashboardOverview() {
         title="Grafik Transaksi Per Bulan"
         description="CASH · KREDIT · COD · TUNAI - TRANSFER"
       >
-        <UnavailableChart description="Monthly transactions require an approved reporting query and date basis. No totals are calculated in this preview." />
+        <DashboardChart kind="monthly" label="Grafik Transaksi Per Bulan" />
       </DashboardPanel>
       <div className="grid gap-4 xl:grid-cols-3">
         <DashboardPanel title="Rekap Penjualan Per Bulan">
-          <UnavailableChart description="Sales summaries require approved revenue and costing definitions." />
+          <DashboardChart kind="sales" label="Rekap Penjualan Per Bulan" />
         </DashboardPanel>
         <DashboardPanel title="Paid Unpaid Invoice">
-          <UnavailableChart description="Invoice totals require the approved invoice lifecycle and payment integration." />
+          <DashboardChart kind="invoices" label="Paid Unpaid Invoice" />
         </DashboardPanel>
         <DashboardPanel title="Grafik Penjualan Harian">
-          <UnavailableChart description="Daily sales require an approved date basis, branch scope and source query." />
+          <DashboardChart kind="daily" label="Grafik Penjualan Harian" />
         </DashboardPanel>
       </div>
     </>

@@ -19,8 +19,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import {
+  Fragment,
+  type ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Sheet,
@@ -133,7 +146,7 @@ export function Navigation({
               {current?.labels.join(" / ") ?? "Page"}
             </span>
           </p>
-          <p>Domain destinations are unavailable.</p>
+          <p>Presentation previews only. Operational services unavailable.</p>
         </div>
       )}
       {!collapsed && (
@@ -363,6 +376,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const current = activeFoundationRoute(pathname);
+  const breadcrumbs = navigationPath(pathname)?.labels ?? [
+    current?.label ?? "Page",
+  ];
   return (
     <div className="flex min-h-dvh bg-workspace">
       <a
@@ -438,7 +454,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <SheetHeader>
                   <SheetTitle>LMS navigation</SheetTitle>
                   <SheetDescription>
-                    Navigate the UI preview. Domain destinations are
+                    Navigate presentation previews. Operational services are
                     unavailable.
                   </SheetDescription>
                 </SheetHeader>
@@ -462,22 +478,48 @@ export function AppShell({ children }: { children: ReactNode }) {
                       Dashboard
                     </Link>
                   </li>
-                  <li aria-hidden="true">
-                    <ChevronRight className="size-3" />
-                  </li>
-                  <li>
-                    <span aria-current="page">{current?.label ?? "Page"}</span>
-                  </li>
+                  {breadcrumbs.map((label, index) => (
+                    <Fragment key={`${index}-${label}`}>
+                      <li aria-hidden="true">
+                        <ChevronRight className="size-3" />
+                      </li>
+                      <li>
+                        <span
+                          aria-current={
+                            index === breadcrumbs.length - 1
+                              ? "page"
+                              : undefined
+                          }
+                        >
+                          {label}
+                        </span>
+                      </li>
+                    </Fragment>
+                  ))}
                 </>
               )}
             </ol>
           </nav>
-          <div className="ml-auto flex items-center gap-2 rounded-full border px-3 py-2 text-xs text-muted-foreground">
-            <UserRound className="size-4 shrink-0" aria-hidden="true" />
-            <span>
-              Account unavailable
-              <span className="hidden sm:inline"> · UI preview</span>
-            </span>
+          <div className="ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="min-h-11 text-xs">
+                  <UserRound aria-hidden="true" />
+                  <span>
+                    Account unavailable
+                    <span className="hidden sm:inline"> · UI preview</span>
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profil Saya — preview</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  Keluar — unavailable
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main

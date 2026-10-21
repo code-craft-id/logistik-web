@@ -224,7 +224,7 @@ function PreviewList({ view }: { view: PreviewView }) {
   const pages = Math.max(1, Math.ceil(count / size));
   const currentPage = Math.min(page, pages);
   const visible = filtered.slice((currentPage - 1) * size, currentPage * size);
-  const actions = view.actions ?? ["Detail", "Edit", "Delete"];
+  const actions = view.actions ?? ["Edit", "Hapus"];
   function open(action: string, row?: PreviewRow, trigger?: string) {
     returnFocus.current = trigger ?? `${id}-add`;
     setOverlay({ action, row });

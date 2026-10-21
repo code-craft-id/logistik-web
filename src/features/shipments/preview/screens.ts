@@ -168,7 +168,7 @@ export const screens = {
         searchLabel: "Search",
         createLabel: "Tambah AWB",
         tools: ["Template Import", "Import Data"],
-        actions: ["Detail", "Edit", "Delete"],
+        actions: ["Edit", "Delete"],
       },
     ],
   },
@@ -348,7 +348,7 @@ export const screens = {
         searchLabel: "Search",
         createLabel: "Tambah Booking",
         tools: [],
-        actions: ["Detail", "Edit", "Delete"],
+        actions: ["Edit", "Delete"],
       },
     ],
   },
@@ -482,6 +482,7 @@ export const screens = {
           },
         ],
         inlineForm: true,
+        actions: [],
         searchLabel: "Search Manifest No",
         filters: [
           {

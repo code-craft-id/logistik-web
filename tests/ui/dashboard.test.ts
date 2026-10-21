@@ -65,13 +65,31 @@ describe("legacy dashboard supported presentation", () => {
     ).toBe(true);
   });
 
-  it("keeps unsupported workflows unlinked and reports unavailable data without fabricated results", async () => {
+  it("links implemented previews and labels chart illustrations without fabricating metrics", async () => {
     await act(async () => root.render(createElement(DashboardOverview)));
     expect(
       Array.from(container.querySelectorAll("a")).map((link) =>
         link.getAttribute("href"),
       ),
-    ).toEqual(["/ui-examples"]);
+    ).toEqual([
+      "/ui-examples",
+      "/bookings",
+      "/transactions",
+      "/shipment-status",
+      "/transactions",
+      "/manifest",
+      "/manifest",
+      "/manifest",
+      "/branch-reports/delivery",
+      "/akunting",
+      "/akunting",
+      "/branch-reports/transaction-details",
+      "/branch-reports/daily-turnover-summary",
+      "/financial-reports",
+    ]);
+    expect(container.querySelectorAll('svg[role="img"]')).toHaveLength(4);
+    expect(container.textContent).toContain("Synthetic illustration");
+    expect(container.textContent).toContain("Filters do not recalculate");
     expect(container.querySelectorAll("dd")).toHaveLength(11);
     for (const value of container.querySelectorAll("dd"))
       expect(value.textContent).toBe("Unavailable");

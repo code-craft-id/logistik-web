@@ -16,6 +16,10 @@ colors:
   input: "#a6b2c2"
   overlay: "#17233480"
   workspace: "#f8fafc"
+  chart-1: "#0f5c4c"
+  chart-2: "#d99717"
+  chart-3: "#2188a5"
+  chart-4: "#526176"
 typography:
   headline:
     fontFamily: "Geist, Arial, Helvetica, sans-serif"
@@ -149,7 +153,7 @@ Borders, alignment and spacing organize the interface. Components stay compact w
 
 This records the implemented FND-03 foundation. Its delivery status is **DONE (2026-10-19)** with coordinator-reported acceptance; see the [closure evidence](docs/decisions/FND-03-iteration-2.md#closure-pass). All local automated gates and the authorized production smoke pass. Vendor add-form tabs and visible Data Vendor fields are VERIFIED; hidden tab fields and live behavior parity remain unverified. D-29 records the coordinator-confirmed admin access and non-archival decision. Overall sidebar acceptance is coordinator-reported; no individual checklist review or independent human verification is claimed. The surface brief owns route composition and mode. English follows the starter; D-19 remains TBD and no locale or timezone policy is established.
 
-The 2026-10-21 legacy UI inheritance batch updates the shared accent, shell canvas, gutters and dashboard panel presentation described below. The preceding acceptance paragraph records the FND-03 closure; it does not approve this batch. Current routes remain `/` and `/ui-examples`. The dashboard is a presentation preview, PLT-01 has not started, and no independent domain-owner acceptance or runtime comparison with legacy is claimed. See [the scoped audit and verification note](docs/experiments/legacy-ui-parity.md) for this batch's evidence and outstanding gates.
+The 2026-10-21 legacy UI inheritance now covers 43 presentation screen routes (34 declared legacy routes and nine dormant source screens), with 72 leaf view contracts; `/ui-examples` remains the separate foundation catalogue. The preceding acceptance paragraph records the historical FND-03 closure, not acceptance of this migration. The inherited presentation retains the source menu, tab and field order within the incumbent shell. All screens use synthetic fixtures or unavailable values; saving and operational actions remain unavailable pending the owning PLT/domain implementations. Comparison is source-based: legacy runtime comparison is unavailable, and no pixel parity, operational/security acceptance or independent domain-owner acceptance is claimed. See [the scoped audit and verification note](docs/experiments/legacy-ui-parity.md) and [screen inventory](docs/experiments/legacy-ui-screen-map.json).
 
 ## Colors
 
@@ -175,6 +179,10 @@ A restrained green accent sits against white and cool slate neutrals. Frontmatte
 ### Semantic
 
 - **Error Red** (`destructive`): invalid fields, destructive buttons and error icons. No distinct success or warning palette is implemented.
+
+### Chart illustrations
+
+- **Chart Green**, **Chart Amber**, **Chart Teal** and **Chart Slate** (`chart-1` through `chart-4`): the shared four-series illustration palette. Amber and teal distinguish chart segments; they do not introduce warning or status meanings. Legends and accessible descriptions identify the series and their synthetic nature.
 
 **The Meaningful Accent Rule.** Use green for actions, selection and focus, and error red for destructive or invalid states. Color must reinforce a label or state.
 
@@ -207,6 +215,8 @@ The desktop sidebar appears from 64rem, occupies 16rem when expanded and 5rem wh
 Filters wrap with their labels and actions. Side-by-side example sections start at the extra-large breakpoint. Tables retain columns within a named, keyboard-focusable horizontal scroll region; page-level horizontal overflow is not the table strategy. The locally exercised viewports are 375px, 768px and 1440px; shared evidence is in the FND-03 note and `docs/decisions/evidence/`. Historical `.impeccable/review/` captures are local, ignored tooling artifacts.
 
 The dashboard's first scoped inheritance batch uses single-column quick-action and metric regions, two columns from the small breakpoint and three from the extra-large breakpoint. Filters grow from one column to two at the small breakpoint and four at the large breakpoint; their action row sits alongside from the extra-large breakpoint. The full-width monthly chart region precedes three chart regions that become columns at the extra-large breakpoint. This is the dashboard composition, not a requirement for other pages. Current screenshots and measurements in `docs/experiments/evidence/legacy-ui-parity/` cover the same three viewports, report no page overflow and show 44px dashboard controls. They do not establish legacy runtime or pixel parity.
+
+Legacy workspaces connect navigation to filters and rows, with local dialogs or source-defined inline entry forms. Source-defined tabs wrap on narrow screens. Form fields grow from one column to two at the small breakpoint; their action row wraps below the fields. Presentation headings use a compact 20px step, growing to 24px at the small breakpoint. Dense tables and the monthly chart contain horizontal scrolling within their own regions.
 
 ## Elevation & Depth
 
@@ -248,17 +258,21 @@ Dashboard month, date and year fields are a local preview. Show reports the ente
 
 ### Navigation
 
-The white sidebar uses compact grouped labels and Lucide domain icons. Implemented links have 44px minimum row height, medium-weight type and selection-green hover/active treatment. Exact-route matching supplies `aria-current`. Unavailable domains are presentation text with an unavailable accessible label. The typed navigation config preserves observed provider top-level order, with Dashboard first, and the 68-leaf provider inventory. Domain inventory displays observed provider labels; the foundation's English copy remains provisional under D-19. No localization policy is established.
+The white sidebar uses compact grouped labels and Lucide domain icons. Implemented preview links have 44px minimum row height, medium-weight type and selection-green hover/active treatment. Exact-route matching supplies `aria-current`. Unavailable destinations are presentation text with an unavailable accessible label. Primary navigation now follows the inspected legacy `MENU` order: Dashboard, Sistem Setting, Kantor, Master Data, Akunting, Modul, Laporan, Ticketing. More previews exposes implemented source screens absent from that menu, including dormant screens. The original 68 observed provider leaves remain as supplementary Provider inventory, followed by System Tutorial and UI examples. Source labels remain recognizable; mixed inherited labels and foundation English do not settle D-19 or establish a localization policy.
 
-The closure pass replaces the rejected flat headers with two disclosure levels: top-level group and section. Folder icons, chevrons, inset borders and nested lists distinguish groups from unavailable leaves. Only one group and one section open at a time. Buttons expose `aria-expanded` and `aria-controls`; active route ancestors open on initial rendering. The current full path appears before the inventory. A labeled local filter searches original provider and existing English leaf labels, showing complete provider paths and unlinked unavailable results. Clear restores the tree and focuses the filter. This extra control addresses the remaining long report scan; no command palette or dependency is introduced. Indentation stops after the second disclosure level. Undocumented groups remain top-level text. The named Expand sidebar control recovers compact mode.
+The FND-03 closure established two disclosure levels: top-level group and section. This bounded tree continues for the inherited menu. Folder icons, chevrons, inset borders and nested lists distinguish groups and leaves. Only one group and one section open at a time. Buttons expose `aria-expanded` and `aria-controls`; active route ancestors open on initial rendering. The current full path appears before the inventory. A labeled local filter searches configured paths and labels, showing complete paths, links to implemented previews and unlinked unavailable results. Clear restores the tree and focuses the filter. Indentation stops after the second disclosure level. Undocumented groups remain top-level text. The named Expand sidebar control recovers compact mode.
 
 The mobile Sheet uses Radix focus containment, Escape dismissal, a 44px close target and trigger focus restoration. Selecting an available route dismisses the drawer. The shell includes a skip link and breadcrumbs.
 
-The persistent sidebar and its bounded disclosure tree adapt the legacy presentation; horizontal flyout navigation is not inherited. Account status is explicitly unavailable in the header, with no fabricated user or account workflow.
+The persistent sidebar and its bounded disclosure tree adapt the legacy presentation; horizontal flyout navigation is not inherited. The header's Account unavailable menu links to the profile preview and leaves logout unavailable; it supplies no fabricated session or account workflow.
 
 ### Dashboard Preview
 
-The current order is filters, six quick-action groups, six branch metrics, five operational metrics, a monthly transaction chart region and three summary chart regions. Quick destinations are unlinked text, metric values say Unavailable, and each chart region explains its missing approved source. No mock counts, money, cache timestamps or plotted data are provided. This records presentation evidence only; workflow, branch scope and financial/reporting definitions require their owner-approved implementations.
+The current order is filters, six quick-action groups, six branch metrics, five operational metrics, a monthly transaction chart and three summary charts. The source quick-action labels now link to implemented presentation previews. All 11 metric values remain Unavailable. The chart regions show a monthly stacked-bar illustration, sales and paid/unpaid donut illustrations, and a daily area illustration. Drawing dimensions in `dashboard-chart-fixtures.ts` are arbitrary geometry, not reporting values, counts, money or approved proportions. Each chart states that it is synthetic, supplies an accessible description and leaves actual values unavailable. Filters do not recalculate the illustrations. This records presentation evidence only; workflow, branch scope and financial/reporting definitions require their owner-approved implementations.
+
+### Legacy workspace previews
+
+Shared PreviewScreen, PreviewWorkspace, PreviewForm and PreviewField compositions render source-derived labels, columns, field order, tabs and row-action affordances. Search, filters, sorting, pagination and state selectors operate on synthetic local rows. Form tabs retain mounted fields, hide inactive panels and keep actions below the panels. Check preview can highlight a missing presentation field; Simpan remains disabled. Action dialogs and import previews describe unavailable backend behavior explicitly. These presentation contracts do not define database, API, authorization or business-validation rules.
 
 ### Table, Feedback and Dialog
 

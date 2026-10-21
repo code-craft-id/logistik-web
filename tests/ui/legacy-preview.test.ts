@@ -34,6 +34,29 @@ const button = (label: string) => {
 };
 
 describe("isolated legacy presentation interactions", () => {
+  it("exposes loading, empty and recoverable error previews without requests", async () => {
+    await act(async () =>
+      root.render(
+        createElement(PreviewWorkspace, { screen: identity["/group-user"] }),
+      ),
+    );
+    const state = host.querySelectorAll<HTMLSelectElement>("select")[1];
+    if (!state) throw Error("Missing state selector");
+    for (const [value, text] of [
+      ["Loading", "no request is running"],
+      ["Empty", "No matching preview rows"],
+      ["Error", "No operational request was made"],
+    ]) {
+      await act(async () => {
+        state.value = value;
+        state.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      expect(host.textContent).toContain(text);
+    }
+    expect(host.querySelector('[role="alert"]')).not.toBeNull();
+    await act(async () => button("Return to preview rows").click());
+    expect(host.querySelectorAll("tbody tr")).toHaveLength(10);
+  });
   it("adds and removes local ticket pictures while saving remains unavailable", async () => {
     await act(async () =>
       root.render(
