@@ -173,6 +173,7 @@ function sanitizeFields(fields) {
 }
 function inspect(file) {
   const unit = load(file);
+  let reportProps;
   const headings = [],
     headers = [],
     fields = [],
@@ -220,6 +221,13 @@ function inspect(file) {
     if (tag === "ReportPage") {
       if (a.title) headings.unshift(a.title);
       if (a.columns) headers.push(...a.columns.map((c) => c.label));
+      reportProps = {
+        dateField: a.dateField,
+        branchField: a.branchField,
+        searchable: a.searchable,
+        selectFilters: sanitizeFields(a.selectFilters ?? []),
+        summaries: (a.summaries ?? []).map((item) => item.label),
+      };
     }
     if (
       ![
@@ -381,14 +389,22 @@ function inspect(file) {
     ...(config
       ? { config: { title: config.title, tabs: configTabs(config.tabs) } }
       : {}),
+    ...(reportProps ? { reportProps } : {}),
     configs: Object.fromEntries(
       Object.entries(declarations)
-        .filter(([k, v]) => /CONFIG/.test(k) && v?.fields)
+        .filter(([k, v]) => /CONFIG/.test(k) && (v?.fields || v?.recapColumns))
         .map(([k, v]) => [
           k,
           {
             label: v.label,
             fields: sanitizeFields(v.fields),
+            entityLabel: v.entityLabel,
+            recapTitle: v.recapTitle,
+            recapColumns: v.recapColumns?.map((column) => ({
+              key: column.key,
+              label: column.label,
+              type: column.type ?? "text",
+            })),
             columns: v.columns?.map((c) => ({ key: c.key, label: c.label })),
             actions: v.rowActions?.map((a) => a.label),
             tools: v.tools?.map((a) => a.label),

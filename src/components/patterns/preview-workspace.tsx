@@ -11,7 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import { Tabs } from "radix-ui";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   makePreviewRows,
   type PreviewRow,
@@ -39,6 +39,7 @@ import {
   TableBody,
   TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -55,15 +56,21 @@ function slug(label: string) {
     .replace(/^-|-$/g, "");
 }
 
+function hasHash(view: PreviewView, hash: string): boolean {
+  return (
+    view.id === hash ||
+    [...(view.children ?? []), ...(view.supplementalViews ?? [])].some(
+      (child) => hasHash(child, hash),
+    )
+  );
+}
+
 export function PreviewWorkspace({ screen }: { screen: PreviewScreen }) {
   const [active, setActive] = useState(screen.views[0]?.id ?? "");
   useEffect(() => {
     const update = () => {
       const hash = decodeURIComponent(window.location.hash.slice(1));
-      const found = screen.views.find(
-        (view) =>
-          view.id === hash || view.children?.some((child) => child.id === hash),
-      );
+      const found = screen.views.find((view) => hasHash(view, hash));
       if (found) setActive(found.id);
     };
     update();
@@ -170,6 +177,7 @@ function PreviewList({ view }: { view: PreviewView }) {
   });
   const [state, setState] = useState("Rows");
   const [overlay, setOverlay] = useState<Overlay | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const returnFocus = useRef<string>("");
   const filtered = useMemo(
     () =>
@@ -256,7 +264,9 @@ function PreviewList({ view }: { view: PreviewView }) {
         </section>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-base font-semibold">{view.label}</h2>
+        <h2 className="text-base font-semibold">
+          {view.tableTitle ?? view.label}
+        </h2>
         <div className="flex flex-wrap gap-2">
           {view.toolsAsMenu ? (
             <DropdownMenu modal={false}>
@@ -333,24 +343,26 @@ function PreviewList({ view }: { view: PreviewView }) {
             setPage(1);
           }}
         >
-          <div className="min-w-0 flex-1 basis-52 space-y-2">
-            <Label htmlFor={`${id}-search`}>
-              {view.searchLabel ?? "Pencarian"}
-            </Label>
-            <Input
-              id={`${id}-search`}
-              type="search"
-              placeholder="Cari preview…"
-              value={draft}
-              onInput={(event) => setDraft(event.currentTarget.value)}
-              className="min-h-11"
-            />
-          </div>
+          {!view.hideSearch && (
+            <div className="min-w-0 flex-1 basis-52 space-y-2">
+              <Label htmlFor={`${id}-search`}>
+                {view.searchLabel ?? "Pencarian"}
+              </Label>
+              <Input
+                id={`${id}-search`}
+                type="search"
+                placeholder="Cari preview…"
+                value={draft}
+                onInput={(event) => setDraft(event.currentTarget.value)}
+                className="min-h-11"
+              />
+            </div>
+          )}
           {(view.filters ?? []).map((field) => (
             <div key={field.key} className="min-w-0 flex-1 basis-40">
               <PreviewField
                 field={field}
-                id={`${id}-filter-${field.key}`}
+                id={`${id}-filter-${encodeURIComponent(field.key)}`}
                 value={filters[field.key] ?? ""}
                 onChange={(value) =>
                   setFilters((current) => ({ ...current, [field.key]: value }))
@@ -480,56 +492,118 @@ function PreviewList({ view }: { view: PreviewView }) {
                 </TableRow>
               ) : (
                 visible.map((row) => (
-                  <TableRow key={row.id}>
-                    {view.columns.map((column) => (
-                      <TableCell key={column.key} className="px-3 py-3">
-                        {/status|aktif|active/i.test(
-                          `${column.key} ${column.label}`,
-                        ) ? (
-                          <Badge variant="secondary">
-                            {row.values[column.key]}
-                          </Badge>
-                        ) : (
-                          row.values[column.key]
-                        )}
-                      </TableCell>
-                    ))}
-                    {actions.length > 0 && (
-                      <TableCell>
-                        <DropdownMenu modal={false}>
-                          <DropdownMenuTrigger asChild>
+                  <Fragment key={row.id}>
+                    <TableRow>
+                      {view.columns.map((column) => (
+                        <TableCell key={column.key} className="px-3 py-3">
+                          {/status|aktif|active/i.test(
+                            `${column.key} ${column.label}`,
+                          ) ? (
+                            <Badge variant="secondary">
+                              {row.values[column.key] === "true"
+                                ? "Active"
+                                : row.values[column.key] === "false"
+                                  ? "Inactive"
+                                  : row.values[column.key]}
+                            </Badge>
+                          ) : (
+                            row.values[column.key]
+                          )}
+                        </TableCell>
+                      ))}
+                      {actions.length > 0 && (
+                        <TableCell>
+                          {view.detailLabels?.length ? (
                             <Button
                               variant="ghost"
-                              size="icon"
-                              id={`${id}-${row.id}`}
-                              className="size-11"
-                              aria-label={`Actions ${row.id}`}
+                              className="min-h-11"
+                              aria-expanded={expanded === row.id}
+                              aria-controls={`${id}-detail-${row.id}`}
+                              onClick={() =>
+                                setExpanded((current) =>
+                                  current === row.id ? null : row.id,
+                                )
+                              }
                             >
-                              <Ellipsis aria-hidden="true" />
+                              Detail
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {actions.map((action) => (
-                              <DropdownMenuItem
-                                key={action}
-                                onSelect={() =>
-                                  open(action, row, `${id}-${row.id}`)
-                                }
-                              >
-                                {action}
-                                {/approve|selesai|revisi|close|buka link/i.test(
-                                  action,
-                                ) && " — unavailable"}
-                              </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  id={`${id}-${row.id}`}
+                                  className="size-11"
+                                  aria-label={`Actions ${row.id}`}
+                                >
+                                  <Ellipsis aria-hidden="true" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {actions.map((action) => (
+                                  <DropdownMenuItem
+                                    key={action}
+                                    onSelect={() =>
+                                      open(action, row, `${id}-${row.id}`)
+                                    }
+                                  >
+                                    {action}
+                                    {/approve|selesai|revisi|close|buka link/i.test(
+                                      action,
+                                    ) && " — unavailable"}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                    {view.detailLabels?.length && (
+                      <TableRow
+                        id={`${id}-detail-${row.id}`}
+                        hidden={expanded !== row.id}
+                      >
+                        <TableCell
+                          colSpan={view.columns.length + 1}
+                          className="whitespace-normal bg-muted/40 p-4"
+                        >
+                          <dl className="grid gap-4 sm:grid-cols-3">
+                            {view.detailLabels.map((label) => (
+                              <div key={label}>
+                                <dt className="text-xs text-muted-foreground">
+                                  {label}
+                                </dt>
+                                <dd className="mt-1 text-sm">
+                                  {row.values[
+                                    view.columns.find(
+                                      (column) => column.label === label,
+                                    )?.key ?? slug(label)
+                                  ] ?? `Preview ${label} ${row.id.slice(-2)}`}
+                                </dd>
+                              </div>
                             ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                          </dl>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </TableRow>
+                  </Fragment>
                 ))
               )}
             </TableBody>
+            {view.footerLabel && (
+              <TableFooter>
+                <TableRow>
+                  <TableCell
+                    colSpan={view.columns.length + (actions.length ? 1 : 0)}
+                  >
+                    {view.footerLabel} · Unavailable — no financial totals
+                    calculated
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+            )}
           </Table>
         )}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t p-3 text-sm">
@@ -560,6 +634,21 @@ function PreviewList({ view }: { view: PreviewView }) {
           </div>
         </div>
       </div>
+      {view.supplementalViews?.length ? (
+        <section aria-label="Detail Tagihan" className="space-y-4">
+          <h2 className="text-base font-semibold">Detail Tagihan</h2>
+          <PreviewWorkspace
+            screen={{
+              path: "",
+              title: "Detail Tagihan",
+              source: "FinancialReport.jsx",
+              kind: "workspace",
+              integration: "",
+              views: view.supplementalViews,
+            }}
+          />
+        </section>
+      ) : null}
       <Dialog
         open={!!overlay}
         onOpenChange={(open) => {

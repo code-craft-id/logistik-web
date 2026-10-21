@@ -24,6 +24,12 @@ export type PreviewView = {
   createLabel?: string;
   searchLabel?: string;
   toolsAsMenu?: boolean;
+  hideSearch?: boolean;
+  tableTitle?: string;
+  footerLabel?: string;
+  supplementalViews?: readonly PreviewView[];
+  detailLabels?: readonly string[];
+  fixtureStatus?: string;
 };
 export type PreviewScreen = {
   path: string;

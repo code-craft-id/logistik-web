@@ -1,5 +1,26 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync as writeBytes,
+} from "node:fs";
 import path from "node:path";
+
+function writeFileSync(file, source) {
+  const formatted = execFileSync(
+    process.execPath,
+    [
+      path.resolve("node_modules/@biomejs/biome/bin/biome"),
+      "format",
+      "--stdin-file-path",
+      file,
+    ],
+    { input: source, encoding: "utf8" },
+  );
+  if (!existsSync(file) || readFileSync(file, "utf8") !== formatted)
+    writeBytes(file, formatted);
+}
 
 const inventory = JSON.parse(
   readFileSync("docs/experiments/legacy-ui-inventory.json", "utf8"),
@@ -256,9 +277,17 @@ for (const route of inventory.routes) {
     screen.views = [
       {
         ...base(title, info.columns, []),
-        filters: [...dateFilters, branchFilter],
+        filters: [
+          ...(info.reportProps?.dateField ? dateFilters : []),
+          ...(info.reportProps?.branchField ? [branchFilter] : []),
+          ...(info.reportProps?.selectFilters ?? []).map((field) => ({
+            ...field,
+            type: "select",
+          })),
+        ],
+        summaries: info.reportProps?.summaries ?? [],
         tools: ["Export Excel"],
-        actions: ["Detail"],
+        actions: [],
       },
     ];
     if (route.path === "/branch-reports") {
@@ -281,7 +310,6 @@ for (const route of inventory.routes) {
           [],
         ),
         filters: [
-          ...dateFilters,
           ...(index
             ? [
                 { key: "month", label: "Bulan", type: "month" },
@@ -292,6 +320,7 @@ for (const route of inventory.routes) {
         ],
         tools: ["Export Excel"],
         actions: ["Detail"],
+        detailLabels: index ? ["Manifes No.", "Tujuan"] : ["AWB No.", "Tujuan"],
       }));
     if (route.path === "/customer-reports")
       screen.views = info.tabs.map((tab, index) => ({
@@ -302,12 +331,14 @@ for (const route of inventory.routes) {
               ? "TAB1_COLUMNS"
               : index === 2
                 ? "TAB3_COLUMNS"
-                : "TAB2_COLUMNS"
+                : index === 3
+                  ? "exportColumns"
+                  : "TAB2_COLUMNS"
           ],
           [],
         ),
         filters:
-          index === 2
+          index === 1
             ? [
                 { key: "dateFrom", label: "Start Date", type: "date" },
                 { key: "dateTo", label: "End Date", type: "date" },
@@ -315,7 +346,7 @@ for (const route of inventory.routes) {
                 { key: "destination", label: "Tujuan", type: "select" },
                 { key: "customer", label: "Customer", type: "select" },
               ]
-            : index === 3
+            : index === 2
               ? [
                   { key: "dateFrom", label: "Periode Dari", type: "date" },
                   { key: "dateTo", label: "Periode Sampai", type: "date" },
@@ -331,15 +362,34 @@ for (const route of inventory.routes) {
                     type: "select",
                   })),
                 ]
-              : [
-                  { key: "dateFrom", label: "Start Date", type: "date" },
-                  { key: "dateTo", label: "End Date", type: "date" },
-                  { key: "customer", label: "Customer", type: "select" },
-                  { key: "destination", label: "Destination", type: "select" },
-                ],
-        summaries: index === 3 ? ["Total POD", "Total Kilo", "Total Koli"] : [],
+              : index === 3
+                ? [
+                    { key: "dateFrom", label: "Start Date", type: "date" },
+                    { key: "dateTo", label: "End Date", type: "date" },
+                    ...[
+                      "Customer",
+                      "Origin",
+                      "Destination",
+                      "Billing Type",
+                    ].map((label) => ({
+                      key: slug(label),
+                      label,
+                      type: "select",
+                    })),
+                  ]
+                : [
+                    { key: "dateFrom", label: "Start Date", type: "date" },
+                    { key: "dateTo", label: "End Date", type: "date" },
+                    { key: "customer", label: "Customer", type: "select" },
+                    {
+                      key: "destination",
+                      label: "Destination",
+                      type: "select",
+                    },
+                  ],
+        summaries: index === 2 ? ["Total POD", "Total Kilo", "Total Koli"] : [],
         tools: ["Export Excel"],
-        actions: ["Detail"],
+        actions: [],
       }));
     if (route.path === "/courier-reports")
       screen.views = info.tabs.map((tab, index) => ({
@@ -359,7 +409,7 @@ for (const route of inventory.routes) {
             ? [
                 { key: "dateFrom", label: "Periode Dari", type: "date" },
                 { key: "dateTo", label: "Periode Sampai", type: "date" },
-                ...["Cabang", "Kurir", "Status"].map((label) => ({
+                ...["Branch", "Kurir", "Status"].map((label) => ({
                   key: slug(label),
                   label,
                   type: "select",
@@ -369,28 +419,84 @@ for (const route of inventory.routes) {
         summaries:
           index === 0 ? ["Tot. Sukses", "Tot. Pending", "Tot. Failed"] : [],
         tools: ["Export Excel"],
-        actions: ["Detail"],
+        actions: [],
       }));
     if (route.path === "/financial-reports")
-      screen.views = info.tabs.map((tab) => ({
-        ...base(tab, info.columnSets.DETAIL_COLUMNS, []),
+      screen.views = info.tabs.map((tab, index) => ({
+        ...base(
+          tab,
+          info.configs[index === 0 ? "AR_CONFIG" : "AP_CONFIG"].recapColumns,
+          [],
+        ),
+        tableTitle:
+          info.configs[index === 0 ? "AR_CONFIG" : "AP_CONFIG"].recapTitle,
+        hideSearch: true,
+        footerLabel: "HASIL AKHIR",
         filters: [
           { key: "month", label: "Bulan", type: "month" },
-          branchFilter,
+          { key: "year", label: "Tahun", type: "number" },
+          {
+            key: "entity",
+            label:
+              info.configs[index === 0 ? "AR_CONFIG" : "AP_CONFIG"].entityLabel,
+            type: "select",
+          },
         ],
         tools: ["Export Excel"],
-        actions: ["Detail"],
+        actions: [],
+        supplementalViews: ["Belum Lunas", "Lunas"].map((status) => ({
+          ...base(status, info.columnSets.DETAIL_COLUMNS, []),
+          id: `${slug(tab)}-${slug(status)}`,
+          fixtureStatus: status,
+          tools: ["Export Excel"],
+          actions: [],
+        })),
       }));
     if (/customer-monthly-summary|daily-turnover-summary/.test(route.path))
       screen.views = [
         {
-          ...base(title, cleanColumns(info.columns), []),
+          ...base(title, info.columnSets.exportColumns, []),
           filters: [
             { key: "month", label: "Bulan", type: "month" },
+            { key: "year", label: "Tahun", type: "number" },
             branchFilter,
           ],
           tools: ["Export Excel"],
+          actions: [],
+        },
+      ];
+    if (route.path === "/branch-reports/gross-profit")
+      screen.views = [
+        {
+          ...base(title, info.columnSets.MANIFEST_COLUMNS, []),
+          filters: [
+            { key: "month", label: "Bulan", type: "month" },
+            { key: "year", label: "Tahun", type: "number" },
+            {
+              key: "status",
+              label: "Status",
+              type: "select",
+              options: ["Destination", "Transit", "Vendor"],
+            },
+          ],
+          tools: ["Export Excel"],
           actions: ["Detail"],
+          detailLabels: ["Status", "Rute", "Tujuan"],
+        },
+      ];
+    if (route.path === "/branch-reports/manifest-vendor")
+      screen.views = [
+        {
+          ...base(title, info.columnSets.COLUMNS, []),
+          filters: [
+            { key: "month", label: "Bulan", type: "month" },
+            { key: "year", label: "Tahun", type: "number" },
+            { key: "penjual", label: "Penjual", type: "select" },
+            { key: "pengguna", label: "Pengguna", type: "select" },
+          ],
+          tools: ["Export Excel"],
+          actions: ["Detail"],
+          detailLabels: ["Rute", "Pengguna"],
         },
       ];
   }

@@ -85,6 +85,62 @@ export const implementedPreviewRoutes = [
     label: "Layanan Pelanggan",
   },
   {
+    href: "/branch-reports",
+    label: "Laporan Cabang",
+  },
+  {
+    href: "/branch-reports/transaction-details",
+    label: "Detail Transaksi",
+  },
+  {
+    href: "/branch-reports/manifest-outbound",
+    label: "Manifest Outbound",
+  },
+  {
+    href: "/branch-reports/delivery",
+    label: "Pengantaran",
+  },
+  {
+    href: "/branch-reports/gross-profit",
+    label: "Gross Profit",
+  },
+  {
+    href: "/branch-reports/rekap-gross-profit",
+    label: "Rekap Gross Profit",
+  },
+  {
+    href: "/branch-reports/manifest-vendor",
+    label: "Penjual Manifes",
+  },
+  {
+    href: "/branch-reports/awb",
+    label: "AWB",
+  },
+  {
+    href: "/branch-reports/customer-monthly-summary",
+    label: "Rekap Customer Bulanan",
+  },
+  {
+    href: "/branch-reports/daily-turnover-summary",
+    label: "Rekap Omset Harian",
+  },
+  {
+    href: "/branch-reports/inbound-transaction-details",
+    label: "Detail Transaksi Inbound",
+  },
+  {
+    href: "/courier-reports",
+    label: "Laporan Kurir",
+  },
+  {
+    href: "/financial-reports",
+    label: "Laporan Keuangan",
+  },
+  {
+    href: "/customer-reports",
+    label: "Customer Reports",
+  },
+  {
     href: "/",
     label: "Filter",
   },

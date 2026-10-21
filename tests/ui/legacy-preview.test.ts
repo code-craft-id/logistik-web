@@ -7,6 +7,7 @@ import { PreviewWorkspace } from "../../src/components/patterns/preview-workspac
 import { MenuAccessPreview } from "../../src/features/identity/components/menu-access-preview";
 import { screens as identity } from "../../src/features/identity/preview/screens";
 import { screens as masters } from "../../src/features/master-data/preview/screens";
+import { screens as reports } from "../../src/features/reports/preview/screens";
 
 let root: Root;
 let host: HTMLDivElement;
@@ -31,6 +32,65 @@ const button = (label: string) => {
 };
 
 describe("isolated legacy presentation interactions", () => {
+  it("preserves AR/AP aging columns and paid/unpaid detail tabs without calculating financial totals", async () => {
+    await act(async () =>
+      root.render(
+        createElement(PreviewWorkspace, {
+          screen: reports["/financial-reports"],
+        }),
+      ),
+    );
+    expect(host.querySelectorAll("table")).toHaveLength(2);
+    expect(host.querySelector("table thead")?.textContent).toContain(
+      "USIA FAKTUR",
+    );
+    expect(host.querySelector("table tfoot")?.textContent).toContain(
+      "no financial totals calculated",
+    );
+    await act(async () =>
+      button("Laporan AP").dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+      ),
+    );
+    expect(host.querySelector("table thead")?.textContent).toContain(
+      "BATAS WAKTU",
+    );
+    await act(async () =>
+      button("Lunas").dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+      ),
+    );
+    const tables = host.querySelectorAll("table");
+    expect(tables[1].querySelector("tbody tr")?.textContent).toContain("Lunas");
+    expect(tables[1].querySelector("tbody tr td:last-child")?.textContent).toBe(
+      "—",
+    );
+    for (const control of host.querySelectorAll<HTMLButtonElement>("button"))
+      if (control.textContent?.includes("Export Excel"))
+        expect(control.disabled).toBe(true);
+  });
+
+  it("expands and collapses manifest report details with explicit disclosure state", async () => {
+    await act(async () =>
+      root.render(
+        createElement(PreviewWorkspace, {
+          screen: reports["/branch-reports/gross-profit"],
+        }),
+      ),
+    );
+    const detail = button("Detail");
+    expect(detail.getAttribute("aria-expanded")).toBe("false");
+    const panel = document.getElementById(
+      detail.getAttribute("aria-controls") ?? "",
+    );
+    expect(panel?.hidden).toBe(true);
+    await act(async () => detail.click());
+    expect(detail.getAttribute("aria-expanded")).toBe("true");
+    expect(panel?.hidden).toBe(false);
+    expect(panel?.textContent).toContain("Rute");
+    await act(async () => detail.click());
+    expect(panel?.hidden).toBe(true);
+  });
   it("validates only an import filename and never simulates an upload or import result", async () => {
     await act(async () => root.render(createElement(ImportPreview)));
     const input = host.querySelector<HTMLInputElement>('input[type="file"]');

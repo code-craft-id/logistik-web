@@ -232,7 +232,7 @@
     "source": "src/pages/reports/branch/BranchReportsIndex.jsx",
     "domain": "reports",
     "kind": "index",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": []
   },
@@ -242,7 +242,7 @@
     "source": "src/pages/reports/branch/TransactionDetailsReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Detail Transaksi"]
   },
@@ -252,7 +252,7 @@
     "source": "src/pages/reports/branch/ManifestOutboundReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Manifest Outbound"]
   },
@@ -262,7 +262,7 @@
     "source": "src/pages/reports/branch/DeliveryReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Pengantaran"]
   },
@@ -272,7 +272,7 @@
     "source": "src/pages/reports/branch/GrossProfitReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Gross Profit"]
   },
@@ -282,7 +282,7 @@
     "source": "src/pages/reports/branch/RekapGrossProfitReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Rekap Gross Profit"]
   },
@@ -292,7 +292,7 @@
     "source": "src/pages/reports/branch/ManifestVendorReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Penjual Manifes"]
   },
@@ -302,7 +302,7 @@
     "source": "src/pages/reports/branch/AwbReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["AWB Tertunda", "AWB Termanifest"]
   },
@@ -312,7 +312,7 @@
     "source": "src/pages/reports/branch/CustomerMonthlySummaryReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Rekap Customer Bulanan"]
   },
@@ -322,7 +322,7 @@
     "source": "src/pages/reports/branch/DailyTurnoverSummaryReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Rekap Omset Harian"]
   },
@@ -332,7 +332,7 @@
     "source": "src/pages/reports/branch/InboundTransactionDetailsReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Detail Transaksi Inbound"]
   },
@@ -342,7 +342,7 @@
     "source": "src/pages/reports/CourierReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Laporan Detail Kurir", "Harian Kurir"]
   },
@@ -352,7 +352,7 @@
     "source": "src/pages/reports/FinancialReport.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Laporan AR", "Laporan AP"]
   },
@@ -362,7 +362,7 @@
     "source": "src/pages/reports/CustomerReports.jsx",
     "domain": "reports",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Pengiriman", "POD Kembali", "Semua Status", "Report Customer"]
   },

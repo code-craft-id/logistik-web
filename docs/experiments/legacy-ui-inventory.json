@@ -5297,6 +5297,11 @@
       "fields": [],
       "tabs": [],
       "actions": [],
+      "reportProps": {
+        "dateField": "date",
+        "selectFilters": [],
+        "summaries": ["Total Pengantaran", "Selesai", "Dalam Proses", "Gagal"]
+      },
       "configs": {}
     },
     {
@@ -5539,6 +5544,16 @@
       "fields": [],
       "tabs": [],
       "actions": [],
+      "reportProps": {
+        "dateField": "date",
+        "selectFilters": [],
+        "summaries": [
+          "Total Transaksi",
+          "Total Koli",
+          "Total Kg",
+          "Total Biaya"
+        ]
+      },
       "configs": {}
     },
     {
@@ -5695,6 +5710,12 @@
       "fields": [],
       "tabs": [],
       "actions": [],
+      "reportProps": {
+        "dateField": "date",
+        "branchField": "branch",
+        "selectFilters": [],
+        "summaries": ["Jumlah Manifest", "Total AWB", "Total Kg", "Total Biaya"]
+      },
       "configs": {}
     },
     {
@@ -5907,6 +5928,21 @@
       "fields": [],
       "tabs": [],
       "actions": [],
+      "reportProps": {
+        "dateField": "date",
+        "branchField": "branch",
+        "selectFilters": [
+          {
+            "key": "origin",
+            "label": "Origin",
+            "type": "text",
+            "required": false,
+            "table": true,
+            "options": []
+          }
+        ],
+        "summaries": []
+      },
       "configs": {}
     },
     {
@@ -6043,6 +6079,17 @@
       "fields": [],
       "tabs": [],
       "actions": [],
+      "reportProps": {
+        "dateField": "date",
+        "branchField": "branch",
+        "selectFilters": [],
+        "summaries": [
+          "Total Transaksi",
+          "Total Koli",
+          "Total Kg",
+          "Total Omset"
+        ]
+      },
       "configs": {}
     },
     {
@@ -7334,7 +7381,132 @@
       ],
       "tabs": ["Laporan AR", "Laporan AP"],
       "actions": ["Show", "Reset", "Export Excel", "Sebelumnya", "Berikutnya"],
-      "configs": {}
+      "configs": {
+        "AR_CONFIG": {
+          "fields": [],
+          "entityLabel": "Pelanggan",
+          "recapTitle": "REKAP AGING PELANGGAN",
+          "recapColumns": [
+            {
+              "key": "tanggalFaktur",
+              "label": "TANGGAL FAKTUR",
+              "type": "date"
+            },
+            {
+              "key": "noKwt",
+              "label": "NO KWT/INV",
+              "type": "text"
+            },
+            {
+              "key": "tanggalTerimaFaktur",
+              "label": "TANGGAL TERIMA FAKTUR",
+              "type": "date"
+            },
+            {
+              "key": "namaPenerimaFaktur",
+              "label": "NAMA PENERIMA FAKTUR",
+              "type": "text"
+            },
+            {
+              "key": "namaPerusahaan",
+              "label": "NAMA PERUSAHAAN",
+              "type": "text"
+            },
+            {
+              "key": "jumlahTagihan",
+              "label": "JUMLAH TAGIHAN",
+              "type": "currency"
+            },
+            {
+              "key": "ketentuan",
+              "label": "KETENTUAN",
+              "type": "text"
+            },
+            {
+              "key": "usiaFaktur",
+              "label": "USIA FAKTUR",
+              "type": "number"
+            },
+            {
+              "key": "b0_21",
+              "label": "0 S/D 21 HARI",
+              "type": "currency"
+            },
+            {
+              "key": "b21_30",
+              "label": "> 21 HARI = 30 HARI",
+              "type": "currency"
+            },
+            {
+              "key": "b30plus",
+              "label": "> 30 HARI",
+              "type": "currency"
+            }
+          ]
+        },
+        "AP_CONFIG": {
+          "fields": [],
+          "entityLabel": "Pemasok",
+          "recapTitle": "REKAP AGING PEMASOK",
+          "recapColumns": [
+            {
+              "key": "namaPerusahaan",
+              "label": "NAMA PERUSAHAAN",
+              "type": "text"
+            },
+            {
+              "key": "noKwt",
+              "label": "NO KWT/INV",
+              "type": "text"
+            },
+            {
+              "key": "tanggalFaktur",
+              "label": "TANGGAL FAKTUR",
+              "type": "date"
+            },
+            {
+              "key": "atas",
+              "label": "ATAS",
+              "type": "text"
+            },
+            {
+              "key": "batasWaktu",
+              "label": "BATAS WAKTU",
+              "type": "date"
+            },
+            {
+              "key": "jumlahTagihan",
+              "label": "JUMLAH TAGIHAN",
+              "type": "currency"
+            },
+            {
+              "key": "b0_30",
+              "label": "0-30",
+              "type": "currency"
+            },
+            {
+              "key": "b31_60",
+              "label": "31-60",
+              "type": "currency"
+            },
+            {
+              "key": "b61_90",
+              "label": "61-90",
+              "type": "currency"
+            },
+            {
+              "key": "b90plus",
+              "label": "> 90",
+              "type": "currency"
+            },
+            {
+              "key": "keterangan",
+              "label": "KETERANGAN",
+              "type": "text"
+            }
+          ]
+        }
+      }
     },
     {
       "source": "src/pages/setting/GroupUser.jsx",

@@ -89,7 +89,28 @@ with demonstrated unrelated failures. Initial slice ready for local checkpoint.
   `batch3-*` checks 375/1440 with no page overflow across customers, outbound
   and manifest. No operations connect to backend services.
 
-Next: reports/accounting/tickets → dashboard visual and cross-screen verification.
+- Batch 3 checkpoint committed: `b19070b`.
+- Batch 4: all 14 report entrypoints, their source column order, filters, customer
+  and courier variants, branch index, AWB tables, expandable manifest details,
+  AR/AP aging and both paid/unpaid detail states. **36/43 route UIs implemented;
+  seven remain.** Aging headers use all 11 original columns for each AR/AP view,
+  with separate five-column invoice details. Financial/footer amounts remain
+  unavailable; no aging percentages, revenue/profit or balances are calculated.
+  Daily summary has ten source columns; customer shipping has 17; extra action
+  columns absent from source were removed. Source-specific ReportPage filter and
+  summary metadata is inventoried separately from generic patterns. Corrected
+  source audit also captures AR_CONFIG/AP_CONFIG, without their seed values.
+  The four embedded paid/unpaid views supplement the original 68 view contracts.
+- Batch 4 checks: typecheck and all 19 UI tests pass, including AR/AP headers,
+  paid/unpaid switching, no financial total computation, and disclosure semantics
+  for manifest details. Browser `batch4-*` checks representative reports at
+  375/1440, all without page overflow; aging + details render as two separate
+  tables. Paid AP screenshot confirms the fictional status label and unavailable
+  money. Lint remains the unrelated config formatting error only. The contract
+  generator now formats its own generated files through the installed Biome
+  executable and writes only changed bytes, avoiding unnecessary dev invalidation.
+
+Next: accounting/tickets → dashboard visual and cross-screen verification.
 Runtime/legacy pixel comparison is still unverified.
 
 Date: 2026-10-21. Owner: Codex, presentation migration requested by coordinator.
