@@ -1,0 +1,114 @@
+import { act, createElement } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { AppShell } from "../../src/components/shell/app-shell";
+import { DashboardFilters } from "../../src/features/dashboard/components/dashboard-filters";
+import { DashboardOverview } from "../../src/features/dashboard/components/dashboard-overview";
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+
+let root: Root;
+let container: HTMLDivElement;
+
+beforeEach(() => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  container = document.createElement("div");
+  document.body.append(container);
+  root = createRoot(container);
+});
+
+afterEach(async () => {
+  await act(async () => root.unmount());
+  container.remove();
+  vi.unstubAllGlobals();
+});
+
+describe("legacy dashboard supported presentation", () => {
+  it("applies draft filters only on Show and resets both draft and applied selection", async () => {
+    await act(async () => root.render(createElement(DashboardFilters)));
+    const form = container.querySelector("form");
+    const field =
+      container.querySelector<HTMLInputElement>("#dashboard-period");
+    if (!form || !field) throw new Error("Dashboard filters missing");
+    await act(async () => {
+      field.value = "2026-10";
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(container.querySelector("output")?.textContent).toBe(
+      "No preview selection applied.",
+    );
+    await act(async () =>
+      form.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      ),
+    );
+    expect(container.querySelector("output")?.textContent).toContain(
+      "period 2026-10",
+    );
+    expect(container.querySelector("output")?.textContent).toContain(
+      "Data remains unavailable",
+    );
+    await act(async () => {
+      field.value = "2026-11";
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(container.querySelector("output")?.textContent).toContain(
+      "period 2026-10",
+    );
+    await act(async () => form.reset());
+    expect(field.value).toBe("");
+    expect(container.querySelector("output")?.textContent).toBe(
+      "No preview selection applied.",
+    );
+    expect(
+      container.querySelector<HTMLSelectElement>("#dashboard-branch")?.disabled,
+    ).toBe(true);
+  });
+
+  it("keeps unsupported workflows unlinked and reports unavailable data without fabricated results", async () => {
+    await act(async () => root.render(createElement(DashboardOverview)));
+    expect(
+      Array.from(container.querySelectorAll("a")).map((link) =>
+        link.getAttribute("href"),
+      ),
+    ).toEqual(["/ui-examples"]);
+    expect(container.querySelectorAll("dd")).toHaveLength(11);
+    for (const value of container.querySelectorAll("dd"))
+      expect(value.textContent).toBe("Unavailable");
+    expect(container.textContent).not.toContain("Last Updated");
+    expect(container.querySelector("h1")?.textContent).toBe("Dashboard");
+  });
+
+  it("recovers a nested group from compact navigation and preserves active Dashboard naming", async () => {
+    await act(async () =>
+      root.render(createElement(AppShell, null, "Dashboard")),
+    );
+    await act(async () =>
+      container
+        .querySelector<HTMLButtonElement>('[aria-label="Collapse sidebar"]')
+        ?.click(),
+    );
+    expect(container.querySelector('[aria-current="page"]')?.textContent).toBe(
+      "Dashboard",
+    );
+    await act(async () =>
+      container
+        .querySelector<HTMLButtonElement>(
+          '[aria-label="Expand Master Data navigation"]',
+        )
+        ?.click(),
+    );
+    const nav = container.querySelector('nav[aria-label="Main navigation"]');
+    const master = Array.from(nav?.querySelectorAll("button") ?? []).find(
+      (button) => button.textContent === "Master Data",
+    );
+    expect(master?.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      document.getElementById(master?.getAttribute("aria-controls") ?? "")
+        ?.hidden,
+    ).toBe(false);
+    expect(
+      container.querySelector('[aria-label="Collapse sidebar"]'),
+    ).not.toBeNull();
+  });
+});

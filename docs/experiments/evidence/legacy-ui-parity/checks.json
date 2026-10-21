@@ -1,0 +1,22 @@
+[
+  {
+    "ExitCode": 1,
+    "Command": "npm run lint",
+    "Log": "docs\\experiments\\evidence\\legacy-ui-parity\\lint.log"
+  },
+  {
+    "ExitCode": 0,
+    "Command": "npm run typecheck",
+    "Log": "docs\\experiments\\evidence\\legacy-ui-parity\\typecheck.log"
+  },
+  {
+    "ExitCode": 1,
+    "Command": "npm test",
+    "Log": "docs\\experiments\\evidence\\legacy-ui-parity\\test.log"
+  },
+  {
+    "ExitCode": 0,
+    "Command": "npm run build",
+    "Log": "docs\\experiments\\evidence\\legacy-ui-parity\\build.log"
+  }
+]

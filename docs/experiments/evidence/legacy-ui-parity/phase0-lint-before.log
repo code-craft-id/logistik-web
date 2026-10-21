@@ -1,0 +1,1422 @@
+
+> logistik-web@0.1.0 lint
+> biome check
+
+next.config.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·type·{·NextConfig·}·from·"next";␍
+     2    │ - ␍
+     3    │ - const·nextConfig:·NextConfig·=·{␍
+     4    │ - ··allowedDevOrigins:·['127.0.0.1'],␍
+     5    │ - ··/*·config·options·here·*/␍
+     6    │ - ··cacheComponents:·true,␍
+     7    │ - ··partialPrefetching:·true,␍
+     8    │ - ··reactCompiler:·true,␍
+     9    │ - ··turbopack:·{␍
+    10    │ - ····rules:·{␍
+    11    │ - ······"*.css":·{␍
+    12    │ - ········loaders:·["@tailwindcss/turbopack"],␍
+    13    │ - ········as:·"*.css",␍
+    14    │ - ······},␍
+    15    │ - ····},␍
+    16    │ - ··},␍
+    17    │ - };␍
+    18    │ - ␍
+    19    │ - export·default·nextConfig;␍
+        1 │ + import·type·{·NextConfig·}·from·"next";
+        2 │ + 
+        3 │ + const·nextConfig:·NextConfig·=·{
+        4 │ + ··allowedDevOrigins:·["127.0.0.1"],
+        5 │ + ··/*·config·options·here·*/
+        6 │ + ··cacheComponents:·true,
+        7 │ + ··partialPrefetching:·true,
+        8 │ + ··reactCompiler:·true,
+        9 │ + ··turbopack:·{
+       10 │ + ····rules:·{
+       11 │ + ······"*.css":·{
+       12 │ + ········loaders:·["@tailwindcss/turbopack"],
+       13 │ + ········as:·"*.css",
+       14 │ + ······},
+       15 │ + ····},
+       16 │ + ··},
+       17 │ + };
+       18 │ + 
+       19 │ + export·default·nextConfig;
+    20 20 │   
+  
+
+prisma.config.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·"dotenv/config";␍
+     2    │ - import·{·defineConfig·}·from·"prisma/config";␍
+     3    │ - ␍
+     4    │ - export·default·defineConfig({␍
+     5    │ - ··schema:·"prisma",␍
+     6    │ - ··migrations:·{␍
+     7    │ - ····path:·"prisma/migrations",␍
+     8    │ - ····seed:·"node·prisma/seed.mjs",␍
+     9    │ - ··},␍
+    10    │ - ··datasource:·{␍
+    11    │ - ····url:·process.env.DATABASE_URL,␍
+    12    │ - ··},␍
+    13    │ - });␍
+        1 │ + import·"dotenv/config";
+        2 │ + import·{·defineConfig·}·from·"prisma/config";
+        3 │ + 
+        4 │ + export·default·defineConfig({
+        5 │ + ··schema:·"prisma",
+        6 │ + ··migrations:·{
+        7 │ + ····path:·"prisma/migrations",
+        8 │ + ····seed:·"node·prisma/seed.mjs",
+        9 │ + ··},
+       10 │ + ··datasource:·{
+       11 │ + ····url:·process.env.DATABASE_URL,
+       12 │ + ··},
+       13 │ + });
+    14 14 │   
+  
+
+prisma\local-database.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - /**·Validate·before·creating·any·database·client·or·launching·Prisma·Migrate.·*/␍
+     2    │ - export·function·localDatabaseUrl(value,·{·purpose,·nodeEnv·}·=·{})·{␍
+     3    │ - ··if·(!["seed",·"migrate"].includes(purpose))·{␍
+     4    │ - ····throw·new·Error("Database·purpose·must·be·seed·or·migrate.");␍
+     5    │ - ··}␍
+     6    │ - ··if·(nodeEnv·===·"production")·{␍
+     7    │ - ····throw·new·Error("Local·database·tools·refuse·NODE_ENV=production.");␍
+     8    │ - ··}␍
+     9    │ - ··if·(typeof·value·!==·"string"·||·!value·||·value.trim()·!==·value)·{␍
+    10    │ - ····throw·new·Error("DATABASE_URL·must·be·a·valid·local·PostgreSQL·URL.");␍
+    11    │ - ··}␍
+    12    │ - ··let·url;␍
+    13    │ - ··try·{␍
+    14    │ - ····url·=·new·URL(value);␍
+    15    │ - ··}·catch·{␍
+    16    │ - ····throw·new·Error("DATABASE_URL·must·be·a·valid·local·PostgreSQL·URL.");␍
+    17    │ - ··}␍
+    18    │ - ··const·hosts·=␍
+    19    │ - ····purpose·===·"migrate"·?·["127.0.0.1"]·:·["127.0.0.1",·"localhost"];␍
+    20    │ - ··if·(␍
+    21    │ - ····!["postgres:",·"postgresql:"].includes(url.protocol)·||␍
+    22    │ - ····!hosts.includes(url.hostname)·||␍
+    23    │ - ····url.pathname·!==·"/logistik_web"·||␍
+    24    │ - ····url.search·||␍
+    25    │ - ····url.hash·||␍
+    26    │ - ····/[\s\\]/u.test(value)␍
+    27    │ - ··)·{␍
+    28    │ - ····throw·new·Error(␍
+    29    │ - ······"DATABASE_URL·rejected:·require·an·allowed·local·host,·logistik_web,·and·no·query·or·fragment.",␍
+    30    │ - ····);␍
+    31    │ - ··}␍
+    32    │ - ··return·value;␍
+    33    │ - }␍
+        1 │ + /**·Validate·before·creating·any·database·client·or·launching·Prisma·Migrate.·*/
+        2 │ + export·function·localDatabaseUrl(value,·{·purpose,·nodeEnv·}·=·{})·{
+        3 │ + ··if·(!["seed",·"migrate"].includes(purpose))·{
+        4 │ + ····throw·new·Error("Database·purpose·must·be·seed·or·migrate.");
+        5 │ + ··}
+        6 │ + ··if·(nodeEnv·===·"production")·{
+        7 │ + ····throw·new·Error("Local·database·tools·refuse·NODE_ENV=production.");
+        8 │ + ··}
+        9 │ + ··if·(typeof·value·!==·"string"·||·!value·||·value.trim()·!==·value)·{
+       10 │ + ····throw·new·Error("DATABASE_URL·must·be·a·valid·local·PostgreSQL·URL.");
+       11 │ + ··}
+       12 │ + ··let·url;
+       13 │ + ··try·{
+       14 │ + ····url·=·new·URL(value);
+       15 │ + ··}·catch·{
+       16 │ + ····throw·new·Error("DATABASE_URL·must·be·a·valid·local·PostgreSQL·URL.");
+       17 │ + ··}
+       18 │ + ··const·hosts·=
+       19 │ + ····purpose·===·"migrate"·?·["127.0.0.1"]·:·["127.0.0.1",·"localhost"];
+       20 │ + ··if·(
+       21 │ + ····!["postgres:",·"postgresql:"].includes(url.protocol)·||
+       22 │ + ····!hosts.includes(url.hostname)·||
+       23 │ + ····url.pathname·!==·"/logistik_web"·||
+       24 │ + ····url.search·||
+       25 │ + ····url.hash·||
+       26 │ + ····/[\s\\]/u.test(value)
+       27 │ + ··)·{
+       28 │ + ····throw·new·Error(
+       29 │ + ······"DATABASE_URL·rejected:·require·an·allowed·local·host,·logistik_web,·and·no·query·or·fragment.",
+       30 │ + ····);
+       31 │ + ··}
+       32 │ + ··return·value;
+       33 │ + }
+    34 34 │   
+  
+
+prisma\migrate-local.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·"dotenv/config";␍
+     2    │ - import·{·spawnSync·}·from·"node:child_process";␍
+     3    │ - import·{·createRequire·}·from·"node:module";␍
+     4    │ - import·{·dirname,·resolve·}·from·"node:path";␍
+     5    │ - import·{·localDatabaseUrl·}·from·"./local-database.mjs";␍
+     6    │ - ␍
+     7    │ - try·{␍
+     8    │ - ··const·connectionString·=·localDatabaseUrl(process.env.DATABASE_URL,·{␍
+     9    │ - ····purpose:·"migrate",␍
+    10    │ - ····nodeEnv:·process.env.NODE_ENV,␍
+    11    │ - ··});␍
+    12    │ - ··const·require·=·createRequire(import.meta.url);␍
+    13    │ - ··const·packagePath·=·require.resolve("prisma/package.json");␍
+    14    │ - ··const·cliPath·=·resolve(␍
+    15    │ - ····dirname(packagePath),␍
+    16    │ - ····require(packagePath).bin.prisma,␍
+    17    │ - ··);␍
+    18    │ - ··const·result·=·spawnSync(process.execPath,·[cliPath,·"migrate",·"deploy"],·{␍
+    19    │ - ····stdio:·"inherit",␍
+    20    │ - ····env:·{·...process.env,·DATABASE_URL:·connectionString·},␍
+    21    │ - ··});␍
+    22    │ - ··if·(result.error)·{␍
+    23    │ - ····console.error("Could·not·start·the·installed·Prisma·CLI.");␍
+    24    │ - ··}␍
+    25    │ - ··process.exitCode·=·result.status·??·1;␍
+    26    │ - }·catch·{␍
+    27    │ - ··console.error(␍
+    28    │ - ····"Migration·refused:·require·non-production,·host·127.0.0.1,·database·logistik_web,·and·no·connection·overrides.",␍
+    29    │ - ··);␍
+    30    │ - ··process.exitCode·=·1;␍
+    31    │ - }␍
+        1 │ + import·"dotenv/config";
+        2 │ + import·{·spawnSync·}·from·"node:child_process";
+        3 │ + import·{·createRequire·}·from·"node:module";
+        4 │ + import·{·dirname,·resolve·}·from·"node:path";
+        5 │ + import·{·localDatabaseUrl·}·from·"./local-database.mjs";
+        6 │ + 
+        7 │ + try·{
+        8 │ + ··const·connectionString·=·localDatabaseUrl(process.env.DATABASE_URL,·{
+        9 │ + ····purpose:·"migrate",
+       10 │ + ····nodeEnv:·process.env.NODE_ENV,
+       11 │ + ··});
+       12 │ + ··const·require·=·createRequire(import.meta.url);
+       13 │ + ··const·packagePath·=·require.resolve("prisma/package.json");
+       14 │ + ··const·cliPath·=·resolve(
+       15 │ + ····dirname(packagePath),
+       16 │ + ····require(packagePath).bin.prisma,
+       17 │ + ··);
+       18 │ + ··const·result·=·spawnSync(process.execPath,·[cliPath,·"migrate",·"deploy"],·{
+       19 │ + ····stdio:·"inherit",
+       20 │ + ····env:·{·...process.env,·DATABASE_URL:·connectionString·},
+       21 │ + ··});
+       22 │ + ··if·(result.error)·{
+       23 │ + ····console.error("Could·not·start·the·installed·Prisma·CLI.");
+       24 │ + ··}
+       25 │ + ··process.exitCode·=·result.status·??·1;
+       26 │ + }·catch·{
+       27 │ + ··console.error(
+       28 │ + ····"Migration·refused:·require·non-production,·host·127.0.0.1,·database·logistik_web,·and·no·connection·overrides.",
+       29 │ + ··);
+       30 │ + ··process.exitCode·=·1;
+       31 │ + }
+    32 32 │   
+  
+
+prisma\migrate-test.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·"dotenv/config";␍
+     2    │ - import·{·spawnSync·}·from·"node:child_process";␍
+     3    │ - import·{·createRequire·}·from·"node:module";␍
+     4    │ - import·{·dirname,·resolve·}·from·"node:path";␍
+     5    │ - import·{·testDatabaseUrl·}·from·"../tests/support/test-database-url.ts";␍
+     6    │ - ␍
+     7    │ - try·{␍
+     8    │ - ··const·connectionString·=·testDatabaseUrl(␍
+     9    │ - ····process.env.TEST_DATABASE_URL,␍
+    10    │ - ····process.env.DATABASE_URL,␍
+    11    │ - ··);␍
+    12    │ - ··const·url·=·new·URL(connectionString);␍
+    13    │ - ··if·(␍
+    14    │ - ····process.env.NODE_ENV·===·"production"·||␍
+    15    │ - ····!["localhost",·"127.0.0.1",·"[::1]"].includes(url.hostname)␍
+    16    │ - ··)·{␍
+    17    │ - ····throw·new·Error("Only·a·non-production·loopback·test·target·is·allowed.");␍
+    18    │ - ··}␍
+    19    │ - ··const·require·=·createRequire(import.meta.url);␍
+    20    │ - ··const·packagePath·=·require.resolve("prisma/package.json");␍
+    21    │ - ··const·cliPath·=·resolve(␍
+    22    │ - ····dirname(packagePath),␍
+    23    │ - ····require(packagePath).bin.prisma,␍
+    24    │ - ··);␍
+    25    │ - ··const·result·=·spawnSync(process.execPath,·[cliPath,·"migrate",·"deploy"],·{␍
+    26    │ - ····stdio:·"inherit",␍
+    27    │ - ····env:·{·...process.env,·DATABASE_URL:·connectionString·},␍
+    28    │ - ··});␍
+    29    │ - ··if·(result.error)·console.error("Could·not·start·the·installed·Prisma·CLI.");␍
+    30    │ - ··process.exitCode·=·result.status·??·1;␍
+    31    │ - }·catch·{␍
+    32    │ - ··console.error(␍
+    33    │ - ····"Test·migration·refused:·require·non-production,·loopback,·a·separate·logistik_web_test,·and·no·connection·overrides.",␍
+    34    │ - ··);␍
+    35    │ - ··process.exitCode·=·1;␍
+    36    │ - }␍
+        1 │ + import·"dotenv/config";
+        2 │ + import·{·spawnSync·}·from·"node:child_process";
+        3 │ + import·{·createRequire·}·from·"node:module";
+        4 │ + import·{·dirname,·resolve·}·from·"node:path";
+        5 │ + import·{·testDatabaseUrl·}·from·"../tests/support/test-database-url.ts";
+        6 │ + 
+        7 │ + try·{
+        8 │ + ··const·connectionString·=·testDatabaseUrl(
+        9 │ + ····process.env.TEST_DATABASE_URL,
+       10 │ + ····process.env.DATABASE_URL,
+       11 │ + ··);
+       12 │ + ··const·url·=·new·URL(connectionString);
+       13 │ + ··if·(
+       14 │ + ····process.env.NODE_ENV·===·"production"·||
+       15 │ + ····!["localhost",·"127.0.0.1",·"[::1]"].includes(url.hostname)
+       16 │ + ··)·{
+       17 │ + ····throw·new·Error("Only·a·non-production·loopback·test·target·is·allowed.");
+       18 │ + ··}
+       19 │ + ··const·require·=·createRequire(import.meta.url);
+       20 │ + ··const·packagePath·=·require.resolve("prisma/package.json");
+       21 │ + ··const·cliPath·=·resolve(
+       22 │ + ····dirname(packagePath),
+       23 │ + ····require(packagePath).bin.prisma,
+       24 │ + ··);
+       25 │ + ··const·result·=·spawnSync(process.execPath,·[cliPath,·"migrate",·"deploy"],·{
+       26 │ + ····stdio:·"inherit",
+       27 │ + ····env:·{·...process.env,·DATABASE_URL:·connectionString·},
+       28 │ + ··});
+       29 │ + ··if·(result.error)·console.error("Could·not·start·the·installed·Prisma·CLI.");
+       30 │ + ··process.exitCode·=·result.status·??·1;
+       31 │ + }·catch·{
+       32 │ + ··console.error(
+       33 │ + ····"Test·migration·refused:·require·non-production,·loopback,·a·separate·logistik_web_test,·and·no·connection·overrides.",
+       34 │ + ··);
+       35 │ + ··process.exitCode·=·1;
+       36 │ + }
+    37 37 │   
+  
+
+prisma\seed-data.d.mts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+    1   │ - import·type·{·Prisma·}·from·"../src/lib/db/generated/client";␍
+    2   │ - ␍
+    3   │ - export·function·seedFakeRecords(tx:·Prisma.TransactionClient):·Promise<void>;␍
+      1 │ + import·type·{·Prisma·}·from·"../src/lib/db/generated/client";
+      2 │ + 
+      3 │ + export·function·seedFakeRecords(tx:·Prisma.TransactionClient):·Promise<void>;
+    4 4 │   
+  
+
+prisma\seed-data.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+      1     │ - //·Stable·fake·fixtures.·No·credentials·or·financial·behavior.␍
+      2     │ - const·firstId·=·9_100_001;␍
+      3     │ - async·function·ensureFakeRecord(delegate,·data)·{␍
+      4     │ - ··const·existing·=·await·delegate.findUnique({·where:·{·id:·data.id·}·});␍
+      5     │ - ··if·(existing)·{␍
+      6     │ - ····const·matches·=·Object.entries(data).every(([key,·expected])·=>·{␍
+      7     │ - ······const·actual·=·existing[key];␍
+      8     │ - ······return·expected·instanceof·Date␍
+      9     │ - ········?·actual·instanceof·Date·&&·actual.getTime()·===·expected.getTime()␍
+     10     │ - ········:·actual·===·expected;␍
+     11     │ - ····});␍
+     12     │ - ····if·(!matches)·{␍
+     13     │ - ······//·Never·overwrite·a·real·row·or·a·changed·fixture·occupying·the·reserved·ID.␍
+     14     │ - ······throw·new·Error("Fake·seed·ID·collision;·transaction·aborted.");␍
+     15     │ - ····}␍
+     16     │ - ····return;␍
+     17     │ - ··}␍
+     18     │ - ··await·delegate.create({␍
+     19     │ - ····data:·{␍
+     20     │ - ······createdAt:·new·Date("2000-01-01T00:00:00Z"),␍
+     21     │ - ······updatedAt:·new·Date("2000-01-01T00:00:00Z"),␍
+     22     │ - ······...data,␍
+     23     │ - ····},␍
+     24     │ - ··});␍
+     25     │ - }␍
+     26     │ - ␍
+     27     │ - export·async·function·seedFakeRecords(tx)·{␍
+     28     │ - ··await·ensureFakeRecord(tx.company,·{␍
+     29     │ - ····id:·firstId,␍
+     30     │ - ····name:·"FAKE·COMPANY·001",␍
+     31     │ - ····address:·"FAKE·ADDRESS·-·NO·REAL·LOCATION",␍
+     32     │ - ····isDepositAgent:·false,␍
+     33     │ - ····showPriceOnPrint:·false,␍
+     34     │ - ··});␍
+     35     │ - ··await·ensureFakeRecord(tx.office,·{␍
+     36     │ - ····id:·firstId,␍
+     37     │ - ····companyId:·firstId,␍
+     38     │ - ····code:·"FAKE-OFFICE-001",␍
+     39     │ - ····name:·"FAKE·OFFICE·001",␍
+     40     │ - ····status:·"ACTIVE",␍
+     41     │ - ··});␍
+     42     │ - ␍
+     43     │ - ··for·(let·i·=·1;·i·<=·30;·i++)·{␍
+     44     │ - ····const·id·=·9_100_000·+·i;␍
+     45     │ - ····const·suffix·=·String(i).padStart(3,·"0");␍
+     46     │ - ····const·status·=·i·%·2·?·"ACTIVE"·:·"INACTIVE";␍
+     47     │ - ····await·ensureFakeRecord(tx.branch,·{␍
+     48     │ - ······id,␍
+     49     │ - ······officeId:·firstId,␍
+     50     │ - ······code:·`FAKE-BRANCH-${suffix}`,␍
+     51     │ - ······name:·`FAKE·BRANCH·${suffix}`,␍
+     52     │ - ······address:·"FAKE·ADDRESS·-·NO·REAL·LOCATION",␍
+     53     │ - ······phoneNumber:·`INVALID-PHONE-${suffix}`,␍
+     54     │ - ······status,␍
+     55     │ - ····});␍
+     56     │ - ····for·(const·[delegate,·label]·of·[␍
+     57     │ - ······[tx.goodsType,·"GOODS·TYPE"],␍
+     58     │ - ······[tx.serviceCategory,·"SERVICE·CATEGORY"],␍
+     59     │ - ······[tx.truckingType,·"TRUCKING·TYPE"],␍
+     60     │ - ····])·{␍
+     61     │ - ······await·ensureFakeRecord(delegate,·{␍
+     62     │ - ········id,␍
+     63     │ - ········name:·`FAKE·${label}·${suffix}`,␍
+     64     │ - ········status,␍
+     65     │ - ······});␍
+     66     │ - ····}␍
+     67     │ - ····await·ensureFakeRecord(tx.term,·{␍
+     68     │ - ······id,␍
+     69     │ - ······name:·`FAKE·TERM·${suffix}`,␍
+     70     │ - ······description:·"FAKE·DISPLAY·DATA·-·NO·BUSINESS·TERMS",␍
+     71     │ - ······status,␍
+     72     │ - ····});␍
+     73     │ - ····await·ensureFakeRecord(tx.vehicle,·{␍
+     74     │ - ······id,␍
+     75     │ - ······name:·`FAKE·VEHICLE·${suffix}`,␍
+     76     │ - ······truckingTypeId:·id,␍
+     77     │ - ······year:·2000,␍
+     78     │ - ······licensePlate:·`INVALID-PLATE-${suffix}`,␍
+     79     │ - ······registrationHolderName:·`FAKE·HOLDER·${suffix}`,␍
+     80     │ - ······registrationNumber:·`INVALID-REG-${suffix}`,␍
+     81     │ - ······registrationDate:␍
+     82     │ - ········suffix·===·"001"·?·new·Date("2000-01-01T00:00:00Z")·:·null,␍
+     83     │ - ······cylinderCapacity:·"FAKE-CAPACITY",␍
+     84     │ - ······color:·"FAKE·COLOR",␍
+     85     │ - ······insuranceName:·"FAKE·INSURANCE",␍
+     86     │ - ······insuranceExpiry:␍
+     87     │ - ········suffix·===·"001"·?·new·Date("2099-01-01T00:00:00Z")·:·null,␍
+     88     │ - ······description:·"FAKE·VEHICLE·-·NOT·FOR·OPERATIONS",␍
+     89     │ - ······chassisNumber:·`INVALID-CHASSIS-${suffix}`,␍
+     90     │ - ······engineNumber:·`INVALID-ENGINE-${suffix}`,␍
+     91     │ - ······status,␍
+     92     │ - ······serviceTrucking:·false,␍
+     93     │ - ······branchId:·id,␍
+     94     │ - ····});␍
+     95     │ - ····const·personnel·=·{␍
+     96     │ - ······id,␍
+     97     │ - ······address:·"FAKE·ADDRESS·-·NO·REAL·LOCATION",␍
+     98     │ - ······nationalIdNumber:·`INVALID-ID-${suffix}`,␍
+     99     │ - ······phone:·`INVALID-PHONE-${suffix}`,␍
+    100     │ - ······branchId:·suffix·===·"001"·?·id·:·null,␍
+    101     │ - ······status,␍
+    102     │ - ····};␍
+    103     │ - ····await·ensureFakeRecord(tx.driver,·{␍
+    104     │ - ······...personnel,␍
+    105     │ - ······name:·`FAKE·DRIVER·${suffix}`,␍
+    106     │ - ······driverLicenseNumber:·`INVALID-LICENSE-${suffix}`,␍
+    107     │ - ····});␍
+    108     │ - ····await·ensureFakeRecord(tx.courier,·{␍
+    109     │ - ······...personnel,␍
+    110     │ - ······name:·`FAKE·COURIER·${suffix}`,␍
+    111     │ - ····});␍
+    112     │ - ····//·Flat·synthetic·dictionaries;·these·do·not·define·a·region·hierarchy.␍
+    113     │ - ····for·(const·[delegate,·label]·of·[␍
+    114     │ - ······[tx.costType,·"COST·TYPE"],␍
+    115     │ - ······[tx.vehicleType,·"VEHICLE·TYPE"],␍
+    116     │ - ······[tx.province,·"PROVINCE"],␍
+    117     │ - ······[tx.regency,·"REGENCY"],␍
+    118     │ - ······[tx.district,·"DISTRICT"],␍
+    119     │ - ······[tx.village,·"VILLAGE"],␍
+    120     │ - ····])·{␍
+    121     │ - ······await·ensureFakeRecord(delegate,·{␍
+    122     │ - ········id,␍
+    123     │ - ········name:·`FAKE·${label}·${suffix}`,␍
+    124     │ - ········status,␍
+    125     │ - ······});␍
+    126     │ - ····}␍
+    127     │ - ····await·ensureFakeRecord(tx.postalCode,·{␍
+    128     │ - ······id,␍
+    129     │ - ······code:·`FAKE${suffix}`,␍
+    130     │ - ······status,␍
+    131     │ - ····});␍
+    132     │ - ····await·ensureFakeRecord(tx.transportMode,·{␍
+    133     │ - ······id,␍
+    134     │ - ······name:·`FAKE·MODE·${suffix}`,␍
+    135     │ - ······divider:·"FAKE-UNITS-TBD",␍
+    136     │ - ······status,␍
+    137     │ - ····});␍
+    138     │ - ····await·ensureFakeRecord(tx.deliveryService,·{␍
+    139     │ - ······id,␍
+    140     │ - ······name:·`FAKE·SERVICE·${suffix}`,␍
+    141     │ - ······serviceCategoryId:·id,␍
+    142     │ - ······transportModeId:·i·%·3·?·id·:·null,␍
+    143     │ - ······status,␍
+    144     │ - ····});␍
+    145     │ - ····await·ensureFakeRecord(tx.shipmentStatus,·{␍
+    146     │ - ······id,␍
+    147     │ - ······code:·`FAKE-${suffix}`,␍
+    148     │ - ······name:·`FAKE·DISPLAY·STATUS·${suffix}`,␍
+    149     │ - ······status,␍
+    150     │ - ····});␍
+  263 more lines truncated
+  
+
+prisma\seed.mjs format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·"dotenv/config";␍
+     2    │ - import·{·localDatabaseUrl·}·from·"./local-database.mjs";␍
+     3    │ - ␍
+     4    │ - import·{·seedFakeRecords·}·from·"./seed-data.mjs";␍
+     5    │ - ␍
+     6    │ - let·prisma;␍
+     7    │ - try·{␍
+     8    │ - ··const·connectionString·=·localDatabaseUrl(process.env.DATABASE_URL,·{␍
+     9    │ - ····purpose:·"seed",␍
+    10    │ - ····nodeEnv:·process.env.NODE_ENV,␍
+    11    │ - ··});␍
+    12    │ - ··//·The·guard·must·pass·before·importing·the·client·or·creating·the·adapter.␍
+    13    │ - ··const·[{·PrismaClient·},·{·PrismaPg·}]·=·await·Promise.all([␍
+    14    │ - ····import("../src/lib/db/generated/client.ts"),␍
+    15    │ - ····import("@prisma/adapter-pg"),␍
+    16    │ - ··]);␍
+    17    │ - ··prisma·=·new·PrismaClient({␍
+    18    │ - ····adapter:·new·PrismaPg({·connectionString,·connectionTimeoutMillis:·3000·}),␍
+    19    │ - ··});␍
+    20    │ - ␍
+    21    │ - ··await·prisma.$transaction(seedFakeRecords,·{·timeout:·30000·});␍
+    22    │ - ··console.log(␍
+    23    │ - ····"Fake·development·seed·complete:·30·fixtures·per·list·entity;·existing·rows·unchanged.",␍
+    24    │ - ··);␍
+    25    │ - }·catch·{␍
+    26    │ - ··//·Avoid·exposing·connection·strings,·database·errors,·or·personal·data.␍
+    27    │ - ··console.error(␍
+    28    │ - ····"Seed·refused·or·failed.·Require·non-production,·localhost/127.0.0.1,·logistik_web,·no·connection·overrides,·applied·migrations,·and·unmodified·fake·IDs·9100001-9100030.·No·partial·seed·writes·are·committed.",␍
+    29    │ - ··);␍
+    30    │ - ··process.exitCode·=·1;␍
+    31    │ - }·finally·{␍
+    32    │ - ··if·(prisma)·await·prisma.$disconnect();␍
+    33    │ - }␍
+        1 │ + import·"dotenv/config";
+        2 │ + import·{·localDatabaseUrl·}·from·"./local-database.mjs";
+        3 │ + 
+        4 │ + import·{·seedFakeRecords·}·from·"./seed-data.mjs";
+        5 │ + 
+        6 │ + let·prisma;
+        7 │ + try·{
+        8 │ + ··const·connectionString·=·localDatabaseUrl(process.env.DATABASE_URL,·{
+        9 │ + ····purpose:·"seed",
+       10 │ + ····nodeEnv:·process.env.NODE_ENV,
+       11 │ + ··});
+       12 │ + ··//·The·guard·must·pass·before·importing·the·client·or·creating·the·adapter.
+       13 │ + ··const·[{·PrismaClient·},·{·PrismaPg·}]·=·await·Promise.all([
+       14 │ + ····import("../src/lib/db/generated/client.ts"),
+       15 │ + ····import("@prisma/adapter-pg"),
+       16 │ + ··]);
+       17 │ + ··prisma·=·new·PrismaClient({
+       18 │ + ····adapter:·new·PrismaPg({·connectionString,·connectionTimeoutMillis:·3000·}),
+       19 │ + ··});
+       20 │ + 
+       21 │ + ··await·prisma.$transaction(seedFakeRecords,·{·timeout:·30000·});
+       22 │ + ··console.log(
+       23 │ + ····"Fake·development·seed·complete:·30·fixtures·per·list·entity;·existing·rows·unchanged.",
+       24 │ + ··);
+       25 │ + }·catch·{
+       26 │ + ··//·Avoid·exposing·connection·strings,·database·errors,·or·personal·data.
+       27 │ + ··console.error(
+       28 │ + ····"Seed·refused·or·failed.·Require·non-production,·localhost/127.0.0.1,·logistik_web,·no·connection·overrides,·applied·migrations,·and·unmodified·fake·IDs·9100001-9100030.·No·partial·seed·writes·are·committed.",
+       29 │ + ··);
+       30 │ + ··process.exitCode·=·1;
+       31 │ + }·finally·{
+       32 │ + ··if·(prisma)·await·prisma.$disconnect();
+       33 │ + }
+    34 34 │   
+  
+
+src\lib\auth\schema-options.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·type·{·BetterAuthOptions·}·from·"better-auth";␍
+     2    │ - import·{·prismaAdapter·}·from·"better-auth/adapters/prisma";␍
+     3    │ - import·type·{·PrismaClient·}·from·"../db/generated/client";␍
+     4    │ - ␍
+     5    │ - /**·Schema/adapter·contract·only.·PLT-01·owns·runtime·auth·and·route·activation.·*/␍
+     6    │ - export·function·authSchemaOptions(client:·PrismaClient)·{␍
+     7    │ - ··return·{␍
+     8    │ - ····database:·prismaAdapter(client,·{·provider:·"postgresql"·}),␍
+     9    │ - ····advanced:·{·database:·{·generateId:·"serial"·}·},␍
+    10    │ - ····account:·{·modelName:·"authAccount"·},␍
+    11    │ - ··}·satisfies·BetterAuthOptions;␍
+    12    │ - }␍
+        1 │ + import·type·{·BetterAuthOptions·}·from·"better-auth";
+        2 │ + import·{·prismaAdapter·}·from·"better-auth/adapters/prisma";
+        3 │ + import·type·{·PrismaClient·}·from·"../db/generated/client";
+        4 │ + 
+        5 │ + /**·Schema/adapter·contract·only.·PLT-01·owns·runtime·auth·and·route·activation.·*/
+        6 │ + export·function·authSchemaOptions(client:·PrismaClient)·{
+        7 │ + ··return·{
+        8 │ + ····database:·prismaAdapter(client,·{·provider:·"postgresql"·}),
+        9 │ + ····advanced:·{·database:·{·generateId:·"serial"·}·},
+       10 │ + ····account:·{·modelName:·"authAccount"·},
+       11 │ + ··}·satisfies·BetterAuthOptions;
+       12 │ + }
+    13 13 │   
+  
+
+src\lib\db\index.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·"server-only";␍
+     2    │ - import·{·PrismaPg·}·from·"@prisma/adapter-pg";␍
+     3    │ - import·{·PrismaClient·}·from·"./generated/client";␍
+     4    │ - ␍
+     5    │ - const·globalForPrisma·=·globalThis·as·unknown·as·{␍
+     6    │ - ··prisma:·PrismaClient·|·undefined;␍
+     7    │ - };␍
+     8    │ - ␍
+     9    │ - function·createClient()·{␍
+    10    │ - ··const·connectionString·=·process.env.DATABASE_URL;␍
+    11    │ - ··if·(!connectionString)·throw·new·Error("DATABASE_URL·is·required.");␍
+    12    │ - ␍
+    13    │ - ··return·new·PrismaClient({␍
+    14    │ - ····adapter:·new·PrismaPg({·connectionString·}),␍
+    15    │ - ··});␍
+    16    │ - }␍
+    17    │ - ␍
+    18    │ - export·const·prisma·=·globalForPrisma.prisma·??·createClient();␍
+    19    │ - ␍
+    20    │ - if·(process.env.NODE_ENV·!==·"production")·globalForPrisma.prisma·=·prisma;␍
+        1 │ + import·"server-only";
+        2 │ + import·{·PrismaPg·}·from·"@prisma/adapter-pg";
+        3 │ + import·{·PrismaClient·}·from·"./generated/client";
+        4 │ + 
+        5 │ + const·globalForPrisma·=·globalThis·as·unknown·as·{
+        6 │ + ··prisma:·PrismaClient·|·undefined;
+        7 │ + };
+        8 │ + 
+        9 │ + function·createClient()·{
+       10 │ + ··const·connectionString·=·process.env.DATABASE_URL;
+       11 │ + ··if·(!connectionString)·throw·new·Error("DATABASE_URL·is·required.");
+       12 │ + 
+       13 │ + ··return·new·PrismaClient({
+       14 │ + ····adapter:·new·PrismaPg({·connectionString·}),
+       15 │ + ··});
+       16 │ + }
+       17 │ + 
+       18 │ + export·const·prisma·=·globalForPrisma.prisma·??·createClient();
+       19 │ + 
+       20 │ + if·(process.env.NODE_ENV·!==·"production")·globalForPrisma.prisma·=·prisma;
+    21 21 │   
+  
+
+tests\integration\database.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·{·PrismaPg·}·from·"@prisma/adapter-pg";␍
+     2    │ - import·{·expect,·it·}·from·"vitest";␍
+     3    │ - import·{·PrismaClient·}·from·"../../src/lib/db/generated/client";␍
+     4    │ - import·{·testDatabaseUrl·}·from·"../support/test-database-url";␍
+     5    │ - ␍
+     6    │ - it("runs·SELECT·1·against·the·explicitly·selected·test·database",·async·()·=>·{␍
+     7    │ - ··//·Validate·before·creating·an·adapter,·client,·or·connection·pool.␍
+     8    │ - ··const·connectionString·=·testDatabaseUrl(␍
+     9    │ - ····process.env.TEST_DATABASE_URL,␍
+    10    │ - ····process.env.DATABASE_URL,␍
+    11    │ - ··);␍
+    12    │ - ··const·client·=·new·PrismaClient({␍
+    13    │ - ····adapter:·new·PrismaPg({·connectionString,·connectionTimeoutMillis:·5_000·}),␍
+    14    │ - ··});␍
+    15    │ - ␍
+    16    │ - ··try·{␍
+    17    │ - ····const·rows·=·await·client.$queryRaw<Array<{·result:·number·}>>`␍
+    18    │ - ······SELECT·1·AS·result␍
+    19    │ - ····`;␍
+    20    │ - ····expect(rows).toEqual([{·result:·1·}]);␍
+    21    │ - ··}·finally·{␍
+    22    │ - ····//·Prisma·disposes·the·adapter-owned·pg·pool·when·disconnecting.␍
+    23    │ - ····await·client.$disconnect();␍
+    24    │ - ··}␍
+    25    │ - });␍
+        1 │ + import·{·PrismaPg·}·from·"@prisma/adapter-pg";
+        2 │ + import·{·expect,·it·}·from·"vitest";
+        3 │ + import·{·PrismaClient·}·from·"../../src/lib/db/generated/client";
+        4 │ + import·{·testDatabaseUrl·}·from·"../support/test-database-url";
+        5 │ + 
+        6 │ + it("runs·SELECT·1·against·the·explicitly·selected·test·database",·async·()·=>·{
+        7 │ + ··//·Validate·before·creating·an·adapter,·client,·or·connection·pool.
+        8 │ + ··const·connectionString·=·testDatabaseUrl(
+        9 │ + ····process.env.TEST_DATABASE_URL,
+       10 │ + ····process.env.DATABASE_URL,
+       11 │ + ··);
+       12 │ + ··const·client·=·new·PrismaClient({
+       13 │ + ····adapter:·new·PrismaPg({·connectionString,·connectionTimeoutMillis:·5_000·}),
+       14 │ + ··});
+       15 │ + 
+       16 │ + ··try·{
+       17 │ + ····const·rows·=·await·client.$queryRaw<Array<{·result:·number·}>>`
+       18 │ + ······SELECT·1·AS·result
+       19 │ + ····`;
+       20 │ + ····expect(rows).toEqual([{·result:·1·}]);
+       21 │ + ··}·finally·{
+       22 │ + ····//·Prisma·disposes·the·adapter-owned·pg·pool·when·disconnecting.
+       23 │ + ····await·client.$disconnect();
+       24 │ + ··}
+       25 │ + });
+    26 26 │   
+  
+
+tests\integration\sch01.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+      1     │ - import·{·PrismaPg·}·from·"@prisma/adapter-pg";␍
+      2     │ - import·{·afterAll,·describe,·expect,·it·}·from·"vitest";␍
+      3     │ - import·{·seedFakeRecords·}·from·"../../prisma/seed-data.mjs";␍
+      4     │ - import·{·authSchemaOptions·}·from·"../../src/lib/auth/schema-options";␍
+      5     │ - import·{·PrismaClient·}·from·"../../src/lib/db/generated/client";␍
+      6     │ - import·{·testDatabaseUrl·}·from·"../support/test-database-url";␍
+      7     │ - ␍
+      8     │ - const·connectionString·=·testDatabaseUrl(␍
+      9     │ - ··process.env.TEST_DATABASE_URL,␍
+     10     │ - ··process.env.DATABASE_URL,␍
+     11     │ - );␍
+     12     │ - const·client·=·new·PrismaClient({␍
+     13     │ - ··adapter:·new·PrismaPg({·connectionString·}),␍
+     14     │ - });␍
+     15     │ - afterAll(()·=>·client.$disconnect());␍
+     16     │ - const·rollback·=·new·Error("SCH-01·verification·rollback");␍
+     17     │ - ␍
+     18     │ - describe("SCH-01·schema·on·the·isolated·test·database",·()·=>·{␍
+     19     │ - ··it("seeds·30·per·named·list·with·varied·values·and·changes·nothing·on·rerun",·async·()·=>·{␍
+     20     │ - ····await·expect(␍
+     21     │ - ······client.$transaction(␍
+     22     │ - ········async·(tx)·=>·{␍
+     23     │ - ··········await·seedFakeRecords(tx);␍
+     24     │ - ··········const·snapshot·=·async·()·=>·({␍
+     25     │ - ············vehicles:·await·tx.vehicle.findMany({·orderBy:·{·id:·"asc"·}·}),␍
+     26     │ - ············drivers:·await·tx.driver.findMany({·orderBy:·{·id:·"asc"·}·}),␍
+     27     │ - ············couriers:·await·tx.courier.findMany({·orderBy:·{·id:·"asc"·}·}),␍
+     28     │ - ············vendors:·await·tx.vendor.findMany({·orderBy:·{·id:·"asc"·}·}),␍
+     29     │ - ············customers:·await·tx.customer.findMany({·orderBy:·{·id:·"asc"·}·}),␍
+     30     │ - ············consignees:·await·tx.consignee.findMany({·orderBy:·{·id:·"asc"·}·}),␍
+     31     │ - ··········});␍
+     32     │ - ··········const·before·=·await·snapshot();␍
+     33     │ - ··········for·(const·rows·of·Object.values(before))·{␍
+     34     │ - ············expect(rows).toHaveLength(30);␍
+     35     │ - ············expect(rows.every((row)·=>·typeof·row.id·===·"number")).toBe(true);␍
+     36     │ - ··········}␍
+     37     │ - ··········expect(new·Set(before.vehicles.map((row)·=>·row.status)).size).toBe(␍
+     38     │ - ············2,␍
+     39     │ - ··········);␍
+     40     │ - ··········expect(before.customers.some((row)·=>·row.branchId·===·null)).toBe(␍
+     41     │ - ············true,␍
+     42     │ - ··········);␍
+     43     │ - ··········expect(before.customers.some((row)·=>·row.regencyId·!==·null)).toBe(␍
+     44     │ - ············true,␍
+     45     │ - ··········);␍
+     46     │ - ··········expect(␍
+     47     │ - ············before.customers.some((row)·=>·(row.address?.length·??·0)·>·300),␍
+     48     │ - ··········).toBe(true);␍
+     49     │ - ··········expect(before.customers.some((row)·=>·row.deletedAt·!==·null)).toBe(␍
+     50     │ - ············true,␍
+     51     │ - ··········);␍
+     52     │ - ··········await·seedFakeRecords(tx);␍
+     53     │ - ··········expect(await·snapshot()).toEqual(before);␍
+     54     │ - ··········expect(await·tx.user.count()).toBe(0);␍
+     55     │ - ··········expect(await·tx.authAccount.count()).toBe(0);␍
+     56     │ - ··········expect(await·tx.customerAccounting.count()).toBe(0);␍
+     57     │ - ··········expect(await·tx.customerTaxProfile.count()).toBe(0);␍
+     58     │ - ··········throw·rollback;␍
+     59     │ - ········},␍
+     60     │ - ········{·timeout:·30000·},␍
+     61     │ - ······),␍
+     62     │ - ····).rejects.toBe(rollback);␍
+     63     │ - ··},·35000);␍
+     64     │ - ␍
+     65     │ - ··it("rolls·back·earlier·seed·inserts·on·a·late·occupied-ID·collision",·async·()·=>·{␍
+     66     │ - ····const·before·=·await·client.vendor.count();␍
+     67     │ - ····await·expect(␍
+     68     │ - ······client.$transaction(␍
+     69     │ - ········async·(tx)·=>·{␍
+     70     │ - ··········await·tx.customer.create({␍
+     71     │ - ············data:·{·id:·9100030,·name:·"FAKE·COLLISION"·},␍
+     72     │ - ··········});␍
+     73     │ - ··········await·seedFakeRecords(tx);␍
+     74     │ - ········},␍
+     75     │ - ········{·timeout:·30000·},␍
+     76     │ - ······),␍
+     77     │ - ····).rejects.toThrow("Fake·seed·ID·collision");␍
+     78     │ - ····expect(await·client.vendor.count()).toBe(before);␍
+     79     │ - ····expect(␍
+     80     │ - ······await·client.customer.findUnique({·where:·{·id:·9100030·}·}),␍
+     81     │ - ····).toBeNull();␍
+     82     │ - ··},·35000);␍
+     83     │ - ␍
+     84     │ - ··it("enforces·new·master·references·without·leaving·a·partial·record",·async·()·=>·{␍
+     85     │ - ····await·expect(␍
+     86     │ - ······client.customer.create({␍
+     87     │ - ········data:·{␍
+     88     │ - ··········id:·9200001,␍
+     89     │ - ··········name:·"FAKE·INVALID·RELATION",␍
+     90     │ - ··········regencyId:·2147483646,␍
+     91     │ - ········},␍
+     92     │ - ······}),␍
+     93     │ - ····).rejects.toMatchObject({·code:·"P2003"·});␍
+     94     │ - ····expect(␍
+     95     │ - ······await·client.customer.findUnique({·where:·{·id:·9200001·}·}),␍
+     96     │ - ····).toBeNull();␍
+     97     │ - ··});␍
+     98     │ - ␍
+     99     │ - ··it("retains·child·uniqueness·after·soft·deletion",·async·()·=>·{␍
+    100     │ - ····await·expect(␍
+    101     │ - ······client.$transaction(async·(tx)·=>·{␍
+    102     │ - ········await·tx.customer.create({␍
+    103     │ - ··········data:·{·id:·9200002,·name:·"FAKE·UNIQUENESS·CHECK"·},␍
+    104     │ - ········});␍
+    105     │ - ········await·tx.customerTaxProfile.create({␍
+    106     │ - ··········data:·{·id:·9200002,·customerId:·9200002,·deletedAt:·new·Date()·},␍
+    107     │ - ········});␍
+    108     │ - ········await·tx.customerTaxProfile.create({␍
+    109     │ - ··········data:·{·id:·9200003,·customerId:·9200002·},␍
+    110     │ - ········});␍
+    111     │ - ······}),␍
+    112     │ - ····).rejects.toMatchObject({·code:·"P2002"·});␍
+    113     │ - ····expect(␍
+    114     │ - ······await·client.customer.findUnique({·where:·{·id:·9200002·}·}),␍
+    115     │ - ····).toBeNull();␍
+    116     │ - ··});␍
+    117     │ - ␍
+    118     │ - ··it("uses·Better·Auth·numeric·IDs·and·its·separate·account·storage",·async·()·=>·{␍
+    119     │ - ····await·expect(␍
+    120     │ - ······client.$transaction(async·(tx)·=>·{␍
+    121     │ - ········const·options·=·authSchemaOptions(tx·as·unknown·as·PrismaClient);␍
+    122     │ - ········const·adapter·=·options.database(options);␍
+    123     │ - ········const·now·=·new·Date();␍
+    124     │ - ········const·user·=·await·adapter.create<{·id:·string·}>({␍
+    125     │ - ··········model:·"user",␍
+    126     │ - ··········data:·{␍
+    127     │ - ············name:·"FAKE·ADAPTER·CHECK",␍
+    128     │ - ············email:·"adapter-check@example.invalid",␍
+    129     │ - ············emailVerified:·false,␍
+    130     │ - ············createdAt:·now,␍
+    131     │ - ············updatedAt:·now,␍
+    132     │ - ··········},␍
+    133     │ - ········});␍
+    134     │ - ········expect(user.id).toMatch(/^\d+$/);␍
+    135     │ - ········await·adapter.create({␍
+    136     │ - ··········model:·"account",␍
+    137     │ - ··········data:·{␍
+    138     │ - ············userId:·user.id,␍
+    139     │ - ············accountId:·"INVALID-PROVIDER-ID",␍
+    140     │ - ············providerId:·"FAKE-PROVIDER",␍
+    141     │ - ············createdAt:·now,␍
+    142     │ - ············updatedAt:·now,␍
+    143     │ - ··········},␍
+    144     │ - ········});␍
+    145     │ - ········expect(await·tx.authAccount.count()).toBe(1);␍
+    146     │ - ········expect(await·tx.account.count()).toBe(0);␍
+    147     │ - ········throw·rollback;␍
+    148     │ - ······}),␍
+    149     │ - ····).rejects.toBe(rollback);␍
+    150     │ - ··});␍
+  153 more lines truncated
+  
+
+tests\support\test-database-url.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - function·parseDatabaseUrl(value:·string·|·undefined,·name:·string)·{␍
+     2    │ - ··if·(!value)·throw·new·Error(`${name}·is·required.`);␍
+     3    │ - ␍
+     4    │ - ··let·url:·URL;␍
+     5    │ - ··try·{␍
+     6    │ - ····url·=·new·URL(value);␍
+     7    │ - ····decodeURIComponent(url.pathname);␍
+     8    │ - ··}·catch·{␍
+     9    │ - ····throw·new·Error(`${name}·must·be·a·valid·PostgreSQL·URL.`);␍
+    10    │ - ··}␍
+    11    │ - ␍
+    12    │ - ··if·(␍
+    13    │ - ····!["postgres:",·"postgresql:"].includes(url.protocol)·||␍
+    14    │ - ····!url.hostname·||␍
+    15    │ - ····url.pathname.length·<=·1·||␍
+    16    │ - ····url.pathname.slice(1).includes("/")·||␍
+    17    │ - ····url.search·||␍
+    18    │ - ····url.hash␍
+    19    │ - ··)·{␍
+    20    │ - ····throw·new·Error(␍
+    21    │ - ······`${name}·must·be·a·PostgreSQL·URL·without·query·or·fragment.`,␍
+    22    │ - ····);␍
+    23    │ - ··}␍
+    24    │ - ␍
+    25    │ - ··return·url;␍
+    26    │ - }␍
+    27    │ - ␍
+    28    │ - function·target(url:·URL)·{␍
+    29    │ - ··const·host·=·["localhost",·"127.0.0.1",·"[::1]"].includes(url.hostname)␍
+    30    │ - ····?·"loopback"␍
+    31    │ - ····:·url.hostname.toLowerCase();␍
+    32    │ - ··return·`${host}:${url.port·||·"5432"}/${decodeURIComponent(url.pathname.slice(1))}`;␍
+    33    │ - }␍
+    34    │ - ␍
+    35    │ - export·function·testDatabaseUrl(␍
+    36    │ - ··testUrl:·string·|·undefined,␍
+    37    │ - ··developmentUrl:·string·|·undefined,␍
+    38    │ - ··nodeEnv:·string·|·undefined·=·process.env.NODE_ENV,␍
+    39    │ - )·{␍
+    40    │ - ··if·(nodeEnv·===·"production")·{␍
+    41    │ - ····throw·new·Error("Test·database·tools·refuse·NODE_ENV=production.");␍
+    42    │ - ··}␍
+    43    │ - ··const·parsed·=·parseDatabaseUrl(testUrl,·"TEST_DATABASE_URL");␍
+    44    │ - ··const·database·=·decodeURIComponent(parsed.pathname.slice(1));␍
+    45    │ - ··if·(database·!==·"logistik_web_test")·{␍
+    46    │ - ····throw·new·Error("TEST_DATABASE_URL·must·target·logistik_web_test.");␍
+    47    │ - ··}␍
+    48    │ - ··if·(!["localhost",·"127.0.0.1",·"[::1]"].includes(parsed.hostname))·{␍
+    49    │ - ····throw·new·Error("TEST_DATABASE_URL·requires·a·loopback·host.");␍
+    50    │ - ··}␍
+    51    │ - ␍
+    52    │ - ··if·(␍
+    53    │ - ····developmentUrl·&&␍
+    54    │ - ····target(parsed)·===·target(parseDatabaseUrl(developmentUrl,·"DATABASE_URL"))␍
+    55    │ - ··)·{␍
+    56    │ - ····throw·new·Error("TEST_DATABASE_URL·must·not·target·DATABASE_URL.");␍
+    57    │ - ··}␍
+    58    │ - ␍
+    59    │ - ··return·parsed.href;␍
+    60    │ - }␍
+        1 │ + function·parseDatabaseUrl(value:·string·|·undefined,·name:·string)·{
+        2 │ + ··if·(!value)·throw·new·Error(`${name}·is·required.`);
+        3 │ + 
+        4 │ + ··let·url:·URL;
+        5 │ + ··try·{
+        6 │ + ····url·=·new·URL(value);
+        7 │ + ····decodeURIComponent(url.pathname);
+        8 │ + ··}·catch·{
+        9 │ + ····throw·new·Error(`${name}·must·be·a·valid·PostgreSQL·URL.`);
+       10 │ + ··}
+       11 │ + 
+       12 │ + ··if·(
+       13 │ + ····!["postgres:",·"postgresql:"].includes(url.protocol)·||
+       14 │ + ····!url.hostname·||
+       15 │ + ····url.pathname.length·<=·1·||
+       16 │ + ····url.pathname.slice(1).includes("/")·||
+       17 │ + ····url.search·||
+       18 │ + ····url.hash
+       19 │ + ··)·{
+       20 │ + ····throw·new·Error(
+       21 │ + ······`${name}·must·be·a·PostgreSQL·URL·without·query·or·fragment.`,
+       22 │ + ····);
+       23 │ + ··}
+       24 │ + 
+       25 │ + ··return·url;
+       26 │ + }
+       27 │ + 
+       28 │ + function·target(url:·URL)·{
+       29 │ + ··const·host·=·["localhost",·"127.0.0.1",·"[::1]"].includes(url.hostname)
+       30 │ + ····?·"loopback"
+       31 │ + ····:·url.hostname.toLowerCase();
+       32 │ + ··return·`${host}:${url.port·||·"5432"}/${decodeURIComponent(url.pathname.slice(1))}`;
+       33 │ + }
+       34 │ + 
+       35 │ + export·function·testDatabaseUrl(
+       36 │ + ··testUrl:·string·|·undefined,
+       37 │ + ··developmentUrl:·string·|·undefined,
+       38 │ + ··nodeEnv:·string·|·undefined·=·process.env.NODE_ENV,
+       39 │ + )·{
+       40 │ + ··if·(nodeEnv·===·"production")·{
+       41 │ + ····throw·new·Error("Test·database·tools·refuse·NODE_ENV=production.");
+       42 │ + ··}
+       43 │ + ··const·parsed·=·parseDatabaseUrl(testUrl,·"TEST_DATABASE_URL");
+       44 │ + ··const·database·=·decodeURIComponent(parsed.pathname.slice(1));
+       45 │ + ··if·(database·!==·"logistik_web_test")·{
+       46 │ + ····throw·new·Error("TEST_DATABASE_URL·must·target·logistik_web_test.");
+       47 │ + ··}
+       48 │ + ··if·(!["localhost",·"127.0.0.1",·"[::1]"].includes(parsed.hostname))·{
+       49 │ + ····throw·new·Error("TEST_DATABASE_URL·requires·a·loopback·host.");
+       50 │ + ··}
+       51 │ + 
+       52 │ + ··if·(
+       53 │ + ····developmentUrl·&&
+       54 │ + ····target(parsed)·===·target(parseDatabaseUrl(developmentUrl,·"DATABASE_URL"))
+       55 │ + ··)·{
+       56 │ + ····throw·new·Error("TEST_DATABASE_URL·must·not·target·DATABASE_URL.");
+       57 │ + ··}
+       58 │ + 
+       59 │ + ··return·parsed.href;
+       60 │ + }
+    61 61 │   
+  
+
+tests\unit\local-database.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·{·describe,·expect,·it·}·from·"vitest";␍
+     2    │ - import·{·localDatabaseUrl·}·from·"../../prisma/local-database.mjs";␍
+     3    │ - ␍
+     4    │ - describe("SCH-01·local·database·guards",·()·=>·{␍
+     5    │ - ··it.each([␍
+     6    │ - ····"seed",␍
+     7    │ - ····"migrate",␍
+     8    │ - ··])("allows·the·explicit·local·development·target·for·%s",·(purpose)·=>·{␍
+     9    │ - ····const·value·=·"postgresql://fake:fake@127.0.0.1:5432/logistik_web";␍
+    10    │ - ····expect(localDatabaseUrl(value,·{·purpose,·nodeEnv:·"development"·})).toBe(␍
+    11    │ - ······value,␍
+    12    │ - ····);␍
+    13    │ - ··});␍
+    14    │ - ␍
+    15    │ - ··it("allows·localhost·only·for·seed",·()·=>·{␍
+    16    │ - ····const·value·=·"postgres://fake:fake@localhost/logistik_web";␍
+    17    │ - ····expect(localDatabaseUrl(value,·{·purpose:·"seed"·})).toBe(value);␍
+    18    │ - ····expect(()·=>·localDatabaseUrl(value,·{·purpose:·"migrate"·})).toThrow();␍
+    19    │ - ··});␍
+    20    │ - ␍
+    21    │ - ··it.each(["seed",·"migrate"])("refuses·production·for·%s",·(purpose)·=>·{␍
+    22    │ - ····expect(()·=>␍
+    23    │ - ······localDatabaseUrl("postgresql://127.0.0.1/logistik_web",·{␍
+    24    │ - ········purpose,␍
+    25    │ - ········nodeEnv:·"production",␍
+    26    │ - ······}),␍
+    27    │ - ····).toThrow("production");␍
+    28    │ - ··});␍
+    29    │ - ␍
+    30    │ - ··it.each([␍
+    31    │ - ····undefined,␍
+    32    │ - ····"",␍
+    33    │ - ····"not·a·URL",␍
+    34    │ - ····"postgresql://127.0.0.1",␍
+    35    │ - ····"postgresql://127.0.0.1/logistik_web_test",␍
+    36    │ - ····"postgresql://127.0.0.1/production",␍
+    37    │ - ····"postgresql://127.0.0.1/logistik_web/other",␍
+    38    │ - ····"postgresql://127.0.0.1/logistik%5fweb",␍
+    39    │ - ····"postgresql://127.0.0.1/LOGISTIK_WEB",␍
+    40    │ - ····"postgresql://db.example.invalid/logistik_web",␍
+    41    │ - ····"postgresql://127.0.0.2/logistik_web",␍
+    42    │ - ····"postgresql://[::1]/logistik_web",␍
+    43    │ - ····"postgresql://127.0.0.1.example.invalid/logistik_web",␍
+    44    │ - ····"postgresql://localhost.example.invalid/logistik_web",␍
+    45    │ - ····"postgresql://127.0.0.1@db.example.invalid/logistik_web",␍
+    46    │ - ····"postgresql://127.0.0.1/logistik_web?host=remote.invalid",␍
+    47    │ - ····"postgresql://127.0.0.1/logistik_web?schema=other",␍
+    48    │ - ····"postgresql://127.0.0.1/logistik_web?dbname=production",␍
+    49    │ - ····"postgresql://127.0.0.1/logistik_web#override",␍
+    50    │ - ····"https://127.0.0.1/logistik_web",␍
+    51    │ - ····"·postgresql://127.0.0.1/logistik_web",␍
+    52    │ - ····"postgresql://127.0.0.1/logistik_web\n",␍
+    53    │ - ····"postgresql://127.0.0.1\\remote/logistik_web",␍
+    54    │ - ··])("refuses·unsafe·or·malformed·target·%s·for·both·purposes",·(value)·=>·{␍
+    55    │ - ····for·(const·purpose·of·["seed",·"migrate"])·{␍
+    56    │ - ······expect(()·=>·localDatabaseUrl(value,·{·purpose·})).toThrow();␍
+    57    │ - ····}␍
+    58    │ - ··});␍
+    59    │ - ␍
+    60    │ - ··it("refuses·missing·or·unexpected·purpose",·()·=>·{␍
+    61    │ - ····const·value·=·"postgresql://127.0.0.1/logistik_web";␍
+    62    │ - ····expect(()·=>·localDatabaseUrl(value)).toThrow();␍
+    63    │ - ····expect(()·=>·localDatabaseUrl(value,·{·purpose:·"reset"·})).toThrow();␍
+    64    │ - ··});␍
+    65    │ - ␍
+    66    │ - ··it("never·exposes·credentials·in·rejection·errors",·()·=>·{␍
+    67    │ - ····const·value·=·"postgresql://fake:DO-NOT-EXPOSE@remote.invalid/production";␍
+    68    │ - ····try·{␍
+    69    │ - ······localDatabaseUrl(value,·{·purpose:·"seed"·});␍
+    70    │ - ······throw·new·Error("Expected·rejection");␍
+    71    │ - ····}·catch·(error)·{␍
+    72    │ - ······expect(String(error)).not.toContain("DO-NOT-EXPOSE");␍
+    73    │ - ······expect(String(error)).not.toContain(value);␍
+    74    │ - ····}␍
+    75    │ - ··});␍
+    76    │ - });␍
+        1 │ + import·{·describe,·expect,·it·}·from·"vitest";
+        2 │ + import·{·localDatabaseUrl·}·from·"../../prisma/local-database.mjs";
+        3 │ + 
+        4 │ + describe("SCH-01·local·database·guards",·()·=>·{
+        5 │ + ··it.each([
+        6 │ + ····"seed",
+        7 │ + ····"migrate",
+        8 │ + ··])("allows·the·explicit·local·development·target·for·%s",·(purpose)·=>·{
+        9 │ + ····const·value·=·"postgresql://fake:fake@127.0.0.1:5432/logistik_web";
+       10 │ + ····expect(localDatabaseUrl(value,·{·purpose,·nodeEnv:·"development"·})).toBe(
+       11 │ + ······value,
+       12 │ + ····);
+       13 │ + ··});
+       14 │ + 
+       15 │ + ··it("allows·localhost·only·for·seed",·()·=>·{
+       16 │ + ····const·value·=·"postgres://fake:fake@localhost/logistik_web";
+       17 │ + ····expect(localDatabaseUrl(value,·{·purpose:·"seed"·})).toBe(value);
+       18 │ + ····expect(()·=>·localDatabaseUrl(value,·{·purpose:·"migrate"·})).toThrow();
+       19 │ + ··});
+       20 │ + 
+       21 │ + ··it.each(["seed",·"migrate"])("refuses·production·for·%s",·(purpose)·=>·{
+       22 │ + ····expect(()·=>
+       23 │ + ······localDatabaseUrl("postgresql://127.0.0.1/logistik_web",·{
+       24 │ + ········purpose,
+       25 │ + ········nodeEnv:·"production",
+       26 │ + ······}),
+       27 │ + ····).toThrow("production");
+       28 │ + ··});
+       29 │ + 
+       30 │ + ··it.each([
+       31 │ + ····undefined,
+       32 │ + ····"",
+       33 │ + ····"not·a·URL",
+       34 │ + ····"postgresql://127.0.0.1",
+       35 │ + ····"postgresql://127.0.0.1/logistik_web_test",
+       36 │ + ····"postgresql://127.0.0.1/production",
+       37 │ + ····"postgresql://127.0.0.1/logistik_web/other",
+       38 │ + ····"postgresql://127.0.0.1/logistik%5fweb",
+       39 │ + ····"postgresql://127.0.0.1/LOGISTIK_WEB",
+       40 │ + ····"postgresql://db.example.invalid/logistik_web",
+       41 │ + ····"postgresql://127.0.0.2/logistik_web",
+       42 │ + ····"postgresql://[::1]/logistik_web",
+       43 │ + ····"postgresql://127.0.0.1.example.invalid/logistik_web",
+       44 │ + ····"postgresql://localhost.example.invalid/logistik_web",
+       45 │ + ····"postgresql://127.0.0.1@db.example.invalid/logistik_web",
+       46 │ + ····"postgresql://127.0.0.1/logistik_web?host=remote.invalid",
+       47 │ + ····"postgresql://127.0.0.1/logistik_web?schema=other",
+       48 │ + ····"postgresql://127.0.0.1/logistik_web?dbname=production",
+       49 │ + ····"postgresql://127.0.0.1/logistik_web#override",
+       50 │ + ····"https://127.0.0.1/logistik_web",
+       51 │ + ····"·postgresql://127.0.0.1/logistik_web",
+       52 │ + ····"postgresql://127.0.0.1/logistik_web\n",
+       53 │ + ····"postgresql://127.0.0.1\\remote/logistik_web",
+       54 │ + ··])("refuses·unsafe·or·malformed·target·%s·for·both·purposes",·(value)·=>·{
+       55 │ + ····for·(const·purpose·of·["seed",·"migrate"])·{
+       56 │ + ······expect(()·=>·localDatabaseUrl(value,·{·purpose·})).toThrow();
+       57 │ + ····}
+       58 │ + ··});
+       59 │ + 
+       60 │ + ··it("refuses·missing·or·unexpected·purpose",·()·=>·{
+       61 │ + ····const·value·=·"postgresql://127.0.0.1/logistik_web";
+       62 │ + ····expect(()·=>·localDatabaseUrl(value)).toThrow();
+       63 │ + ····expect(()·=>·localDatabaseUrl(value,·{·purpose:·"reset"·})).toThrow();
+       64 │ + ··});
+       65 │ + 
+       66 │ + ··it("never·exposes·credentials·in·rejection·errors",·()·=>·{
+       67 │ + ····const·value·=·"postgresql://fake:DO-NOT-EXPOSE@remote.invalid/production";
+       68 │ + ····try·{
+       69 │ + ······localDatabaseUrl(value,·{·purpose:·"seed"·});
+       70 │ + ······throw·new·Error("Expected·rejection");
+       71 │ + ····}·catch·(error)·{
+       72 │ + ······expect(String(error)).not.toContain("DO-NOT-EXPOSE");
+       73 │ + ······expect(String(error)).not.toContain(value);
+       74 │ + ····}
+  3 more lines truncated
+  
+
+tests\unit\sch01-schema.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·{·createHash·}·from·"node:crypto";␍
+     2    │ - import·{·readdirSync,·readFileSync·}·from·"node:fs";␍
+     3    │ - import·{·getAuthTables·}·from·"better-auth/db";␍
+     4    │ - import·{·describe,·expect,·expectTypeOf,·it,·vi·}·from·"vitest";␍
+     5    │ - import·{·authSchemaOptions·}·from·"../../src/lib/auth/schema-options";␍
+     6    │ - import·type·{␍
+     7    │ - ··Customer,␍
+     8    │ - ··PrismaClient,␍
+     9    │ - ··User,␍
+    10    │ - ··Vehicle,␍
+    11    │ - }·from·"../../src/lib/db/generated/client";␍
+    12    │ - import·baseline·from·"../fixtures/sch01-baseline.json";␍
+    13    │ - ␍
+    14    │ - const·source·=·readdirSync("prisma/schema")␍
+    15    │ - ··.map((name)·=>·readFileSync(`prisma/schema/${name}`,·"utf8"))␍
+    16    │ - ··.join("\n");␍
+    17    │ - const·models·=·[...source.matchAll(/model·(\w+)·\{([\s\S]*?)\n\}/g)];␍
+    18    │ - ␍
+    19    │ - describe("SCH-01·preservation·and·adapter·contract",·()·=>·{␍
+    20    │ - ··it("preserves·every·baseline·scalar·field·and·all·applied·migration·bytes",·()·=>·{␍
+    21    │ - ····for·(const·{·table,·fields·}·of·baseline.models)·{␍
+    22    │ - ······const·model·=·models.find(([,·,·body])·=>␍
+    23    │ - ········body.includes(`@@map("${table}")`),␍
+    24    │ - ······);␍
+    25    │ - ······expect(model,·table).toBeDefined();␍
+    26    │ - ······for·(const·field·of·fields)·{␍
+    27    │ - ········expect(model?.[2],·`${table}.${field}`).toMatch(␍
+    28    │ - ··········new·RegExp(`\\b${field}\\s`),␍
+    29    │ - ········);␍
+    30    │ - ······}␍
+    31    │ - ····}␍
+    32    │ - ····for·(const·[name,·checksum]·of·Object.entries(baseline.migrations))·{␍
+    33    │ - ······expect(␍
+    34    │ - ········createHash("sha256")␍
+    35    │ - ··········.update(readFileSync(`prisma/migrations/${name}/migration.sql`))␍
+    36    │ - ··········.digest("hex"),␍
+    37    │ - ······).toBe(checksum);␍
+    38    │ - ····}␍
+    39    │ - ··});␍
+    40    │ - ␍
+    41    │ - ··it("keeps·domain·lifecycles,·narrow·keys,·draft·guards·and·auth·exceptions",·()·=>·{␍
+    42    │ - ····expect(source).not.toMatch(/\bBigInt\b|\/\/\/·(?:Prototype:|PII)/);␍
+    43    │ - ····for·(const·[,·name,·body]·of·models)·{␍
+    44    │ - ······expect(body,·name).toMatch(/\bid\s+Int\s+@id/);␍
+    45    │ - ······expect(body,·name).toMatch(␍
+    46    │ - ········/\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,␍
+    47    │ - ······);␍
+    48    │ - ······expect(body,·name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);␍
+    49    │ - ······if·(!["User",·"Session",·"AuthAccount",·"Verification"].includes(name))·{␍
+    50    │ - ········expect(body,·name).toMatch(/\bdeletedAt\s+DateTime\?/);␍
+    51    │ - ······}␍
+    52    │ - ····}␍
+    53    │ - ····expect(source).toMatch(/DRAFT:.*D-27/);␍
+    54    │ - ····expect(source).toMatch(/DRAFT:.*D-26/);␍
+    55    │ - ····expect(source).toMatch(/DRAFT:.*D-11,·D-13/);␍
+    56    │ - ····expectTypeOf<Vehicle["id"]>().toEqualTypeOf<number>();␍
+    57    │ - ····expectTypeOf<Customer["branchId"]>().toEqualTypeOf<number·|·null>();␍
+    58    │ - ····expectTypeOf<User["emailVerified"]>().toEqualTypeOf<boolean>();␍
+    59    │ - ··});␍
+    60    │ - ␍
+    61    │ - ··it("matches·every·required·field·from·the·installed·Better·Auth·version",·()·=>·{␍
+    62    │ - ····const·options·=·authSchemaOptions({}·as·PrismaClient);␍
+    63    │ - ····const·tables·=·getAuthTables(options);␍
+    64    │ - ····const·names:·Record<string,·string>·=·{␍
+    65    │ - ······user:·"User",␍
+    66    │ - ······session:·"Session",␍
+    67    │ - ······account:·"AuthAccount",␍
+    68    │ - ······verification:·"Verification",␍
+    69    │ - ····};␍
+    70    │ - ····for·(const·[key,·table]·of·Object.entries(tables))·{␍
+    71    │ - ······const·body·=·models.find(([,·name])·=>·name·===·names[key])?.[2];␍
+    72    │ - ······expect(body,·key).toBeDefined();␍
+    73    │ - ······for·(const·field·of·Object.keys(table.fields))·{␍
+    74    │ - ········expect(body,·`${key}.${field}`).toMatch(new·RegExp(`\\b${field}\\s`));␍
+    75    │ - ······}␍
+    76    │ - ····}␍
+    77    │ - ····expect(options.advanced.database.generateId).toBe("serial");␍
+    78    │ - ··});␍
+    79    │ - ␍
+    80    │ - ··it("routes·provider·accounts·to·authAccount·and·converts·numeric·IDs",·async·()·=>·{␍
+    81    │ - ····const·findFirst·=·vi.fn().mockResolvedValue(null);␍
+    82    │ - ····const·financialLookup·=·vi.fn();␍
+    83    │ - ····const·options·=·authSchemaOptions({␍
+    84    │ - ······authAccount:·{·findFirst·},␍
+    85    │ - ······account:·{·findFirst:·financialLookup·},␍
+    86    │ - ····}·as·unknown·as·PrismaClient);␍
+    87    │ - ····const·adapter·=·options.database(options);␍
+    88    │ - ····await·adapter.findOne({␍
+    89    │ - ······model:·"account",␍
+    90    │ - ······where:·[{·field:·"userId",·value:·"42"·}],␍
+    91    │ - ····});␍
+    92    │ - ····expect(findFirst).toHaveBeenCalledWith(␍
+    93    │ - ······expect.objectContaining({·where:·{·userId:·{·equals:·42·}·}·}),␍
+    94    │ - ····);␍
+    95    │ - ····expect(financialLookup).not.toHaveBeenCalled();␍
+    96    │ - ··});␍
+    97    │ - });␍
+        1 │ + import·{·createHash·}·from·"node:crypto";
+        2 │ + import·{·readdirSync,·readFileSync·}·from·"node:fs";
+        3 │ + import·{·getAuthTables·}·from·"better-auth/db";
+        4 │ + import·{·describe,·expect,·expectTypeOf,·it,·vi·}·from·"vitest";
+        5 │ + import·{·authSchemaOptions·}·from·"../../src/lib/auth/schema-options";
+        6 │ + import·type·{
+        7 │ + ··Customer,
+        8 │ + ··PrismaClient,
+        9 │ + ··User,
+       10 │ + ··Vehicle,
+       11 │ + }·from·"../../src/lib/db/generated/client";
+       12 │ + import·baseline·from·"../fixtures/sch01-baseline.json";
+       13 │ + 
+       14 │ + const·source·=·readdirSync("prisma/schema")
+       15 │ + ··.map((name)·=>·readFileSync(`prisma/schema/${name}`,·"utf8"))
+       16 │ + ··.join("\n");
+       17 │ + const·models·=·[...source.matchAll(/model·(\w+)·\{([\s\S]*?)\n\}/g)];
+       18 │ + 
+       19 │ + describe("SCH-01·preservation·and·adapter·contract",·()·=>·{
+       20 │ + ··it("preserves·every·baseline·scalar·field·and·all·applied·migration·bytes",·()·=>·{
+       21 │ + ····for·(const·{·table,·fields·}·of·baseline.models)·{
+       22 │ + ······const·model·=·models.find(([,·,·body])·=>
+       23 │ + ········body.includes(`@@map("${table}")`),
+       24 │ + ······);
+       25 │ + ······expect(model,·table).toBeDefined();
+       26 │ + ······for·(const·field·of·fields)·{
+       27 │ + ········expect(model?.[2],·`${table}.${field}`).toMatch(
+       28 │ + ··········new·RegExp(`\\b${field}\\s`),
+       29 │ + ········);
+       30 │ + ······}
+       31 │ + ····}
+       32 │ + ····for·(const·[name,·checksum]·of·Object.entries(baseline.migrations))·{
+       33 │ + ······expect(
+       34 │ + ········createHash("sha256")
+       35 │ + ··········.update(readFileSync(`prisma/migrations/${name}/migration.sql`))
+       36 │ + ··········.digest("hex"),
+       37 │ + ······).toBe(checksum);
+       38 │ + ····}
+       39 │ + ··});
+       40 │ + 
+       41 │ + ··it("keeps·domain·lifecycles,·narrow·keys,·draft·guards·and·auth·exceptions",·()·=>·{
+       42 │ + ····expect(source).not.toMatch(/\bBigInt\b|\/\/\/·(?:Prototype:|PII)/);
+       43 │ + ····for·(const·[,·name,·body]·of·models)·{
+       44 │ + ······expect(body,·name).toMatch(/\bid\s+Int\s+@id/);
+       45 │ + ······expect(body,·name).toMatch(
+       46 │ + ········/\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,
+       47 │ + ······);
+       48 │ + ······expect(body,·name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);
+       49 │ + ······if·(!["User",·"Session",·"AuthAccount",·"Verification"].includes(name))·{
+       50 │ + ········expect(body,·name).toMatch(/\bdeletedAt\s+DateTime\?/);
+       51 │ + ······}
+       52 │ + ····}
+       53 │ + ····expect(source).toMatch(/DRAFT:.*D-27/);
+  45 more lines truncated
+  
+
+tests\unit\test-database-url.test.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·{·describe,·expect,·it·}·from·"vitest";␍
+     2    │ - import·{·testDatabaseUrl·}·from·"../support/test-database-url";␍
+     3    │ - ␍
+     4    │ - const·development·=·"postgresql://postgres@127.0.0.1:5432/logistik_web";␍
+     5    │ - const·valid·=·"postgresql://postgres@127.0.0.1:5432/logistik_web_test";␍
+     6    │ - ␍
+     7    │ - describe("integration·database·safety",·()·=>·{␍
+     8    │ - ··it("accepts·a·separate·test·database",·()·=>·{␍
+     9    │ - ····expect(testDatabaseUrl(valid,·development)).toBe(valid);␍
+    10    │ - ··});␍
+    11    │ - ␍
+    12    │ - ··it("refuses·production·before·any·connection",·()·=>·{␍
+    13    │ - ····expect(()·=>·testDatabaseUrl(valid,·development,·"production")).toThrow(␍
+    14    │ - ······"refuse·NODE_ENV=production",␍
+    15    │ - ····);␍
+    16    │ - ··});␍
+    17    │ - ␍
+    18    │ - ··it.each([␍
+    19    │ - ····undefined,␍
+    20    │ - ····"",␍
+    21    │ - ····"not-a-url",␍
+    22    │ - ····"https://localhost/app_test",␍
+    23    │ - ····"postgresql://localhost/",␍
+    24    │ - ····"postgresql://localhost/logistik-web",␍
+    25    │ - ····"postgresql://localhost/other_test",␍
+    26    │ - ····"postgresql://localhost/logistik_web_test_copy",␍
+    27    │ - ····"postgresql://localhost/LOGISTIK_WEB_TEST",␍
+    28    │ - ····"postgresql://remote.invalid/logistik_web_test",␍
+    29    │ - ····"postgresql://localhost/%ZZ_test",␍
+    30    │ - ····"postgresql://localhost/app_test/other",␍
+    31    │ - ····"postgresql://localhost/app_test?dbname=production",␍
+    32    │ - ····"postgresql://localhost/app_test?host=elsewhere",␍
+    33    │ - ····"postgresql://localhost/app_test#other",␍
+    34    │ - ··])("rejects·unsafe·test·URL·%s",·(value)·=>·{␍
+    35    │ - ····expect(()·=>·testDatabaseUrl(value,·development)).toThrow();␍
+    36    │ - ··});␍
+    37    │ - ␍
+    38    │ - ··it.each([␍
+    39    │ - ····valid,␍
+    40    │ - ····"postgres://other@localhost/logistik_web_test",␍
+    41    │ - ····"postgresql://postgres@[::1]:5432/logistik_web_%74est",␍
+    42    │ - ··])("rejects·the·same·database·despite·URL·spelling:·%s",·(value)·=>·{␍
+    43    │ - ····expect(()·=>·testDatabaseUrl(value,·valid)).toThrow(␍
+    44    │ - ······"must·not·target·DATABASE_URL",␍
+    45    │ - ····);␍
+    46    │ - ··});␍
+    47    │ - ␍
+    48    │ - ··it("rejects·an·invalid·development·URL·instead·of·bypassing·comparison",·()·=>·{␍
+    49    │ - ····expect(()·=>·testDatabaseUrl(valid,·"invalid")).toThrow();␍
+    50    │ - ··});␍
+    51    │ - });␍
+Checked 63 files in 197ms. No fixes applied.
+Found 17 errors.
+        1 │ + import·{·describe,·expect,·it·}·from·"vitest";
+        2 │ + import·{·testDatabaseUrl·}·from·"../support/test-database-url";
+        3 │ + 
+        4 │ + const·development·=·"postgresql://postgres@127.0.0.1:5432/logistik_web";
+        5 │ + const·valid·=·"postgresql://postgres@127.0.0.1:5432/logistik_web_test";
+        6 │ + 
+        7 │ + describe("integration·database·safety",·()·=>·{
+        8 │ + ··it("accepts·a·separate·test·database",·()·=>·{
+        9 │ + ····expect(testDatabaseUrl(valid,·development)).toBe(valid);
+       10 │ + ··});
+       11 │ + 
+       12 │ + ··it("refuses·production·before·any·connection",·()·=>·{
+       13 │ + ····expect(()·=>·testDatabaseUrl(valid,·development,·"production")).toThrow(
+       14 │ + ······"refuse·NODE_ENV=production",
+       15 │ + ····);
+       16 │ + ··});
+       17 │ + 
+       18 │ + ··it.each([
+       19 │ + ····undefined,
+       20 │ + ····"",
+       21 │ + ····"not-a-url",
+       22 │ + ····"https://localhost/app_test",
+       23 │ + ····"postgresql://localhost/",
+       24 │ + ····"postgresql://localhost/logistik-web",
+       25 │ + ····"postgresql://localhost/other_test",
+       26 │ + ····"postgresql://localhost/logistik_web_test_copy",
+       27 │ + ····"postgresql://localhost/LOGISTIK_WEB_TEST",
+       28 │ + ····"postgresql://remote.invalid/logistik_web_test",
+       29 │ + ····"postgresql://localhost/%ZZ_test",
+       30 │ + ····"postgresql://localhost/app_test/other",
+       31 │ + ····"postgresql://localhost/app_test?dbname=production",
+       32 │ + ····"postgresql://localhost/app_test?host=elsewhere",
+       33 │ + ····"postgresql://localhost/app_test#other",
+       34 │ + ··])("rejects·unsafe·test·URL·%s",·(value)·=>·{
+       35 │ + ····expect(()·=>·testDatabaseUrl(value,·development)).toThrow();
+       36 │ + ··});
+       37 │ + 
+       38 │ + ··it.each([
+       39 │ + ····valid,
+       40 │ + ····"postgres://other@localhost/logistik_web_test",
+       41 │ + ····"postgresql://postgres@[::1]:5432/logistik_web_%74est",
+       42 │ + ··])("rejects·the·same·database·despite·URL·spelling:·%s",·(value)·=>·{
+       43 │ + ····expect(()·=>·testDatabaseUrl(value,·valid)).toThrow(
+       44 │ + ······"must·not·target·DATABASE_URL",
+       45 │ + ····);
+       46 │ + ··});
+       47 │ + 
+       48 │ + ··it("rejects·an·invalid·development·URL·instead·of·bypassing·comparison",·()·=>·{
+       49 │ + ····expect(()·=>·testDatabaseUrl(valid,·"invalid")).toThrow();
+       50 │ + ··});
+       51 │ + });
+    52 52 │   
+  
+
+vitest.integration.config.mts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·"dotenv/config";␍
+     2    │ - import·{·defineConfig·}·from·"vitest/config";␍
+     3    │ - ␍
+     4    │ - export·default·defineConfig({␍
+     5    │ - ··test:·{␍
+     6    │ - ····environment:·"node",␍
+     7    │ - ····include:·["tests/integration/**/*.test.ts"],␍
+     8    │ - ····testTimeout:·15_000,␍
+     9    │ - ··},␍
+    10    │ - });␍
+        1 │ + import·"dotenv/config";
+        2 │ + import·{·defineConfig·}·from·"vitest/config";
+        3 │ + 
+        4 │ + export·default·defineConfig({
+        5 │ + ··test:·{
+        6 │ + ····environment:·"node",
+        7 │ + ····include:·["tests/integration/**/*.test.ts"],
+        8 │ + ····testTimeout:·15_000,
+        9 │ + ··},
+       10 │ + });
+    11 11 │   
+  
+
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+

@@ -1,18 +1,25 @@
 "use client";
 
 import {
+  BookOpen,
+  Building2,
+  ChartNoAxesCombined,
   ChevronRight,
   Folder,
   Home,
+  ListTree,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
   PanelsTopLeft,
+  Settings,
+  Ticket,
   Truck,
+  UserRound,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useId, useState } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,14 +40,27 @@ import {
   navigationPath,
 } from "./navigation";
 
+const groupIcons = {
+  "System Settings": Settings,
+  Office: Building2,
+  "Master Data": ListTree,
+  Modules: Folder,
+  Accounting: ChartNoAxesCombined,
+  Reports: ChartNoAxesCombined,
+  Ticketing: Ticket,
+  "System Tutorial": BookOpen,
+};
+
 export function Navigation({
   collapsed = false,
   mobile = false,
   groups = navigation,
+  onExpand,
 }: {
   collapsed?: boolean;
   mobile?: boolean;
   groups?: readonly NavigationGroup[];
+  onExpand?: () => void;
 }) {
   const pathname = usePathname();
   const current = navigationPath(pathname, groups);
@@ -51,6 +71,16 @@ export function Navigation({
     current?.section?.label ?? null,
   );
   const id = useId();
+  const expansionTarget = useRef<string | null>(null);
+  useEffect(() => {
+    if (!collapsed && expansionTarget.current) {
+      const index = groups.findIndex(
+        (group) => group.label === expansionTarget.current,
+      );
+      document.getElementById(`${id}-${index}-trigger`)?.focus();
+      expansionTarget.current = null;
+    }
+  }, [collapsed, groups, id]);
   const [query, setQuery] = useState("");
   const search = query.trim().toLowerCase();
   const results = groups
@@ -95,7 +125,7 @@ export function Navigation({
   return (
     <nav
       aria-label={mobile ? "Mobile navigation" : "Main navigation"}
-      className="space-y-6 p-3"
+      className="space-y-4 p-3"
     >
       {!collapsed && (
         <div className="space-y-2 px-3 text-xs leading-5 text-muted-foreground">
@@ -105,10 +135,7 @@ export function Navigation({
               {current?.labels.join(" / ") ?? "Page"}
             </span>
           </p>
-          <p>
-            Domain destinations are unavailable. Find an item or open a group
-            and section.
-          </p>
+          <p>Domain destinations are unavailable.</p>
         </div>
       )}
       {!collapsed && (
@@ -124,6 +151,7 @@ export function Navigation({
             aria-controls={`${id}-results`}
             className="min-h-11"
             autoComplete="off"
+            placeholder="Search navigation…"
           />
         </div>
       )}
@@ -172,16 +200,48 @@ export function Navigation({
       ) : (
         <div id={`${id}-results`} className="space-y-1">
           {groups.map((group, groupIndex) => {
+            const GroupIcon =
+              groupIcons[group.label as keyof typeof groupIcons] ?? Folder;
             if (group.href) {
               return <div key={group.label}>{routeLink(group, collapsed)}</div>;
             }
-            if (collapsed) return null;
+            if (collapsed)
+              return group.sections ? (
+                <Button
+                  key={group.label}
+                  type="button"
+                  variant="ghost"
+                  className="min-h-11 w-full"
+                  title={group.providerLabel}
+                  aria-label={`Expand ${group.providerLabel} navigation`}
+                  onClick={() => {
+                    expansionTarget.current = group.label;
+                    onExpand?.();
+                    setOpenGroup(group.label);
+                    setOpenSection(null);
+                  }}
+                >
+                  <GroupIcon aria-hidden="true" />
+                </Button>
+              ) : (
+                <p
+                  key={group.label}
+                  title={`${group.providerLabel} — unavailable`}
+                  className="flex min-h-11 items-center justify-center text-muted-foreground"
+                >
+                  <GroupIcon className="size-4" aria-hidden="true" />
+                  <span className="sr-only">
+                    {group.providerLabel} — unavailable
+                  </span>
+                </p>
+              );
             if (!group.sections)
               return (
                 <p
                   key={group.label}
-                  className="px-3 py-3 text-sm text-muted-foreground"
+                  className="flex min-h-11 items-center gap-3 px-3 py-2 text-sm text-muted-foreground"
                 >
+                  <GroupIcon className="size-4 shrink-0" aria-hidden="true" />
                   {group.providerLabel}
                   <span className="sr-only"> — unavailable</span>
                 </p>
@@ -192,6 +252,7 @@ export function Navigation({
               <div key={group.label}>
                 <button
                   type="button"
+                  id={`${groupId}-trigger`}
                   aria-expanded={expanded}
                   aria-controls={groupId}
                   className="flex min-h-11 w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold hover:bg-secondary"
@@ -204,7 +265,7 @@ export function Navigation({
                     );
                   }}
                 >
-                  <Folder className="size-4 shrink-0" aria-hidden="true" />
+                  <GroupIcon className="size-4 shrink-0" aria-hidden="true" />
                   <span className="min-w-0 flex-1 break-words">
                     {group.providerLabel}
                   </span>
@@ -291,7 +352,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const current = activeFoundationRoute(pathname);
   return (
-    <div className="flex min-h-dvh">
+    <div className="flex min-h-dvh bg-workspace">
       <a
         href="#main-content"
         className="sr-only z-50 rounded-md bg-background p-3 text-primary focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
@@ -306,7 +367,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <div
           className={cn(
-            "flex min-h-20 items-center gap-3 border-b px-6",
+            "flex min-h-17 items-center gap-3 border-b px-6",
             collapsed && "justify-center px-0",
           )}
         >
@@ -321,7 +382,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
         </div>
         <div id="desktop-navigation" className="flex-1">
-          <Navigation key={pathname} collapsed={collapsed} />
+          <Navigation
+            key={pathname}
+            collapsed={collapsed}
+            onExpand={() => setCollapsed(false)}
+          />
         </div>
         <div className="sticky bottom-0 border-t bg-sidebar p-3">
           <Button
@@ -344,7 +409,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <header className="flex min-h-20 flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-8">
+        <header className="flex min-h-17 flex-wrap items-center gap-3 border-b bg-background px-4 py-3 sm:px-6 lg:px-8">
           <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
@@ -361,7 +426,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <SheetHeader>
                   <SheetTitle>LMS navigation</SheetTitle>
                   <SheetDescription>
-                    Foundation preview. Domain pages are unavailable.
+                    Navigate the UI preview. Domain destinations are
+                    unavailable.
                   </SheetDescription>
                 </SheetHeader>
                 <Navigation key={pathname} mobile />
@@ -394,19 +460,23 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             </ol>
           </nav>
-          <span className="ml-auto text-xs text-muted-foreground">
-            UI preview
-          </span>
+          <div className="ml-auto flex items-center gap-2 rounded-full border px-3 py-2 text-xs text-muted-foreground">
+            <UserRound className="size-4 shrink-0" aria-hidden="true" />
+            <span>
+              Account unavailable
+              <span className="hidden sm:inline"> · UI preview</span>
+            </span>
+          </div>
         </header>
         <main
           id="main-content"
           tabIndex={-1}
-          className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 focus:outline-none sm:px-8 lg:py-10"
+          className="w-full space-y-6 px-4 py-6 focus:outline-none sm:px-6 lg:p-8"
         >
           {children}
         </main>
-        <footer className="border-t px-4 py-5 text-xs text-muted-foreground sm:px-8">
-          LMS foundation · Presentation examples only
+        <footer className="border-t bg-background px-4 py-5 text-xs text-muted-foreground sm:px-6 lg:px-8">
+          LMS · Presentation preview · No operational records loaded or saved
         </footer>
       </div>
     </div>
