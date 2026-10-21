@@ -303,6 +303,11 @@ export const navigation: readonly NavigationGroup[] = [
   },
 ];
 
+// Both surfaces derive their partition from the verified inventory, never a
+// second handwritten menu. Supplemental material keeps its own identity.
+export const primaryNavigation = navigation.slice(0, legacyMenu.length);
+export const supplementaryNavigation = navigation.slice(legacyMenu.length);
+
 export function navigationEntries(group: NavigationGroup) {
   return group.entries ?? group.sections ?? [];
 }
@@ -316,15 +321,28 @@ export function navigationDestinations(
 ) {
   return groups.flatMap((group) => [
     ...(group.href || !navigationEntries(group).length
-      ? [{ item: group as NavigationLeaf, path: group.providerLabel }]
+      ? [
+          {
+            item: group as NavigationLeaf,
+            path: group.providerLabel,
+            searchLabels: [group.label],
+          },
+        ]
       : []),
     ...navigationEntries(group).flatMap((entry) =>
       isNavigationSection(entry)
         ? entry.items.map((item) => ({
             item,
             path: [group.providerLabel, ...entry.providerPath].join(" / "),
+            searchLabels: [group.label, entry.label],
           }))
-        : [{ item: entry, path: group.providerLabel }],
+        : [
+            {
+              item: entry,
+              path: group.providerLabel,
+              searchLabels: [group.label],
+            },
+          ],
     ),
   ]);
 }

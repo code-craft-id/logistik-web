@@ -244,3 +244,46 @@ is production integration and external visual acceptance, grouped for the owners
 
 These are documented blockers to operational/live-parity acceptance, not PLT
 completion claims. No architecture decision was silently resolved by UI metadata.
+
+## 2026-10-21 compact navbar refinement (local, uncommitted)
+
+This is new evidence after the historical migration record above. The starting tree was clean on `feat/legacy-ui-parity` at `47e072a187351fa12c53e6c5ec5d1a71429a2a10`. The user authorized local shell implementation only. No commit, branch change, push, merge, deployment or server startup occurred; browser checks reused `http://localhost:3000`.
+
+### Structure and intentional adaptation
+
+Read-only reinspection of legacy `src/components/header.jsx` and `src/App.jsx` confirms Header before Outlet, login outside AppLayout, eight ordered primary entries, a sticky 60px mobile/68px desktop brand-account row plus a separate 50px desktop menu, click dropdowns/right flyouts, and recursive mobile drawer. Source is presentation evidence only.
+
+The target now has one 60px primary navbar row, 61px with its border, instead of the persistent desktop sidebar or the legacy's approximately 118px desktop chrome. It keeps a local Truck/LMS placeholder, Geist, green/white/slate identity, subtle borders and full-width workspace. A separate normal-flow breadcrumb strip measures 37px on a single line and wraps independently. All header controls and route rows have 44px minimum touch targets. Existing utilities/tokens express the shell; `globals.css`, dashboard layout and feature pages are unchanged.
+
+Source-owned `ui/navigation-menu.tsx` composes the installed Radix NavigationMenu in manual activation mode with Next.js Link. Current Context7 shadcn Radix composition and installed Radix declarations were checked; relevant installed Next.js Link, usePathname and Server/Client docs were read. Grouped, contained panels replace fragile cascades. `navigation.ts` partitions the existing typed config using `legacyMenu.length`; no second MENU is maintained. `compact-navigation.tsx` shares the existing bounded disclosures/finder with the drawer and More. Full primary navigation appears at the existing 80rem (`xl`) breakpoint. At 1280px its right edge is 991.375px and finder begins at 1137px; 1279px uses compact mode. Pathname and breakpoint changes close stale surfaces and retain a visible focus destination.
+
+All eight legacy labels/order and URLs (including `/ticketting`), 43 preview destinations, More previews, 68 unlinked provider leaves, Tutorial System and UI examples remain. Supplemental material stays under its own More panel. Exact active links use `aria-current="page"`, with primary ancestor styling and visible nested section context. Account links only to `/profile`; logout remains unavailable. No auth, RBAC, persistence, schema, fixtures, dependencies or business rules changed; PLT-01 remains unstarted.
+
+### Actual verification
+
+| Check | Result |
+|---|---|
+| `npx vitest run tests/ui/foundation.test.ts tests/ui/dashboard.test.ts tests/unit/legacy-ui-inventory.test.ts` | PASS: 16 tests; inventory protections unchanged |
+| `npm run lint` | PASS: final Biome check covered 153 files |
+| `npm run typecheck` | PASS |
+| `npm test` | 151 passed, 1 failed of 152: unrelated SCH-01 migration byte checksum |
+| `npm run build` | PASS: optimized compilation, TypeScript and 47 static pages |
+| `git diff --check` | PASS |
+| Browser smoke | PASS: all 43 migrated destinations plus UI examples at 1440px; login correctly outside shell; zero missing pages/overflow |
+| Representative browser matrix | Dashboard, nested inbound report, vendor dense table and UI examples at 375/768/1440px; vendor form at all three sizes; zero page overflow |
+| Fit and panel probes | 375/768/1240/1279/1280/1320/1440px; 60px row throughout; all five desktop panels contained at 1280px |
+| Keyboard/overlays | ArrowDown enters first desktop destination; Escape restores trigger; outside dismisses; nested link selected and menu closed; drawer focus loops in both directions, locks background scroll and closes after route selection; resize to desktop closes drawer and focuses brand |
+| Finder/account | Label/path/URL matching, available and unavailable results, empty state, Clear focus, profile link and disabled logout verified |
+| 200% reflow | PASS equivalent: 720x450 CSS viewport at device scale 2 (1440x900 / 2), compact navigation and `/ticketting` selection; zero overflow |
+
+The command-output wrapper initially misrouted a lint attempt into unrelated npm/ESLint commands. Rerunning with `rtk bypass npm run lint` executed the actual package script and passed. No project dependency or lockfile changed. Other full gate commands also used `rtk bypass` to retain actual results.
+
+Fresh checksum diagnosis is saved in `evidence/compact-navbar/checksum-diagnosis.json`: all six expected fixture hashes equal committed HEAD SQL blobs; each working SQL differs only by CRLF versus LF. The checksum test and fixture match HEAD. No SQL, fixture or unrelated file was normalized or edited.
+
+During initial editing, a temporary Windows-encoded shell file produced six UTF-8 compilation error messages. It was corrected to UTF-8 before focused tests/browser validation. Subsequent verification produced zero console warnings/errors; the full historical log is retained in `browser-findings.json` so those transient failures are not hidden.
+
+### Evidence and limits
+
+Evidence directory: `docs/experiments/evidence/compact-navbar/`. `browser-findings.json` records header heights, breakpoint fit, panel bounds, representative viewports and console messages. `route-smoke.json` records all 44 destination visits. `final-lint.log`, `final-typecheck.log`, `final-test.log` and `final-build.log` retain the final package-script output. Representative JPEGs include `1440-dashboard.jpg`, `375-dashboard.jpg`, `768-ui-examples.jpg`, `desktop-active-report.jpg`, `desktop-reports.jpg`, `desktop-more-inventory.jpg`, `desktop-finder.jpg`, `desktop-account.jpg`, `mobile-drawer.jpg`, `desktop-vendor-form.jpg`, `375-vendor-form.jpg`, `768-vendor-form.jpg`, and `zoom-200-finder.jpg`. These are direct target-browser screenshots, not generated images or legacy runtime evidence.
+
+Native browser 200% zoom and physical touch remain UNVERIFIED: browser zoom shortcuts did not change the viewport and raw touch-event injection is unsupported by this browser tool. Equivalent zoom reflow, 44px targets and pointer interactions were checked. Screen-reader review, legacy/provider runtime or pixel comparison, staging acceptance and production integration remain unverified. No historical FND-03 or migration acceptance was rewritten as navbar acceptance. Legacy integrity and final changed-file scope are recorded in `legacy-integrity.json` and `verification.json`.

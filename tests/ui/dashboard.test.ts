@@ -97,36 +97,39 @@ describe("legacy dashboard supported presentation", () => {
     expect(container.querySelector("h1")?.textContent).toBe("Dashboard");
   });
 
-  it("recovers a nested group from compact navigation and preserves active Dashboard naming", async () => {
+  it("opens the complete compact drawer and dismisses it after selecting Dashboard", async () => {
     await act(async () =>
       root.render(createElement(AppShell, null, "Dashboard")),
     );
-    await act(async () =>
-      container
-        .querySelector<HTMLButtonElement>('[aria-label="Collapse sidebar"]')
-        ?.click(),
+    const trigger = container.querySelector<HTMLButtonElement>(
+      '[aria-label="Open navigation"]',
     );
-    expect(container.querySelector('[aria-current="page"]')?.textContent).toBe(
+    if (!trigger) throw new Error("Navigation trigger missing");
+    trigger.focus();
+    await act(async () => trigger.click());
+    const dialog = document.querySelector('[role="dialog"]');
+    expect(dialog?.getAttribute("aria-labelledby")).toBeTruthy();
+    expect(dialog?.getAttribute("aria-describedby")).toBeTruthy();
+    const nav = dialog?.querySelector('nav[aria-label="Mobile navigation"]');
+    expect(nav?.querySelector('[aria-current="page"]')?.textContent).toBe(
       "Dashboard",
     );
-    await act(async () =>
-      container
-        .querySelector<HTMLButtonElement>(
-          '[aria-label="Expand Master Data navigation"]',
-        )
-        ?.click(),
-    );
-    const nav = container.querySelector('nav[aria-label="Main navigation"]');
+    expect(nav?.textContent).toContain("Provider inventory");
+    expect(nav?.textContent).toContain("More previews");
     const master = Array.from(nav?.querySelectorAll("button") ?? []).find(
       (button) => button.textContent === "Master Data",
     );
+    await act(async () => master?.click());
     expect(master?.getAttribute("aria-expanded")).toBe("true");
-    expect(
-      document.getElementById(master?.getAttribute("aria-controls") ?? "")
-        ?.hidden,
-    ).toBe(false);
-    expect(
-      container.querySelector('[aria-label="Collapse sidebar"]'),
-    ).not.toBeNull();
+    const section = Array.from(nav?.querySelectorAll("button") ?? []).find(
+      (button) => button.textContent === "Logistik4",
+    );
+    await act(async () => section?.click());
+    expect(section?.getAttribute("aria-expanded")).toBe("true");
+    const dashboard = nav?.querySelector<HTMLAnchorElement>('a[href="/"]');
+    dashboard?.addEventListener("click", (event) => event.preventDefault());
+    await act(async () => dashboard?.click());
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
   });
 });
