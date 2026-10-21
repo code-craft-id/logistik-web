@@ -61,8 +61,21 @@ with demonstrated unrelated failures. Initial slice ready for local checkpoint.
   matrix creates 76 preview checkboxes with save disabled; create dialog has
   accessible title/description and initial field focus. Evidence: `batch1-*`.
 
-Next: organization/master data → operations → reports/accounting/tickets →
-dashboard visual and cross-screen verification. Remaining route UIs: **37**.
+- Batch 1 checkpoint committed: `aae9c4c`.
+- Batch 2: office plus nine master-data routes, including all company sub-tabs,
+  four logistics workspaces, vendor's three table/form groups, shipment status
+  and three dormant headings. **16/43 route UIs implemented; 27 remain.**
+  No Prisma/DRAFT model is consumed. Vendor form opens the source-selected
+  group (e.g. NPWP), with all three form panels mounted. Office company-dependent
+  tabs expose their parent selector with fictional choices. Arrow-key switching
+  between Data Bank / Dompet Digital verified. At 375/768/1440, representative
+  office (15 columns), vendor (12), and vehicle (19) tables scroll within the
+  work area with no page overflow. NPWP dialog is 343px at a 375px viewport.
+  Typecheck, 15 UI tests and two inventory tests pass; lint remains only the
+  unrelated config format error. Evidence: `batch2-*`.
+
+Next: operations → reports/accounting/tickets → dashboard visual and cross-screen
+verification. Runtime/legacy pixel comparison is still unverified.
 
 Date: 2026-10-21. Owner: Codex, presentation migration requested by coordinator.
 Branch: `feat/legacy-ui-parity`, created from clean `main` at

@@ -55,7 +55,7 @@
     "source": "src/pages/office/Office.jsx",
     "domain": "organization",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": [
       "Perusahaan",
@@ -75,7 +75,7 @@
     "source": "src/pages/master-data/logistics/AreaLogistic.jsx",
     "domain": "master-data",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Kode Pos"]
   },
@@ -85,7 +85,7 @@
     "source": "src/pages/master-data/logistics/DivisionLogistic.jsx",
     "domain": "master-data",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Pemasaran", "Driver", "Kurir"]
   },
@@ -95,7 +95,7 @@
     "source": "src/pages/master-data/logistics/ServicesLogistic.jsx",
     "domain": "master-data",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": [
       "Moda",
@@ -112,7 +112,7 @@
     "source": "src/pages/master-data/logistics/VehiclesLogistic.jsx",
     "domain": "master-data",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Kendaraan", "Jenis Kendaraan", "Jenis Trucking"]
   },
@@ -122,7 +122,7 @@
     "source": "src/pages/master-data/Vendor.jsx",
     "domain": "master-data",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Data Vendor", "NPWP", "Accounting"]
   },
@@ -132,7 +132,7 @@
     "source": "src/pages/master-data/ShipmentStatus.jsx",
     "domain": "master-data",
     "kind": "workspace",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": ["Shipment Status"]
   },
@@ -142,7 +142,7 @@
     "source": "src/pages/master-data/LogisticList.jsx",
     "domain": "master-data",
     "kind": "heading",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": []
   },
@@ -152,7 +152,7 @@
     "source": "src/pages/master-data/Category.jsx",
     "domain": "master-data",
     "kind": "heading",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": []
   },
@@ -162,7 +162,7 @@
     "source": "src/pages/master-data/Unit.jsx",
     "domain": "master-data",
     "kind": "heading",
-    "routeImplemented": false,
+    "routeImplemented": true,
     "backend": "unavailable",
     "views": []
   },

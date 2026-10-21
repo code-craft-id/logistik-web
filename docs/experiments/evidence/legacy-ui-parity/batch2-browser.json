@@ -1,0 +1,74 @@
+[
+  {
+    "clientWidth": 360,
+    "columns": 15,
+    "heading": "Kantor",
+    "route": "/office",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 753,
+    "columns": 15,
+    "heading": "Kantor",
+    "route": "/office",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "clientWidth": 1425,
+    "columns": 15,
+    "heading": "Kantor",
+    "route": "/office",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": 12,
+    "heading": "Data Vendor",
+    "route": "/vendor",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 753,
+    "columns": 12,
+    "heading": "Data Vendor",
+    "route": "/vendor",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "clientWidth": 1425,
+    "columns": 12,
+    "heading": "Data Vendor",
+    "route": "/vendor",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": 19,
+    "heading": "Kendaraan Logistik",
+    "route": "/logistics/vehicles",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 753,
+    "columns": 19,
+    "heading": "Kendaraan Logistik",
+    "route": "/logistics/vehicles",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "clientWidth": 1425,
+    "columns": 19,
+    "heading": "Kendaraan Logistik",
+    "route": "/logistics/vehicles",
+    "scrollWidth": 1425,
+    "width": 1440
+  }
+]

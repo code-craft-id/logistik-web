@@ -26,7 +26,9 @@ export function PreviewForm({
             .filter((group): group is string => !!group),
         ),
       ];
-  const [active, setActive] = useState(groups[0] ?? "Fields");
+  const [active, setActive] = useState(
+    groups.includes(view.label) ? view.label : (groups[0] ?? "Fields"),
+  );
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(
       view.fields.map((field) => [
