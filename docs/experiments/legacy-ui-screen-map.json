@@ -1,0 +1,455 @@
+[
+  {
+    "path": "/login",
+    "title": "Masuk Sistem",
+    "source": "src/pages/login/Login.jsx",
+    "domain": "identity",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Masuk Sistem"]
+  },
+  {
+    "path": "/group-user",
+    "title": "Grup User",
+    "source": "src/pages/setting/GroupUser.jsx",
+    "domain": "identity",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Grup User"]
+  },
+  {
+    "path": "/user-management",
+    "title": "Manajemen User",
+    "source": "src/pages/setting/UserManagement.jsx",
+    "domain": "identity",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["User"]
+  },
+  {
+    "path": "/hak-akses-menu",
+    "title": "Hak Akses Menu",
+    "source": "src/pages/setting/MenuAccess.jsx",
+    "domain": "identity",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Hak Akses Menu"]
+  },
+  {
+    "path": "/profile",
+    "title": "Profil Saya",
+    "source": "src/pages/Profile.jsx",
+    "domain": "identity",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/office",
+    "title": "Kantor",
+    "source": "src/pages/office/Office.jsx",
+    "domain": "organization",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": [
+      "Perusahaan / Data Perusahaan",
+      "Perusahaan / Tanda Tangan Invoice",
+      "Perusahaan / Data Bank",
+      "Perusahaan / Dompet Digital",
+      "Perusahaan / WA Notifikasi",
+      "Kantor",
+      "Kantor Cabang",
+      "Agen"
+    ]
+  },
+  {
+    "path": "/logistics/areas",
+    "title": "Logistik",
+    "source": "src/pages/master-data/logistics/AreaLogistic.jsx",
+    "domain": "master-data",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Kode Pos"]
+  },
+  {
+    "path": "/logistics/division",
+    "title": "Divisi Logistik",
+    "source": "src/pages/master-data/logistics/DivisionLogistic.jsx",
+    "domain": "master-data",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Pemasaran", "Driver", "Kurir"]
+  },
+  {
+    "path": "/logistics/services",
+    "title": "Layanan Logistik",
+    "source": "src/pages/master-data/logistics/ServicesLogistic.jsx",
+    "domain": "master-data",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": [
+      "Moda",
+      "Kategori Layanan",
+      "Layanan Pengantaran",
+      "Jenis Barang",
+      "Jenis Biaya",
+      "Termin"
+    ]
+  },
+  {
+    "path": "/logistics/vehicles",
+    "title": "Kendaraan Logistik",
+    "source": "src/pages/master-data/logistics/VehiclesLogistic.jsx",
+    "domain": "master-data",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Kendaraan", "Jenis Kendaraan", "Jenis Trucking"]
+  },
+  {
+    "path": "/vendor",
+    "title": "Data Vendor",
+    "source": "src/pages/master-data/Vendor.jsx",
+    "domain": "master-data",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Data Vendor", "NPWP", "Accounting"]
+  },
+  {
+    "path": "/shipment-status",
+    "title": "Shipment Status",
+    "source": "src/pages/master-data/ShipmentStatus.jsx",
+    "domain": "master-data",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Shipment Status"]
+  },
+  {
+    "path": "/master-data/logistics",
+    "title": "Daftar Logistik",
+    "source": "src/pages/master-data/LogisticList.jsx",
+    "domain": "master-data",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/master-data/categories",
+    "title": "Kategori",
+    "source": "src/pages/master-data/Category.jsx",
+    "domain": "master-data",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/master-data/units",
+    "title": "Satuan",
+    "source": "src/pages/master-data/Unit.jsx",
+    "domain": "master-data",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/marketing",
+    "title": "Pemasaran/Penjualan",
+    "source": "src/pages/module/Marketing.jsx",
+    "domain": "sales",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Customer", "Consignee"]
+  },
+  {
+    "path": "/transactions",
+    "title": "On Site Outbound",
+    "source": "src/pages/module/Transaction.jsx",
+    "domain": "shipments",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["On Site Outbound"]
+  },
+  {
+    "path": "/bookings",
+    "title": "Kelola Booking",
+    "source": "src/pages/module/Booking.jsx",
+    "domain": "shipments",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Kelola Booking"]
+  },
+  {
+    "path": "/manifest",
+    "title": "Daftar Manifest",
+    "source": "src/pages/module/Manifest.jsx",
+    "domain": "shipments",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Manifest"]
+  },
+  {
+    "path": "/operations",
+    "title": "Operasional",
+    "source": "src/pages/module/Operations.jsx",
+    "domain": "shipments",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/customer-service",
+    "title": "Layanan Pelanggan",
+    "source": "src/pages/module/CustomerService.jsx",
+    "domain": "shipments",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/branch-reports",
+    "title": "Laporan Cabang",
+    "source": "src/pages/reports/branch/BranchReportsIndex.jsx",
+    "domain": "reports",
+    "kind": "index",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  },
+  {
+    "path": "/branch-reports/transaction-details",
+    "title": "Detail Transaksi",
+    "source": "src/pages/reports/branch/TransactionDetailsReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Detail Transaksi"]
+  },
+  {
+    "path": "/branch-reports/manifest-outbound",
+    "title": "Manifest Outbound",
+    "source": "src/pages/reports/branch/ManifestOutboundReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Manifest Outbound"]
+  },
+  {
+    "path": "/branch-reports/delivery",
+    "title": "Pengantaran",
+    "source": "src/pages/reports/branch/DeliveryReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Pengantaran"]
+  },
+  {
+    "path": "/branch-reports/gross-profit",
+    "title": "Gross Profit",
+    "source": "src/pages/reports/branch/GrossProfitReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Gross Profit"]
+  },
+  {
+    "path": "/branch-reports/rekap-gross-profit",
+    "title": "Rekap Gross Profit",
+    "source": "src/pages/reports/branch/RekapGrossProfitReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Rekap Gross Profit"]
+  },
+  {
+    "path": "/branch-reports/manifest-vendor",
+    "title": "Penjual Manifes",
+    "source": "src/pages/reports/branch/ManifestVendorReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Penjual Manifes"]
+  },
+  {
+    "path": "/branch-reports/awb",
+    "title": "AWB",
+    "source": "src/pages/reports/branch/AwbReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["AWB Tertunda", "AWB Termanifest"]
+  },
+  {
+    "path": "/branch-reports/customer-monthly-summary",
+    "title": "Rekap Customer Bulanan",
+    "source": "src/pages/reports/branch/CustomerMonthlySummaryReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Rekap Customer Bulanan"]
+  },
+  {
+    "path": "/branch-reports/daily-turnover-summary",
+    "title": "Rekap Omset Harian",
+    "source": "src/pages/reports/branch/DailyTurnoverSummaryReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Rekap Omset Harian"]
+  },
+  {
+    "path": "/branch-reports/inbound-transaction-details",
+    "title": "Detail Transaksi Inbound",
+    "source": "src/pages/reports/branch/InboundTransactionDetailsReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Detail Transaksi Inbound"]
+  },
+  {
+    "path": "/courier-reports",
+    "title": "Laporan Kurir",
+    "source": "src/pages/reports/CourierReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Laporan Detail Kurir", "Harian Kurir"]
+  },
+  {
+    "path": "/financial-reports",
+    "title": "Laporan Keuangan",
+    "source": "src/pages/reports/FinancialReport.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": [
+      "Laporan AR",
+      "Laporan AR / Belum Lunas",
+      "Laporan AR / Lunas",
+      "Laporan AP",
+      "Laporan AP / Belum Lunas",
+      "Laporan AP / Lunas"
+    ]
+  },
+  {
+    "path": "/customer-reports",
+    "title": "Customer Reports",
+    "source": "src/pages/reports/CustomerReports.jsx",
+    "domain": "reports",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Pengiriman", "POD Kembali", "Semua Status", "Report Customer"]
+  },
+  {
+    "path": "/perkiraan",
+    "title": "Perkiraan",
+    "source": "src/pages/master-data/Perkiraan.jsx",
+    "domain": "accounting",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Perkiraan"]
+  },
+  {
+    "path": "/akunting",
+    "title": "Akunting",
+    "source": "src/pages/akunting/Akunting.jsx",
+    "domain": "accounting",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Ledger", "Kategori Akun", "Rugi Laba", "Kategori Cashflow"]
+  },
+  {
+    "path": "/akunting/ledger",
+    "title": "Ledger",
+    "source": "src/pages/akunting/LedgerPage.jsx",
+    "domain": "accounting",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Ledger"]
+  },
+  {
+    "path": "/akunting/kategori-akun",
+    "title": "Kategori Akun",
+    "source": "src/pages/akunting/KategoriAkunPage.jsx",
+    "domain": "accounting",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Kategori Akun"]
+  },
+  {
+    "path": "/akunting/rugi-laba",
+    "title": "Rugi Laba",
+    "source": "src/pages/akunting/RugiLabaPage.jsx",
+    "domain": "accounting",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Rugi Laba"]
+  },
+  {
+    "path": "/akunting/kategori-cashflow",
+    "title": "Kategori Cashflow",
+    "source": "src/pages/akunting/CashflowPage.jsx",
+    "domain": "accounting",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Kategori Cashflow"]
+  },
+  {
+    "path": "/ticketting",
+    "title": "Ticketing",
+    "source": "src/pages/ticketting/Ticketting.jsx",
+    "domain": "ticketing",
+    "kind": "workspace",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": ["Ticket Support", "Persetujuan Ticketing"]
+  },
+  {
+    "path": "/",
+    "title": "Filter",
+    "source": "src/pages/Dashboard.jsx",
+    "domain": "dashboard",
+    "kind": "heading",
+    "routeImplemented": true,
+    "backend": "unavailable",
+    "views": []
+  }
+]

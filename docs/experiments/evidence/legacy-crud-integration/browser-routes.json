@@ -1,0 +1,905 @@
+[
+  {
+    "heading": "Masuk Sistem",
+    "overflow": false,
+    "path": "/login",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Grup User",
+    "overflow": false,
+    "path": "/group-user",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Manajemen User",
+    "overflow": false,
+    "path": "/user-management",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Hak Akses Menu",
+    "overflow": false,
+    "path": "/hak-akses-menu",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Profil Saya",
+    "overflow": false,
+    "path": "/profile",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Kantor",
+    "overflow": false,
+    "path": "/office",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Logistik",
+    "overflow": false,
+    "path": "/logistics/areas",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Divisi Logistik",
+    "overflow": false,
+    "path": "/logistics/division",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Layanan Logistik",
+    "overflow": false,
+    "path": "/logistics/services",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Kendaraan Logistik",
+    "overflow": false,
+    "path": "/logistics/vehicles",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Data Vendor",
+    "overflow": false,
+    "path": "/vendor",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Shipment Status",
+    "overflow": false,
+    "path": "/shipment-status",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Daftar Logistik",
+    "overflow": false,
+    "path": "/master-data/logistics",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Kategori",
+    "overflow": false,
+    "path": "/master-data/categories",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Satuan",
+    "overflow": false,
+    "path": "/master-data/units",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Pemasaran/Penjualan",
+    "overflow": false,
+    "path": "/marketing",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "On Site Outbound",
+    "overflow": false,
+    "path": "/transactions",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Kelola Booking",
+    "overflow": false,
+    "path": "/bookings",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Daftar Manifest",
+    "overflow": false,
+    "path": "/manifest",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Operasional",
+    "overflow": false,
+    "path": "/operations",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Layanan Pelanggan",
+    "overflow": false,
+    "path": "/customer-service",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Laporan Cabang",
+    "overflow": false,
+    "path": "/branch-reports",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Detail Transaksi",
+    "overflow": false,
+    "path": "/branch-reports/transaction-details",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Manifest Outbound",
+    "overflow": false,
+    "path": "/branch-reports/manifest-outbound",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Pengantaran",
+    "overflow": false,
+    "path": "/branch-reports/delivery",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Gross Profit",
+    "overflow": false,
+    "path": "/branch-reports/gross-profit",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Rekap Gross Profit",
+    "overflow": false,
+    "path": "/branch-reports/rekap-gross-profit",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Penjual Manifes",
+    "overflow": false,
+    "path": "/branch-reports/manifest-vendor",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "AWB",
+    "overflow": false,
+    "path": "/branch-reports/awb",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Rekap Customer Bulanan",
+    "overflow": false,
+    "path": "/branch-reports/customer-monthly-summary",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Rekap Omset Harian",
+    "overflow": false,
+    "path": "/branch-reports/daily-turnover-summary",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Detail Transaksi Inbound",
+    "overflow": false,
+    "path": "/branch-reports/inbound-transaction-details",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Laporan Kurir",
+    "overflow": false,
+    "path": "/courier-reports",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Laporan Keuangan",
+    "overflow": false,
+    "path": "/financial-reports",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Customer Reports",
+    "overflow": false,
+    "path": "/customer-reports",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Perkiraan",
+    "overflow": false,
+    "path": "/perkiraan",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Akunting",
+    "overflow": false,
+    "path": "/akunting",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Ledger",
+    "overflow": false,
+    "path": "/akunting/ledger",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Kategori Akun",
+    "overflow": false,
+    "path": "/akunting/kategori-akun",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Rugi Laba",
+    "overflow": false,
+    "path": "/akunting/rugi-laba",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Kategori Cashflow",
+    "overflow": false,
+    "path": "/akunting/kategori-cashflow",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Ticketing",
+    "overflow": false,
+    "path": "/ticketting",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Dashboard",
+    "overflow": false,
+    "path": "/",
+    "refreshButtons": [],
+    "width": 375
+  },
+  {
+    "heading": "Masuk Sistem",
+    "overflow": false,
+    "path": "/login",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Grup User",
+    "overflow": false,
+    "path": "/group-user",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Manajemen User",
+    "overflow": false,
+    "path": "/user-management",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Hak Akses Menu",
+    "overflow": false,
+    "path": "/hak-akses-menu",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Profil Saya",
+    "overflow": false,
+    "path": "/profile",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Kantor",
+    "overflow": false,
+    "path": "/office",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Logistik",
+    "overflow": false,
+    "path": "/logistics/areas",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Divisi Logistik",
+    "overflow": false,
+    "path": "/logistics/division",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Layanan Logistik",
+    "overflow": false,
+    "path": "/logistics/services",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Kendaraan Logistik",
+    "overflow": false,
+    "path": "/logistics/vehicles",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Data Vendor",
+    "overflow": false,
+    "path": "/vendor",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Shipment Status",
+    "overflow": false,
+    "path": "/shipment-status",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Daftar Logistik",
+    "overflow": false,
+    "path": "/master-data/logistics",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Kategori",
+    "overflow": false,
+    "path": "/master-data/categories",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Satuan",
+    "overflow": false,
+    "path": "/master-data/units",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Pemasaran/Penjualan",
+    "overflow": false,
+    "path": "/marketing",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "On Site Outbound",
+    "overflow": false,
+    "path": "/transactions",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Kelola Booking",
+    "overflow": false,
+    "path": "/bookings",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Daftar Manifest",
+    "overflow": false,
+    "path": "/manifest",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Operasional",
+    "overflow": false,
+    "path": "/operations",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Layanan Pelanggan",
+    "overflow": false,
+    "path": "/customer-service",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Laporan Cabang",
+    "overflow": false,
+    "path": "/branch-reports",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Detail Transaksi",
+    "overflow": false,
+    "path": "/branch-reports/transaction-details",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Manifest Outbound",
+    "overflow": false,
+    "path": "/branch-reports/manifest-outbound",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Pengantaran",
+    "overflow": false,
+    "path": "/branch-reports/delivery",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Gross Profit",
+    "overflow": false,
+    "path": "/branch-reports/gross-profit",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Rekap Gross Profit",
+    "overflow": false,
+    "path": "/branch-reports/rekap-gross-profit",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Penjual Manifes",
+    "overflow": false,
+    "path": "/branch-reports/manifest-vendor",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "AWB",
+    "overflow": false,
+    "path": "/branch-reports/awb",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Rekap Customer Bulanan",
+    "overflow": false,
+    "path": "/branch-reports/customer-monthly-summary",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Rekap Omset Harian",
+    "overflow": false,
+    "path": "/branch-reports/daily-turnover-summary",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Detail Transaksi Inbound",
+    "overflow": false,
+    "path": "/branch-reports/inbound-transaction-details",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Laporan Kurir",
+    "overflow": false,
+    "path": "/courier-reports",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Laporan Keuangan",
+    "overflow": false,
+    "path": "/financial-reports",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Customer Reports",
+    "overflow": false,
+    "path": "/customer-reports",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Perkiraan",
+    "overflow": false,
+    "path": "/perkiraan",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Akunting",
+    "overflow": false,
+    "path": "/akunting",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Ledger",
+    "overflow": false,
+    "path": "/akunting/ledger",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Kategori Akun",
+    "overflow": false,
+    "path": "/akunting/kategori-akun",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Rugi Laba",
+    "overflow": false,
+    "path": "/akunting/rugi-laba",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Kategori Cashflow",
+    "overflow": false,
+    "path": "/akunting/kategori-cashflow",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Ticketing",
+    "overflow": false,
+    "path": "/ticketting",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Dashboard",
+    "overflow": false,
+    "path": "/",
+    "refreshButtons": [],
+    "width": 768
+  },
+  {
+    "heading": "Masuk Sistem",
+    "overflow": false,
+    "path": "/login",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Grup User",
+    "overflow": false,
+    "path": "/group-user",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Manajemen User",
+    "overflow": false,
+    "path": "/user-management",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Hak Akses Menu",
+    "overflow": false,
+    "path": "/hak-akses-menu",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Profil Saya",
+    "overflow": false,
+    "path": "/profile",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Kantor",
+    "overflow": false,
+    "path": "/office",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Logistik",
+    "overflow": false,
+    "path": "/logistics/areas",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Divisi Logistik",
+    "overflow": false,
+    "path": "/logistics/division",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Layanan Logistik",
+    "overflow": false,
+    "path": "/logistics/services",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Kendaraan Logistik",
+    "overflow": false,
+    "path": "/logistics/vehicles",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Data Vendor",
+    "overflow": false,
+    "path": "/vendor",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Shipment Status",
+    "overflow": false,
+    "path": "/shipment-status",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Daftar Logistik",
+    "overflow": false,
+    "path": "/master-data/logistics",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Kategori",
+    "overflow": false,
+    "path": "/master-data/categories",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Satuan",
+    "overflow": false,
+    "path": "/master-data/units",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Pemasaran/Penjualan",
+    "overflow": false,
+    "path": "/marketing",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "On Site Outbound",
+    "overflow": false,
+    "path": "/transactions",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Kelola Booking",
+    "overflow": false,
+    "path": "/bookings",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Daftar Manifest",
+    "overflow": false,
+    "path": "/manifest",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Operasional",
+    "overflow": false,
+    "path": "/operations",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Layanan Pelanggan",
+    "overflow": false,
+    "path": "/customer-service",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Laporan Cabang",
+    "overflow": false,
+    "path": "/branch-reports",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Detail Transaksi",
+    "overflow": false,
+    "path": "/branch-reports/transaction-details",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Manifest Outbound",
+    "overflow": false,
+    "path": "/branch-reports/manifest-outbound",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Pengantaran",
+    "overflow": false,
+    "path": "/branch-reports/delivery",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Gross Profit",
+    "overflow": false,
+    "path": "/branch-reports/gross-profit",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Rekap Gross Profit",
+    "overflow": false,
+    "path": "/branch-reports/rekap-gross-profit",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Penjual Manifes",
+    "overflow": false,
+    "path": "/branch-reports/manifest-vendor",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "AWB",
+    "overflow": false,
+    "path": "/branch-reports/awb",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Rekap Customer Bulanan",
+    "overflow": false,
+    "path": "/branch-reports/customer-monthly-summary",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Rekap Omset Harian",
+    "overflow": false,
+    "path": "/branch-reports/daily-turnover-summary",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Detail Transaksi Inbound",
+    "overflow": false,
+    "path": "/branch-reports/inbound-transaction-details",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Laporan Kurir",
+    "overflow": false,
+    "path": "/courier-reports",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Laporan Keuangan",
+    "overflow": false,
+    "path": "/financial-reports",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Customer Reports",
+    "overflow": false,
+    "path": "/customer-reports",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Perkiraan",
+    "overflow": false,
+    "path": "/perkiraan",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Akunting",
+    "overflow": false,
+    "path": "/akunting",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Ledger",
+    "overflow": false,
+    "path": "/akunting/ledger",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Kategori Akun",
+    "overflow": false,
+    "path": "/akunting/kategori-akun",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Rugi Laba",
+    "overflow": false,
+    "path": "/akunting/rugi-laba",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Kategori Cashflow",
+    "overflow": false,
+    "path": "/akunting/kategori-cashflow",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Ticketing",
+    "overflow": false,
+    "path": "/ticketting",
+    "refreshButtons": [],
+    "width": 1440
+  },
+  {
+    "heading": "Dashboard",
+    "overflow": false,
+    "path": "/",
+    "refreshButtons": [],
+    "width": 1440
+  }
+]

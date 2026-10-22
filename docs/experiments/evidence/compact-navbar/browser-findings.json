@@ -1,0 +1,295 @@
+{
+  "measurements": [
+    {
+      "brandLeft": 16,
+      "clientWidth": 360,
+      "controlsLeft": 196,
+      "desktopVisible": false,
+      "menuVisible": true,
+      "navRight": 0,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 375
+    },
+    {
+      "brandLeft": 24,
+      "clientWidth": 753,
+      "controlsLeft": 581,
+      "desktopVisible": false,
+      "menuVisible": true,
+      "navRight": 0,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 768
+    },
+    {
+      "brandLeft": 24,
+      "clientWidth": 1225,
+      "controlsLeft": 1053,
+      "desktopVisible": false,
+      "menuVisible": true,
+      "navRight": 0,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 1240
+    },
+    {
+      "brandLeft": 24,
+      "clientWidth": 1264,
+      "controlsLeft": 1092,
+      "desktopVisible": false,
+      "menuVisible": true,
+      "navRight": 0,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 1279
+    },
+    {
+      "brandLeft": 32,
+      "clientWidth": 1265,
+      "controlsLeft": 1137,
+      "desktopVisible": true,
+      "menuVisible": false,
+      "navRight": 991.375,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 1280
+    },
+    {
+      "brandLeft": 32,
+      "clientWidth": 1305,
+      "controlsLeft": 1177,
+      "desktopVisible": true,
+      "menuVisible": false,
+      "navRight": 991.375,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 1320
+    },
+    {
+      "brandLeft": 32,
+      "clientWidth": 1425,
+      "controlsLeft": 1297,
+      "desktopVisible": true,
+      "menuVisible": false,
+      "navRight": 991.375,
+      "overflow": 0,
+      "rowHeight": 60,
+      "width": 1440
+    }
+  ],
+  "representative": [
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 375
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/branch-reports/inbound-transaction-details",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 375
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/vendor",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 375
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/ui-examples",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 375
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 768
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/branch-reports/inbound-transaction-details",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 768
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/vendor",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 768
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/ui-examples",
+      "visibleNavs": ["Breadcrumb"],
+      "width": 768
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/",
+      "visibleNavs": ["Main navigation", "Breadcrumb"],
+      "width": 1440
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/branch-reports/inbound-transaction-details",
+      "visibleNavs": ["Main navigation", "Breadcrumb"],
+      "width": 1440
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/vendor",
+      "visibleNavs": ["Main navigation", "Breadcrumb"],
+      "width": 1440
+    },
+    {
+      "headerHeight": 60,
+      "overflow": 0,
+      "path": "/ui-examples",
+      "visibleNavs": ["Main navigation", "Breadcrumb"],
+      "width": 1440
+    }
+  ],
+  "panelChecks": [
+    {
+      "bottom": 239,
+      "clientWidth": 1265,
+      "label": "Sistem Setting",
+      "left": 124.5,
+      "right": 892.5,
+      "scrollable": false,
+      "viewportHeight": 800
+    },
+    {
+      "bottom": 395,
+      "clientWidth": 1265,
+      "label": "Master Data",
+      "left": 124.5,
+      "right": 892.5,
+      "scrollable": false,
+      "viewportHeight": 800
+    },
+    {
+      "bottom": 331,
+      "clientWidth": 1265,
+      "label": "Modul",
+      "left": 124.5,
+      "right": 892.5,
+      "scrollable": false,
+      "viewportHeight": 800
+    },
+    {
+      "bottom": 659,
+      "clientWidth": 1265,
+      "label": "Laporan",
+      "left": 124.5,
+      "right": 892.5,
+      "scrollable": false,
+      "viewportHeight": 800
+    },
+    {
+      "bottom": 330,
+      "clientWidth": 1265,
+      "label": "More",
+      "left": 124.5,
+      "right": 892.5,
+      "scrollable": false,
+      "viewportHeight": 800
+    }
+  ],
+  "zoom": {
+    "cssWidth": 720,
+    "dpr": 2,
+    "drawerTriggerVisible": true,
+    "headerHeight": 60,
+    "method": "200% reflow emulation: 1440x900 / 2",
+    "overflow": 0
+  },
+  "consoleFindings": [
+    {
+      "level": "error",
+      "message": "./src/components/shell/app-shell.tsx\nError: Reading source code for parsing failed\nAn unexpected error happened while trying to read the source code to parse: failed to convert rope into string\n\nCaused by:\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nImport trace:\n  Server Component:\n    ./src/components/shell/app-shell.tsx\n    ./src/app/(dashboard)/layout.tsx",
+      "timestamp": "2026-10-21T14:22:29.017Z",
+      "url": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_1bjkg68unqmjx._.js"
+    },
+    {
+      "level": "error",
+      "message": "./src/components/shell/app-shell.tsx\nError: Module not found: Can't resolve './app-shell.tsx'\nfailed to convert rope into string\n\nCaused by:\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nDebug info:\n- Execution of <ModuleAssetContext as AssetContext>::process_resolve_result failed\n- Execution of <NextEcmascriptClientReferenceTransition as Transition>::process failed\n- Execution of Transition::process failed\n- failed to convert rope into string\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nImport trace:\n  Server Component:\n    ./src/components/shell/app-shell.tsx\n    ./src/app/(dashboard)/layout.tsx\n\nhttps://nextjs.org/docs/messages/module-not-found",
+      "timestamp": "2026-10-21T14:22:29.017Z",
+      "url": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_1bjkg68unqmjx._.js"
+    },
+    {
+      "level": "error",
+      "message": "./src/components/shell/app-shell.tsx\nError: Reading source code for parsing failed\nAn unexpected error happened while trying to read the source code to parse: failed to convert rope into string\n\nCaused by:\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nImport trace:\n  Server Component:\n    ./src/components/shell/app-shell.tsx\n    ./src/app/(dashboard)/layout.tsx",
+      "timestamp": "2026-10-21T14:22:30.575Z",
+      "url": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_1bjkg68unqmjx._.js"
+    },
+    {
+      "level": "error",
+      "message": "./src/components/shell/app-shell.tsx\nError: Module not found: Can't resolve './app-shell.tsx'\nfailed to convert rope into string\n\nCaused by:\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nDebug info:\n- Execution of <ModuleAssetContext as AssetContext>::process_resolve_result failed\n- Execution of <NextEcmascriptClientReferenceTransition as Transition>::process failed\n- Execution of Transition::process failed\n- failed to convert rope into string\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nImport trace:\n  Server Component:\n    ./src/components/shell/app-shell.tsx\n    ./src/app/(dashboard)/layout.tsx\n\nhttps://nextjs.org/docs/messages/module-not-found",
+      "timestamp": "2026-10-21T14:22:30.575Z",
+      "url": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_1bjkg68unqmjx._.js"
+    },
+    {
+      "level": "error",
+      "message": "./src/components/shell/app-shell.tsx\nError: Reading source code for parsing failed\nAn unexpected error happened while trying to read the source code to parse: failed to convert rope into string\n\nCaused by:\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nImport trace:\n  Server Component:\n    ./src/components/shell/app-shell.tsx\n    ./src/app/(dashboard)/layout.tsx",
+      "timestamp": "2026-10-21T14:22:41.502Z",
+      "url": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_1bjkg68unqmjx._.js"
+    },
+    {
+      "level": "error",
+      "message": "./src/components/shell/app-shell.tsx\nError: Module not found: Can't resolve './app-shell.tsx'\nfailed to convert rope into string\n\nCaused by:\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nDebug info:\n- Execution of <ModuleAssetContext as AssetContext>::process_resolve_result failed\n- Execution of <NextEcmascriptClientReferenceTransition as Transition>::process failed\n- Execution of Transition::process failed\n- failed to convert rope into string\n- invalid utf-8 sequence of 1 bytes from index 1827\n\nImport trace:\n  Server Component:\n    ./src/components/shell/app-shell.tsx\n    ./src/app/(dashboard)/layout.tsx\n\nhttps://nextjs.org/docs/messages/module-not-found",
+      "timestamp": "2026-10-21T14:22:41.502Z",
+      "url": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_1bjkg68unqmjx._.js"
+    }
+  ],
+  "interactionChecks": {
+    "desktopArrowDown": "first report link focused",
+    "escape": "trigger restored",
+    "outside": "panel dismissed",
+    "drawerFocusForward": "search input inside dialog",
+    "drawerFocusBack": "Close",
+    "bodyScroll": "hidden while open; visible after close",
+    "resize": "drawer dismissed and brand focused",
+    "routeSelection": "/ticketting selected, drawer closed",
+    "search": "label and URL results; unavailable text; empty and clear focus verified",
+    "account": "profile preview link; logout disabled"
+  },
+  "limitations": [
+    "200% tested by equivalent 720x450 CSS viewport at device scale 2, not native browser zoom",
+    "Raw touch injection unavailable in IAB; 44px targets and pointer interactions verified; physical touch unverified"
+  ],
+  "finalConfirmation": {
+    "skipCheck": {
+      "focused": "main-content",
+      "headerBottom": 61,
+      "mainTop": 80
+    },
+    "shrinkCheck": {
+      "focus": "LMS \u2014 Dashboard",
+      "openPanels": 0
+    },
+    "finalValidationStartedAt": "2026-10-21T14:35:59.100Z",
+    "finalConsoleFindings": []
+  },
+  "parentLabelSearch": {
+    "query": "Logistics / Areas",
+    "matchingItems": 6,
+    "availableLinks": 1,
+    "unavailableLeaves": 5
+  }
+}

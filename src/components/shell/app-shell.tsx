@@ -1,355 +1,286 @@
 "use client";
 
-import {
-  ChevronRight,
-  Folder,
-  Home,
-  Menu,
-  PanelLeftClose,
-  PanelLeftOpen,
-  PanelsTopLeft,
-  Truck,
-} from "lucide-react";
+import { ChevronRight, Menu, Search, Truck, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useId, useState } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { Navigation } from "./compact-navigation";
 import {
-  activeFoundationRoute,
+  isNavigationSection,
   type NavigationGroup,
   type NavigationLeaf,
-  navigation,
+  navigationEntries,
   navigationPath,
+  primaryNavigation,
+  supplementaryNavigation,
 } from "./navigation";
 
-export function Navigation({
-  collapsed = false,
-  mobile = false,
-  groups = navigation,
+export { Navigation } from "./compact-navigation";
+
+function DesktopNavigation({
+  value,
+  onValueChange,
 }: {
-  collapsed?: boolean;
-  mobile?: boolean;
-  groups?: readonly NavigationGroup[];
+  value: string;
+  onValueChange: (value: string) => void;
 }) {
   const pathname = usePathname();
-  const current = navigationPath(pathname, groups);
-  const [openGroup, setOpenGroup] = useState(
-    current?.section ? current.group.label : null,
-  );
-  const [openSection, setOpenSection] = useState(
-    current?.section?.label ?? null,
-  );
-  const id = useId();
-  const [query, setQuery] = useState("");
-  const search = query.trim().toLowerCase();
-  const results = groups
-    .flatMap((group) => [
-      ...(group.href || !group.sections
-        ? [{ item: group, path: group.providerLabel }]
-        : []),
-      ...(group.sections?.flatMap((section) =>
-        section.items.map((item) => ({
-          item,
-          path: [group.providerLabel, ...section.providerPath].join(" / "),
-        })),
-      ) ?? []),
-    ])
-    .filter(({ item, path }) =>
-      `${path} ${item.label} ${item.providerLabel}`
-        .toLowerCase()
-        .includes(search),
-    );
-  const routeLink = (item: NavigationLeaf, compact = false) => {
-    if (!item.href) return null;
-    const Icon = item.href === "/" ? Home : PanelsTopLeft;
-    const link = (
-      <Link
-        href={item.href}
-        aria-current={pathname === item.href ? "page" : undefined}
-        title={compact ? item.label : undefined}
-        className={cn(
-          "flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-          compact && "justify-center px-0",
-          pathname === item.href && "bg-accent text-accent-foreground",
-        )}
+  const current = navigationPath(pathname);
+  const routeLink = (item: NavigationLeaf) =>
+    item.href ? (
+      <NavigationMenuLink
+        asChild
+        active={pathname === item.href}
+        onSelect={() => onValueChange("")}
       >
-        <Icon className="size-4 shrink-0" aria-hidden="true" />
-        <span className={compact ? "sr-only" : "min-w-0 break-words"}>
+        <Link
+          href={item.href}
+          className="flex min-h-11 items-center rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground aria-[current=page]:bg-accent aria-[current=page]:font-semibold aria-[current=page]:text-accent-foreground"
+        >
           {item.label}
-        </span>
-      </Link>
+        </Link>
+      </NavigationMenuLink>
+    ) : (
+      <p className="px-3 py-2 text-sm text-muted-foreground">
+        {item.providerLabel} <span className="text-xs">— unavailable</span>
+      </p>
     );
-    return mobile ? <SheetClose asChild>{link}</SheetClose> : link;
-  };
+  const groupPanel = (group: NavigationGroup) => (
+    <NavigationMenuContent aria-label={`${group.providerLabel} destinations`}>
+      <p className="mb-3 border-b px-3 pb-3 text-xs text-muted-foreground">
+        Presentation previews · Operational services unavailable
+      </p>
+      <ul className="grid grid-cols-2 items-start gap-4">
+        {navigationEntries(group).map((entry) => (
+          <li key={entry.label}>
+            {isNavigationSection(entry) ? (
+              <section aria-label={entry.providerPath.join(" / ")}>
+                <h2 className="mb-1 px-3 text-sm font-semibold">
+                  {entry.providerPath.join(" / ")}
+                </h2>
+                <ul>
+                  {entry.items.map((item) => (
+                    <li key={item.label}>{routeLink(item)}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : (
+              routeLink(entry)
+            )}
+          </li>
+        ))}
+      </ul>
+    </NavigationMenuContent>
+  );
   return (
-    <nav
-      aria-label={mobile ? "Mobile navigation" : "Main navigation"}
-      className="space-y-6 p-3"
+    <NavigationMenu
+      aria-label="Main navigation"
+      value={value}
+      onValueChange={onValueChange}
     >
-      {!collapsed && (
-        <div className="space-y-2 px-3 text-xs leading-5 text-muted-foreground">
-          <p>
-            Current page:{" "}
-            <span className="font-medium text-foreground">
-              {current?.labels.join(" / ") ?? "Page"}
-            </span>
-          </p>
-          <p>
-            Domain destinations are unavailable. Find an item or open a group
-            and section.
-          </p>
-        </div>
-      )}
-      {!collapsed && (
-        <div className="space-y-2 px-1">
-          <label htmlFor={`${id}-search`} className="text-sm font-medium">
-            Find menu item
-          </label>
-          <Input
-            id={`${id}-search`}
-            type="search"
-            value={query}
-            onInput={(event) => setQuery(event.currentTarget.value)}
-            aria-controls={`${id}-results`}
-            className="min-h-11"
-            autoComplete="off"
-          />
-        </div>
-      )}
-      {!collapsed && search ? (
-        <div id={`${id}-results`} className="space-y-2">
-          <output className="block px-3 text-xs text-muted-foreground">
-            {results.length} matching {results.length === 1 ? "item" : "items"}
-          </output>
-          <ul className="space-y-3">
-            {results.map(({ item, path }) => (
-              <li
-                key={`${path}-${item.providerLabel}`}
-                className="break-words px-3 text-sm"
+      <NavigationMenuList>
+        {primaryNavigation.map((group) => (
+          <NavigationMenuItem key={group.label} value={group.label}>
+            {group.href ? (
+              <NavigationMenuLink
+                asChild
+                active={pathname === group.href}
+                onSelect={() => onValueChange("")}
               >
-                <p className="mb-1 text-xs leading-5 text-muted-foreground">
-                  {path}
-                </p>
-                {item.href ? (
-                  routeLink(item)
-                ) : (
-                  <p className="border-l pl-3 text-muted-foreground">
-                    {item.providerLabel}
-                    <span className="sr-only"> — unavailable</span>
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-          {results.length === 0 && (
-            <p className="px-3 text-sm text-muted-foreground">
-              No matching items. Try a provider label or clear the search.
-            </p>
-          )}
-          <Button
-            type="button"
-            variant="ghost"
-            className="min-h-11"
-            onClick={() => {
-              setQuery("");
-              document.getElementById(`${id}-search`)?.focus();
-            }}
-          >
-            Clear menu search
-          </Button>
-        </div>
-      ) : (
-        <div id={`${id}-results`} className="space-y-1">
-          {groups.map((group, groupIndex) => {
-            if (group.href) {
-              return <div key={group.label}>{routeLink(group, collapsed)}</div>;
-            }
-            if (collapsed) return null;
-            if (!group.sections)
-              return (
-                <p
-                  key={group.label}
-                  className="px-3 py-3 text-sm text-muted-foreground"
-                >
+                <Link className={navigationMenuTriggerStyle} href={group.href}>
+                  {group.label}
+                </Link>
+              </NavigationMenuLink>
+            ) : (
+              <>
+                <NavigationMenuTrigger data-active={current?.group === group}>
                   {group.providerLabel}
-                  <span className="sr-only"> — unavailable</span>
-                </p>
-              );
-            const expanded = openGroup === group.label;
-            const groupId = `${id}-${groupIndex}`;
-            return (
-              <div key={group.label}>
-                <button
-                  type="button"
-                  aria-expanded={expanded}
-                  aria-controls={groupId}
-                  className="flex min-h-11 w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold hover:bg-secondary"
-                  onClick={() => {
-                    setOpenGroup(expanded ? null : group.label);
-                    setOpenSection(
-                      current?.group === group
-                        ? (current.section?.label ?? null)
-                        : null,
-                    );
-                  }}
-                >
-                  <Folder className="size-4 shrink-0" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 break-words">
-                    {group.providerLabel}
-                  </span>
-                  <ChevronRight
-                    className={cn("size-4 shrink-0", expanded && "rotate-90")}
-                    aria-hidden="true"
-                  />
-                </button>
-                <div
-                  id={groupId}
-                  hidden={!expanded}
-                  className="ml-3 border-l pl-2"
-                >
-                  {group.sections.map((section, sectionIndex) => {
-                    const sectionOpen = openSection === section.label;
-                    const sectionId = `${groupId}-${sectionIndex}`;
-                    return (
-                      <div key={section.label}>
-                        <button
-                          type="button"
-                          aria-expanded={sectionOpen}
-                          aria-controls={sectionId}
-                          className="flex min-h-11 w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm font-medium hover:bg-secondary"
-                          onClick={() =>
-                            setOpenSection(sectionOpen ? null : section.label)
-                          }
-                        >
-                          <ChevronRight
-                            className={cn(
-                              "size-3 shrink-0",
-                              sectionOpen && "rotate-90",
-                            )}
-                            aria-hidden="true"
-                          />
-                          <span className="min-w-0 flex-1 break-words">
-                            {section.providerPath.join(" / ")}
-                          </span>
-                          <span
-                            className="text-xs text-muted-foreground"
-                            aria-hidden="true"
-                          >
-                            {section.items.length}
-                          </span>
-                        </button>
-                        <ul
-                          id={sectionId}
-                          hidden={!sectionOpen}
-                          className="ml-2 border-l py-1 pl-2"
-                        >
-                          {section.items.map((item) => (
-                            <li
-                              key={item.label}
-                              className="break-words px-2 py-2 text-sm leading-5 text-muted-foreground"
-                            >
-                              {item.href ? (
-                                routeLink(item)
-                              ) : (
-                                <>
-                                  {item.providerLabel}
-                                  <span className="sr-only">
-                                    {" "}
-                                    — unavailable
-                                  </span>
-                                </>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </nav>
+                </NavigationMenuTrigger>
+                {groupPanel(group)}
+              </>
+            )}
+          </NavigationMenuItem>
+        ))}
+        <NavigationMenuItem value="supplementary">
+          <NavigationMenuTrigger
+            data-active={
+              current && supplementaryNavigation.includes(current.group)
+            }
+          >
+            More
+          </NavigationMenuTrigger>
+          <NavigationMenuContent aria-label="Supplementary navigation">
+            <h2 className="px-3 pt-1 text-sm font-semibold">
+              Supplementary navigation
+            </h2>
+            <Navigation
+              key={pathname}
+              groups={supplementaryNavigation}
+              finder={false}
+              menuLinks
+              label="Additional navigation"
+              onNavigate={() => onValueChange("")}
+            />
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const pathname = usePathname();
-  const current = activeFoundationRoute(pathname);
+// Remount only the interactive header on pathname changes, including history
+// navigation. Pages and the dashboard layout retain their server boundaries.
+function ShellHeader() {
+  const [openMenu, setOpenMenu] = useState("");
+  const [drawer, setDrawer] = useState(false);
+  const [finder, setFinder] = useState(false);
+  const [account, setAccount] = useState(false);
+  const brand = useRef<HTMLAnchorElement>(null);
+  const desktop = useRef<HTMLDivElement>(null);
+  const hamburger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 80rem)");
+    const resize = () => {
+      if (
+        desktop.current?.contains(document.activeElement) ||
+        document.activeElement === hamburger.current
+      )
+        brand.current?.focus();
+      setOpenMenu("");
+      setDrawer(false);
+      setFinder(false);
+      setAccount(false);
+    };
+    media.addEventListener("change", resize);
+    return () => media.removeEventListener("change", resize);
+  }, []);
+  const closeSurface = () => {
+    setDrawer(false);
+    setFinder(false);
+    setOpenMenu("");
+  };
   return (
-    <div className="flex min-h-dvh">
-      <a
-        href="#main-content"
-        className="sr-only z-50 rounded-md bg-background p-3 text-primary focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+    <header className="sticky top-0 z-40 border-b bg-background">
+      <div
+        data-shell-row
+        className="flex min-h-15 items-center gap-3 px-4 py-2 sm:px-6 xl:gap-4 xl:px-8"
       >
-        Skip to content
-      </a>
-      <aside
-        className={cn(
-          "sticky top-0 hidden h-dvh shrink-0 flex-col overflow-y-auto border-r bg-sidebar lg:flex",
-          collapsed ? "w-20" : "w-sidebar",
-        )}
-      >
-        <div
-          className={cn(
-            "flex min-h-20 items-center gap-3 border-b px-6",
-            collapsed && "justify-center px-0",
-          )}
+        <Link
+          ref={brand}
+          href="/"
+          aria-label="LMS — Dashboard"
+          onClick={closeSurface}
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md text-primary"
         >
-          <Truck className="size-6 shrink-0 text-primary" aria-hidden="true" />
-          {!collapsed && (
-            <div>
-              <p className="font-semibold">LMS</p>
-              <p className="text-xs text-muted-foreground">
-                Logistics management
-              </p>
-            </div>
-          )}
+          <span className="flex size-8 items-center justify-center rounded-md bg-accent">
+            <Truck className="size-5" aria-hidden="true" />
+          </span>
+          <span className="text-lg font-semibold tracking-tight">LMS</span>
+        </Link>
+        <div ref={desktop} className="hidden min-w-0 xl:block">
+          <DesktopNavigation
+            value={openMenu}
+            onValueChange={(value) => {
+              setOpenMenu(value);
+              setFinder(false);
+            }}
+          />
         </div>
-        <div id="desktop-navigation" className="flex-1">
-          <Navigation key={pathname} collapsed={collapsed} />
-        </div>
-        <div className="sticky bottom-0 border-t bg-sidebar p-3">
-          <Button
-            variant="ghost"
-            className="min-h-11 w-full"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-expanded={!collapsed}
-            aria-controls="desktop-navigation"
-            onClick={() => setCollapsed(!collapsed)}
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <Sheet
+            open={finder}
+            onOpenChange={(value) => {
+              setFinder(value);
+              setOpenMenu("");
+            }}
           >
-            {collapsed ? (
-              <PanelLeftOpen aria-hidden="true" />
-            ) : (
-              <>
-                <PanelLeftClose aria-hidden="true" />
-                <span>Collapse sidebar</span>
-              </>
-            )}
-          </Button>
-        </div>
-      </aside>
-      <div className="min-w-0 flex-1">
-        <header className="flex min-h-20 flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-8">
-          <div className="lg:hidden">
-            <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-11"
+                aria-label="Find menu item"
+              >
+                <Search aria-hidden="true" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="w-full gap-0 overflow-y-auto overscroll-contain sm:max-w-md"
+            >
+              <SheetHeader>
+                <SheetTitle>Menu finder</SheetTitle>
+                <SheetDescription>
+                  Search all preview destinations and documented provider paths.
+                  Unavailable items have no links.
+                </SheetDescription>
+              </SheetHeader>
+              <Navigation
+                mobile
+                label="Menu finder results"
+                onNavigate={closeSurface}
+              />
+            </SheetContent>
+          </Sheet>
+          <DropdownMenu
+            open={account}
+            onOpenChange={(value) => {
+              setAccount(value);
+              setOpenMenu("");
+            }}
+          >
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-11"
+                aria-label="Account unavailable"
+              >
+                <UserRound aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <p className="px-3 py-2 text-xs text-muted-foreground">
+                Account unavailable · UI preview
+              </p>
+              <DropdownMenuItem asChild>
+                <Link href="/profile" onClick={closeSurface}>
+                  Profil Saya — preview
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled>Keluar — unavailable</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="xl:hidden">
+            <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
                 <Button
-                  variant="outline"
+                  ref={hamburger}
+                  variant="ghost"
                   size="icon"
                   className="size-11"
                   aria-label="Open navigation"
@@ -357,58 +288,94 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <Menu aria-hidden="true" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="overflow-y-auto bg-sidebar">
+              <SheetContent
+                side="left"
+                className="w-full gap-0 overflow-y-auto overscroll-contain sm:max-w-md"
+                onCloseAutoFocus={(event) => {
+                  if (window.matchMedia("(min-width: 80rem)").matches) {
+                    event.preventDefault();
+                    brand.current?.focus();
+                  }
+                }}
+              >
                 <SheetHeader>
                   <SheetTitle>LMS navigation</SheetTitle>
                   <SheetDescription>
-                    Foundation preview. Domain pages are unavailable.
+                    Navigate presentation previews. Operational services are
+                    unavailable.
                   </SheetDescription>
                 </SheetHeader>
-                <Navigation key={pathname} mobile />
+                <Navigation mobile onNavigate={closeSurface} />
               </SheetContent>
             </Sheet>
           </div>
-          <nav aria-label="Breadcrumb" className="min-w-0 text-sm">
-            <ol className="flex flex-wrap items-center gap-2">
-              {pathname === "/" ? (
-                <li>
-                  <span aria-current="page">Dashboard</span>
-                </li>
-              ) : (
-                <>
-                  <li>
-                    <Link
-                      href="/"
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      Dashboard
-                    </Link>
-                  </li>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const breadcrumbs = navigationPath(pathname)?.labels ?? ["Page"];
+  return (
+    <div className="min-h-dvh min-w-0 bg-workspace">
+      <a
+        href="#main-content"
+        className="sr-only z-50 rounded-md bg-background p-3 text-primary focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
+      <ShellHeader key={pathname} />
+      <nav
+        aria-label="Breadcrumb"
+        className="border-b bg-background px-4 py-2 text-xs sm:px-6 xl:px-8"
+      >
+        <ol className="flex min-h-5 flex-wrap items-center gap-x-2 gap-y-1 break-words">
+          {pathname === "/" ? (
+            <li>
+              <span aria-current="page">Dashboard</span>
+            </li>
+          ) : (
+            <>
+              <li>
+                <Link
+                  href="/"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              {breadcrumbs.map((label, index) => (
+                <Fragment key={`${index}-${label}`}>
                   <li aria-hidden="true">
                     <ChevronRight className="size-3" />
                   </li>
-                  <li>
-                    <span aria-current="page">{current?.label ?? "Page"}</span>
+                  <li className="min-w-0">
+                    <span
+                      aria-current={
+                        index === breadcrumbs.length - 1 ? "page" : undefined
+                      }
+                    >
+                      {label}
+                    </span>
                   </li>
-                </>
-              )}
-            </ol>
-          </nav>
-          <span className="ml-auto text-xs text-muted-foreground">
-            UI preview
-          </span>
-        </header>
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 focus:outline-none sm:px-8 lg:py-10"
-        >
-          {children}
-        </main>
-        <footer className="border-t px-4 py-5 text-xs text-muted-foreground sm:px-8">
-          LMS foundation · Presentation examples only
-        </footer>
-      </div>
+                </Fragment>
+              ))}
+            </>
+          )}
+        </ol>
+      </nav>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="w-full min-w-0 scroll-mt-20 space-y-6 px-4 py-6 focus:outline-none sm:px-6 lg:p-8"
+      >
+        {children}
+      </main>
+      <footer className="border-t bg-background px-4 py-5 text-xs text-muted-foreground sm:px-6 lg:px-8">
+        LMS · Presentation preview · No operational records loaded or saved
+      </footer>
     </div>
   );
 }

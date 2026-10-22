@@ -1,0 +1,50 @@
+[
+  {
+    "clientWidth": 360,
+    "columns": 9,
+    "heading": "Pemasaran/Penjualan",
+    "route": "/marketing",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": 9,
+    "heading": "Pemasaran/Penjualan",
+    "route": "/marketing",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": 13,
+    "heading": "On Site Outbound",
+    "route": "/transactions",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": 13,
+    "heading": "On Site Outbound",
+    "route": "/transactions",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": 16,
+    "heading": "Daftar Manifest",
+    "route": "/manifest",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": 16,
+    "heading": "Daftar Manifest",
+    "route": "/manifest",
+    "scrollWidth": 1425,
+    "width": 1440
+  }
+]

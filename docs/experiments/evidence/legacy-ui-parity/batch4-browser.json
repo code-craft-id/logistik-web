@@ -1,0 +1,74 @@
+[
+  {
+    "clientWidth": 360,
+    "columns": [11],
+    "heading": "Gross Profit",
+    "route": "/branch-reports/gross-profit",
+    "scrollWidth": 360,
+    "tables": 1,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": [11],
+    "heading": "Gross Profit",
+    "route": "/branch-reports/gross-profit",
+    "scrollWidth": 1425,
+    "tables": 1,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": [17],
+    "heading": "Customer Reports",
+    "route": "/customer-reports",
+    "scrollWidth": 360,
+    "tables": 1,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": [17],
+    "heading": "Customer Reports",
+    "route": "/customer-reports",
+    "scrollWidth": 1425,
+    "tables": 1,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": [11, 5],
+    "heading": "Laporan Keuangan",
+    "route": "/financial-reports",
+    "scrollWidth": 360,
+    "tables": 2,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": [11, 5],
+    "heading": "Laporan Keuangan",
+    "route": "/financial-reports",
+    "scrollWidth": 1425,
+    "tables": 2,
+    "width": 1440
+  },
+  {
+    "clientWidth": 360,
+    "columns": [10],
+    "heading": "Rekap Omset Harian",
+    "route": "/branch-reports/daily-turnover-summary",
+    "scrollWidth": 360,
+    "tables": 1,
+    "width": 375
+  },
+  {
+    "clientWidth": 1425,
+    "columns": [10],
+    "heading": "Rekap Omset Harian",
+    "route": "/branch-reports/daily-turnover-summary",
+    "scrollWidth": 1425,
+    "tables": 1,
+    "width": 1440
+  }
+]

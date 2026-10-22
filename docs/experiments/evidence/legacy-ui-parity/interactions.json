@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "show": "period 2026-10; date 2026-10-21; year 2026; data remains unavailable",
+    "reset": "all fields empty; no preview selection applied",
+    "compact": {
+      "recoveredGroup": "Master Data",
+      "focus": "Master Data",
+      "expanded": true
+    },
+    "menuSearch": {
+      "query": "Rekap Omset Harian",
+      "matches": 1,
+      "links": 0
+    },
+    "exclusiveGroups": "Opening Modul closes Master Data"
+  },
+  "mobileSheet": {
+    "keyboardGroupAndSection": "Master Data / Area Logistik; Enter expands both",
+    "escapeCloses": true,
+    "triggerFocusRestores": true,
+    "shiftTabWrapsToClose": true,
+    "tabWrapsToSearch": true,
+    "routeSelectionCloses": true
+  },
+  "existingExamples": {
+    "filterNavigationRows": 1,
+    "recoveryRows": 5,
+    "keyboardTableScrollLeft": 40,
+    "invalidFieldFocused": "example-name",
+    "tabs": "ArrowRight selects Tax; Home returns Vendor data; 3 mounted panels",
+    "dialogShiftTabWrap": true,
+    "dialogTabWrap": true,
+    "escape": true,
+    "focusRestored": true
+  },
+  "runtimeWarningsOrErrors": []
+}

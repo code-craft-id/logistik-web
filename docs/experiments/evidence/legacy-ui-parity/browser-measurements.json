@@ -1,0 +1,173 @@
+[
+  {
+    "clientWidth": 360,
+    "fields": [
+      {
+        "height": 44,
+        "id": "dashboard-period",
+        "insideViewport": true,
+        "label": "",
+        "type": "month",
+        "width": 286
+      },
+      {
+        "height": 44,
+        "id": "dashboard-date",
+        "insideViewport": true,
+        "label": "",
+        "type": "date",
+        "width": 286
+      },
+      {
+        "height": 44,
+        "id": "dashboard-year",
+        "insideViewport": true,
+        "label": "",
+        "type": "number",
+        "width": 286
+      },
+      {
+        "height": 44,
+        "id": "dashboard-branch",
+        "insideViewport": true,
+        "label": "Unavailable — PLT-01",
+        "type": null,
+        "width": 286
+      },
+      {
+        "height": 44,
+        "id": "",
+        "insideViewport": true,
+        "label": "Show",
+        "type": "submit",
+        "width": 84.875
+      },
+      {
+        "height": 44,
+        "id": "",
+        "insideViewport": true,
+        "label": "Reset",
+        "type": "reset",
+        "width": 88.03125
+      }
+    ],
+    "mainWidth": 360,
+    "primary": "#0f5c4c",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "clientWidth": 753,
+    "fields": [
+      {
+        "height": 44,
+        "id": "dashboard-period",
+        "insideViewport": true,
+        "label": "",
+        "type": "month",
+        "width": 323.5
+      },
+      {
+        "height": 44,
+        "id": "dashboard-date",
+        "insideViewport": true,
+        "label": "",
+        "type": "date",
+        "width": 323.5
+      },
+      {
+        "height": 44,
+        "id": "dashboard-year",
+        "insideViewport": true,
+        "label": "",
+        "type": "number",
+        "width": 323.5
+      },
+      {
+        "height": 44,
+        "id": "dashboard-branch",
+        "insideViewport": true,
+        "label": "Unavailable — PLT-01",
+        "type": null,
+        "width": 323.5
+      },
+      {
+        "height": 44,
+        "id": "",
+        "insideViewport": true,
+        "label": "Show",
+        "type": "submit",
+        "width": 84.875
+      },
+      {
+        "height": 44,
+        "id": "",
+        "insideViewport": true,
+        "label": "Reset",
+        "type": "reset",
+        "width": 88.03125
+      }
+    ],
+    "mainWidth": 753,
+    "primary": "#0f5c4c",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "clientWidth": 1425,
+    "fields": [
+      {
+        "height": 44,
+        "id": "dashboard-period",
+        "insideViewport": true,
+        "label": "",
+        "type": "month",
+        "width": 204.515625
+      },
+      {
+        "height": 44,
+        "id": "dashboard-date",
+        "insideViewport": true,
+        "label": "",
+        "type": "date",
+        "width": 204.53125
+      },
+      {
+        "height": 44,
+        "id": "dashboard-year",
+        "insideViewport": true,
+        "label": "",
+        "type": "number",
+        "width": 204.515625
+      },
+      {
+        "height": 44,
+        "id": "dashboard-branch",
+        "insideViewport": true,
+        "label": "Unavailable — PLT-01",
+        "type": null,
+        "width": 204.53125
+      },
+      {
+        "height": 44,
+        "id": "",
+        "insideViewport": true,
+        "label": "Show",
+        "type": "submit",
+        "width": 84.875
+      },
+      {
+        "height": 44,
+        "id": "",
+        "insideViewport": true,
+        "label": "Reset",
+        "type": "reset",
+        "width": 88.03125
+      }
+    ],
+    "mainWidth": 1169,
+    "primary": "#0f5c4c",
+    "scrollWidth": 1425,
+    "width": 1440
+  }
+]

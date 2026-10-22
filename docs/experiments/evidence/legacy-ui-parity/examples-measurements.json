@@ -1,0 +1,29 @@
+[
+  {
+    "clientWidth": 360,
+    "rows": 5,
+    "scrollWidth": 360,
+    "tableScrollWidth": 682,
+    "tableTabIndex": 0,
+    "tableWidth": 326,
+    "width": 375
+  },
+  {
+    "clientWidth": 753,
+    "rows": 5,
+    "scrollWidth": 753,
+    "tableScrollWidth": 703,
+    "tableTabIndex": 0,
+    "tableWidth": 703,
+    "width": 768
+  },
+  {
+    "clientWidth": 1425,
+    "rows": 5,
+    "scrollWidth": 1425,
+    "tableScrollWidth": 1103,
+    "tableTabIndex": 0,
+    "tableWidth": 1103,
+    "width": 1440
+  }
+]

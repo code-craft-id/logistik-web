@@ -1,0 +1,12 @@
+{
+  "drawerLink": {
+    "drawerClosed": true,
+    "heading": "Kendaraan Logistik",
+    "overflow": false
+  },
+  "focusContainedAfterTabs": true,
+  "escape": {
+    "closed": true,
+    "focus": "Open navigation"
+  }
+}

@@ -1,0 +1,87 @@
+
+ RUN  v4.1.12 C:/Development/logistik-web
+
+ ❯ |ui| tests/ui/foundation.test.ts (9 tests | 4 failed) 1245ms
+     × keeps the active route named when the sidebar collapses and restores domain labels on expansion 436ms
+     × preserves every provider leaf behind two disclosure levels with no operational links 144ms
+     × opens only one group and section at a time and keeps their controlled lists hidden otherwise 174ms
+     × finds provider and English labels with full paths, keeps unavailable results unlinked, and clears an empty search 102ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |ui| tests/ui/foundation.test.ts > FND-03 local interaction contracts > keeps the active route named when the sidebar collapses and restores domain labels on expansion
+AssertionError: expected <a …(2)>…(2)</a>
+<a …(2)>…(2)</a>
+…(5) to have a length of 2 but got 7
+
+- Expected
++ Received
+
+- 2
++ 7
+
+ ❯ tests/ui/foundation.test.ts:55:7
+     53|     expect(
+     54|       container.querySelectorAll('nav[aria-label="Main navigation"] a'…
+     55|     ).toHaveLength(2);
+       |       ^
+     56|   });
+     57|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |ui| tests/ui/foundation.test.ts > FND-03 local interaction contracts > preserves every provider leaf behind two disclosure levels with no operational links
+AssertionError: expected …(29) to have a length of 22 but got 29
+
+- Expected
++ Received
+
+- 22
++ 29
+
+ ❯ tests/ui/foundation.test.ts:123:60
+    121|       ),
+    122|     ).toHaveLength(68);
+    123|     expect(nav?.querySelectorAll("button[aria-expanded]")).toHaveLengt…
+       |                                                            ^
+    124|     for (const group of navigation) {
+    125|       for (const section of group.sections ?? []) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |ui| tests/ui/foundation.test.ts > FND-03 local interaction contracts > opens only one group and section at a time and keeps their controlled lists hidden otherwise
+Error: Button not found: M. Logistik / Area Logistik5
+ ❯ button tests/ui/foundation.test.ts:33:22
+     31|       element.textContent === name,
+     32|   );
+     33|   if (!target) throw new Error(`Button not found: ${name}`);
+       |                      ^
+     34|   return target;
+     35| }
+ ❯ tests/ui/foundation.test.ts:154:27
+ ❯ process.env.NODE_ENV.exports.act node_modules/react/cjs/react.development.js:890:22
+ ❯ tests/ui/foundation.test.ts:154:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |ui| tests/ui/foundation.test.ts > FND-03 local interaction contracts > finds provider and English labels with full paths, keeps unavailable results unlinked, and clears an empty search
+AssertionError: expected '2 matching items' to contain '1 matching item'
+
+Expected: "1 matching item"
+Received: "2 matching items"
+
+ ❯ tests/ui/foundation.test.ts:264:62
+    262|     for (const value of ["Rekap Omset Harian", "daily turnover summary…
+    263|       await searchFor(value);
+    264|       expect(container.querySelector("output")?.textContent).toContain(
+       |                                                              ^
+    265|         "1 matching item",
+    266|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  4 failed | 8 passed (12)
+   Start at  11:25:56
+   Duration  6.15s (transform 2.21s, setup 0ms, import 6.95s, tests 1.77s, environment 2.12s)

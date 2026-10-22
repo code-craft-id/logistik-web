@@ -21,13 +21,33 @@ describe("SCH-01 schema on the isolated test database", () => {
       client.$transaction(
         async (tx) => {
           await seedFakeRecords(tx);
+          // Count only this seed's reserved IDs; preserve other test fixtures.
+          const where = { id: { gte: 9100001, lte: 9100030 } };
           const snapshot = async () => ({
-            vehicles: await tx.vehicle.findMany({ orderBy: { id: "asc" } }),
-            drivers: await tx.driver.findMany({ orderBy: { id: "asc" } }),
-            couriers: await tx.courier.findMany({ orderBy: { id: "asc" } }),
-            vendors: await tx.vendor.findMany({ orderBy: { id: "asc" } }),
-            customers: await tx.customer.findMany({ orderBy: { id: "asc" } }),
-            consignees: await tx.consignee.findMany({ orderBy: { id: "asc" } }),
+            vehicles: await tx.vehicle.findMany({
+              where,
+              orderBy: { id: "asc" },
+            }),
+            drivers: await tx.driver.findMany({
+              where,
+              orderBy: { id: "asc" },
+            }),
+            couriers: await tx.courier.findMany({
+              where,
+              orderBy: { id: "asc" },
+            }),
+            vendors: await tx.vendor.findMany({
+              where,
+              orderBy: { id: "asc" },
+            }),
+            customers: await tx.customer.findMany({
+              where,
+              orderBy: { id: "asc" },
+            }),
+            consignees: await tx.consignee.findMany({
+              where,
+              orderBy: { id: "asc" },
+            }),
           });
           const before = await snapshot();
           for (const rows of Object.values(before)) {

@@ -1,0 +1,53 @@
+{
+  "migrations": [
+    {
+      "path": "prisma/migrations/20261018000100_sch01_organization/migration.sql",
+      "fixture": "1c2efd45156a3002cdb61ea3637dfc70a4379cb51f654067a17e1425b2dc340f",
+      "working": "41b7f0d8d7eda3565d48e4390112a7de2de15396ef642a6aa514fb25b43c194e",
+      "committed": "1c2efd45156a3002cdb61ea3637dfc70a4379cb51f654067a17e1425b2dc340f",
+      "fixtureMatchesHead": true,
+      "onlyCRLFDifference": true
+    },
+    {
+      "path": "prisma/migrations/20261018000200_sch01_identity/migration.sql",
+      "fixture": "8c84c1d920c62f0015668f15f150ad88b2466e6b8dec014ef6a3ddc1bf6f981a",
+      "working": "17074ec2f60f987151b194ab32e908f304f3c650716f440247513f5cbb0df0b4",
+      "committed": "8c84c1d920c62f0015668f15f150ad88b2466e6b8dec014ef6a3ddc1bf6f981a",
+      "fixtureMatchesHead": true,
+      "onlyCRLFDifference": true
+    },
+    {
+      "path": "prisma/migrations/20261018000300_sch01_master_data/migration.sql",
+      "fixture": "cc080f4bab513c51123c8e2f2a3ea86042e4b084138a8c3e415fd8cd68c882fe",
+      "working": "980903c73a7b7198a56a578c7a67479d3cc67d5c174437237b7f17a12d68d507",
+      "committed": "cc080f4bab513c51123c8e2f2a3ea86042e4b084138a8c3e415fd8cd68c882fe",
+      "fixtureMatchesHead": true,
+      "onlyCRLFDifference": true
+    },
+    {
+      "path": "prisma/migrations/20261018000400_sch01_sales/migration.sql",
+      "fixture": "9e53bdff598db33464d5dc529a2d00a68a2cefddf642aa857b1235c057d099f9",
+      "working": "16328a5bb6da05586297064a92484ea62829de39a7084fbf3bc1d08c7815fc79",
+      "committed": "9e53bdff598db33464d5dc529a2d00a68a2cefddf642aa857b1235c057d099f9",
+      "fixtureMatchesHead": true,
+      "onlyCRLFDifference": true
+    },
+    {
+      "path": "prisma/migrations/20261018000500_sch01_accounting/migration.sql",
+      "fixture": "c20c149196fd1fc8eed71946305a6928663b5981d3fc31fba9985c0ccaeb9787",
+      "working": "2850ee7d3882330d77010f23c25cde394bf9b2d970685995843769372ee8cca7",
+      "committed": "c20c149196fd1fc8eed71946305a6928663b5981d3fc31fba9985c0ccaeb9787",
+      "fixtureMatchesHead": true,
+      "onlyCRLFDifference": true
+    },
+    {
+      "path": "prisma/migrations/20261018000600_sch01_integration/migration.sql",
+      "fixture": "4476c20bc4b5eb6bfb817d4f9c5889f3f864df0ff1e2c699bd57d4f2cee6dfe4",
+      "working": "792bab3caa0d0638daab5797043da0ebedf704ffa99267253bba5e1c4dfb172b",
+      "committed": "4476c20bc4b5eb6bfb817d4f9c5889f3f864df0ff1e2c699bd57d4f2cee6dfe4",
+      "fixtureMatchesHead": true,
+      "onlyCRLFDifference": true
+    }
+  ],
+  "testAndFixtureMatchHead": true
+}

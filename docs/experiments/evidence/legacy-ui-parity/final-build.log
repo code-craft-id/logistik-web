@@ -1,0 +1,71 @@
+
+> logistik-web@0.1.0 build
+> next build
+
+▲ Next.js 16.4.2 (Turbopack)
+- Environments: .env
+✓ Running next.config.ts took 286ms
+- Cache Components enabled
+- Partial Prefetching enabled
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 6.1s
+  Running TypeScript ...
+  Finished TypeScript in 7.7s ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/47) ...
+  Generating static pages using 3 workers (11/47)
+  Generating static pages using 3 workers (23/47)
+  Generating static pages using 3 workers (35/47)
+✓ Generating static pages using 3 workers (47/47) in 4.2s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /akunting
+├ ○ /akunting/kategori-akun
+├ ○ /akunting/kategori-cashflow
+├ ○ /akunting/ledger
+├ ○ /akunting/rugi-laba
+├ ○ /bookings
+├ ○ /branch-reports
+├ ○ /branch-reports/awb
+├ ○ /branch-reports/customer-monthly-summary
+├ ○ /branch-reports/daily-turnover-summary
+├ ○ /branch-reports/delivery
+├ ○ /branch-reports/gross-profit
+├ ○ /branch-reports/inbound-transaction-details
+├ ○ /branch-reports/manifest-outbound
+├ ○ /branch-reports/manifest-vendor
+├ ○ /branch-reports/rekap-gross-profit
+├ ○ /branch-reports/transaction-details
+├ ○ /courier-reports
+├ ○ /customer-reports
+├ ○ /customer-service
+├ ○ /financial-reports
+├ ○ /group-user
+├ ○ /hak-akses-menu
+├ ○ /login
+├ ○ /logistics/areas
+├ ○ /logistics/division
+├ ○ /logistics/services
+├ ○ /logistics/vehicles
+├ ○ /manifest
+├ ○ /marketing
+├ ○ /master-data/categories
+├ ○ /master-data/logistics
+├ ○ /master-data/units
+├ ○ /office
+├ ○ /operations
+├ ○ /perkiraan
+├ ○ /profile
+├ ○ /shipment-status
+├ ○ /ticketting
+├ ○ /transactions
+├ ○ /ui-examples
+├ ○ /user-management
+└ ○ /vendor
+
+
+○  (Static)  prerendered as static content
