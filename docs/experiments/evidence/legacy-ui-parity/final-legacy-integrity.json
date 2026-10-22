@@ -1,0 +1,539 @@
+{
+  "method": "Read-only SHA-256 comparison against initial AST inventory; no legacy JS executed",
+  "modules": 133,
+  "unchanged": 133,
+  "results": [
+    {
+      "source": "src/api.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/App.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/auth/AuthContext.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/components/CrudTab.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/components/header.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/components/RequireAuth.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/components/WhatsAppMessageModal.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/components/BookingForm.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/components/BookingHeader.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/components/BookingSearch.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/components/BookingTable.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/constants/columns.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/constants/initialRows.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/constants/status.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/hooks/useBooking.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/utils/compare.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/utils/excel.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/utils/formatter.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/booking/utils/validation.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/components/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/components/ManifestForm.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/components/ManifestTable.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/components/ManifestToolbar.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/constants/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/constants/manifestColumns.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/constants/manifestStatus.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/hooks/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/hooks/useManifest.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/hooks/useManifestForm.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/hooks/useManifestTable.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/services/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/services/manifestService.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/types/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/utils/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/manifest/utils/manifestMapper.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/ActionMenu.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/Badge.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/ConsigneeTable.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/CustomerForm.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/CustomerTable.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/DropdownMenu.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/FormField.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/ManagementModal.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/MarketingHeader.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/MarketingTabs.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/components/TabButton.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/constants/consignee.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/constants/customer.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/constants/status.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/constants/tabs.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/hooks/useMarketing.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/services/customerApi.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/utils/getLastId.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/marketing/utils/makeForm.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/Badge.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/ManifesList.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/Pagination.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/ReportPage.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/ReportTable.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/ReportToolbar.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/components/SummaryCards.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/constants/branches.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/constants/statusMeta.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/data/seed.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/hooks/useReportData.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/hooks/useReportTable.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/index.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/utils/excel.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/reports/utils/formatters.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/components/ImportDialog.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/components/TransactionFilters.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/components/TransactionForm.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/components/TransactionHeader.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/components/TransactionTable.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/constants/columns.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/constants/initialRows.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/constants/status.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/hooks/useTransaction.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/utils/compare.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/utils/excel.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/utils/formatter.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/features/transaction/utils/validation.js",
+      "unchanged": true
+    },
+    {
+      "source": "src/main.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/akunting/Akunting.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/akunting/CashflowPage.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/akunting/KategoriAkunPage.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/akunting/LedgerPage.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/akunting/RugiLabaPage.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/Dashboard.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/login/Login.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/Category.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/LogisticList.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/logistics/AreaLogistic.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/logistics/DivisionLogistic.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/logistics/ServicesLogistic.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/logistics/VehiclesLogistic.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/Perkiraan.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/ShipmentStatus.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/Unit.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/master-data/Vendor.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/module/Booking.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/module/CustomerService.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/module/Manifest.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/module/Marketing.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/module/Operations.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/module/Transaction.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/office/Office.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/Profile.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/AwbReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/BranchReportsIndex.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/CustomerMonthlySummaryReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/DailyTurnoverSummaryReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/DeliveryReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/GrossProfitReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/InboundTransactionDetailsReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/ManifestOutboundReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/ManifestVendorReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/RekapGrossProfitReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/branch/TransactionDetailsReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/CourierReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/CustomerReports.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/reports/FinancialReport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/setting/GroupUser.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/setting/MenuAccess.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/setting/UserManagement.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/TicketApproval.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/TicketBadge.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/TicketDetailModal.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/TicketFormModal.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/TicketSupport.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/Ticketting.jsx",
+      "unchanged": true
+    },
+    {
+      "source": "src/pages/ticketting/ticketUtils.js",
+      "unchanged": true
+    }
+  ]
+}

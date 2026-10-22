@@ -4,14 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FoundationExamples } from "../../src/components/examples/foundation-examples";
 import { VendorFormExample } from "../../src/components/examples/vendor-form-example";
 import { AppShell, Navigation } from "../../src/components/shell/app-shell";
-import { navigation } from "../../src/components/shell/navigation";
+import {
+  navigation,
+  providerNavigation,
+} from "../../src/components/shell/navigation";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/ui-examples" }));
+const route = vi.hoisted(() => ({ pathname: "/ui-examples" }));
+vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
 
 let root: Root;
 let container: HTMLDivElement;
 
 beforeEach(() => {
+  route.pathname = "/ui-examples";
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   container = document.createElement("div");
   document.body.append(container);
@@ -35,24 +40,100 @@ function button(name: string) {
 }
 
 describe("FND-03 local interaction contracts", () => {
-  it("keeps the active route named when the sidebar collapses and restores domain labels on expansion", async () => {
+  it("replaces the sidebar with ordered primary navigation and a distinct supplementary menu", async () => {
     await act(async () =>
       root.render(createElement(AppShell, null, "Example content")),
     );
-    await act(async () => button("Collapse sidebar").click());
-    expect(button("Expand sidebar").getAttribute("aria-expanded")).toBe(
-      "false",
-    );
-    const current = container.querySelector(
-      'nav[aria-label="Main navigation"] [aria-current="page"]',
-    );
-    expect(current?.textContent).toBe("UI examples");
-    expect(current?.getAttribute("href")).toBe("/ui-examples");
-    await act(async () => button("Expand sidebar").click());
-    expect(container.textContent).toContain("Master Data");
+    expect(container.querySelector("aside")).toBeNull();
     expect(
-      container.querySelectorAll('nav[aria-label="Main navigation"] a'),
-    ).toHaveLength(2);
+      container.querySelector('[aria-label="Collapse sidebar"]'),
+    ).toBeNull();
+    expect(
+      container
+        .querySelector('[aria-label="LMS — Dashboard"]')
+        ?.getAttribute("href"),
+    ).toBe("/");
+    const nav = container.querySelector('nav[aria-label="Main navigation"]');
+    expect(
+      Array.from(nav?.querySelector("ul")?.children ?? []).map(
+        (item) => item.textContent,
+      ),
+    ).toEqual([
+      "Dashboard",
+      "Sistem Setting",
+      "Kantor",
+      "Master Data",
+      "Akunting",
+      "Modul",
+      "Laporan",
+      "Ticketing",
+      "More",
+    ]);
+    expect(button("More").getAttribute("data-active")).toBe("true");
+    await act(async () => button("More").click());
+    const additional = container.querySelector(
+      'nav[aria-label="Additional navigation"]',
+    );
+    expect(additional?.textContent).toContain("More previews");
+    expect(additional?.textContent).toContain("Provider inventory");
+    expect(additional?.textContent).toContain("Tutorial System");
+    expect(
+      additional?.querySelector('[aria-current="page"]')?.getAttribute("href"),
+    ).toBe("/ui-examples");
+    expect(
+      container.querySelector('main#main-content[tabindex="-1"]'),
+    ).not.toBeNull();
+  });
+
+  it("reveals the exact nested desktop destination and closes stale panels after pathname changes", async () => {
+    route.pathname = "/branch-reports/inbound-transaction-details";
+    await act(async () => root.render(createElement(AppShell, null, "Report")));
+    expect(button("Laporan").getAttribute("data-active")).toBe("true");
+    await act(async () => button("Laporan").click());
+    expect(
+      container.querySelector('section[aria-label="Laporan Cabang"]'),
+    ).not.toBeNull();
+    expect(
+      container
+        .querySelector(
+          'nav[aria-label="Main navigation"] [aria-current="page"]',
+        )
+        ?.getAttribute("href"),
+    ).toBe(route.pathname);
+    expect(
+      container.querySelector('nav[aria-label="Breadcrumb"]')?.textContent,
+    ).toContain("Laporan Cabang");
+    route.pathname = "/vendor";
+    await act(async () => root.render(createElement(AppShell, null, "Vendor")));
+    expect(button("Laporan").getAttribute("aria-expanded")).toBe("false");
+    expect(button("Master Data").getAttribute("data-active")).toBe("true");
+  });
+
+  it("searches actual route URLs from the compact finder and restores focus after Escape", async () => {
+    await act(async () =>
+      root.render(createElement(AppShell, null, "Example")),
+    );
+    const trigger = button("Find menu item");
+    trigger.focus();
+    await act(async () => trigger.click());
+    const search = document.querySelector<HTMLInputElement>(
+      'input[type="search"]',
+    );
+    if (!search) throw new Error("Finder missing");
+    await act(async () => {
+      search.value = "/ticketting";
+      search.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(
+      document.querySelector('[role="dialog"] a')?.getAttribute("href"),
+    ).toBe("/ticketting");
+    await act(async () =>
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+      ),
+    );
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
   });
 
   it("associates local validation feedback and moves focus to the invalid field", async () => {
@@ -109,19 +190,19 @@ describe("FND-03 local interaction contracts", () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
   });
-  it("preserves every provider leaf behind two disclosure levels with no operational links", async () => {
+  it("preserves every provider inventory leaf behind two disclosure levels with no operational links", async () => {
     await act(async () =>
-      root.render(createElement(AppShell, null, "Example content")),
+      root.render(createElement(Navigation, { groups: providerNavigation })),
     );
     const nav = container.querySelector('nav[aria-label="Main navigation"]');
     expect(navigation[0].label).toBe("Dashboard");
     expect(
-      navigation.flatMap(
+      providerNavigation.flatMap(
         (group) => group.sections?.flatMap((section) => section.items) ?? [],
       ),
     ).toHaveLength(68);
     expect(nav?.querySelectorAll("button[aria-expanded]")).toHaveLength(22);
-    for (const group of navigation) {
+    for (const group of providerNavigation) {
       for (const section of group.sections ?? []) {
         for (const leaf of section.items) {
           expect(nav?.textContent).toContain(leaf.providerLabel);
@@ -140,7 +221,7 @@ describe("FND-03 local interaction contracts", () => {
 
   it("opens only one group and section at a time and keeps their controlled lists hidden otherwise", async () => {
     await act(async () =>
-      root.render(createElement(AppShell, null, "Example content")),
+      root.render(createElement(Navigation, { groups: providerNavigation })),
     );
     const panel = (name: string) => {
       const control = button(name);
@@ -248,7 +329,7 @@ describe("FND-03 local interaction contracts", () => {
 
   it("finds provider and English labels with full paths, keeps unavailable results unlinked, and clears an empty search", async () => {
     await act(async () =>
-      root.render(createElement(AppShell, null, "Example content")),
+      root.render(createElement(Navigation, { groups: providerNavigation })),
     );
     const search = container.querySelector<HTMLInputElement>(
       'input[type="search"]',
@@ -259,7 +340,11 @@ describe("FND-03 local interaction contracts", () => {
         search.value = value;
         search.dispatchEvent(new Event("input", { bubbles: true }));
       });
-    for (const value of ["Rekap Omset Harian", "daily turnover summary"]) {
+    for (const value of [
+      "Rekap Omset Harian",
+      "daily turnover summary",
+      "Reports daily turnover summary",
+    ]) {
       await searchFor(value);
       expect(container.querySelector("output")?.textContent).toContain(
         "1 matching item",

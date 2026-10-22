@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-21",
+  "branch": "feat/legacy-ui-parity",
+  "head": "47e072a187351fa12c53e6c5ec5d1a71429a2a10",
+  "initialWorkingTree": "clean",
+  "commands": [
+    {
+      "command": "npx vitest run tests/ui/foundation.test.ts tests/ui/dashboard.test.ts tests/unit/legacy-ui-inventory.test.ts",
+      "result": "PASS: 16/16"
+    },
+    {
+      "command": "npm run lint",
+      "result": "PASS; final run recorded in final-lint.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "PASS"
+    },
+    {
+      "command": "npm test",
+      "result": "151 passed, 1 unrelated checksum failure of 152; see checksum-diagnosis.json"
+    },
+    {
+      "command": "npm run build",
+      "result": "PASS; 47 static pages"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "sourcePreservation": {
+    "filesCompared": 138,
+    "changed": [],
+    "added": [],
+    "allUnchanged": true,
+    "legacyNotExecuted": true,
+    "legacyNotInstalled": true,
+    "legacyNotFormatted": true
+  },
+  "scopeStatusBeforeEvidenceFinalization": " M DESIGN.md\n M docs/decisions/FND-03-surface.md\n M docs/experiments/legacy-ui-parity.md\n M src/components/shell/app-shell.tsx\n M src/components/shell/navigation.ts\n M tests/ui/dashboard.test.ts\n M tests/ui/foundation.test.ts\n?? docs/experiments/evidence/compact-navbar/\n?? src/components/shell/compact-navigation.tsx\n?? src/components/ui/navigation-menu.tsx\n",
+  "noCommitPushMergeDeployOrBranchChange": true,
+  "devServer": "Reused existing localhost:3000. No server launched or restarted.",
+  "unchangedBoundaries": [
+    "globals.css",
+    "Server Component pages/layouts",
+    "authentication/RBAC/backend",
+    "Prisma/schema/migrations/fixtures",
+    "dependencies/lockfile",
+    "PRD/ROADMAP",
+    "legacy source/assets"
+  ],
+  "finalChangedFiles": [
+    " M DESIGN.md",
+    " M docs/decisions/FND-03-surface.md",
+    " M docs/experiments/legacy-ui-parity.md",
+    " M src/components/shell/app-shell.tsx",
+    " M src/components/shell/navigation.ts",
+    " M tests/ui/dashboard.test.ts",
+    " M tests/ui/foundation.test.ts",
+    "?? docs/experiments/evidence/compact-navbar/",
+    "?? src/components/shell/compact-navigation.tsx",
+    "?? src/components/ui/navigation-menu.tsx"
+  ],
+  "finalLintFilesChecked": 153,
+  "screenshots": [
+    "1440-dashboard.jpg",
+    "1440-inbound-transaction-details.jpg",
+    "1440-ui-examples.jpg",
+    "1440-vendor.jpg",
+    "375-dashboard.jpg",
+    "375-inbound-transaction-details.jpg",
+    "375-ui-examples.jpg",
+    "375-vendor-form.jpg",
+    "375-vendor.jpg",
+    "768-dashboard.jpg",
+    "768-inbound-transaction-details.jpg",
+    "768-ui-examples.jpg",
+    "768-vendor-form.jpg",
+    "768-vendor.jpg",
+    "desktop-account.jpg",
+    "desktop-active-report.jpg",
+    "desktop-finder.jpg",
+    "desktop-more-inventory.jpg",
+    "desktop-reports.jpg",
+    "desktop-vendor-form.jpg",
+    "final-desktop.jpg",
+    "mobile-drawer.jpg",
+    "mobile-report.jpg",
+    "zoom-200-finder.jpg",
+    "zoom-200-reflow.jpg"
+  ]
+}

@@ -1,0 +1,104 @@
+[
+  {
+    "path": "next.config.ts",
+    "crlf": 19,
+    "normalizedEqualsHEAD": false,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma.config.ts",
+    "crlf": 13,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma/local-database.mjs",
+    "crlf": 33,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma/migrate-local.mjs",
+    "crlf": 31,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma/migrate-test.mjs",
+    "crlf": 36,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma/seed-data.d.mts",
+    "crlf": 3,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma/seed-data.mjs",
+    "crlf": 206,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "prisma/seed.mjs",
+    "crlf": 33,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "src/lib/auth/schema-options.ts",
+    "crlf": 12,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "src/lib/db/index.ts",
+    "crlf": 20,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "tests/integration/database.test.ts",
+    "crlf": 25,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "tests/integration/sch01.test.ts",
+    "crlf": 151,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "tests/support/test-database-url.ts",
+    "crlf": 60,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "tests/unit/local-database.test.ts",
+    "crlf": 76,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "tests/unit/sch01-schema.test.ts",
+    "crlf": 97,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "tests/unit/test-database-url.test.ts",
+    "crlf": 51,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  },
+  {
+    "path": "vitest.integration.config.mts",
+    "crlf": 10,
+    "normalizedEqualsHEAD": true,
+    "encoding": "UTF-8, original BOM preserved"
+  }
+]

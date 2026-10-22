@@ -1,0 +1,1163 @@
+[
+  {
+    "path": "/login",
+    "width": 375,
+    "h1": "Masuk Sistem",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Masuk Sistem · LMS"
+  },
+  {
+    "path": "/group-user",
+    "width": 375,
+    "h1": "Grup User",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Grup User · LMS"
+  },
+  {
+    "path": "/user-management",
+    "width": 375,
+    "h1": "Manajemen User",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Manajemen User · LMS"
+  },
+  {
+    "path": "/hak-akses-menu",
+    "width": 375,
+    "h1": "Hak Akses Menu",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Hak Akses Menu · LMS"
+  },
+  {
+    "path": "/profile",
+    "width": 375,
+    "h1": "Profil Saya",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Profil Saya · LMS"
+  },
+  {
+    "path": "/office",
+    "width": 375,
+    "h1": "Kantor",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kantor · LMS"
+  },
+  {
+    "path": "/logistics/areas",
+    "width": 375,
+    "h1": "Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Logistik · LMS"
+  },
+  {
+    "path": "/logistics/division",
+    "width": 375,
+    "h1": "Divisi Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Divisi Logistik · LMS"
+  },
+  {
+    "path": "/logistics/services",
+    "width": 375,
+    "h1": "Layanan Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Layanan Logistik · LMS"
+  },
+  {
+    "path": "/logistics/vehicles",
+    "width": 375,
+    "h1": "Kendaraan Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kendaraan Logistik · LMS"
+  },
+  {
+    "path": "/vendor",
+    "width": 375,
+    "h1": "Data Vendor",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Data Vendor · LMS"
+  },
+  {
+    "path": "/shipment-status",
+    "width": 375,
+    "h1": "Shipment Status",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Shipment Status · LMS"
+  },
+  {
+    "path": "/master-data/logistics",
+    "width": 375,
+    "h1": "Daftar Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Daftar Logistik · LMS"
+  },
+  {
+    "path": "/master-data/categories",
+    "width": 375,
+    "h1": "Kategori",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Kategori · LMS"
+  },
+  {
+    "path": "/master-data/units",
+    "width": 375,
+    "h1": "Satuan",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Satuan · LMS"
+  },
+  {
+    "path": "/marketing",
+    "width": 375,
+    "h1": "Pemasaran/Penjualan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Pemasaran/Penjualan · LMS"
+  },
+  {
+    "path": "/transactions",
+    "width": 375,
+    "h1": "On Site Outbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "On Site Outbound · LMS"
+  },
+  {
+    "path": "/bookings",
+    "width": 375,
+    "h1": "Kelola Booking",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kelola Booking · LMS"
+  },
+  {
+    "path": "/manifest",
+    "width": 375,
+    "h1": "Daftar Manifest",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Daftar Manifest · LMS"
+  },
+  {
+    "path": "/operations",
+    "width": 375,
+    "h1": "Operasional",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Operasional · LMS"
+  },
+  {
+    "path": "/customer-service",
+    "width": 375,
+    "h1": "Layanan Pelanggan",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Layanan Pelanggan · LMS"
+  },
+  {
+    "path": "/branch-reports",
+    "width": 375,
+    "h1": "Laporan Cabang",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Laporan Cabang · LMS"
+  },
+  {
+    "path": "/branch-reports/transaction-details",
+    "width": 375,
+    "h1": "Detail Transaksi",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Detail Transaksi · LMS"
+  },
+  {
+    "path": "/branch-reports/manifest-outbound",
+    "width": 375,
+    "h1": "Manifest Outbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Manifest Outbound · LMS"
+  },
+  {
+    "path": "/branch-reports/delivery",
+    "width": 375,
+    "h1": "Pengantaran",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Pengantaran · LMS"
+  },
+  {
+    "path": "/branch-reports/gross-profit",
+    "width": 375,
+    "h1": "Gross Profit",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Gross Profit · LMS"
+  },
+  {
+    "path": "/branch-reports/rekap-gross-profit",
+    "width": 375,
+    "h1": "Rekap Gross Profit",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Gross Profit · LMS"
+  },
+  {
+    "path": "/branch-reports/manifest-vendor",
+    "width": 375,
+    "h1": "Penjual Manifes",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Penjual Manifes · LMS"
+  },
+  {
+    "path": "/branch-reports/awb",
+    "width": 375,
+    "h1": "AWB",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "AWB · LMS"
+  },
+  {
+    "path": "/branch-reports/customer-monthly-summary",
+    "width": 375,
+    "h1": "Rekap Customer Bulanan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Customer Bulanan · LMS"
+  },
+  {
+    "path": "/branch-reports/daily-turnover-summary",
+    "width": 375,
+    "h1": "Rekap Omset Harian",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Omset Harian · LMS"
+  },
+  {
+    "path": "/branch-reports/inbound-transaction-details",
+    "width": 375,
+    "h1": "Detail Transaksi Inbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Detail Transaksi Inbound · LMS"
+  },
+  {
+    "path": "/courier-reports",
+    "width": 375,
+    "h1": "Laporan Kurir",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Laporan Kurir · LMS"
+  },
+  {
+    "path": "/financial-reports",
+    "width": 375,
+    "h1": "Laporan Keuangan",
+    "overflow": false,
+    "preview": true,
+    "tables": 2,
+    "title": "Laporan Keuangan · LMS"
+  },
+  {
+    "path": "/customer-reports",
+    "width": 375,
+    "h1": "Customer Reports",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Customer Reports · LMS"
+  },
+  {
+    "path": "/perkiraan",
+    "width": 375,
+    "h1": "Perkiraan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Perkiraan · LMS"
+  },
+  {
+    "path": "/akunting",
+    "width": 375,
+    "h1": "Akunting",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Akunting · LMS"
+  },
+  {
+    "path": "/akunting/ledger",
+    "width": 375,
+    "h1": "Ledger",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Ledger · LMS"
+  },
+  {
+    "path": "/akunting/kategori-akun",
+    "width": 375,
+    "h1": "Kategori Akun",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kategori Akun · LMS"
+  },
+  {
+    "path": "/akunting/rugi-laba",
+    "width": 375,
+    "h1": "Rugi Laba",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rugi Laba · LMS"
+  },
+  {
+    "path": "/akunting/kategori-cashflow",
+    "width": 375,
+    "h1": "Kategori Cashflow",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kategori Cashflow · LMS"
+  },
+  {
+    "path": "/ticketting",
+    "width": 375,
+    "h1": "Ticketing",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Ticketing · LMS"
+  },
+  {
+    "path": "/",
+    "width": 375,
+    "h1": "Dashboard",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Dashboard · LMS"
+  },
+  {
+    "path": "/login",
+    "width": 1440,
+    "h1": "Masuk Sistem",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Masuk Sistem · LMS"
+  },
+  {
+    "path": "/group-user",
+    "width": 1440,
+    "h1": "Grup User",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Grup User · LMS"
+  },
+  {
+    "path": "/user-management",
+    "width": 1440,
+    "h1": "Manajemen User",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Manajemen User · LMS"
+  },
+  {
+    "path": "/hak-akses-menu",
+    "width": 1440,
+    "h1": "Hak Akses Menu",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Hak Akses Menu · LMS"
+  },
+  {
+    "path": "/profile",
+    "width": 1440,
+    "h1": "Profil Saya",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Profil Saya · LMS"
+  },
+  {
+    "path": "/office",
+    "width": 1440,
+    "h1": "Kantor",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kantor · LMS"
+  },
+  {
+    "path": "/logistics/areas",
+    "width": 1440,
+    "h1": "Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Logistik · LMS"
+  },
+  {
+    "path": "/logistics/division",
+    "width": 1440,
+    "h1": "Divisi Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Divisi Logistik · LMS"
+  },
+  {
+    "path": "/logistics/services",
+    "width": 1440,
+    "h1": "Layanan Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Layanan Logistik · LMS"
+  },
+  {
+    "path": "/logistics/vehicles",
+    "width": 1440,
+    "h1": "Kendaraan Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kendaraan Logistik · LMS"
+  },
+  {
+    "path": "/vendor",
+    "width": 1440,
+    "h1": "Data Vendor",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Data Vendor · LMS"
+  },
+  {
+    "path": "/shipment-status",
+    "width": 1440,
+    "h1": "Shipment Status",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Shipment Status · LMS"
+  },
+  {
+    "path": "/master-data/logistics",
+    "width": 1440,
+    "h1": "Daftar Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Daftar Logistik · LMS"
+  },
+  {
+    "path": "/master-data/categories",
+    "width": 1440,
+    "h1": "Kategori",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Kategori · LMS"
+  },
+  {
+    "path": "/master-data/units",
+    "width": 1440,
+    "h1": "Satuan",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Satuan · LMS"
+  },
+  {
+    "path": "/marketing",
+    "width": 1440,
+    "h1": "Pemasaran/Penjualan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Pemasaran/Penjualan · LMS"
+  },
+  {
+    "path": "/transactions",
+    "width": 1440,
+    "h1": "On Site Outbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "On Site Outbound · LMS"
+  },
+  {
+    "path": "/bookings",
+    "width": 1440,
+    "h1": "Kelola Booking",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kelola Booking · LMS"
+  },
+  {
+    "path": "/manifest",
+    "width": 1440,
+    "h1": "Daftar Manifest",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Daftar Manifest · LMS"
+  },
+  {
+    "path": "/operations",
+    "width": 1440,
+    "h1": "Operasional",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Operasional · LMS"
+  },
+  {
+    "path": "/customer-service",
+    "width": 1440,
+    "h1": "Layanan Pelanggan",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Layanan Pelanggan · LMS"
+  },
+  {
+    "path": "/branch-reports",
+    "width": 1440,
+    "h1": "Laporan Cabang",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Laporan Cabang · LMS"
+  },
+  {
+    "path": "/branch-reports/transaction-details",
+    "width": 1440,
+    "h1": "Detail Transaksi",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Detail Transaksi · LMS"
+  },
+  {
+    "path": "/branch-reports/manifest-outbound",
+    "width": 1440,
+    "h1": "Manifest Outbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Manifest Outbound · LMS"
+  },
+  {
+    "path": "/branch-reports/delivery",
+    "width": 1440,
+    "h1": "Pengantaran",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Pengantaran · LMS"
+  },
+  {
+    "path": "/branch-reports/gross-profit",
+    "width": 1440,
+    "h1": "Gross Profit",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Gross Profit · LMS"
+  },
+  {
+    "path": "/branch-reports/rekap-gross-profit",
+    "width": 1440,
+    "h1": "Rekap Gross Profit",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Gross Profit · LMS"
+  },
+  {
+    "path": "/branch-reports/manifest-vendor",
+    "width": 1440,
+    "h1": "Penjual Manifes",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Penjual Manifes · LMS"
+  },
+  {
+    "path": "/branch-reports/awb",
+    "width": 1440,
+    "h1": "AWB",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "AWB · LMS"
+  },
+  {
+    "path": "/branch-reports/customer-monthly-summary",
+    "width": 1440,
+    "h1": "Rekap Customer Bulanan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Customer Bulanan · LMS"
+  },
+  {
+    "path": "/branch-reports/daily-turnover-summary",
+    "width": 1440,
+    "h1": "Rekap Omset Harian",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Omset Harian · LMS"
+  },
+  {
+    "path": "/branch-reports/inbound-transaction-details",
+    "width": 1440,
+    "h1": "Detail Transaksi Inbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Detail Transaksi Inbound · LMS"
+  },
+  {
+    "path": "/courier-reports",
+    "width": 1440,
+    "h1": "Laporan Kurir",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Laporan Kurir · LMS"
+  },
+  {
+    "path": "/financial-reports",
+    "width": 1440,
+    "h1": "Laporan Keuangan",
+    "overflow": false,
+    "preview": true,
+    "tables": 2,
+    "title": "Laporan Keuangan · LMS"
+  },
+  {
+    "path": "/customer-reports",
+    "width": 1440,
+    "h1": "Customer Reports",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Customer Reports · LMS"
+  },
+  {
+    "path": "/perkiraan",
+    "width": 1440,
+    "h1": "Perkiraan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Perkiraan · LMS"
+  },
+  {
+    "path": "/akunting",
+    "width": 1440,
+    "h1": "Akunting",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Akunting · LMS"
+  },
+  {
+    "path": "/akunting/ledger",
+    "width": 1440,
+    "h1": "Ledger",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Ledger · LMS"
+  },
+  {
+    "path": "/akunting/kategori-akun",
+    "width": 1440,
+    "h1": "Kategori Akun",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kategori Akun · LMS"
+  },
+  {
+    "path": "/akunting/rugi-laba",
+    "width": 1440,
+    "h1": "Rugi Laba",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rugi Laba · LMS"
+  },
+  {
+    "path": "/akunting/kategori-cashflow",
+    "width": 1440,
+    "h1": "Kategori Cashflow",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kategori Cashflow · LMS"
+  },
+  {
+    "path": "/ticketting",
+    "width": 1440,
+    "h1": "Ticketing",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Ticketing · LMS"
+  },
+  {
+    "path": "/",
+    "width": 1440,
+    "h1": "Dashboard",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Dashboard · LMS"
+  },
+  {
+    "path": "/login",
+    "width": 768,
+    "h1": "Masuk Sistem",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Masuk Sistem · LMS"
+  },
+  {
+    "path": "/group-user",
+    "width": 768,
+    "h1": "Grup User",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Grup User · LMS"
+  },
+  {
+    "path": "/user-management",
+    "width": 768,
+    "h1": "Manajemen User",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Manajemen User · LMS"
+  },
+  {
+    "path": "/hak-akses-menu",
+    "width": 768,
+    "h1": "Hak Akses Menu",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Hak Akses Menu · LMS"
+  },
+  {
+    "path": "/profile",
+    "width": 768,
+    "h1": "Profil Saya",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Profil Saya · LMS"
+  },
+  {
+    "path": "/office",
+    "width": 768,
+    "h1": "Kantor",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kantor · LMS"
+  },
+  {
+    "path": "/logistics/areas",
+    "width": 768,
+    "h1": "Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Logistik · LMS"
+  },
+  {
+    "path": "/logistics/division",
+    "width": 768,
+    "h1": "Divisi Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Divisi Logistik · LMS"
+  },
+  {
+    "path": "/logistics/services",
+    "width": 768,
+    "h1": "Layanan Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Layanan Logistik · LMS"
+  },
+  {
+    "path": "/logistics/vehicles",
+    "width": 768,
+    "h1": "Kendaraan Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kendaraan Logistik · LMS"
+  },
+  {
+    "path": "/vendor",
+    "width": 768,
+    "h1": "Data Vendor",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Data Vendor · LMS"
+  },
+  {
+    "path": "/shipment-status",
+    "width": 768,
+    "h1": "Shipment Status",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Shipment Status · LMS"
+  },
+  {
+    "path": "/master-data/logistics",
+    "width": 768,
+    "h1": "Daftar Logistik",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Daftar Logistik · LMS"
+  },
+  {
+    "path": "/master-data/categories",
+    "width": 768,
+    "h1": "Kategori",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Kategori · LMS"
+  },
+  {
+    "path": "/master-data/units",
+    "width": 768,
+    "h1": "Satuan",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Satuan · LMS"
+  },
+  {
+    "path": "/marketing",
+    "width": 768,
+    "h1": "Pemasaran/Penjualan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Pemasaran/Penjualan · LMS"
+  },
+  {
+    "path": "/transactions",
+    "width": 768,
+    "h1": "On Site Outbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "On Site Outbound · LMS"
+  },
+  {
+    "path": "/bookings",
+    "width": 768,
+    "h1": "Kelola Booking",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kelola Booking · LMS"
+  },
+  {
+    "path": "/manifest",
+    "width": 768,
+    "h1": "Daftar Manifest",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Daftar Manifest · LMS"
+  },
+  {
+    "path": "/operations",
+    "width": 768,
+    "h1": "Operasional",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Operasional · LMS"
+  },
+  {
+    "path": "/customer-service",
+    "width": 768,
+    "h1": "Layanan Pelanggan",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Layanan Pelanggan · LMS"
+  },
+  {
+    "path": "/branch-reports",
+    "width": 768,
+    "h1": "Laporan Cabang",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Laporan Cabang · LMS"
+  },
+  {
+    "path": "/branch-reports/transaction-details",
+    "width": 768,
+    "h1": "Detail Transaksi",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Detail Transaksi · LMS"
+  },
+  {
+    "path": "/branch-reports/manifest-outbound",
+    "width": 768,
+    "h1": "Manifest Outbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Manifest Outbound · LMS"
+  },
+  {
+    "path": "/branch-reports/delivery",
+    "width": 768,
+    "h1": "Pengantaran",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Pengantaran · LMS"
+  },
+  {
+    "path": "/branch-reports/gross-profit",
+    "width": 768,
+    "h1": "Gross Profit",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Gross Profit · LMS"
+  },
+  {
+    "path": "/branch-reports/rekap-gross-profit",
+    "width": 768,
+    "h1": "Rekap Gross Profit",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Gross Profit · LMS"
+  },
+  {
+    "path": "/branch-reports/manifest-vendor",
+    "width": 768,
+    "h1": "Penjual Manifes",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Penjual Manifes · LMS"
+  },
+  {
+    "path": "/branch-reports/awb",
+    "width": 768,
+    "h1": "AWB",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "AWB · LMS"
+  },
+  {
+    "path": "/branch-reports/customer-monthly-summary",
+    "width": 768,
+    "h1": "Rekap Customer Bulanan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Customer Bulanan · LMS"
+  },
+  {
+    "path": "/branch-reports/daily-turnover-summary",
+    "width": 768,
+    "h1": "Rekap Omset Harian",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rekap Omset Harian · LMS"
+  },
+  {
+    "path": "/branch-reports/inbound-transaction-details",
+    "width": 768,
+    "h1": "Detail Transaksi Inbound",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Detail Transaksi Inbound · LMS"
+  },
+  {
+    "path": "/courier-reports",
+    "width": 768,
+    "h1": "Laporan Kurir",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Laporan Kurir · LMS"
+  },
+  {
+    "path": "/financial-reports",
+    "width": 768,
+    "h1": "Laporan Keuangan",
+    "overflow": false,
+    "preview": true,
+    "tables": 2,
+    "title": "Laporan Keuangan · LMS"
+  },
+  {
+    "path": "/customer-reports",
+    "width": 768,
+    "h1": "Customer Reports",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Customer Reports · LMS"
+  },
+  {
+    "path": "/perkiraan",
+    "width": 768,
+    "h1": "Perkiraan",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Perkiraan · LMS"
+  },
+  {
+    "path": "/akunting",
+    "width": 768,
+    "h1": "Akunting",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Akunting · LMS"
+  },
+  {
+    "path": "/akunting/ledger",
+    "width": 768,
+    "h1": "Ledger",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Ledger · LMS"
+  },
+  {
+    "path": "/akunting/kategori-akun",
+    "width": 768,
+    "h1": "Kategori Akun",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kategori Akun · LMS"
+  },
+  {
+    "path": "/akunting/rugi-laba",
+    "width": 768,
+    "h1": "Rugi Laba",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Rugi Laba · LMS"
+  },
+  {
+    "path": "/akunting/kategori-cashflow",
+    "width": 768,
+    "h1": "Kategori Cashflow",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Kategori Cashflow · LMS"
+  },
+  {
+    "path": "/ticketting",
+    "width": 768,
+    "h1": "Ticketing",
+    "overflow": false,
+    "preview": true,
+    "tables": 1,
+    "title": "Ticketing · LMS"
+  },
+  {
+    "path": "/",
+    "width": 768,
+    "h1": "Dashboard",
+    "overflow": false,
+    "preview": true,
+    "tables": 0,
+    "title": "Dashboard · LMS"
+  }
+]

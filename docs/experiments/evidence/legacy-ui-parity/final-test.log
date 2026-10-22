@@ -1,0 +1,33 @@
+
+> logistik-web@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.12 C:/Development/logistik-web
+
+ ❯ |unit| tests/unit/sch01-schema.test.ts (4 tests | 1 failed) 636ms
+     × preserves every baseline scalar field and all applied migration bytes 96ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/sch01-schema.test.ts > SCH-01 preservation and adapter contract > preserves every baseline scalar field and all applied migration bytes
+AssertionError: expected '41b7f0d8d7eda3565d48e4390112a7de2de15…' to be '1c2efd45156a3002cdb61ea3637dfc70a4379…' // Object.is equality
+
+Expected: "1c2efd45156a3002cdb61ea3637dfc70a4379cb51f654067a17e1425b2dc340f"
+Received: "41b7f0d8d7eda3565d48e4390112a7de2de15396ef642a6aa514fb25b43c194e"
+
+ ❯ tests/unit/sch01-schema.test.ts:37:9
+     35|           .update(readFileSync(`prisma/migrations/${name}/migration.sq…
+     36|           .digest("hex"),
+     37|       ).toBe(checksum);
+       |         ^
+     38|     }
+     39|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  1 failed | 149 passed (150)
+   Start at  12:13:50
+   Duration  20.43s (transform 3.48s, setup 0ms, import 15.26s, tests 23.88s, environment 8.07s)

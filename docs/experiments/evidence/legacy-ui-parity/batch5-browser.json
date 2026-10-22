@@ -1,0 +1,44 @@
+[
+  {
+    "path": "/perkiraan",
+    "width": 375,
+    "columns": 8,
+    "heading": "Perkiraan",
+    "overflow": false
+  },
+  {
+    "path": "/akunting",
+    "width": 375,
+    "columns": 4,
+    "heading": "Akunting",
+    "overflow": false
+  },
+  {
+    "path": "/ticketting",
+    "width": 375,
+    "columns": 8,
+    "heading": "Ticketing",
+    "overflow": false
+  },
+  {
+    "path": "/perkiraan",
+    "width": 1440,
+    "columns": 8,
+    "heading": "Perkiraan",
+    "overflow": false
+  },
+  {
+    "path": "/akunting",
+    "width": 1440,
+    "columns": 4,
+    "heading": "Akunting",
+    "overflow": false
+  },
+  {
+    "path": "/ticketting",
+    "width": 1440,
+    "columns": 8,
+    "heading": "Ticketing",
+    "overflow": false
+  }
+]

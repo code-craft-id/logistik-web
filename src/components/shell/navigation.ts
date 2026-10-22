@@ -1,3 +1,6 @@
+import { implementedPreviewRoutes } from "./implemented-preview-routes";
+import { legacyMenu } from "./legacy-menu";
+
 export type NavigationLeaf = {
   label: string;
   providerLabel: string;
@@ -10,6 +13,7 @@ export type NavigationSection = {
 };
 export type NavigationGroup = NavigationLeaf & {
   sections?: readonly NavigationSection[];
+  entries?: readonly (NavigationLeaf | NavigationSection)[];
 };
 
 // Provisional English presentation; D-19 remains unresolved. No permissions implied.
@@ -18,7 +22,7 @@ const leaves = (
 ): NavigationLeaf[] =>
   pairs.map(([label, providerLabel]) => ({ label, providerLabel }));
 
-export const navigation: readonly NavigationGroup[] = [
+export const providerNavigation: readonly NavigationGroup[] = [
   { label: "Dashboard", providerLabel: "Dashboard", href: "/" },
   { label: "System Settings", providerLabel: "Sistem Seting" },
   { label: "Office", providerLabel: "Kantor" },
@@ -223,7 +227,128 @@ export const navigation: readonly NavigationGroup[] = [
   },
 ];
 
-export const foundationRoutes = navigation.filter((item) => item.href);
+type LegacyItem = {
+  label: string;
+  href?: string;
+  children?: readonly LegacyItem[];
+};
+const implemented = new Set<string>(
+  implementedPreviewRoutes.map((item) => item.href),
+);
+const leaf = (item: LegacyItem): NavigationLeaf => ({
+  label: item.label,
+  providerLabel: item.label,
+  ...(item.href && implemented.has(item.href) ? { href: item.href } : {}),
+});
+export const navigation: readonly NavigationGroup[] = [
+  ...legacyMenu.map(
+    (item: LegacyItem): NavigationGroup => ({
+      ...leaf(item),
+      ...(item.children
+        ? {
+            entries: item.children.map((child) =>
+              child.children
+                ? {
+                    label: child.label,
+                    providerPath: [child.label],
+                    items: child.children.map(leaf),
+                  }
+                : leaf(child),
+            ),
+          }
+        : {}),
+    }),
+  ),
+  {
+    label: "More previews",
+    providerLabel: "More previews",
+    entries: implementedPreviewRoutes
+      .filter(
+        (item) =>
+          !legacyMenu.some(
+            (group: LegacyItem) =>
+              group.href === item.href ||
+              group.children?.some(
+                (child) =>
+                  child.href === item.href ||
+                  child.children?.some(
+                    (grandchild) => grandchild.href === item.href,
+                  ),
+              ),
+          ),
+      )
+      .map((item) => ({
+        label: item.label,
+        providerLabel: item.label,
+        href: item.href,
+      })),
+  },
+  {
+    label: "Provider inventory",
+    providerLabel: "Provider inventory",
+    sections: providerNavigation.flatMap(
+      (group) =>
+        group.sections?.map((section) => ({
+          ...section,
+          label: `${group.label} / ${section.label}`,
+          providerPath: [group.providerLabel, ...section.providerPath],
+        })) ?? [],
+    ),
+  },
+  { label: "System Tutorial", providerLabel: "Tutorial System" },
+  {
+    label: "UI examples",
+    providerLabel: "Local foundation example",
+    href: "/ui-examples",
+  },
+];
+
+// Both surfaces derive their partition from the verified inventory, never a
+// second handwritten menu. Supplemental material keeps its own identity.
+export const primaryNavigation = navigation.slice(0, legacyMenu.length);
+export const supplementaryNavigation = navigation.slice(legacyMenu.length);
+
+export function navigationEntries(group: NavigationGroup) {
+  return group.entries ?? group.sections ?? [];
+}
+export function isNavigationSection(
+  entry: NavigationLeaf | NavigationSection,
+): entry is NavigationSection {
+  return "items" in entry;
+}
+export function navigationDestinations(
+  groups: readonly NavigationGroup[] = navigation,
+) {
+  return groups.flatMap((group) => [
+    ...(group.href || !navigationEntries(group).length
+      ? [
+          {
+            item: group as NavigationLeaf,
+            path: group.providerLabel,
+            searchLabels: [group.label],
+          },
+        ]
+      : []),
+    ...navigationEntries(group).flatMap((entry) =>
+      isNavigationSection(entry)
+        ? entry.items.map((item) => ({
+            item,
+            path: [group.providerLabel, ...entry.providerPath].join(" / "),
+            searchLabels: [group.label, entry.label],
+          }))
+        : [
+            {
+              item: entry,
+              path: group.providerLabel,
+              searchLabels: [group.label],
+            },
+          ],
+    ),
+  ]);
+}
+export const foundationRoutes = navigationDestinations()
+  .filter(({ item }) => item.href)
+  .map(({ item }) => item);
 export function activeFoundationRoute(pathname: string) {
   return foundationRoutes.find((route) => route.href === pathname);
 }
@@ -234,7 +359,13 @@ export function navigationPath(
 ) {
   for (const group of groups) {
     if (group.href === pathname) return { group, labels: [group.label] };
-    for (const section of group.sections ?? []) {
+    for (const entry of navigationEntries(group)) {
+      if (!isNavigationSection(entry)) {
+        if (entry.href === pathname)
+          return { group, labels: [group.providerLabel, entry.providerLabel] };
+        continue;
+      }
+      const section = entry;
       const leaf = section.items.find((item) => item.href === pathname);
       if (leaf)
         return {
