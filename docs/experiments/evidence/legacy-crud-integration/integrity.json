@@ -1,0 +1,92 @@
+{
+  "legacy": {
+    "files": 133,
+    "changed": []
+  },
+  "migrations": [
+    {
+      "name": "20261018000100_sch01_organization",
+      "committed": "1c2efd45156a3002cdb61ea3637dfc70a4379cb51f654067a17e1425b2dc340f",
+      "working": "41b7f0d8d7eda3565d48e4390112a7de2de15396ef642a6aa514fb25b43c194e",
+      "baseline": "1c2efd45156a3002cdb61ea3637dfc70a4379cb51f654067a17e1425b2dc340f",
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261018000200_sch01_identity",
+      "committed": "8c84c1d920c62f0015668f15f150ad88b2466e6b8dec014ef6a3ddc1bf6f981a",
+      "working": "17074ec2f60f987151b194ab32e908f304f3c650716f440247513f5cbb0df0b4",
+      "baseline": "8c84c1d920c62f0015668f15f150ad88b2466e6b8dec014ef6a3ddc1bf6f981a",
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261018000300_sch01_master_data",
+      "committed": "cc080f4bab513c51123c8e2f2a3ea86042e4b084138a8c3e415fd8cd68c882fe",
+      "working": "980903c73a7b7198a56a578c7a67479d3cc67d5c174437237b7f17a12d68d507",
+      "baseline": "cc080f4bab513c51123c8e2f2a3ea86042e4b084138a8c3e415fd8cd68c882fe",
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261018000400_sch01_sales",
+      "committed": "9e53bdff598db33464d5dc529a2d00a68a2cefddf642aa857b1235c057d099f9",
+      "working": "16328a5bb6da05586297064a92484ea62829de39a7084fbf3bc1d08c7815fc79",
+      "baseline": "9e53bdff598db33464d5dc529a2d00a68a2cefddf642aa857b1235c057d099f9",
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261018000500_sch01_accounting",
+      "committed": "c20c149196fd1fc8eed71946305a6928663b5981d3fc31fba9985c0ccaeb9787",
+      "working": "2850ee7d3882330d77010f23c25cde394bf9b2d970685995843769372ee8cca7",
+      "baseline": "c20c149196fd1fc8eed71946305a6928663b5981d3fc31fba9985c0ccaeb9787",
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261018000600_sch01_integration",
+      "committed": "4476c20bc4b5eb6bfb817d4f9c5889f3f864df0ff1e2c699bd57d4f2cee6dfe4",
+      "working": "792bab3caa0d0638daab5797043da0ebedf704ffa99267253bba5e1c4dfb172b",
+      "baseline": "4476c20bc4b5eb6bfb817d4f9c5889f3f864df0ff1e2c699bd57d4f2cee6dfe4",
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261019000100_sch01_int_keys",
+      "committed": "f3662396705c58a4d26a2b80c36c981e12af20a64c07ecd26ba4015f2d47ab64",
+      "working": "55f1c0c28d67dd9755c83112f103709f2a41237ec2f249ca56b8e2940204ddb6",
+      "baseline": null,
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261019000200_sch01_lifecycle",
+      "committed": "05d3327f770c29f9008d484b215464ff79e9f4e1c08835bc18ba414a5814502d",
+      "working": "ce6b8a6fc42259d5b3bdfe8390b8e5b33826b9aa3381dee04c1dc7631d8d912b",
+      "baseline": null,
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261019000300_sch01_better_auth",
+      "committed": "746227648ea9520ed99733adc66b2b8ad85a0ca01ed643123a6a9f8598355ada",
+      "working": "ed8c44357141269e479efb41607941051bd11ac0e95e34717381b077e0cac817",
+      "baseline": null,
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261019000400_sch01_sales",
+      "committed": "ed95dc87ceb62e5250b0c0df02f2b35ace623bb0004cb13c09b7b5b326acb2ef",
+      "working": "9b91dc87afafdf41c65ec0aefd4d46c91dca45fed0183b94486beec7718fc196",
+      "baseline": null,
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261019000500_sch01_accounting",
+      "committed": "7c9d28c2f8e8f96db7a89ea36c13da05e7424e5cc675e2c0224c5efb61245371",
+      "working": "7b64310a542669dc08844d6e8031e72f92f3165df107c8d7aa9a3013bbe03405",
+      "baseline": null,
+      "equalAfterCRLFNormalization": true
+    },
+    {
+      "name": "20261019000600_sch01_integration",
+      "committed": "cc95fc7ab32472a40faa5e199f4e5ffc23dd4db98f79d2f6f21e1a82a4340a57",
+      "working": "607cf27a99dea798e09aad7cf081ca940b42088f8233501166c1ecacce53eb80",
+      "baseline": null,
+      "equalAfterCRLFNormalization": true
+    }
+  ]
+}

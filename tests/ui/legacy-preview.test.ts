@@ -34,6 +34,36 @@ const button = (label: string) => {
 };
 
 describe("isolated legacy presentation interactions", () => {
+  it("keeps permission filtering usable without a manual refresh control", async () => {
+    await act(async () => root.render(createElement(MenuAccessPreview)));
+    expect(
+      [...host.querySelectorAll("button")].map(
+        (control) => control.textContent,
+      ),
+    ).toEqual(["Show Menu", "Simpan — unavailable"]);
+    await act(async () =>
+      host
+        .querySelector("form")
+        ?.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        ),
+    );
+    const permission = host.querySelector<HTMLInputElement>(
+      'input[type="checkbox"]',
+    );
+    if (!permission) throw Error("Missing preview permission");
+    await act(async () => permission.click());
+    const type = host.querySelectorAll<HTMLSelectElement>("select")[1];
+    await act(async () => {
+      type.value = "selected";
+      type.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(host.querySelectorAll("tbody tr")).toHaveLength(1);
+    expect(host.querySelector("output")?.textContent).toContain(
+      "1 preview checkboxes",
+    );
+    expect(button("Simpan — unavailable").disabled).toBe(true);
+  });
   it("exposes loading, empty and recoverable error previews without requests", async () => {
     await act(async () =>
       root.render(
@@ -275,7 +305,7 @@ describe("isolated legacy presentation interactions", () => {
     expect(host.textContent).toContain("No changes saved");
   });
 
-  it("changes only the fictional rights matrix and clears it without granting permissions", async () => {
+  it("changes only the fictional rights matrix and clears checks when applying another group", async () => {
     await act(async () => root.render(createElement(MenuAccessPreview)));
     expect(host.querySelectorAll('input[type="checkbox"]')).toHaveLength(0);
     await act(async () =>
@@ -298,7 +328,24 @@ describe("isolated legacy presentation interactions", () => {
       "no access granted",
     );
     expect(button("Simpan — unavailable").disabled).toBe(true);
-    await act(async () => button("Refresh").click());
-    expect(host.querySelectorAll('input[type="checkbox"]')).toHaveLength(0);
+    const group = host.querySelector<HTMLSelectElement>("select");
+    if (!group) throw Error("Missing preview group");
+    await act(async () => {
+      group.value = "Viewer";
+      group.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await act(async () =>
+      host
+        .querySelector("form")
+        ?.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        ),
+    );
+    expect(
+      host.querySelectorAll('input[type="checkbox"]:checked'),
+    ).toHaveLength(0);
+    expect(host.querySelector("tbody")?.textContent).toContain(
+      "Viewer · fixture",
+    );
   });
 });

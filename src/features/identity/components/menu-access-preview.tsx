@@ -94,19 +94,6 @@ export function MenuAccessPreview() {
         <Button type="submit" className="min-h-11">
           Show Menu
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="min-h-11"
-          onClick={() => {
-            setLoaded(null);
-            setChecks({});
-            setSelectedOnly(false);
-            setGroup("Administrator");
-          }}
-        >
-          Refresh
-        </Button>
         <Button disabled className="min-h-11">
           Simpan — unavailable
         </Button>

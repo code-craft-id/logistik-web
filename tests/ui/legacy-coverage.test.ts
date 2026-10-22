@@ -76,6 +76,12 @@ describe("complete legacy workspace presentation coverage", () => {
       "Synthetic presentation fixtures only",
     );
     expect(host.textContent).toContain("24 preview rows");
+    for (const control of host.querySelectorAll("button, [role='button']")) {
+      const label = control.getAttribute("aria-label") ?? control.textContent;
+      expect(label, `${screen.path} / ${view.label}`).not.toMatch(
+        /\b(refresh|reload(?: data)?|sync(?:hronize)?|muat ulang|segarkan)\b/i,
+      );
+    }
     if (view.fields.length) {
       await act(async () => root.render(createElement(PreviewForm, { view })));
       const ids = [...host.querySelectorAll("input, select, textarea")].map(

@@ -83,6 +83,10 @@ One owner per ticket. Every ticket specifies FE, server, schema impact, authoriz
 
 ## 5. Working agreements specific to this roadmap
 
+### Legacy operational integration audit (2026-10-22)
+
+The [implementation matrix](experiments/legacy-crud-integration.md) accounts for all 43 migrated routes, 72 leaf views and embedded form/message panels. All operational integrations remain BLOCKED: PLT-01 has not started, and D-03/D-04 still lack the reviewed organization/permission contract required by its gate. No operational ticket is marked DONE by this audit. The independent UI cleanup removes the manual Refresh control; schema/seed approval remains limited to SCH-01. Next work is DISC-02 evidence and review, then PLT-01, followed by one approved reference-data slice in dependency order.
+
 - Owners are accountable for sign-off. Any dev or coding agent can draft a DISC ticket or a schema port, but the domain owner reviews it before an item moves from `OBSERVED` to `CONFIRMED`.
 - Port, do not copy: prototype models follow the port rules in `docs/PRD.md` section 10.
 - Demo a realistic user journey at each phase exit, not only isolated CRUD screens.
