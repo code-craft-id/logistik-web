@@ -510,7 +510,13 @@ export function ReferenceWorkspace({
               Perubahan akan disimpan ke data {config.label.toLowerCase()}.
             </DialogDescription>
           </DialogHeader>
-          <form action={save} className="space-y-5">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!busy) void save(new FormData(event.currentTarget));
+            }}
+            className="space-y-5"
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               {config.fields
                 .filter((field) => fixedValues?.[field.key] === undefined)

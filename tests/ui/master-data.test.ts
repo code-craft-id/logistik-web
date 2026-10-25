@@ -92,6 +92,64 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 describe("Dev 1 reference workspace", () => {
+  it.each([
+    ["create", "rejection"],
+    ["create", "network"],
+    ["edit", "rejection"],
+    ["edit", "network"],
+  ])("preserves %s input after a %s failure and allows retry", async (mode, failure) => {
+    if (failure === "network")
+      actions.saveMasterData.mockRejectedValueOnce(new Error("Network failed"));
+    else
+      actions.saveMasterData.mockResolvedValueOnce({
+        ok: false,
+        message: "FAKE validation error",
+      });
+    await render();
+    await act(async () =>
+      button(mode === "edit" ? "Edit" : "Tambah Driver").click(),
+    );
+    const form = document.querySelector<HTMLFormElement>(
+      '[role="dialog"] form',
+    );
+    if (!form) throw new Error("Missing editor form");
+    const values = {
+      name: "FAKE unsaved name",
+      address: "FAKE unsaved address",
+      nationalIdNumber: "FAKE unsaved ID",
+    };
+    for (const [key, value] of Object.entries(values)) {
+      const field = form.querySelector<HTMLInputElement>(`[name="${key}"]`);
+      if (!field) throw new Error(`Missing field ${key}`);
+      field.value = value;
+    }
+    await act(async () => {
+      form.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      );
+    });
+    expect(form.querySelector('[role="alert"]')?.textContent).toContain(
+      failure === "network" ? "Data gagal disimpan" : "FAKE validation error",
+    );
+    for (const [key, value] of Object.entries(values))
+      expect(
+        form.querySelector<HTMLInputElement>(`[name="${key}"]`)?.value,
+      ).toBe(value);
+    expect(button("Simpan").disabled).toBe(false);
+    await act(async () => {
+      form.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      );
+    });
+    expect(actions.saveMasterData).toHaveBeenLastCalledWith(
+      "driver",
+      mode === "edit" ? row.id : null,
+      expect.objectContaining(values),
+      mode === "edit" ? date : undefined,
+    );
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(host.textContent).toContain("Data tersimpan.");
+  });
   it("loads scoped data, keeps private identifiers out of the table, and applies search on submit", async () => {
     await render();
     expect(host.textContent).toContain("FAKE Driver");
