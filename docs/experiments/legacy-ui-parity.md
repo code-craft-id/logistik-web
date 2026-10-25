@@ -1,5 +1,10 @@
 # Legacy UI parity — full presentation migration
 
+> Historical presentation record. The 2026-10-23–24
+> [Dev 1 checkpoint](../decisions/PLT-01.md) records partial identity integration,
+> still pending the reviewed D-03/D-04 contract. Current entry routes are public
+> `/` and protected `/dashboard`; original inventory keys below stay unchanged.
+
 ## Status and scope
 
 2026-10-21. Branch: `feat/legacy-ui-parity`. Starting commit:

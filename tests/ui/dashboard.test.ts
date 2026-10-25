@@ -5,7 +5,7 @@ import { AppShell } from "../../src/components/shell/app-shell";
 import { DashboardFilters } from "../../src/features/dashboard/components/dashboard-filters";
 import { DashboardOverview } from "../../src/features/dashboard/components/dashboard-overview";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/dashboard" }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -126,7 +126,9 @@ describe("legacy dashboard supported presentation", () => {
     );
     await act(async () => section?.click());
     expect(section?.getAttribute("aria-expanded")).toBe("true");
-    const dashboard = nav?.querySelector<HTMLAnchorElement>('a[href="/"]');
+    const dashboard = nav?.querySelector<HTMLAnchorElement>(
+      'a[href="/dashboard"]',
+    );
     dashboard?.addEventListener("click", (event) => event.preventDefault());
     await act(async () => dashboard?.click());
     expect(document.querySelector('[role="dialog"]')).toBeNull();

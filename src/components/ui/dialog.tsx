@@ -50,6 +50,7 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onEscapeKeyDown,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
@@ -64,6 +65,17 @@ function DialogContent({
           className,
         )}
         {...props}
+        onEscapeKeyDown={(event) => {
+          onEscapeKeyDown?.(event);
+          // Let an expanded searchable field handle Escape before dismissing its form.
+          if (
+            event.target instanceof Element &&
+            event.target
+              .closest("fieldset")
+              ?.querySelector('[role="combobox"][aria-expanded="true"]')
+          )
+            event.preventDefault();
+        }}
       >
         {children}
         {showCloseButton && (

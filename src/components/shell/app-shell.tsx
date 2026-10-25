@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,14 +27,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { DASHBOARD_PATH } from "@/lib/routes";
 import { Navigation } from "./compact-navigation";
 import {
   isNavigationSection,
   type NavigationGroup,
   type NavigationLeaf,
+  navigation,
   navigationEntries,
   navigationPath,
-  primaryNavigation,
   supplementaryNavigation,
 } from "./navigation";
 
@@ -44,12 +44,18 @@ export { Navigation } from "./compact-navigation";
 function DesktopNavigation({
   value,
   onValueChange,
+  groups,
 }: {
+  groups: readonly NavigationGroup[];
   value: string;
   onValueChange: (value: string) => void;
 }) {
   const pathname = usePathname();
-  const current = navigationPath(pathname);
+  const current = navigationPath(pathname, groups);
+  const additional = groups.filter((group) =>
+    supplementaryNavigation.some((item) => item.label === group.label),
+  );
+  const primary = groups.filter((group) => !additional.includes(group));
   const routeLink = (item: NavigationLeaf) =>
     item.href ? (
       <NavigationMenuLink
@@ -72,7 +78,7 @@ function DesktopNavigation({
   const groupPanel = (group: NavigationGroup) => (
     <NavigationMenuContent aria-label={`${group.providerLabel} destinations`}>
       <p className="mb-3 border-b px-3 pb-3 text-xs text-muted-foreground">
-        Presentation previews · Operational services unavailable
+        Navigate LMS pages
       </p>
       <ul className="grid grid-cols-2 items-start gap-4">
         {navigationEntries(group).map((entry) => (
@@ -103,7 +109,7 @@ function DesktopNavigation({
       onValueChange={onValueChange}
     >
       <NavigationMenuList>
-        {primaryNavigation.map((group) => (
+        {primary.map((group) => (
           <NavigationMenuItem key={group.label} value={group.label}>
             {group.href ? (
               <NavigationMenuLink
@@ -125,28 +131,28 @@ function DesktopNavigation({
             )}
           </NavigationMenuItem>
         ))}
-        <NavigationMenuItem value="supplementary">
-          <NavigationMenuTrigger
-            data-active={
-              current && supplementaryNavigation.includes(current.group)
-            }
-          >
-            More
-          </NavigationMenuTrigger>
-          <NavigationMenuContent aria-label="Supplementary navigation">
-            <h2 className="px-3 pt-1 text-sm font-semibold">
-              Supplementary navigation
-            </h2>
-            <Navigation
-              key={pathname}
-              groups={supplementaryNavigation}
-              finder={false}
-              menuLinks
-              label="Additional navigation"
-              onNavigate={() => onValueChange("")}
-            />
-          </NavigationMenuContent>
-        </NavigationMenuItem>
+        {additional.length > 0 && (
+          <NavigationMenuItem value="supplementary">
+            <NavigationMenuTrigger
+              data-active={current && additional.includes(current.group)}
+            >
+              More
+            </NavigationMenuTrigger>
+            <NavigationMenuContent aria-label="Supplementary navigation">
+              <h2 className="px-3 pt-1 text-sm font-semibold">
+                Supplementary navigation
+              </h2>
+              <Navigation
+                key={pathname}
+                groups={additional}
+                finder={false}
+                menuLinks
+                label="Additional navigation"
+                onNavigate={() => onValueChange("")}
+              />
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        )}
       </NavigationMenuList>
     </NavigationMenu>
   );
@@ -154,7 +160,13 @@ function DesktopNavigation({
 
 // Remount only the interactive header on pathname changes, including history
 // navigation. Pages and the dashboard layout retain their server boundaries.
-function ShellHeader() {
+function ShellHeader({
+  accountContent,
+  groups,
+}: {
+  accountContent?: ReactNode;
+  groups: readonly NavigationGroup[];
+}) {
   const [openMenu, setOpenMenu] = useState("");
   const [drawer, setDrawer] = useState(false);
   const [finder, setFinder] = useState(false);
@@ -191,8 +203,20 @@ function ShellHeader() {
       >
         <Link
           ref={brand}
-          href="/"
-          aria-label="LMS — Dashboard"
+          href={
+            groups[0]?.href ??
+            groups
+              .flatMap((group) =>
+                navigationEntries(group).flatMap((entry) =>
+                  isNavigationSection(entry) ? entry.items : [entry],
+                ),
+              )
+              .find((item) => item.href)?.href ??
+            "/profile"
+          }
+          aria-label={
+            groups === navigation ? "LMS — Dashboard" : "LMS — Beranda"
+          }
           onClick={closeSurface}
           className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md text-primary"
         >
@@ -203,6 +227,7 @@ function ShellHeader() {
         </Link>
         <div ref={desktop} className="hidden min-w-0 xl:block">
           <DesktopNavigation
+            groups={groups}
             value={openMenu}
             onValueChange={(value) => {
               setOpenMenu(value);
@@ -235,12 +260,12 @@ function ShellHeader() {
               <SheetHeader>
                 <SheetTitle>Menu finder</SheetTitle>
                 <SheetDescription>
-                  Search all preview destinations and documented provider paths.
-                  Unavailable items have no links.
+                  Cari halaman yang tersedia sesuai hak akses Anda.
                 </SheetDescription>
               </SheetHeader>
               <Navigation
                 mobile
+                groups={groups}
                 label="Menu finder results"
                 onNavigate={closeSurface}
               />
@@ -258,21 +283,17 @@ function ShellHeader() {
                 variant="outline"
                 size="icon"
                 className="size-11"
-                aria-label="Account unavailable"
+                aria-label="Menu akun"
               >
                 <UserRound aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <p className="px-3 py-2 text-xs text-muted-foreground">
-                Account unavailable · UI preview
-              </p>
-              <DropdownMenuItem asChild>
-                <Link href="/profile" onClick={closeSurface}>
-                  Profil Saya — preview
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled>Keluar — unavailable</DropdownMenuItem>
+              {accountContent ?? (
+                <output className="px-3 py-2 text-sm text-muted-foreground">
+                  Memuat akun...
+                </output>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="xl:hidden">
@@ -300,12 +321,9 @@ function ShellHeader() {
               >
                 <SheetHeader>
                   <SheetTitle>LMS navigation</SheetTitle>
-                  <SheetDescription>
-                    Navigate presentation previews. Operational services are
-                    unavailable.
-                  </SheetDescription>
+                  <SheetDescription>Navigate LMS pages.</SheetDescription>
                 </SheetHeader>
-                <Navigation mobile onNavigate={closeSurface} />
+                <Navigation mobile groups={groups} onNavigate={closeSurface} />
               </SheetContent>
             </Sheet>
           </div>
@@ -315,9 +333,18 @@ function ShellHeader() {
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  accountContent,
+  groups = navigation,
+}: {
+  children?: ReactNode;
+  accountContent?: ReactNode;
+  groups?: readonly NavigationGroup[];
+}) {
   const pathname = usePathname();
-  const breadcrumbs = navigationPath(pathname)?.labels ?? ["Page"];
+  const breadcrumbs = navigationPath(pathname, groups)?.labels ??
+    navigationPath(pathname)?.labels ?? ["Page"];
   return (
     <div className="min-h-dvh min-w-0 bg-workspace">
       <a
@@ -326,13 +353,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <ShellHeader key={pathname} />
+      <ShellHeader
+        key={pathname}
+        accountContent={accountContent}
+        groups={groups}
+      />
       <nav
         aria-label="Breadcrumb"
         className="border-b bg-background px-4 py-2 text-xs sm:px-6 xl:px-8"
       >
         <ol className="flex min-h-5 flex-wrap items-center gap-x-2 gap-y-1 break-words">
-          {pathname === "/" ? (
+          {pathname === DASHBOARD_PATH ? (
             <li>
               <span aria-current="page">Dashboard</span>
             </li>
@@ -340,10 +371,20 @@ export function AppShell({ children }: { children: ReactNode }) {
             <>
               <li>
                 <Link
-                  href="/"
+                  href={
+                    groups[0]?.href ??
+                    groups
+                      .flatMap((group) =>
+                        navigationEntries(group).flatMap((entry) =>
+                          isNavigationSection(entry) ? entry.items : [entry],
+                        ),
+                      )
+                      .find((item) => item.href)?.href ??
+                    "/profile"
+                  }
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Dashboard
+                  {groups === navigation ? "Dashboard" : "Beranda"}
                 </Link>
               </li>
               {breadcrumbs.map((label, index) => (
@@ -374,7 +415,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       <footer className="border-t bg-background px-4 py-5 text-xs text-muted-foreground sm:px-6 lg:px-8">
-        LMS · Presentation preview · No operational records loaded or saved
+        {[
+          "/group-user",
+          "/user-management",
+          "/hak-akses-menu",
+          "/profile",
+          "/office",
+          "/logistics/areas",
+          "/logistics/services",
+          "/logistics/vehicles",
+          "/logistics/division",
+          "/vendor",
+          "/shipment-status",
+        ].some(
+          (route) => pathname === route || pathname.startsWith(`${route}/`),
+        )
+          ? "LMS · Administrasi · Perubahan data dicatat"
+          : "LMS · Presentation preview · No operational records loaded or saved"}
       </footer>
     </div>
   );

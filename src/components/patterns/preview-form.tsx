@@ -16,6 +16,9 @@ export function PreviewForm({
   row?: PreviewRow;
   readOnly?: boolean;
 }) {
+  "use no memo";
+  // This metadata-driven preview times out in automatic React compilation.
+  // Keep its existing form/state behavior without compiler memoization.
   const prefix = useId();
   const groups = view.formGroups?.length
     ? view.formGroups

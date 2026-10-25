@@ -157,6 +157,8 @@ The 2026-10-21 legacy UI inheritance now covers 43 presentation screen routes (3
 
 ## Colors
 
+**2026-10-23–24 identity checkpoint:** the all-preview description above is the historical migration snapshot. Existing PLT-01 login, groups, users, rights and profile/session screens now call identity services, with loading/error/empty states and source-owned Card/Select/Checkbox/Separator primitives. The account menu renders server-selected display fields and supports provider sign-out. `/` is public company-information placeholder content; `/dashboard` retains the existing domain preview. This partial identity implementation has no accepted D-03/D-04 contract and does not activate other domains. Earlier responsive/browser evidence does not verify these newer identity forms. See [PLT-01](docs/decisions/PLT-01.md).
+
 A restrained green accent sits against white and cool slate neutrals. Frontmatter color values are extracted from `src/app/globals.css`; that stylesheet remains the implementation source of truth. Repeated aliases share these values: primary foreground and sidebar use background, while ring and accent foreground use primary. Sidecar tonal ramps are derived swatch previews, not additional runtime tokens.
 
 ### Primary
@@ -248,7 +250,7 @@ The current badge is a status label, not a selectable filter chip. The secondary
 
 ### Cards / Containers
 
-No Card primitive is implemented. The table work region is a large-cornered bordered container. Its muted filter toolbar, readable rows, caption and count footer form one continuous work area. The DashboardPanel composition uses a white surface, single-pixel border, extra-large corners and 20px padding; its heading and optional description precede content with 16px separation. Dashboard metric containers share that surface and padding. Panels group the observed dashboard sections without decorative elevation.
+PLT-01 adds a source-owned Card primitive for login/profile composition; this was absent from the earlier presentation-only snapshot. The table work region is a large-cornered bordered container. Its muted filter toolbar, readable rows, caption and count footer form one continuous work area. The DashboardPanel composition uses a white surface, single-pixel border, extra-large corners and 20px padding; its heading and optional description precede content with 16px separation. Dashboard metric containers share that surface and padding. Panels group the observed dashboard sections without decorative elevation.
 
 ### Inputs / Fields
 
@@ -264,7 +266,7 @@ The single typed `navigation.ts` config remains shared by desktop, drawer, finde
 
 The compact drawer and supplementary inventory retain two bounded disclosure levels with one group and section open at a time. Active ancestors open when mounted. The finder control opens a labeled Radix Sheet, searching every configured label, parent path and actual URL; results retain full parent paths and destination labels. Empty results explain recovery, and Clear menu search restores the tree and focuses the input. Search includes available previews and unlinked unavailable inventory. Sheets preserve focus containment, Escape dismissal, background scroll locking, 44px close targets and trigger focus restoration. Selecting a route closes them, including selecting the current route. Resizing an open drawer into desktop mode closes it and focuses the visible brand link.
 
-The Account unavailable menu links to the profile preview and leaves logout disabled. It provides no fabricated identity, session or authorization. The skip link and focusable main-content target remain. The Server Component dashboard layout and feature pages are unchanged; only shell interactions are Client Components. Existing green/white/slate tokens and Geist remain authoritative; `globals.css` is unchanged.
+At the 2026-10-21 snapshot, Account unavailable linked to the profile preview and left logout disabled. The PLT-01 checkpoint above supersedes that identity behavior, not the historical navbar acceptance. The skip link and focusable main-content target remain. Pages/layouts stay Server Components with interactive boundaries. Existing green/white/slate tokens and Geist remain authoritative; `globals.css` is unchanged.
 
 New local evidence lives in `docs/experiments/evidence/compact-navbar/`. All 43 migrated routes plus UI examples passed desktop smoke checks. Dashboard, a nested inbound report, vendor table/form and UI examples were inspected at 375/768/1440px; breakpoint probes include 1240/1279/1280/1320px. No page overflow was found. A 720x450 CSS viewport at device scale 2 checks the equivalent reflow of a 1440x900 viewport at 200%; native browser zoom, physical touch and screen-reader acceptance remain unverified. Historical sidebar acceptance above remains historical and does not approve this navbar. See the appended refinement record in `docs/experiments/legacy-ui-parity.md` for actual gates and limitations.
 

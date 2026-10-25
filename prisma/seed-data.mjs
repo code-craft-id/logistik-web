@@ -171,6 +171,13 @@ export async function seedFakeRecords(tx) {
       status,
       deletedAt,
     });
+    await ensureFakeRecord(tx.vendorService, {
+      id,
+      name: `FAKE VENDOR SERVICE ${suffix}`,
+      vendorId: id,
+      status,
+      deletedAt,
+    });
     await ensureFakeRecord(tx.customer, {
       id,
       name: `FAKE CUSTOMER ${suffix}${extendedName}`,

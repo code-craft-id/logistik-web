@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { SheetClose } from "@/components/ui/sheet";
+import { DASHBOARD_PATH } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import {
   isNavigationSection,
@@ -86,7 +87,7 @@ export function Navigation({
   );
   const routeLink = (item: NavigationLeaf) => {
     if (!item.href) return null;
-    const Icon = item.href === "/" ? Home : PanelsTopLeft;
+    const Icon = item.href === DASHBOARD_PATH ? Home : PanelsTopLeft;
     const link = (
       <Link
         href={item.href}
@@ -123,7 +124,7 @@ export function Navigation({
               {current?.labels.join(" / ") ?? "Page"}
             </span>
           </p>
-          <p>Presentation previews only. Operational services unavailable.</p>
+          <p>Navigate LMS pages.</p>
         </div>
       )}
       {finder && (
