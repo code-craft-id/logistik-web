@@ -73,6 +73,7 @@ Every step needs explicit decisions on cancellation, returns, retries, partial d
 - Maintain company, office, branch, and agency reference structures. Approved Branch refinement D-33 adds nullable postal code, fax, email, Finance/Marketing contact names and NPWP, without changing parent relationships.
 - Deny both list access and direct record access outside permission and branch scope.
 - Prevent unsafe deletion of entities used by transactions.
+- WhatsApp setup (D-34): integrate with a separate Baileys project using one number/session per branch. Stakeholder delegated the API contract to LMS: scoped status checks and administrator-only QR/connect/logout are implemented. The gateway follows the documented v1 contract. Automatic notification triggers and sending remain separate decisions.
 - Implementation checkpoint, 2026-10-25: runtime PLT-01 identity and PLT-02/03 organization/master CRUD are implemented and locally checked; see [Dev 1 contracts and handoff](decisions/DEV1-2026-10-25.md). This supersedes the older partial-code snapshot. D-03/D-04 contract acceptance, complete provider role parity, independent review and staging remain open; implementation is not formal acceptance.
 
 ### FR-02. Logistics master data
@@ -157,7 +158,7 @@ D-30 records the user's technical SCH-01 approval on 2026-10-18 separately from 
 | D-15 | Reports | Exact columns, formulas, export formats, date/time basis, access scope, and sample outputs per report? | FR-06 | DISC-04 | RPT-01, RPT-02 (per report) | TBD |
 | D-16 | Ticketing | Visibility, assignment, and resolved/reopened rules? | FR-07 | DISC-04 | SUP-01 | TBD |
 | D-17 | Delivery | Launch scope and date? | All | DISC-01 | Phase 1 start | TBD |
-| D-18 | Delivery | Required integrations? | TBD per integration | DISC-01 | Phase 1 start | TBD |
+| D-18 | Delivery | Required integrations? Baileys in a separate stakeholder-supplied project is selected for branch WhatsApp; preparatory setup is approved under D-34. Transport and sending rules, plus other integrations, remain TBD. | TBD per integration | DISC-01, WA-01 | Before each live integration | PARTIAL |
 | D-19 | Delivery | Localization and time zone conventions? | FR-06 | FND-01 | FND-01, RPT-01 | TBD |
 | D-20 | Delivery | Volumes, infrastructure, and data retention? Decision so far: self-hosted deployment. Backup and restore, TLS, and monitoring are the team's responsibility. | NFR | DISC-01, FND-01 | FND-01 (infra), REL-01 (volume) | TBD |
 | D-21 | Delivery | Required approvals and approvers? | FR-03 to FR-05 | DISC-01 | OPS-01, FIN-01 | TBD |
@@ -173,6 +174,7 @@ D-30 records the user's technical SCH-01 approval on 2026-10-18 separately from 
 | D-31 | ETA scope | Stakeholder explicitly deferred ETA until Dev 2 makes the operational requirement clear. Do not invent a model, calculation or form. | Future ETA only | Dev 2 / PLT-03 | Before ETA implementation | CONFIRMED, 2026-10-25 |
 | D-32 | Vendor services | Stakeholder explicitly approved VendorService (name, vendor relation, status, timestamps, soft deletion) and one additive migration. No vendor pricing/financial behavior approved. | PLT-03 vendor service CRUD | Dev 1; peer review before merge | Shared rollout | CONFIRMED technical scope, 2026-10-25 |
 | D-33 | Branch reference fields | Stakeholder explicitly approved six nullable Branch columns and one additive migration: postal code, fax, email, Finance contact name, Marketing contact name and NPWP. Existing rows remain NULL, parent relationships unchanged; no financial behavior. Design and verification in the Dev 1 handoff. | PLT-02 Branch parity | Dev 1; peer review before merge | Shared rollout | CONFIRMED technical scope, 2026-10-25 |
+| D-34 | Branch WhatsApp | Stakeholder confirmed separate Baileys number/session per branch and subsequently delegated route/contract design to LMS. Two server environment settings, bearer-authenticated gateway v1, branch-scoped status, administrator-only QR/connect/logout and audit are implemented; Baileys must follow [the contract](decisions/WA-01-gateway-api.md). Live interoperability, gateway durable session implementation and operational sending rules remain pending. Existing company preferences are not session ownership. | Live interoperability and operational sending | WA-01; gateway owner; Dev 1, operational owners for triggers | Before release or sending | PARTIAL, 2026-10-26 |
 
 ## 8. Release boundaries
 
@@ -245,7 +247,7 @@ If the prototype and the provider app differ, the provider app wins. An `OBSERVE
 | Organization, identity, master data (Dev 1), marketing personnel (Dev 2) | SCH-01 DONE / APPROVED by the project coordinator (2026-10-19); six original plus six forward migrations applied and verified on development/test. Better Auth-compatible active storage replaces prototype identity delegates; ignored legacy tables retained. FND-03 dependency formally cleared without claiming independent domain-owner reviews. Shared deployment and decision-dependent behavior retain their review gates. |
 | Customer, Consignee (Dev 2; tax/accounting reviewed by Dev 3) | Provider-form schema additions implemented in SCH-01, with 30 fake records each. Tax/accounting structures follow Vendor patterns as guarded drafts; no financial or notification workflows approved. Nullable form/child contract awaits domain review. |
 | Accounting and transactional invoice/payment/wallet/bank behavior (Dev 3) | Remains guarded by D-12 to D-14 (FIN-01, FIN-02), with Decimal money. Separately approved company configuration storage under D-24 does not approve transactional financial behavior. |
-| WhatsApp notification | Stakeholder approved existing configuration storage only (D-24 partial). No external sending; template persistence declined pending separate schema approval. |
+| WhatsApp notification | Existing configuration storage approved (D-24 partial); branch WhatsApp preparation approved in D-34 with a separate future Baileys project. No external sending; template persistence declined pending separate schema approval. |
 | Booking, AWB, shipment, manifest, delivery, ticket | No prototype model. Derive from observing the provider app and sample documents (D-05 to D-09). |
 
 **Port rules** (what the Prisma schema must not inherit)

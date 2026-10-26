@@ -63,6 +63,10 @@ export function CompanySettingEditor({
           setError(result.message);
           return;
         }
+        if (page > result.data.pagination.totalPages) {
+          setPage(result.data.pagination.totalPages);
+          return;
+        }
         setLoaded(true);
         setRows(result.data.items);
         setPages(result.data.pagination.totalPages);

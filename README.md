@@ -86,3 +86,17 @@ Primitives live in `src/components/ui/`, shared compositions in
 `src/components/patterns/`, and shared tokens only in `src/app/globals.css`.
 Follow `DESIGN.md`; read the installed Next.js guides in
 `node_modules/next/dist/docs/` before implementation.
+
+## Branch WhatsApp gateway
+
+Office > Perusahaan > WA Notifikasi now includes a branch setup inventory after
+selecting a company. It requires `whatsapp_configuration:view` and applies the
+current server branch scope. With a configured gateway, select a branch to view
+live status. Administrators may connect, display QR and confirm logout.
+
+The optional server-only `WHATSAPP_GATEWAY_URL` and `WHATSAPP_GATEWAY_API_KEY`
+settings are documented in `.env.example`. Both can remain empty until the
+separate Baileys project is available. Entering them enables gateway requests;
+pairing requires explicit connection and a device scan. No message is sent by
+the setup panel. No schema migration or Baileys package is required in LMS.
+The Baileys project implements [gateway API v1](docs/decisions/WA-01-gateway-api.md).

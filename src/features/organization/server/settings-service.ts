@@ -311,6 +311,23 @@ export function createConfigurationService(
           const where = {
             deletedAt: null,
             company: companyScope(current),
+            ...(!isAdministrator(current)
+              ? {
+                  AND: [
+                    {
+                      OR: [
+                        { customerId: null },
+                        {
+                          customer: {
+                            deletedAt: null,
+                            branchId: { in: current.branchIds },
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                }
+              : {}),
             ...(companyId ? { companyId } : {}),
             ...(search
               ? {

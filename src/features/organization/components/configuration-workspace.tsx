@@ -8,6 +8,7 @@ import {
 import { SearchSelect } from "@/components/patterns/search-select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { BranchWhatsAppSetupPanel } from "@/features/whatsapp/components/branch-whatsapp-setup";
 import {
   configurationCapabilities,
   configurationChoices,
@@ -131,6 +132,12 @@ function ConfigurationLoader({
           />
           {kind === "whatsapp_configuration" && <WhatsAppMessagePreview />}
         </div>
+      )}
+      {kind === "whatsapp_configuration" && companyId && (
+        <BranchWhatsAppSetupPanel
+          key={companyId}
+          companyId={Number(companyId)}
+        />
       )}
     </div>
   );

@@ -226,4 +226,81 @@ describe("Dev 1 company/vendor configuration storage", () => {
       await db.identityAuditEvent.count({ where: { actorId: adminId } }),
     ).toBe(audits);
   });
+  it("scopes customer WhatsApp lists and counts while preserving company-wide settings", async () => {
+    const office = await db.office.create({
+      data: {
+        companyId,
+        code: `WA-${tag}`,
+        name: `FAKE WA ${tag}`,
+        status: "ACTIVE",
+      },
+    });
+    const branches: number[] = [];
+    const customers: number[] = [];
+    const notifications: number[] = [];
+    try {
+      for (const suffix of ["A", "B"]) {
+        const branch = await db.branch.create({
+          data: {
+            officeId: office.id,
+            code: `WA-${suffix}-${tag}`,
+            name: `FAKE WA ${suffix} ${tag}`,
+            status: "ACTIVE",
+          },
+        });
+        branches.push(branch.id);
+        const customer = await db.customer.create({
+          data: { name: `FAKE WA ${suffix} ${tag}`, branchId: branch.id },
+        });
+        customers.push(customer.id);
+      }
+      await db.userAllowedBranch.create({
+        data: { userId: readerId, branchId: branches[0] },
+      });
+      for (const customerId of [null, ...customers]) {
+        const notification = await db.customerWhatsAppNotification.create({
+          data: { companyId, customerId, isEnabled: true },
+        });
+        notifications.push(notification.id);
+      }
+      // Search and company filters must not replace the customer branch predicate.
+      for (const filters of [{ companyId }, { search: `FAKE CONFIG ${tag}` }]) {
+        const page = await service(readerId).list(
+          "whatsapp_configuration",
+          filters,
+        );
+        expect(page.items.map((row) => row.id)).toEqual(
+          notifications.slice(0, 2),
+        );
+        expect(page.pagination.total).toBe(2);
+        expect(JSON.stringify(page.items)).not.toContain(`FAKE WA B ${tag}`);
+      }
+      const paged = await service(readerId).list("whatsapp_configuration", {
+        companyId,
+        pageSize: 1,
+        page: 2,
+      });
+      expect(paged.items.map((row) => row.id)).toEqual([notifications[1]]);
+      expect(paged.pagination).toMatchObject({ total: 2, totalPages: 2 });
+      const admin = await service(adminId).list("whatsapp_configuration", {
+        companyId,
+      });
+      expect(admin.items.map((row) => row.id)).toEqual(notifications);
+      expect(admin.pagination.total).toBe(3);
+      await db.userAllowedBranch.deleteMany({ where: { userId: readerId } });
+      const denied = await service(readerId).list("whatsapp_configuration", {
+        companyId,
+      });
+      expect(denied.items).toEqual([]);
+      expect(denied.pagination.total).toBe(0);
+    } finally {
+      await db.userAllowedBranch.deleteMany({ where: { userId: readerId } });
+      await db.customerWhatsAppNotification.deleteMany({
+        where: { id: { in: notifications } },
+      });
+      await db.customer.deleteMany({ where: { id: { in: customers } } });
+      await db.branch.deleteMany({ where: { id: { in: branches } } });
+      await db.office.delete({ where: { id: office.id } });
+    }
+  });
 });

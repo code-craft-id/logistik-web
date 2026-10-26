@@ -29,6 +29,18 @@ const masterActions = vi.hoisted(() => ({
 vi.mock("../../src/features/master-data/actions", () => masterActions);
 vi.mock("../../src/features/organization/actions", () => actions);
 vi.mock("../../src/features/organization/settings-actions", () => settings);
+vi.mock("../../src/features/whatsapp/actions", () => ({
+  listBranchWhatsAppSetup: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      items: [],
+      pagination: { page: 1, pageSize: 20, total: 0, totalPages: 1 },
+      connectionAvailable: false,
+      canManageConnections: false,
+      gatewayConfiguration: null,
+    },
+  }),
+}));
 let root: Root, host: HTMLDivElement;
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -309,6 +321,72 @@ describe("Office access and reference workflow", () => {
     );
     expect(field.value).toBe("FAKE unsaved description");
     expect(field.disabled).toBe(false);
+  });
+  it("returns to the remaining configurations after deleting the final row on page two", async () => {
+    const rows = Array.from({ length: 51 }, (_, index) => ({
+      id: index + 1,
+      name: "FAKE Company",
+      companyId: 12,
+      description: `FAKE bank ${index + 1}`,
+      updatedAt: new Date("2026-10-25T00:00:00Z"),
+    }));
+    settings.listConfigurations.mockImplementation(async (_kind, { page }) => ({
+      ok: true,
+      data: {
+        items: rows.slice((page - 1) * 50, page * 50),
+        pagination: {
+          page,
+          pageSize: 50,
+          total: rows.length,
+          totalPages: Math.max(1, Math.ceil(rows.length / 50)),
+        },
+      },
+    }));
+    settings.configurationDetail.mockImplementation(async (_kind, id) => ({
+      ok: true,
+      data: rows.find((row) => row.id === id),
+    }));
+    settings.removeConfiguration.mockImplementation(async (_kind, id) => {
+      rows.splice(
+        rows.findIndex((row) => row.id === id),
+        1,
+      );
+      return { ok: true, data: { success: true } };
+    });
+    await act(async () =>
+      root.render(
+        createElement(CompanySettingEditor, {
+          kind: "company_bank",
+          companyId: 12,
+          capabilities: { create: true, update: true, delete: true },
+        }),
+      ),
+    );
+    await act(async () => button("Berikutnya").click());
+    expect(
+      host.querySelector<HTMLTextAreaElement>('[name="description"]')?.value,
+    ).toBe("FAKE bank 51");
+    await act(async () => button("Hapus konfigurasi").click());
+    await act(async () => button("Hapus").click());
+    expect(settings.removeConfiguration).toHaveBeenCalledWith(
+      "company_bank",
+      51,
+    );
+    expect(settings.listConfigurations).toHaveBeenLastCalledWith(
+      "company_bank",
+      {
+        companyId: 12,
+        page: 1,
+        pageSize: 50,
+      },
+    );
+    const selector = host.querySelector<HTMLSelectElement>("#setting-record");
+    expect(selector?.options).toHaveLength(50);
+    expect(selector?.value).toBe("1");
+    expect(
+      host.querySelector<HTMLTextAreaElement>('[name="description"]')?.value,
+    ).toBe("FAKE bank 1");
+    expect(button("Update").disabled).toBe(false);
   });
   it("shows the three WhatsApp preview tabs without saving or sending", async () => {
     await act(async () => root.render(createElement(WhatsAppMessagePreview)));
