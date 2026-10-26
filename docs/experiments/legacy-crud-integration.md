@@ -1,5 +1,11 @@
 # Legacy CRUD integration audit
 
+> Historical snapshot: the matrix and commands below describe 2026-10-22.
+> The 2026-10-23–24 [Dev 1 continuation](../decisions/PLT-01.md) finds partial
+> identity implementation in the working tree. It supersedes “PLT-01 has not
+> started,” not the unapproved D-03/D-04 gate or other domains' blocked status.
+> Matrix keys remain source-inventory identifiers, including the old dashboard `/`.
+
 Audit date: 2026-10-22. Branch: `feat/legacy-crud-integration`, created from clean `feat/legacy-ui-parity` at `7888c2a82b4f57462584be2c813c5cdb4933d10b`. The initial implementation performed no commit or push. The coordinator subsequently authorized committing and publishing this branch to `origin` for Dev 1 handoff. No merge, rebase, deployment, service restart, legacy write, or modification of `main` or `feat/legacy-ui-parity` is included in that authorization.
 
 ## Result and next eligible work

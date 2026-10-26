@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/organization/preview/screens";
-
+import { Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
+import { OrganizationPage } from "@/features/organization/components/organization-page";
 export const metadata: Metadata = { title: "Kantor" };
 export default function Page() {
-  return <PreviewScreenPage screen={screens["/office"]} />;
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <OrganizationPage />
+    </Suspense>
+  );
 }

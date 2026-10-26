@@ -61,7 +61,7 @@ export function LoginPreview() {
           Sistem Logistik · Presentation preview
         </p>
         <Link
-          href="/"
+          href="/ui-examples"
           className="mt-3 flex min-h-11 items-center justify-center text-sm text-primary underline underline-offset-4"
         >
           Browse UI previews

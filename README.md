@@ -1,73 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Logistics Management System
+
+Next.js 16 App Router, strict TypeScript, Prisma/PostgreSQL, Better Auth and
+Tailwind v4. Read `AGENTS.md`, `docs/PRD.md`, then `docs/ROADMAP.md`.
+Deployment is self-hosted; CI/staging remain shared FND-02 work.
 
 ## Local setup
 
-Use Node.js 24.15.0 (`.nvmrc`) and npm with the checked-in `package-lock.json`.
-
-1. Run `npm ci`.
-2. Copy `.env.example` to `.env` (PowerShell: `Copy-Item .env.example .env`; Linux: `cp .env.example .env`).
-3. Start PostgreSQL through Laragon. Pin PostgreSQL major **18**: the running local binary reports 18.3.
-4. Keep the existing development database `logistik_web`. Create the separate test database manually:
-
-   ```sql
-   CREATE DATABASE "logistik_web_test";
-   ```
-
-5. Validate and generate the client without changing either database:
+1. Use Node.js **24.15.0** (`.nvmrc`), not the shell's older default:
 
    ```sh
-   npx prisma validate
-   npx prisma generate
+   nvm use
+   npm ci
+   ```
+
+2. Copy `.env.example` to `.env` only if you do not already have local settings.
+   Set development/test database URLs, `BETTER_AUTH_URL`, and a random
+   `BETTER_AUTH_SECRET` of at least 32 characters (for example,
+   `openssl rand -hex 32`). Never commit local credentials or session cookies.
+3. Start local PostgreSQL major **18**. Development uses `logistik_web`; integration
+   tests require the separate `logistik_web_test`. Do not reset existing databases.
+4. Validate and generate without applying migrations:
+
+   ```sh
+   npx --no-install prisma validate
+   npx --no-install prisma generate
    npm run check
    npm run build
    ```
 
-6. Explicitly opt into the read-only test database smoke test:
+Generated Prisma files are ignored; regenerate after installation/schema changes.
+Read-only migration checks:
 
-   ```sh
-   npm run test:integration
-   ```
-
-The CLI and integration tests load `.env`; existing process variables take precedence.
-`TEST_DATABASE_URL` must name a PostgreSQL database containing `test` and must not target the development database.
-Default `npm test` and `npm run check` run only database-free tests.
-The smoke test runs only `SELECT 1`; it creates no tables or databases.
-Generated Prisma files are ignored; rerun `npx prisma generate` after installation or schema changes.
-Do not run migrations, introspection, or `db push` for this foundation-only schema.
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sh
+npx --no-install prisma migrate status
+npx --no-install prisma migrate diff --from-config-datasource --to-schema prisma --exit-code
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Apply only reviewed migrations, through `node prisma/migrate-local.mjs` for
+development or `node prisma/migrate-test.mjs` for tests. These commands **change
+their target database**; they are not setup verification. No `db push`, reset or
+rewriting applied SQL. Existing PLT-01 migrations and business rules still need
+review; see `docs/decisions/PLT-01.md`.
 
-The foundation page lives in `src/app/(dashboard)/page.tsx`; shared UI examples are available at `/ui-examples`. Pages and layouts stay Server Components; interactive shell controls and synthetic examples are isolated in Client Components.
+## Tests and fake fixtures
 
-FND-03 establishes source-owned shadcn/ui primitives in `src/components/ui/`, compositions in `src/components/patterns/`, and tokens in `src/app/globals.css`. Follow `DESIGN.md` and `AGENTS.md` when building future screens. Examples do not load or save operational records. Provider menu evidence and acceptance gates remain pending; see `docs/decisions/FND-03.md` for the matrix, exact checks, and browser capture paths.
+- `npm run check`: lint, typecheck and database-free unit/UI tests.
+- `npm run test:integration`: explicitly opt into PostgreSQL tests. They create,
+  mutate and clean up their own fake identity fixtures and run schema/seed checks;
+  this is **not read-only** and no longer only `SELECT 1`. Target guards require
+  exact `logistik_web_test`, loopback, non-production and a target distinct from
+  development. Never point this at shared or real data.
+- `npm run db:seed`: guarded, development-only fake fixtures. Existing matching
+  fixtures are preserved; collisions roll back. It does not provision credentials.
+  `scripts/seed-direct.mjs` delegates to the same guarded seed.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+CLI/integration configuration loads `.env`; process variables take precedence.
+Local admin bootstrap scripts require an explicit local target/password and
+separate privilege initialization. They are not production provisioning and
+are never run automatically.
 
-## Learn More
+## Application routes and scope
 
-To learn more about Next.js, take a look at the following resources:
+Run `npm run dev`, then visit `http://localhost:3000`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Route | Current purpose |
+| --- | --- |
+| `/` | Public company-information placeholder; no fabricated company records |
+| `/login` | Username/password login |
+| `/dashboard` | Protected existing dashboard preview; no live KPIs |
+| `/group-user`, `/user-management`, `/hak-akses-menu` | Partial PLT-01 identity management with server permission checks |
+| `/profile` | Own profile/password and session management |
+| `/ui-examples` | Protected, explicitly synthetic shared UI examples |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The old presentation inventory retains `/` as its source dashboard identifier;
+runtime navigation maps that destination to `/dashboard`. Other office/master
+data and Dev 2/3 domain screens remain previews. Do not treat menu availability or
+schema storage as approved workflows.
 
-## Deploy on Vercel
+PLT-01 is **PARTIAL, acceptance BLOCKED**: D-03/D-04 organization/permission
+evidence and review remain missing. Remaining Dev 1 work and verification are in
+`docs/decisions/PLT-01.md`. No deployment or production readiness is claimed.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Pages/layouts remain Server Components; interactive boundaries are isolated.
+Primitives live in `src/components/ui/`, shared compositions in
+`src/components/patterns/`, and shared tokens only in `src/app/globals.css`.
+Follow `DESIGN.md`; read the installed Next.js guides in
+`node_modules/next/dist/docs/` before implementation.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Branch WhatsApp gateway
+
+Office > Perusahaan > WA Notifikasi now includes a branch setup inventory after
+selecting a company. It requires `whatsapp_configuration:view` and applies the
+current server branch scope. With a configured gateway, select a branch to view
+live status. Administrators may connect, display QR and confirm logout.
+
+The optional server-only `WHATSAPP_GATEWAY_URL` and `WHATSAPP_GATEWAY_API_KEY`
+settings are documented in `.env.example`. Both can remain empty until the
+separate Baileys project is available. Entering them enables gateway requests;
+pairing requires explicit connection and a device scan. No message is sent by
+the setup panel. No schema migration or Baileys package is required in LMS.
+The Baileys project implements [gateway API v1](docs/decisions/WA-01-gateway-api.md).

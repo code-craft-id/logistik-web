@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/master-data/preview/screens";
-
+import { Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
+import { MasterDataPage } from "@/features/master-data/components/master-data-page";
 export const metadata: Metadata = { title: "Divisi Logistik" };
 export default function Page() {
-  return <PreviewScreenPage screen={screens["/logistics/division"]} />;
+  return (
+    <div className="space-y-8">
+      <Suspense fallback={<LoadingState />}>
+        <MasterDataPage
+          title="Divisi Logistik"
+          kinds={["marketing_person", "driver", "courier"]}
+        />
+      </Suspense>
+    </div>
+  );
 }

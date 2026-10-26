@@ -48,27 +48,34 @@ model Office {
 }
 
 model Branch {
-  customers       Customer[]
-  consignees      Consignee[]
-  id              Int               @id @default(autoincrement())
-  officeId        Int               @map("office_id")
-  code            String
-  name            String
-  address         String?
-  city            String?
-  phoneNumber     String?           @map("phone_number")
-  managerName     String?           @map("manager_name")
-  managerContact  String?           @map("manager_contact")
-  status          RecordStatus
-  office          Office            @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime          @updatedAt @map("updated_at")
-  deletedAt       DateTime?         @map("deleted_at")
-  agents          Agent[]
-  drivers         Driver[]
-  couriers        Courier[]
-  vehicles        Vehicle[]
-  marketingPeople MarketingPerson[]
+  customers           Customer[]
+  consignees          Consignee[]
+  id                  Int                 @id @default(autoincrement())
+  officeId            Int                 @map("office_id")
+  code                String
+  name                String
+  address             String?
+  city                String?
+  phoneNumber         String?             @map("phone_number")
+  managerName         String?             @map("manager_name")
+  managerContact      String?             @map("manager_contact")
+  postalCode          String?             @map("postal_code")
+  faxNumber           String?             @map("fax_number")
+  email               String?
+  financeContactName  String?             @map("finance_contact_name")
+  marketingContactName String?            @map("marketing_contact_name")
+  taxId               String?             @map("tax_id")
+  status              RecordStatus
+  office              Office              @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  deletedAt           DateTime?           @map("deleted_at")
+  agents              Agent[]
+  drivers             Driver[]
+  couriers            Courier[]
+  vehicles            Vehicle[]
+  marketingPeople     MarketingPerson[]
+  userAllowedBranches UserAllowedBranch[]
 
   @@index([officeId])
   @@index([status])

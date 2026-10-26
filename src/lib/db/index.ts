@@ -6,9 +6,11 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function createClient() {
+function createClient(): PrismaClient {
   const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("DATABASE_URL is required.");
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is required.");
+  }
 
   return new PrismaClient({
     adapter: new PrismaPg({ connectionString }),

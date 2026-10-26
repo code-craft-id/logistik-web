@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/master-data/preview/screens";
-
-export const metadata: Metadata = { title: "Logistik" };
+import { Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
+import { MasterDataPage } from "@/features/master-data/components/master-data-page";
+export const metadata: Metadata = { title: "Area Logistik" };
 export default function Page() {
-  return <PreviewScreenPage screen={screens["/logistics/areas"]} />;
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <MasterDataPage
+        title="Area Logistik"
+        kinds={["province", "regency", "district", "village", "postal_code"]}
+      />
+    </Suspense>
+  );
 }

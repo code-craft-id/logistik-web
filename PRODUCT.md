@@ -18,6 +18,8 @@ Internal logistics staff across branches. PRD personas and exact permission assi
 
 FND-03 covers shared UI, navigation and clearly labeled static examples. It does not deliver operational workflows, authentication, RBAC, persistence or database integration. PLT-01 owns identity behavior and scope. DRAFT models remain inaccessible. SCH-01 is approved for its completed scope.
 
+Current checkpoint (2026-10-23–24): partial PLT-01 login, group/user/permission and profile/session code exists in the working tree; it is not covered by FND-03 acceptance. D-03/D-04 remain TBD and acceptance is blocked pending their reviewed contract. Office/master-data and Dev 2/3 domain screens remain previews. `/` is the public company-information placeholder; the existing dashboard preview is at `/dashboard`. See `docs/decisions/PLT-01.md`.
+
 Localization, timezone and formatting policy remain TBD under D-19. Preserve existing English presentation and lang="en" without establishing a localization policy. Do not format example money or dates.
 
 ## Evidence on Hand

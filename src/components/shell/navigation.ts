@@ -23,7 +23,7 @@ const leaves = (
   pairs.map(([label, providerLabel]) => ({ label, providerLabel }));
 
 export const providerNavigation: readonly NavigationGroup[] = [
-  { label: "Dashboard", providerLabel: "Dashboard", href: "/" },
+  { label: "Dashboard", providerLabel: "Dashboard", href: DASHBOARD_PATH },
   { label: "System Settings", providerLabel: "Sistem Seting" },
   { label: "Office", providerLabel: "Kantor" },
   {
@@ -235,11 +235,14 @@ type LegacyItem = {
 const implemented = new Set<string>(
   implementedPreviewRoutes.map((item) => item.href),
 );
-const leaf = (item: LegacyItem): NavigationLeaf => ({
-  label: item.label,
-  providerLabel: item.label,
-  ...(item.href && implemented.has(item.href) ? { href: item.href } : {}),
-});
+const leaf = (item: LegacyItem): NavigationLeaf => {
+  const href = item.href ? applicationPreviewPath(item.href) : undefined;
+  return {
+    label: item.label,
+    providerLabel: item.label,
+    ...(href && implemented.has(href) ? { href } : {}),
+  };
+};
 export const navigation: readonly NavigationGroup[] = [
   ...legacyMenu.map(
     (item: LegacyItem): NavigationGroup => ({
@@ -267,7 +270,8 @@ export const navigation: readonly NavigationGroup[] = [
         (item) =>
           !legacyMenu.some(
             (group: LegacyItem) =>
-              group.href === item.href ||
+              (group.href &&
+                applicationPreviewPath(group.href) === item.href) ||
               group.children?.some(
                 (child) =>
                   child.href === item.href ||
@@ -380,3 +384,5 @@ export function navigationPath(
     }
   }
 }
+
+import { applicationPreviewPath, DASHBOARD_PATH } from "@/lib/routes";

@@ -169,7 +169,7 @@ export const implementedPreviewRoutes = [
     label: "Ticketing",
   },
   {
-    href: "/",
+    href: "/dashboard",
     label: "Filter",
   },
 ] as const;

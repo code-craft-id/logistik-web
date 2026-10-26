@@ -52,7 +52,7 @@ describe("FND-03 local interaction contracts", () => {
       container
         .querySelector('[aria-label="LMS — Dashboard"]')
         ?.getAttribute("href"),
-    ).toBe("/");
+    ).toBe("/dashboard");
     const nav = container.querySelector('nav[aria-label="Main navigation"]');
     expect(
       Array.from(nav?.querySelector("ul")?.children ?? []).map(
@@ -216,7 +216,7 @@ describe("FND-03 local interaction contracts", () => {
       Array.from(nav?.querySelectorAll("a") ?? []).map((a) =>
         a.getAttribute("href"),
       ),
-    ).toEqual(["/", "/ui-examples"]);
+    ).toEqual(["/dashboard", "/ui-examples"]);
   });
 
   it("opens only one group and section at a time and keeps their controlled lists hidden otherwise", async () => {

@@ -23,15 +23,25 @@ model LegacyUser {
 // Better Auth 1.6.23 core contract. Runtime activation is PLT-01.
 // Auth storage uses native expiry/cleanup, not domain soft deletion.
 model User {
-  id            Int           @id @default(autoincrement())
-  name          String
-  email         String        @unique
-  emailVerified Boolean       @default(false) @map("email_verified")
-  image         String?
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
-  sessions      Session[]
-  authAccounts  AuthAccount[]
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  username            String?              @unique
+  displayUsername     String?              @map("display_username")
+  email               String               @unique
+  emailVerified       Boolean              @default(false) @map("email_verified")
+  /// Application-managed account availability; not writable through provider public inputs.
+  status              RecordStatus         @default(ACTIVE)
+  image               String?
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  sessions            Session[]
+  authAccounts        AuthAccount[]
+  group               UserGroup?           @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  groupId             Int?                 @map("group_id")
+  /// Retained unused column from the first PLT-01 migration; never an authorization source.
+  legacyBranchIds     Int[]                @map("branch_ids") @ignore
+  allowedBranches     UserAllowedBranch[]
+  identityAuditEvents IdentityAuditEvent[]
 
   @@map("auth_users")
 }
@@ -101,4 +111,70 @@ model LegacyRefreshToken {
   @@index([userId])
   @@map("refresh_tokens")
   @@ignore
+}
+
+/// PLT-01 user-approved contract: one group per user, configurable permissions per group.
+/// Group names carry no privilege. Inactive or deleted groups grant no access.
+model UserGroup {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar(50)
+  description String?      @db.Text
+  status      RecordStatus @default(ACTIVE)
+  users       User[]
+  permissions Permission[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  deletedAt   DateTime?    @map("deleted_at")
+
+  @@index([status])
+  @@map("user_groups")
+}
+
+/// Current permission grants. Revocation removes the association; immutable audit retains history.
+/// Lifecycle exception: no domain soft deletion on security grant associations.
+model Permission {
+  id        Int       @id @default(autoincrement())
+  action    String    @db.VarChar(50) // view, create, update, delete, approve, export, etc.
+  resource  String    @db.VarChar(100) // user, branch, office, vendor, vehicle, shipment, report, etc.
+  groupId   Int       @map("group_id")
+  group     UserGroup @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@unique([action, resource, groupId])
+  @@index([groupId])
+  @@map("permissions")
+}
+
+/// Explicit allowed branches; an empty set never means HQ or administrator.
+/// Lifecycle exception: current membership associations are replaced transactionally and audited.
+model UserAllowedBranch {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  branchId  Int      @map("branch_id")
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, branchId])
+  @@index([userId])
+  @@index([branchId])
+  @@map("user_allowed_branches")
+}
+
+/// Immutable security history: no update/soft-delete lifecycle and no passwords, tokens or PII.
+model IdentityAuditEvent {
+  id          Int      @id @default(autoincrement())
+  actorId     Int      @map("actor_id")
+  actor       User     @relation(fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  action      String   @db.VarChar(60)
+  subjectType String   @map("subject_type") @db.VarChar(30)
+  subjectId   Int      @map("subject_id")
+  details     Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([actorId, createdAt])
+  @@index([subjectType, subjectId, createdAt])
+  @@map("identity_audit_events")
 }

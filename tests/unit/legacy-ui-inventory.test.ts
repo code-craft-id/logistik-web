@@ -41,7 +41,7 @@ describe("legacy inventory coverage and presentation routing", () => {
     for (const { href } of implementedPreviewRoutes)
       expect(
         existsSync(
-          `src/app/${href === "/login" ? "(auth)" : "(dashboard)"}${href === "/" ? "" : href}/page.tsx`,
+          `src/app/${href === "/login" ? "(auth)" : "(dashboard)"}${href}/page.tsx`,
         ),
       ).toBe(true);
     expect(

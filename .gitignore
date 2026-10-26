@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Local HTTP smoke-test cookies contain session secrets.
+/cookies.txt
+
 # generated Prisma client
 /src/lib/db/generated/
 
@@ -54,3 +57,6 @@ next-env.d.ts
 /.agents/
 /.codex/
 /.impeccable/
+
+
+.codex/dev-admin-accounts.txt

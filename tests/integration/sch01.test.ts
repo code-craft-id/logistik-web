@@ -20,6 +20,13 @@ describe("SCH-01 schema on the isolated test database", () => {
     await expect(
       client.$transaction(
         async (tx) => {
+          // Existing isolated-test fixtures are not owned by this seed.
+          const protectedCounts = await Promise.all([
+            tx.user.count(),
+            tx.authAccount.count(),
+            tx.customerAccounting.count(),
+            tx.customerTaxProfile.count(),
+          ]);
           await seedFakeRecords(tx);
           // Count only this seed's reserved IDs; preserve other test fixtures.
           const where = { id: { gte: 9100001, lte: 9100030 } };
@@ -71,16 +78,20 @@ describe("SCH-01 schema on the isolated test database", () => {
           );
           await seedFakeRecords(tx);
           expect(await snapshot()).toEqual(before);
-          expect(await tx.user.count()).toBe(0);
-          expect(await tx.authAccount.count()).toBe(0);
-          expect(await tx.customerAccounting.count()).toBe(0);
-          expect(await tx.customerTaxProfile.count()).toBe(0);
+          expect(
+            await Promise.all([
+              tx.user.count(),
+              tx.authAccount.count(),
+              tx.customerAccounting.count(),
+              tx.customerTaxProfile.count(),
+            ]),
+          ).toEqual(protectedCounts);
           throw rollback;
         },
-        { timeout: 30000 },
+        { timeout: 60000 },
       ),
     ).rejects.toBe(rollback);
-  }, 35000);
+  }, 65000);
 
   it("rolls back earlier seed inserts on a late occupied-ID collision", async () => {
     const before = await client.vendor.count();

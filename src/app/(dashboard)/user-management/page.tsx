@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/identity/preview/screens";
-
+import { Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
+import { IdentityAccess } from "@/features/identity/components/identity-access";
+import { UserManagementPageClient } from "./user-management-client";
 export const metadata: Metadata = { title: "Manajemen User" };
 export default function Page() {
-  return <PreviewScreenPage screen={screens["/user-management"]} />;
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <IdentityAccess resource="user">
+        <UserManagementPageClient />
+      </IdentityAccess>
+    </Suspense>
+  );
 }
