@@ -133,7 +133,8 @@ describe("FND-03 local interaction contracts", () => {
       ),
     );
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    // Radix restores focus in a deferred unmount callback.
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
   it("associates local validation feedback and moves focus to the invalid field", async () => {
@@ -188,7 +189,8 @@ describe("FND-03 local interaction contracts", () => {
       );
     });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    // Radix restores focus in a deferred unmount callback.
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
   });
   it("preserves every provider inventory leaf behind two disclosure levels with no operational links", async () => {
     await act(async () =>

@@ -170,7 +170,8 @@ describe("PLT-01 existing profile frontend", () => {
       ),
     );
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    // Radix restores focus in a deferred unmount callback.
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
     await act(async () => trigger.click());
     expect(
       (document.getElementById("currentPassword") as HTMLInputElement).value,

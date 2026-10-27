@@ -1,6 +1,6 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ImportPreview } from "../../src/components/patterns/import-preview";
 import { PreviewForm } from "../../src/components/patterns/preview-form";
 import { PreviewWorkspace } from "../../src/components/patterns/preview-workspace";
@@ -242,7 +242,8 @@ describe("isolated legacy presentation interactions", () => {
       ),
     );
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    // Radix restores focus in a deferred unmount callback.
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
     expect(host.textContent).toContain("24 preview rows");
   });
   it("paginates, sorts, applies search explicitly and resets fixtures without mutating them", async () => {
