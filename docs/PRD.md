@@ -72,9 +72,12 @@ Every step needs explicit decisions on cancellation, returns, retries, partial d
 - Manage users, access, and each user's allowed branches.
 - Maintain company, office, branch, and agency reference structures. Approved Branch refinement D-33 adds nullable postal code, fax, email, Finance/Marketing contact names and NPWP, without changing parent relationships.
 - Deny both list access and direct record access outside permission and branch scope.
+- D-03/D-04 bounded v1 approved by the stakeholder on 2026-10-27: Company -> Office -> Branch -> Agent; one group per user; explicit action grants and allowed branches; full access only through `system_admin:manage`. Organization mutations require administrator access. Active user/group and server-side branch enforcement remain required. This accepts the existing Dev 1 contract, not future booking/AWB permissions, provider parity or staging results.
 - Prevent unsafe deletion of entities used by transactions.
 - WhatsApp setup (D-34): integrate with a separate Baileys project using one number/session per branch. Stakeholder delegated the API contract to LMS: scoped status checks and administrator-only QR/connect/logout are implemented. The gateway follows the documented v1 contract. Automatic notification triggers and sending remain separate decisions.
-- Implementation checkpoint, 2026-10-25: runtime PLT-01 identity and PLT-02/03 organization/master CRUD are implemented and locally checked; see [Dev 1 contracts and handoff](decisions/DEV1-2026-10-25.md). This supersedes the older partial-code snapshot. D-03/D-04 contract acceptance, complete provider role parity, independent review and staging remain open; implementation is not formal acceptance.
+- Implementation checkpoint, 2026-10-25: runtime PLT-01 identity and PLT-02/03 organization/master CRUD are implemented and locally checked; see [Dev 1 contracts and handoff](decisions/DEV1-2026-10-25.md). This supersedes the older partial-code snapshot. This checkpoint is historical: D-03/D-04 bounded-v1 stakeholder acceptance was recorded on 2026-10-27 and PR #7 supplies independent code review. Complete provider role parity, staging and review of subsequent changes remain open; implementation is not full release acceptance.
+
+- Temporary handoff exception, 2026-10-27: stakeholder explicitly accepts local test/build/smoke results instead of staging for PLT-01/PLT-02 Dev 1 handoff only. Actual staging and provider non-admin comparison remain required before release. See [approval record](decisions/DEV1-OPS01-HANDOFF.md#temporary-staging-substitution-approved-2026-10-27). No booking/AWB approval or global release waiver is implied.
 
 ### FR-02. Logistics master data
 - Manage areas, divisions, services, vehicles, vendors and shipment-status definitions. ETA reference rules are explicitly deferred until Dev 2 defines the operational requirement (D-31).
@@ -143,8 +146,8 @@ D-30 records the user's technical SCH-01 approval on 2026-10-18 separately from 
 |---|---|---|---|---|---|---|
 | D-01 | Existing system | Is this an extension, a redesign, or a replacement of an existing product? Decision: standalone replacement of the provider app (per the team's understanding of stakeholder input; re-verify in DISC-01). | All | DISC-01 | Phase 1 start | CONFIRMED |
 | D-02 | Existing system | Is data migration from the provider app required? If yes: export access and legal right to the data, format, provider ID and AWB number continuity, and history depth. | FR-01 to FR-03 | DISC-01 | Phase 1 start | TBD |
-| D-03 | Organization | Exact company, office, and agency hierarchy? | FR-01 | DISC-02 | PLT-01 | TBD |
-| D-04 | RBAC | Multi-branch users, HQ override, and the full list of permission actions? | FR-01 | DISC-02 | PLT-01 | TBD |
+| D-03 | Organization | Bounded v1: Company -> Office -> Branch -> Agent; organization mutations require administrator access; historical references remain protected with soft deletion. Stakeholder approval recorded in DEV1-OPS01-HANDOFF. | FR-01 | DISC-02 | PLT-01 | CONFIRMED bounded v1, 2026-10-27 |
+| D-04 | RBAC | Bounded Dev 1 v1: one group/user; explicit action grants and allowed branches; full access only through system_admin:manage. Active user/group and server-side scope checks remain required. Future operational permissions need separate review; provider parity and staging are not claimed. | FR-01 | DISC-02 | PLT-01 | CONFIRMED bounded v1, 2026-10-27 |
 | D-05 | Shipment | Booking to AWB relationship, and AWB to pieces relationship? | FR-03 | DISC-03 | OPS-01 | TBD |
 | D-06 | Shipment | AWB numbering scheme? | FR-03 | DISC-03 | OPS-01 | TBD |
 | D-07 | Shipment | Status list and transition matrix? | FR-03, FR-04 | DISC-03 | PLT-02, OPS-02 | TBD |

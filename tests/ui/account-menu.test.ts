@@ -195,6 +195,7 @@ describe("PLT-01 shell account menu", () => {
       ),
     );
     expect(document.querySelector('[role="menu"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    // Radix restores focus in a deferred unmount callback.
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 });
