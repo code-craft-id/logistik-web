@@ -101,6 +101,8 @@ model Courier {
   branchId         Int?         @map("branch_id")
   branch           Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   status           RecordStatus @default(ACTIVE)
+  transactions     Transaction[]
+  manifests        Manifest[]
 
   @@index([branchId])
   @@index([status])
@@ -218,6 +220,7 @@ model Vehicle {
   serviceTrucking        Boolean       @default(false) @map("service_trucking")
   branchId               Int?          @map("branch_id")
   branch                 Branch?       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  manifests              Manifest[]
 
   @@index([truckingTypeId])
   @@index([branchId])

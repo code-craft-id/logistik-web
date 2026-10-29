@@ -45,6 +45,7 @@ model Customer {
   taxProfile                  CustomerTaxProfile?
   accounting                  CustomerAccounting?
   whatsappNotifications       CustomerWhatsAppNotification[]
+  bookings                    Booking[]
   createdAt                   DateTime                       @default(now()) @map("created_at")
   updatedAt                   DateTime                       @updatedAt @map("updated_at")
   deletedAt                   DateTime?                      @map("deleted_at")
@@ -100,4 +101,199 @@ model CustomerTaxProfile {
   deletedAt      DateTime? @map("deleted_at")
 
   @@map("customer_tax_profiles")
+}
+
+
+/// Booking/AWB/Transaction - OBSERVED structure, D-05/D-06 rules TBD.
+/// Booking is optional; Transaction/AWB is the operational document.
+model Booking {
+  id            Int           @id @default(autoincrement())
+  bookingNo     String?       @map("booking_no") @db.VarChar(50)
+  bookingDate   DateTime      @default(now()) @map("booking_date")
+  branchId      Int?          @map("branch_id")
+  branch        Branch?       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  customerId    Int?          @map("customer_id")
+  customer      Customer?     @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  senderName    String?       @map("sender_name")
+  receiverName  String?       @map("receiver_name")
+  doNo          String?       @map("do_no") @db.VarChar(50)
+  destination   String?
+  koli          Int?          @default(0)
+  kilo          Decimal?      @db.Decimal(10, 2)
+  volume        Decimal?      @db.Decimal(10, 3)
+  biaya         Decimal?      @db.Decimal(15, 2)
+  status        String        @default("Open") @db.VarChar(30)
+  createdById   Int?          @map("created_by_id")
+  createdBy     User?         @relation("BookingCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  deletedAt     DateTime?     @map("deleted_at")
+  transactions  Transaction[]
+
+  @@index([branchId])
+  @@index([customerId])
+  @@index([status])
+  @@index([bookingDate])
+  @@map("bookings")
+}
+
+/// Transaction/AWB - operational document. Idempotent creation required (AC-02).
+model Transaction {
+  id                    Int                        @id @default(autoincrement())
+  idempotencyKey        String?                    @unique @map("idempotency_key") @db.VarChar(64)
+  awbNo                 String?                    @map("awb_no") @db.VarChar(50)
+  bookingId             Int?                       @map("booking_id")
+  booking               Booking?                   @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionDate       DateTime                   @default(now()) @map("transaction_date")
+  doNo                  String?                    @map("do_no") @db.VarChar(50)
+  senderName            String?                    @map("sender_name")
+  receiverName          String?                    @map("receiver_name")
+  originBranchId        Int?                       @map("origin_branch_id")
+  originBranch          Branch?                    @relation("TransactionOriginBranch", fields: [originBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  destinationBranchId   Int?                       @map("destination_branch_id")
+  destinationBranch     Branch?                    @relation("TransactionDestinationBranch", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  koli                  Int?                       @default(0)
+  kilo                  Decimal?                   @db.Decimal(10, 2)
+  volume                Decimal?                   @db.Decimal(10, 3)
+  biaya                 Decimal?                   @db.Decimal(15, 2)
+  status                String                     @default("Open") @db.VarChar(30)
+  courierId             Int?                       @map("courier_id")
+  courier               Courier?                   @relation(fields: [courierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdById           Int?                       @map("created_by_id")
+  createdBy             User?                      @relation("TransactionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt             DateTime                   @default(now()) @map("created_at")
+  updatedAt             DateTime                   @updatedAt @map("updated_at")
+  deletedAt             DateTime?                  @map("deleted_at")
+  statusHistory         TransactionStatusHistory[]
+  manifestItems         ManifestItem[]
+  deliverySheetItems    DeliverySheetItem[]
+
+  @@unique([originBranchId, awbNo])
+  @@index([originBranchId])
+  @@index([destinationBranchId])
+  @@index([bookingId])
+  @@index([status])
+  @@index([transactionDate])
+  @@map("transactions")
+}
+
+model TransactionStatusHistory {
+  id            Int         @id @default(autoincrement())
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  priorStatus   String?     @map("prior_status") @db.VarChar(30)
+  newStatus     String      @map("new_status") @db.VarChar(30)
+  reason        String?
+  actorId       Int?        @map("actor_id")
+  actor         User?       @relation("TransactionStatusChangedBy", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  changedAt     DateTime    @default(now()) @map("changed_at")
+
+  @@index([transactionId])
+  @@index([changedAt])
+  @@map("transaction_status_history")
+}
+
+model TransactionStatusHistory {
+  id            Int         @id @default(autoincrement())
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  priorStatus   String?     @map("prior_status") @db.VarChar(30)
+  newStatus     String      @map("new_status") @db.VarChar(30)
+  reason        String?
+  actorId       Int?        @map("actor_id")
+  actor         User?       @relation("TransactionStatusChangedBy", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  changedAt     DateTime    @default(now()) @map("changed_at")
+
+  @@index([transactionId])
+  @@index([changedAt])
+  @@map("transaction_status_history")
+}
+
+
+/// Manifest - OBSERVED structure partially, D-08 rules TBD.
+/// Supports outbound/transit/inbound concepts via type/routes tracked flexibly.
+model Manifest {
+  id                Int                @id @default(autoincrement())
+  manifestNo        String             @unique @map("manifest_no") @db.VarChar(50)
+  manifestDate      DateTime           @default(now()) @map("manifest_date")
+  type              String?            @db.VarChar(30)
+  branchId          Int?               @map("branch_id")
+  branch            Branch?            @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vehicleId         Int?               @map("vehicle_id")
+  vehicle           Vehicle?           @relation(fields: [vehicleId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  courierId         Int?               @map("courier_id")
+  courier           Courier?           @relation(fields: [courierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  originBranchId    Int?               @map("origin_branch_id")
+  destinationBranchId Int?             @map("destination_branch_id")
+  status            String             @default("Draft") @db.VarChar(30)
+  transit1          String?            @db.VarChar(100)
+  transit2          String?            @db.VarChar(100)
+  transit3          String?            @db.VarChar(100)
+  transit4          String?            @db.VarChar(100)
+  transit5          String?            @db.VarChar(100)
+  createdById       Int?               @map("created_by_id")
+  createdBy         User?              @relation("ManifestCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  deletedAt         DateTime?          @map("deleted_at")
+  items             ManifestItem[]
+  deliverySheet     DeliverySheet?
+
+  @@index([branchId])
+  @@index([originBranchId])
+  @@index([status])
+  @@index([manifestDate])
+  @@map("manifests")
+}
+
+model ManifestItem {
+  id            Int         @id @default(autoincrement())
+  manifestId    Int         @map("manifest_id")
+  manifest      Manifest    @relation(fields: [manifestId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  assignedAt    DateTime    @default(now()) @map("assigned_at")
+  assignedById  Int?        @map("assigned_by_id")
+  assignedBy    User?       @relation("ManifestItemAssignedBy", fields: [assignedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  releasedAt    DateTime?   @map("released_at")
+
+  @@unique([transactionId])
+  @@index([manifestId])
+  @@map("manifest_items")
+}
+
+model DeliverySheet {
+  id            Int       @id @default(autoincrement())
+  sheetNo       String    @unique @map("sheet_no") @db.VarChar(50)
+  manifestId    Int       @unique @map("manifest_id")
+  manifest      Manifest  @relation(fields: [manifestId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deliveryDate  DateTime  @default(now()) @map("delivery_date")
+  deliveredById Int?      @map("delivered_by_id")
+  deliveredBy   User?     @relation("DeliverySheetDeliveredBy", fields: [deliveredById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  items         DeliverySheetItem[]
+
+  @@index([deliveryDate])
+  @@map("delivery_sheets")
+}
+
+model DeliverySheetItem {
+  id               Int           @id @default(autoincrement())
+  deliverySheetId  Int           @map("delivery_sheet_id")
+  deliverySheet    DeliverySheet @relation(fields: [deliverySheetId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId    Int           @map("transaction_id")
+  transaction      Transaction   @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  outcome          String?       @db.VarChar(30)
+  deliveredAt      DateTime?     @map("delivered_at")
+  receivedBy       String?       @map("received_by")
+  notes            String?
+
+  @@unique([deliverySheetId, transactionId])
+  @@index([transactionId])
+  @@map("delivery_sheet_items")
 }

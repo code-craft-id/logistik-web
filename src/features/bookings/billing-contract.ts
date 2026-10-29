@@ -1,0 +1,21 @@
+export type ShipmentBillingEvent = {
+  eventId: string;
+  eventType: "SHIPMENT_BILLABLE";
+  occurredAt: string;
+  branchId: number | null;
+  originBranchId: number | null;
+  destinationBranchId: number | null;
+  transactionId: number;
+  awbNo: string | null;
+  bookingId: number | null;
+  manifestId: number | null;
+  manifestNo: string | null;
+  courierId: number | null;
+  vendorId: number | null;
+  serviceId: number | null;
+  status: string;
+  koli: number | null;
+  kilo: unknown | null;
+  volume: unknown | null;
+  createdById: number | null;
+};
