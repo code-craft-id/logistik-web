@@ -5,18 +5,31 @@ import { createTransactionAction } from "../actions";
 
 export function TransactionForm() {
   const [isPending, startTransition] = useTransition();
-  const [idempotencyKey, setIdempotencyKey] = useState(
-    () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-  );
+  const generateKey = () => {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
+    throw new Error("Secure cryptographic random generator is required for idempotency keys");
+  };
+
+  const [idempotencyKey, setIdempotencyKey] = useState(() => generateKey());
 
   function onSubmit(formData: FormData) {
     formData.set("idempotencyKey", idempotencyKey);
     startTransition(async () => {
       await createTransactionAction(formData);
       // Rotate key for next submission to avoid accidental reuse
-      setIdempotencyKey(
-        typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-      );
+      setIdempotencyKey(generateKey());
     });
   }
 

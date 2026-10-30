@@ -195,25 +195,6 @@ model TransactionStatusHistory {
   @@map("transaction_status_history")
 }
 
-model TransactionStatusHistory {
-  id            Int         @id @default(autoincrement())
-  transactionId Int         @map("transaction_id")
-  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  priorStatus   String?     @map("prior_status") @db.VarChar(30)
-  newStatus     String      @map("new_status") @db.VarChar(30)
-  reason        String?
-  actorId       Int?        @map("actor_id")
-  actor         User?       @relation("TransactionStatusChangedBy", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-  changedAt     DateTime    @default(now()) @map("changed_at")
-
-  @@index([transactionId])
-  @@index([changedAt])
-  @@map("transaction_status_history")
-}
-
-
 /// Manifest - OBSERVED structure partially, D-08 rules TBD.
 /// Supports outbound/transit/inbound concepts via type/routes tracked flexibly.
 model Manifest {

@@ -31,9 +31,15 @@ export async function createTransactionAction(formData: FormData) {
   const raw = Object.fromEntries(formData.entries());
   const parsed = createTransactionSchema.parse(raw);
   const result = await createTransaction(parsed, current.actor);
+  const tx = (result as any).transaction ? (result as any).transaction : result;
   revalidatePath("/transactions");
   revalidatePath("/bookings");
-  return { ok: true, id: result.id };
+  return {
+    ok: true,
+    id: tx.id,
+    created: (result as any).created ?? true,
+    idempotent: (result as any).idempotent ?? false,
+  };
 }
 
 export async function updateTransactionStatusAction(formData: FormData) {

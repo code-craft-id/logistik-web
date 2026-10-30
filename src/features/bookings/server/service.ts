@@ -18,19 +18,60 @@ export async function createBooking(input: CreateBookingInput, actor: AccessActo
   if (data.branchId && !permitsBranch(actor, data.branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
+  const { status: _status, ...bookingData } = data as any;
   return prisma.booking.create({
     data: {
-      ...data,
+      ...bookingData,
       createdById: actor.id,
     },
   });
+}
+
+function payloadMatchesExisting(existing: any, data: any) {
+  // Compare key fields that define the business payload; ignore server-set fields
+  const fields = [
+    "bookingId",
+    "awbNo",
+    "doNo",
+    "senderName",
+    "receiverName",
+    "originBranchId",
+    "destinationBranchId",
+    "koli",
+    "courierId",
+  ];
+  for (const f of fields) {
+    const a = existing[f];
+    const b = data[f];
+    if (a === b) continue;
+    if (a == null && b == null) continue;
+    // Normalize numbers
+    if (typeof a === "number" && typeof b === "number" && a === b) continue;
+    if (typeof a === "bigint" && typeof b === "bigint" && a === b) continue;
+    // For decimals/strings, compare string forms loosely
+    if (String(a ?? null) !== String(b ?? null)) {
+      return false;
+    }
+  }
+  // Compare decimals as strings
+  const decFields = ["kilo", "volume", "biaya"];
+  for (const f of decFields) {
+    const a = existing[f];
+    const b = data[f];
+    if (a == null && (b == null || b === undefined)) continue;
+    if ((a == null) !== ((b == null || b === undefined))) return false;
+    if (a != null && b != null) {
+      if (a.toString() !== b.toString()) return false;
+    }
+  }
+  return true;
 }
 
 export async function createTransaction(
   input: CreateTransactionInput,
   actor: AccessActor,
 ) {
-  const data = createTransactionSchema.parse(input);
+  const data = createTransactionSchema.parse(input) as any;
   if (!permitsBranch(actor, data.originBranchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
@@ -43,50 +84,88 @@ export async function createTransaction(
 
   return prisma.$transaction(async (tx: any) => {
     if (data.idempotencyKey) {
-      const existing = await tx.transaction.findUnique({
+      const existingByKey = await tx.transaction.findUnique({
         where: { idempotencyKey: data.idempotencyKey },
       });
-      if (existing) return existing;
+      if (existingByKey) {
+        if (!payloadMatchesExisting(existingByKey, data)) {
+          throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
+        }
+        return { transaction: existingByKey, created: false, idempotent: true };
+      }
     }
     if (data.awbNo && data.originBranchId) {
-      const existing = await tx.transaction.findFirst({
+      const existingByAwb = await tx.transaction.findFirst({
         where: {
           originBranchId: data.originBranchId,
           awbNo: data.awbNo,
           deletedAt: null,
         },
       });
-      if (existing) return existing;
+      if (existingByAwb) {
+        if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
+          throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+        }
+        if (!payloadMatchesExisting(existingByAwb, data)) {
+          throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
+        }
+        return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
+      }
     }
 
     try {
+      const { status: _status, idempotencyKey, ...rest } = data;
       const created = await tx.transaction.create({
         data: {
-          ...data,
+          ...rest,
+          idempotencyKey: idempotencyKey ?? null,
+          status: "Open",
           createdById: actor.id,
         },
       });
-      return created;
+      await tx.transactionStatusHistory.create({
+        data: {
+          transactionId: created.id,
+          priorStatus: null,
+          newStatus: "Open",
+          reason: "CREATED",
+          actorId: actor.id,
+        },
+      });
+      return { transaction: created, created: true, idempotent: false };
     } catch (e: unknown) {
       if (
         e instanceof Prisma.PrismaClientKnownRequestError &&
         e.code === "P2002"
       ) {
         if (data.idempotencyKey) {
-          const existing = await tx.transaction.findUnique({
+          const existingByKey = await tx.transaction.findUnique({
             where: { idempotencyKey: data.idempotencyKey },
           });
-          if (existing) return existing;
+          if (existingByKey) {
+            if (!payloadMatchesExisting(existingByKey, data)) {
+              throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
+            }
+            return { transaction: existingByKey, created: false, idempotent: true };
+          }
         }
         if (data.awbNo && data.originBranchId) {
-          const existing = await tx.transaction.findFirst({
+          const existingByAwb = await tx.transaction.findFirst({
             where: {
               originBranchId: data.originBranchId,
               awbNo: data.awbNo,
               deletedAt: null,
             },
           });
-          if (existing) return existing;
+          if (existingByAwb) {
+            if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
+              throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+            }
+            if (!payloadMatchesExisting(existingByAwb, data)) {
+              throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
+            }
+            return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
+          }
         }
       }
       throw e;

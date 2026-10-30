@@ -14,6 +14,9 @@ import {
 
 export async function createManifest(input: CreateManifestInput, actor: AccessActor) {
   const data = createManifestSchema.parse(input);
+  if (actor.branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
   if (data.branchId && !permitsBranch(actor, data.branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
@@ -31,6 +34,9 @@ export async function assignTransactionToManifest(
   actor: AccessActor,
 ) {
   const data = assignToManifestSchema.parse(input);
+  if (actor.branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
 
   return prisma.$transaction(async (tx: any) => {
     const manifest = await tx.manifest.findFirst({
@@ -40,11 +46,21 @@ export async function assignTransactionToManifest(
       },
     });
     if (!manifest) throw new IdentityError("FORBIDDEN_BRANCH", 403);
-    if (
-      actor.branchIds.length > 0 &&
-      manifest.branchId &&
-      !actor.branchIds.includes(manifest.branchId)
-    ) {
+    if (manifest.branchId && !actor.branchIds.includes(manifest.branchId)) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+
+    const transaction = await tx.transaction.findFirst({
+      where: {
+        id: data.transactionId,
+        deletedAt: null,
+        OR: [
+          { originBranchId: { in: actor.branchIds } },
+          { destinationBranchId: { in: actor.branchIds } },
+        ],
+      },
+    });
+    if (!transaction) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
 
@@ -71,6 +87,9 @@ export async function recordDeliveryOutcome(
   actor: AccessActor,
 ) {
   const data = deliveryOutcomeSchema.parse(input);
+  if (actor.branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
 
   return prisma.$transaction(async (tx: any) => {
     const sheet = await tx.deliverySheet.findUnique({
@@ -78,36 +97,54 @@ export async function recordDeliveryOutcome(
       include: { manifest: true },
     });
     if (!sheet) throw new Error("DELIVERY_SHEET_NOT_FOUND");
-    if (
-      actor.branchIds.length > 0 &&
-      sheet.manifest.branchId &&
-      !actor.branchIds.includes(sheet.manifest.branchId)
-    ) {
+    if (!sheet.manifest.branchId || !actor.branchIds.includes(sheet.manifest.branchId)) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
 
-    const item = await tx.deliverySheetItem.upsert({
+    const allowedItem = await tx.deliverySheetItem.findUnique({
       where: {
         deliverySheetId_transactionId: {
           deliverySheetId: data.deliverySheetId,
           transactionId: data.transactionId,
         },
       },
-      create: {
-        deliverySheetId: data.deliverySheetId,
-        transactionId: data.transactionId,
-        outcome: data.outcome || null,
-        receivedBy: data.receivedBy || null,
-        notes: data.notes || null,
-        deliveredAt: data.outcome === "DELIVERED" ? new Date() : null,
-      },
-      update: {
-        outcome: data.outcome || null,
-        receivedBy: data.receivedBy || null,
-        notes: data.notes || null,
-        deliveredAt: data.outcome === "DELIVERED" ? new Date() : null,
-      },
     });
+    if (!allowedItem) {
+      const manifestItem = await tx.manifestItem.findFirst({
+        where: {
+          manifestId: sheet.manifestId,
+          transactionId: data.transactionId,
+        },
+      });
+      if (!manifestItem) {
+        throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
+      await tx.deliverySheetItem.create({
+        data: {
+          deliverySheetId: data.deliverySheetId,
+          transactionId: data.transactionId,
+          outcome: data.outcome || null,
+          receivedBy: data.receivedBy || null,
+          notes: data.notes || null,
+          deliveredAt: data.outcome === "DELIVERED" ? new Date() : null,
+        },
+      });
+    } else {
+      await tx.deliverySheetItem.update({
+        where: {
+          deliverySheetId_transactionId: {
+            deliverySheetId: data.deliverySheetId,
+            transactionId: data.transactionId,
+          },
+        },
+        data: {
+          outcome: data.outcome || null,
+          receivedBy: data.receivedBy || null,
+          notes: data.notes || null,
+          deliveredAt: data.outcome === "DELIVERED" ? new Date() : null,
+        },
+      });
+    }
 
     if (data.outcome === "DELIVERED") {
       const txRecord = await tx.transaction.findUnique({
@@ -136,6 +173,14 @@ export async function recordDeliveryOutcome(
       }
     }
 
-    return item;
+    const result = await tx.deliverySheetItem.findUnique({
+      where: {
+        deliverySheetId_transactionId: {
+          deliverySheetId: data.deliverySheetId,
+          transactionId: data.transactionId,
+        },
+      },
+    });
+    return result;
   });
 }

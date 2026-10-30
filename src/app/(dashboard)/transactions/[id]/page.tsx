@@ -4,6 +4,8 @@ import { requirePermission } from "@/lib/auth/session";
 import { getTransactionById } from "@/features/bookings/server/queries";
 import { StatusUpdateForm } from "@/features/bookings/components/status-update-form";
 
+export const instant = false;
+
 export const metadata: Metadata = { title: "Detail AWB/Transaction" };
 
 export default async function Page({

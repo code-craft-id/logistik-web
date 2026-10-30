@@ -2,14 +2,22 @@ import "server-only";
 
 import { prisma } from "@/lib/db";
 import { getUserBranchScope } from "@/lib/auth/session";
+import { IdentityError } from "@/features/identity/server/access";
+
+function requireNonEmptyBranchScope(branchIds: number[]) {
+  if (!branchIds || branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
+}
 
 export async function listBookings(params: { limit?: number } = {}) {
   const branchIds = await getUserBranchScope();
+  requireNonEmptyBranchScope(branchIds);
   const limit = params.limit ?? 50;
   return prisma.booking.findMany({
     where: {
       deletedAt: null,
-      ...(branchIds.length > 0 ? { branchId: { in: branchIds } } : {}),
+      branchId: { in: branchIds },
     },
     orderBy: { bookingDate: "desc" },
     take: limit,
@@ -18,11 +26,12 @@ export async function listBookings(params: { limit?: number } = {}) {
 
 export async function getBookingById(id: number) {
   const branchIds = await getUserBranchScope();
+  requireNonEmptyBranchScope(branchIds);
   return prisma.booking.findFirst({
     where: {
       id,
       deletedAt: null,
-      ...(branchIds.length > 0 ? { branchId: { in: branchIds } } : {}),
+      branchId: { in: branchIds },
     },
     include: {
       customer: true,
@@ -38,18 +47,15 @@ export async function getBookingById(id: number) {
 
 export async function listTransactions(params: { limit?: number } = {}) {
   const branchIds = await getUserBranchScope();
+  requireNonEmptyBranchScope(branchIds);
   const limit = params.limit ?? 50;
   return prisma.transaction.findMany({
     where: {
       deletedAt: null,
-      ...(branchIds.length > 0
-        ? {
-            OR: [
-              { originBranchId: { in: branchIds } },
-              { destinationBranchId: { in: branchIds } },
-            ],
-          }
-        : {}),
+      OR: [
+        { originBranchId: { in: branchIds } },
+        { destinationBranchId: { in: branchIds } },
+      ],
     },
     orderBy: { transactionDate: "desc" },
     take: limit,
@@ -58,18 +64,15 @@ export async function listTransactions(params: { limit?: number } = {}) {
 
 export async function getTransactionById(id: number) {
   const branchIds = await getUserBranchScope();
+  requireNonEmptyBranchScope(branchIds);
   return prisma.transaction.findFirst({
     where: {
       id,
       deletedAt: null,
-      ...(branchIds.length > 0
-        ? {
-            OR: [
-              { originBranchId: { in: branchIds } },
-              { destinationBranchId: { in: branchIds } },
-            ],
-          }
-        : {}),
+      OR: [
+        { originBranchId: { in: branchIds } },
+        { destinationBranchId: { in: branchIds } },
+      ],
     },
     include: {
       booking: true,
@@ -90,19 +93,16 @@ export async function lookupTransactionByAwb(
   originBranchId?: number,
 ) {
   const branchIds = await getUserBranchScope();
+  requireNonEmptyBranchScope(branchIds);
   return prisma.transaction.findFirst({
     where: {
       awbNo,
       deletedAt: null,
       ...(originBranchId ? { originBranchId } : {}),
-      ...(branchIds.length > 0
-        ? {
-            OR: [
-              { originBranchId: { in: branchIds } },
-              { destinationBranchId: { in: branchIds } },
-            ],
-          }
-        : {}),
+      OR: [
+        { originBranchId: { in: branchIds } },
+        { destinationBranchId: { in: branchIds } },
+      ],
     },
     include: {
       booking: true,
