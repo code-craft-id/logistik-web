@@ -19,6 +19,17 @@ const decimalString = (maxInt: number, scale: number) => {
     .transform((v) => v);
 };
 
+const emptyToUndefined = (v: unknown) => {
+  if (v === null || v === undefined) return undefined;
+  if (typeof v === "string" && v.trim() === "") return undefined;
+  return v;
+};
+
+const optionalPositiveInt = z.preprocess(
+  emptyToUndefined,
+  z.coerce.number().int().positive().optional().nullable(),
+);
+
 const decimalField = (maxInt: number, scale: number) =>
   z
     .union([z.string(), z.number(), z.null()])
@@ -43,13 +54,16 @@ export const createBookingSchema = z
   .object({
     bookingNo: z.string().trim().max(50).optional().nullable(),
     bookingDate: z.coerce.date().optional(),
-    branchId: z.coerce.number().int().positive().optional().nullable(),
-    customerId: z.coerce.number().int().positive().optional().nullable(),
+    branchId: optionalPositiveInt,
+    customerId: optionalPositiveInt,
     senderName: z.string().trim().max(150).optional().nullable(),
     receiverName: z.string().trim().max(150).optional().nullable(),
     doNo: z.string().trim().max(50).optional().nullable(),
     destination: z.string().trim().max(150).optional().nullable(),
-    koli: z.coerce.number().int().min(0).optional(),
+    koli: z.preprocess(
+      emptyToUndefined,
+      z.coerce.number().int().min(0).optional(),
+    ),
     kilo: decimalField(8, 2),
     volume: decimalField(7, 3),
     biaya: decimalField(13, 2),
@@ -61,20 +75,23 @@ export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 
 export const createTransactionSchema = z
   .object({
-    idempotencyKey: z.string().min(8).max(64).optional(),
-    bookingId: z.coerce.number().int().positive().optional().nullable(),
+    idempotencyKey: z.preprocess(emptyToUndefined, z.string().min(8).max(64).optional()),
+    bookingId: optionalPositiveInt,
     awbNo: z.string().trim().max(50).optional().nullable(),
     transactionDate: z.coerce.date().optional(),
     doNo: z.string().trim().max(50).optional().nullable(),
     senderName: z.string().trim().max(150).optional().nullable(),
     receiverName: z.string().trim().max(150).optional().nullable(),
-    originBranchId: z.coerce.number().int().positive(),
-    destinationBranchId: z.coerce.number().int().positive().optional().nullable(),
-    koli: z.coerce.number().int().min(0).optional(),
+    originBranchId: z.preprocess(emptyToUndefined, z.coerce.number().int().positive()),
+    destinationBranchId: optionalPositiveInt,
+    koli: z.preprocess(
+      emptyToUndefined,
+      z.coerce.number().int().min(0).optional(),
+    ),
     kilo: decimalField(8, 2),
     volume: decimalField(7, 3),
     biaya: decimalField(13, 2),
-    courierId: z.coerce.number().int().positive().optional().nullable(),
+    courierId: optionalPositiveInt,
     status: z.never().optional(),
   })
   .strip();

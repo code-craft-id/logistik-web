@@ -36,10 +36,6 @@ export function BookingForm() {
           <input name="destination" className="w-full border rounded px-2 py-1" />
         </div>
         <div>
-          <label className="text-sm font-medium">Status</label>
-          <input name="status" defaultValue="Open" className="w-full border rounded px-2 py-1" />
-        </div>
-        <div>
           <label className="text-sm font-medium">Koli</label>
           <input name="koli" type="number" min="0" className="w-full border rounded px-2 py-1" />
         </div>
