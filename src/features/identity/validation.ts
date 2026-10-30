@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validPermission } from "./permissions";
+import { permissionGrantCount, validPermission } from "./permissions";
 
 export const identityId = z
   .union([z.number(), z.string().trim().min(1)])
@@ -78,7 +78,7 @@ export const permissionMatrixSchema = z
           })
           .refine(validPermission, "Hak akses tidak dikenal"),
       )
-      .max(128),
+      .max(permissionGrantCount),
   })
   .refine(
     (value) =>
