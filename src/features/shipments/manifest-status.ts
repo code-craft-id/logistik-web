@@ -1,0 +1,27 @@
+export const MANIFEST_STATUS = {
+  DRAFT: "Draft",
+  LOADED: "Loaded",
+  IN_TRANSIT: "In Transit",
+  ARRIVED: "Arrived",
+  DELIVERED: "Delivered",
+  CLOSED: "Closed",
+} as const;
+
+export type ManifestStatus = (typeof MANIFEST_STATUS)[keyof typeof MANIFEST_STATUS];
+
+export const ALLOWED_MANIFEST_TRANSITIONS: Record<string, string[]> = {
+  [MANIFEST_STATUS.DRAFT]: [MANIFEST_STATUS.LOADED],
+  [MANIFEST_STATUS.LOADED]: [MANIFEST_STATUS.IN_TRANSIT],
+  [MANIFEST_STATUS.IN_TRANSIT]: [MANIFEST_STATUS.ARRIVED],
+  [MANIFEST_STATUS.ARRIVED]: [MANIFEST_STATUS.DELIVERED, MANIFEST_STATUS.CLOSED],
+  [MANIFEST_STATUS.DELIVERED]: [MANIFEST_STATUS.CLOSED],
+  [MANIFEST_STATUS.CLOSED]: [],
+};
+
+export function canTransitionManifestStatus(
+  current: string,
+  next: string,
+): boolean {
+  const allowed = ALLOWED_MANIFEST_TRANSITIONS[current] || [];
+  return allowed.includes(next);
+}

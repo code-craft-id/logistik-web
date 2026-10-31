@@ -36,12 +36,18 @@ model User {
   updatedAt           DateTime             @updatedAt @map("updated_at")
   sessions            Session[]
   authAccounts        AuthAccount[]
-  group               UserGroup?           @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  groupId             Int?                 @map("group_id")
+  group                    UserGroup?           @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  groupId                  Int?                 @map("group_id")
   /// Retained unused column from the first PLT-01 migration; never an authorization source.
-  legacyBranchIds     Int[]                @map("branch_ids") @ignore
-  allowedBranches     UserAllowedBranch[]
-  identityAuditEvents IdentityAuditEvent[]
+  legacyBranchIds          Int[]                @map("branch_ids") @ignore
+  allowedBranches          UserAllowedBranch[]
+  identityAuditEvents      IdentityAuditEvent[]
+  bookingsCreated          Booking[]                @relation("BookingCreatedBy")
+  transactionsCreated      Transaction[]            @relation("TransactionCreatedBy")
+  transactionStatusChanges TransactionStatusHistory[] @relation("TransactionStatusChangedBy")
+  manifestsCreated         Manifest[]               @relation("ManifestCreatedBy")
+  manifestItemsAssigned    ManifestItem[]           @relation("ManifestItemAssignedBy")
+  deliverySheetsDelivered  DeliverySheet[]          @relation("DeliverySheetDeliveredBy")
 
   @@map("auth_users")
 }

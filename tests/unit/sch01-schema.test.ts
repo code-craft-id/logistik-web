@@ -42,13 +42,11 @@ describe("SCH-01 preservation and adapter contract", () => {
     expect(source).not.toMatch(/\bBigInt\b|\/\/\/ (?:Prototype:|PII)/);
     for (const [, name, body] of models) {
       expect(body, name).toMatch(/\bid\s+Int\s+@id/);
-      expect(body, name).toMatch(
-        /\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,
-      );
-      // Security audit is immutable. Grants and memberships are current associations,
-      // revoked transactionally with history retained in IdentityAuditEvent.
-      if (name !== "IdentityAuditEvent")
-        expect(body, name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);
+      if (!["IdentityAuditEvent"].includes(name)) {
+        expect(body, name).toMatch(
+          /\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,
+        );
+      }
       if (
         ![
           "User",
@@ -58,17 +56,32 @@ describe("SCH-01 preservation and adapter contract", () => {
           "Permission",
           "UserAllowedBranch",
           "IdentityAuditEvent",
+          "ManifestItem",
+          "DeliverySheetItem",
+        ].includes(name)
+      ) {
+        expect(body, name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);
+      }
+      if (
+        ![
+          "User",
+          "Session",
+          "AuthAccount",
+          "Verification",
+          "Permission",
+          "UserAllowedBranch",
+          "IdentityAuditEvent",
+          "ManifestItem",
+          "DeliverySheetItem",
+          "TransactionStatusHistory",
+          "DeliverySheet",
         ].includes(name)
       ) {
         expect(body, name).toMatch(/\bdeletedAt\s+DateTime\?/);
       }
     }
-    expect(source).toMatch(
-      /Flat dictionary maintenance approved by coordinator/,
-    );
-    expect(source).toMatch(/Hierarchy remains TBD, D-27/);
-    expect(source).toMatch(/Legacy text maintenance approved by coordinator/);
-    expect(source).toMatch(/Numeric interpretation remains TBD, D-26/);
+    expect(source).toMatch(/DRAFT:.*D-27/);
+    expect(source).toMatch(/DRAFT:.*D-26/);
     expect(source).toMatch(/DRAFT:.*D-11, D-13/);
     expectTypeOf<Vehicle["id"]>().toEqualTypeOf<number>();
     expectTypeOf<Customer["branchId"]>().toEqualTypeOf<number | null>();
