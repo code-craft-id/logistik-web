@@ -1,5 +1,5 @@
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
-/// Hierarchy remains TBD, D-27; no parent relationships are inferred.
+/// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model Province {
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
@@ -13,7 +13,7 @@ model Province {
 }
 
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
-/// Hierarchy remains TBD, D-27; no parent relationships are inferred.
+/// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model Regency {
   customers  Customer[]
   consignees Consignee[]
@@ -29,7 +29,7 @@ model Regency {
 }
 
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
-/// Hierarchy remains TBD, D-27; no parent relationships are inferred.
+/// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model District {
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
@@ -43,7 +43,7 @@ model District {
 }
 
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
-/// Hierarchy remains TBD, D-27; no parent relationships are inferred.
+/// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model Village {
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
@@ -57,7 +57,7 @@ model Village {
 }
 
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
-/// Hierarchy remains TBD, D-27; no parent relationships are inferred.
+/// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model PostalCode {
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
@@ -115,8 +115,7 @@ model TransportMode {
   createdAt        DateTime          @default(now()) @map("created_at")
   id               Int               @id @default(autoincrement())
   name             String            @db.VarChar(100)
-  /// Legacy text maintenance approved by coordinator in chat, 2026-10-25.
-  /// Numeric interpretation remains TBD, D-26; never calculate charges from this field.
+  /// DRAFT: Legacy text maintenance approved by coordinator in chat, 2026-10-25. Numeric interpretation remains TBD, D-26; never calculate charges from this field.
   divider          String            @db.VarChar(100)
   status           RecordStatus      @default(ACTIVE)
   deliveryServices DeliveryService[]

@@ -4,6 +4,7 @@ import { Prisma } from "@/lib/db/generated/client";
 import { prisma } from "@/lib/db";
 import { IdentityError } from "@/features/identity/server/access";
 import { permitsBranch, type AccessActor } from "@/features/identity/permissions";
+import { ALLOWED_TRANSITIONS } from "../status";
 import {
   createBookingSchema,
   createTransactionSchema,
@@ -27,13 +28,47 @@ export async function createBooking(input: CreateBookingInput, actor: AccessActo
   if (!permitsBranch(actor, branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
-  const { status: _status, ...bookingData } = data as any;
-  return prisma.booking.create({
-    data: {
-      ...bookingData,
-      branchId,
-      createdById: actor.id,
-    },
+
+  const { isAdministrator } = await import("@/features/identity/permissions");
+
+  return prisma.$transaction(async (tx: TxClient) => {
+    if (data.customerId) {
+      const customer = await tx.customer.findFirst({
+        where: {
+          id: data.customerId,
+          deletedAt: null,
+          ...(isAdministrator(actor)
+            ? {}
+            : {
+                OR: [
+                  { branchId: { in: actor.branchIds } },
+                  { branchId: null },
+                ],
+              }),
+        },
+      });
+      if (!customer) {
+        throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
+    }
+
+    return tx.booking.create({
+      data: {
+        bookingNo: data.bookingNo ?? null,
+        bookingDate: data.bookingDate,
+        branchId,
+        customerId: data.customerId ?? null,
+        senderName: data.senderName ?? null,
+        receiverName: data.receiverName ?? null,
+        doNo: data.doNo ?? null,
+        destination: data.destination ?? null,
+        koli: data.koli ?? null,
+        kilo: data.kilo ?? null,
+        volume: data.volume ?? null,
+        biaya: data.biaya ?? null,
+        createdById: actor.id,
+      },
+    });
   });
 }
 
@@ -134,6 +169,46 @@ export async function createTransaction(
 
   try {
     return await prisma.$transaction(async (tx: TxClient) => {
+      const { isAdministrator } = await import("@/features/identity/permissions");
+      if (data.bookingId) {
+        const booking = await tx.booking.findFirst({
+          where: {
+            id: data.bookingId,
+            deletedAt: null,
+            ...(isAdministrator(actor)
+              ? {}
+              : {
+                  OR: [
+                    { branchId: { in: actor.branchIds } },
+                    { branchId: null },
+                  ],
+                }),
+          },
+        });
+        if (!booking) {
+          throw new IdentityError("FORBIDDEN_BRANCH", 403);
+        }
+      }
+      if (data.courierId) {
+        const courier = await tx.courier.findFirst({
+          where: {
+            id: data.courierId,
+            deletedAt: null,
+            ...(isAdministrator(actor)
+              ? {}
+              : {
+                  OR: [
+                    { branchId: { in: actor.branchIds } },
+                    { branchId: null },
+                  ],
+                }),
+          },
+        });
+        if (!courier) {
+          throw new IdentityError("FORBIDDEN_BRANCH", 403);
+        }
+      }
+
       if (data.idempotencyKey) {
         const existingByKey = await tx.transaction.findUnique({
           where: { idempotencyKey: data.idempotencyKey },
@@ -162,13 +237,34 @@ export async function createTransaction(
           }
           return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
         }
+        const existingByAwbAny = await tx.transaction.findFirst({
+          where: {
+            originBranchId: data.originBranchId,
+            awbNo: data.awbNo,
+          },
+        });
+        if (existingByAwbAny && existingByAwbAny.deletedAt) {
+          throw new Error("AWB_ALREADY_USED");
+        }
       }
 
       const { status: _status, idempotencyKey, ...rest } = data;
       const created = await tx.transaction.create({
         data: {
-          ...rest,
           idempotencyKey: idempotencyKey ?? null,
+          awbNo: rest.awbNo ?? null,
+          bookingId: rest.bookingId ?? null,
+          transactionDate: rest.transactionDate,
+          doNo: rest.doNo ?? null,
+          senderName: rest.senderName ?? null,
+          receiverName: rest.receiverName ?? null,
+          originBranchId: rest.originBranchId,
+          destinationBranchId: rest.destinationBranchId ?? null,
+          koli: rest.koli ?? null,
+          kilo: rest.kilo ?? null,
+          volume: rest.volume ?? null,
+          biaya: rest.biaya ?? null,
+          courierId: rest.courierId ?? null,
           status: "Open",
           createdById: actor.id,
         },
@@ -217,6 +313,15 @@ export async function createTransaction(
           }
           return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
         }
+        const existingByAwbAny = await prisma.transaction.findFirst({
+          where: {
+            originBranchId: data.originBranchId,
+            awbNo: data.awbNo,
+          },
+        });
+        if (existingByAwbAny && existingByAwbAny.deletedAt) {
+          throw new Error("AWB_ALREADY_USED");
+        }
       }
     }
     throw e;
@@ -233,21 +338,25 @@ export async function updateTransactionStatus(
   }
 
   return prisma.$transaction(async (tx: TxClient) => {
+    const { isAdministrator } = await import("@/features/identity/permissions");
     const transaction = await tx.transaction.findFirst({
       where: {
         id: data.transactionId,
         deletedAt: null,
-        OR: [
-          { originBranchId: { in: actor.branchIds } },
-          { destinationBranchId: { in: actor.branchIds } },
-        ],
+        ...(isAdministrator(actor)
+          ? {}
+          : {
+              OR: [
+                { originBranchId: { in: actor.branchIds } },
+                { destinationBranchId: { in: actor.branchIds } },
+              ],
+            }),
       },
     });
     if (!transaction) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
 
-    const { ALLOWED_TRANSITIONS } = await import("../status");
     const allowed = ALLOWED_TRANSITIONS[transaction.status] || [];
     if (!allowed.includes(data.newStatus)) {
       throw new Error("INVALID_STATUS_TRANSITION");

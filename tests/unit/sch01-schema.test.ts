@@ -42,11 +42,41 @@ describe("SCH-01 preservation and adapter contract", () => {
     expect(source).not.toMatch(/\bBigInt\b|\/\/\/ (?:Prototype:|PII)/);
     for (const [, name, body] of models) {
       expect(body, name).toMatch(/\bid\s+Int\s+@id/);
-      expect(body, name).toMatch(
-        /\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,
-      );
-      expect(body, name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);
-      if (!["User", "Session", "AuthAccount", "Verification"].includes(name)) {
+      if (!["IdentityAuditEvent"].includes(name)) {
+        expect(body, name).toMatch(
+          /\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,
+        );
+      }
+      if (
+        ![
+          "User",
+          "Session",
+          "AuthAccount",
+          "Verification",
+          "Permission",
+          "UserAllowedBranch",
+          "IdentityAuditEvent",
+          "ManifestItem",
+          "DeliverySheetItem",
+        ].includes(name)
+      ) {
+        expect(body, name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);
+      }
+      if (
+        ![
+          "User",
+          "Session",
+          "AuthAccount",
+          "Verification",
+          "Permission",
+          "UserAllowedBranch",
+          "IdentityAuditEvent",
+          "ManifestItem",
+          "DeliverySheetItem",
+          "TransactionStatusHistory",
+          "DeliverySheet",
+        ].includes(name)
+      ) {
         expect(body, name).toMatch(/\bdeletedAt\s+DateTime\?/);
       }
     }

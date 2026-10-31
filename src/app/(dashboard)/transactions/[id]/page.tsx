@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { requirePermission } from "@/lib/auth/session";
 import { getTransactionById } from "@/features/bookings/server/queries";
 import { StatusUpdateForm } from "@/features/bookings/components/status-update-form";
@@ -8,6 +9,8 @@ export const instant = false;
 
 export const metadata: Metadata = { title: "Detail AWB/Transaction" };
 
+const idSchema = z.coerce.number().int().positive();
+
 export default async function Page({
   params,
 }: {
@@ -15,7 +18,12 @@ export default async function Page({
 }) {
   await requirePermission("view", "transaction");
   const { id } = await params;
-  const tx = await getTransactionById(Number(id));
+  const parsed = idSchema.safeParse(id);
+  if (!parsed.success) {
+    notFound();
+  }
+  const parsedId = parsed.data;
+  const tx = await getTransactionById(parsedId);
   if (!tx) notFound();
 
   return (

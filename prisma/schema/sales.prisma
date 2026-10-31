@@ -241,6 +241,9 @@ model ManifestItem {
   assignedById  Int?        @map("assigned_by_id")
   assignedBy    User?       @relation("ManifestItemAssignedBy", fields: [assignedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   releasedAt    DateTime?   @map("released_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  deletedAt     DateTime?   @map("deleted_at")
 
   @@unique([transactionId])
   @@index([manifestId])
@@ -273,6 +276,9 @@ model DeliverySheetItem {
   deliveredAt      DateTime?     @map("delivered_at")
   receivedBy       String?       @map("received_by")
   notes            String?
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+  deletedAt        DateTime?     @map("deleted_at")
 
   @@unique([deliverySheetId, transactionId])
   @@index([transactionId])

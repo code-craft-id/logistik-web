@@ -3,7 +3,7 @@ import { z } from "zod";
 const decimalString = (maxInt: number, scale: number) => {
   const max = 10 ** maxInt - 10 ** (-scale);
   const regex = new RegExp(
-    `^-?(?:0|[1-9][0-9]*)(?:\.[0-9]{1,${scale}})?$`,
+    String.raw`^-?(?:0|[1-9][0-9]*)(?:\.[0-9]{1,` + scale + "})?$",
   );
   return z
     .string()
@@ -77,8 +77,7 @@ export const createBookingSchema = z
     biaya: decimalField(13, 2),
     status: z.never().optional(),
   })
-  .strip()
-  .passthrough();
+  .strict();
 
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 
@@ -114,8 +113,7 @@ export const createTransactionSchema = z
     courierId: optionalPositiveInt,
     status: z.never().optional(),
   })
-  .strip()
-  .passthrough();
+  .strict();
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 

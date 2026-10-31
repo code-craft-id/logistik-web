@@ -6,7 +6,10 @@ import { IdentityError } from "@/features/identity/server/access";
 import { isAdministrator } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 
-function requireNonEmptyBranchScope(branchIds: number[]) {
+function requireNonEmptyBranchScope(branchIds: number[], actor?: any) {
+  if (isAdministrator(actor)) {
+    return;
+  }
   if (!branchIds || branchIds.length === 0) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
@@ -24,7 +27,7 @@ export async function listBookings(params: { limit?: number } = {}) {
     });
   }
   const branchIds = await getUserBranchScope();
-  requireNonEmptyBranchScope(branchIds);
+  requireNonEmptyBranchScope(branchIds, actor);
   const limit = params.limit ?? 50;
   return prisma.booking.findMany({
     where: {
@@ -57,7 +60,7 @@ export async function getBookingById(id: number) {
     });
   }
   const branchIds = await getUserBranchScope();
-  requireNonEmptyBranchScope(branchIds);
+  requireNonEmptyBranchScope(branchIds, actor);
   return prisma.booking.findFirst({
     where: {
       id,
@@ -88,7 +91,7 @@ export async function listTransactions(params: { limit?: number } = {}) {
     });
   }
   const branchIds = await getUserBranchScope();
-  requireNonEmptyBranchScope(branchIds);
+  requireNonEmptyBranchScope(branchIds, actor);
   const limit = params.limit ?? 50;
   return prisma.transaction.findMany({
     where: {
@@ -126,7 +129,7 @@ export async function getTransactionById(id: number) {
     });
   }
   const branchIds = await getUserBranchScope();
-  requireNonEmptyBranchScope(branchIds);
+  requireNonEmptyBranchScope(branchIds, actor);
   return prisma.transaction.findFirst({
     where: {
       id,
@@ -175,7 +178,7 @@ export async function lookupTransactionByAwb(
     });
   }
   const branchIds = await getUserBranchScope();
-  requireNonEmptyBranchScope(branchIds);
+  requireNonEmptyBranchScope(branchIds, actor);
   return prisma.transaction.findFirst({
     where: {
       awbNo,

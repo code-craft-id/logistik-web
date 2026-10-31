@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTransactionSchema } from "../../../src/features/bookings/schemas";
+import { createBookingSchema, createTransactionSchema } from "../../../src/features/bookings/schemas";
 
 describe("booking/awb idempotency schema and behavior", () => {
   it("creates valid transaction payload without client status", () => {
@@ -43,6 +43,33 @@ describe("booking/awb idempotency schema and behavior", () => {
         originBranchId: 1,
         status: "Delivered",
       }),
+    ).toThrow();
+  });
+
+  it("rejects unknown fields and internal identifiers in booking/transaction", () => {
+    expect(() =>
+      createBookingSchema.parse({
+        branchId: 1,
+        id: 999,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: new Date(),
+        status: "Delivered",
+        ownerBranchId: 2,
+        extra: "x",
+      } as any),
+    ).toThrow();
+
+    expect(() =>
+      createTransactionSchema.parse({
+        originBranchId: 1,
+        id: 123,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: new Date(),
+        status: "Delivered",
+        internalFlag: true,
+      } as any),
     ).toThrow();
   });
 });
