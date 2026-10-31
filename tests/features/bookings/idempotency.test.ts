@@ -1,16 +1,48 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import { createTransactionSchema } from "../../../src/features/bookings/schemas";
 
-describe("booking/awb idempotency design", () => {
-  it("enforces idempotencyKey uniqueness in schema", () => {
-    expect(true).toBe(true);
+describe("booking/awb idempotency schema and behavior", () => {
+  it("creates valid transaction payload without client status", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: 10,
+      awbNo: "AWB-IDEM-001",
+      idempotencyKey: "idem-key-12345678",
+      kilo: "1.50",
+      volume: "0.5",
+      biaya: "10000.00",
+    });
+    expect((parsed as any).status).toBeUndefined();
+    expect(parsed.originBranchId).toBe(10);
+    expect(parsed.kilo).toBe("1.50");
   });
-  it("handles P2002 by returning existing record", () => {
-    expect(true).toBe(true);
+
+  it("treats empty optionals as undefined and normalizes decimals", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: "10",
+      destinationBranchId: "",
+      bookingId: "   ",
+      kilo: 1.5,
+      volume: 1.5,
+      biaya: 1000,
+    });
+    expect(parsed.destinationBranchId).toBeUndefined();
+    expect(parsed.bookingId).toBeUndefined();
+    expect(parsed.kilo).toBe("1.50");
+    expect(parsed.volume).toBe("1.500");
+    expect(parsed.biaya).toBe("1000.00");
   });
-  it("checks existing by idempotencyKey before create", () => {
-    expect(true).toBe(true);
+
+  it("rejects payload without required originBranchId", () => {
+    expect(() => createTransactionSchema.parse({ awbNo: "AWB-X" })).toThrow();
+    expect(() => createTransactionSchema.parse({ originBranchId: "" })).toThrow();
   });
-  it("checks existing by branch+awbNo when awbNo provided", () => {
-    expect(true).toBe(true);
+
+  it("rejects client-supplied status", () => {
+    expect(() =>
+      createTransactionSchema.parse({
+        originBranchId: 1,
+        status: "Delivered",
+      }),
+    ).toThrow();
   });
 });

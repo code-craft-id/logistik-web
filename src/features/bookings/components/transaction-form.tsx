@@ -26,10 +26,22 @@ export function TransactionForm() {
 
   function onSubmit(formData: FormData) {
     formData.set("idempotencyKey", idempotencyKey);
+    formData.delete("status");
+    // Normalize empty strings to avoid coercion issues
+    for (const key of ["bookingId", "destinationBranchId", "courierId"]) {
+      const val = formData.get(key);
+      if (typeof val === "string" && val.trim() === "") {
+        formData.delete(key);
+      }
+    }
     startTransition(async () => {
-      await createTransactionAction(formData);
-      // Rotate key for next submission to avoid accidental reuse
-      setIdempotencyKey(generateKey());
+      try {
+        await createTransactionAction(formData);
+        setIdempotencyKey(generateKey());
+      } catch (e) {
+        // Keep key on error so user can retry
+        console.error(e);
+      }
     });
   }
 

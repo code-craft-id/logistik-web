@@ -7,6 +7,7 @@ export function BookingForm() {
   const [isPending, startTransition] = useTransition();
 
   function onSubmit(formData: FormData) {
+    formData.delete("status");
     startTransition(async () => {
       await createBookingAction(formData);
     });
@@ -22,6 +23,10 @@ export function BookingForm() {
         <div>
           <label className="text-sm font-medium">DO No.</label>
           <input name="doNo" className="w-full border rounded px-2 py-1" />
+        </div>
+        <div>
+          <label className="text-sm font-medium">Cabang (branchId)</label>
+          <input name="branchId" type="number" className="w-full border rounded px-2 py-1" required />
         </div>
         <div>
           <label className="text-sm font-medium">Pengirim</label>

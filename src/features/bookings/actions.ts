@@ -52,5 +52,5 @@ export async function updateTransactionStatusAction(formData: FormData) {
   const result = await updateTransactionStatus(parsed, current.actor);
   revalidatePath("/transactions");
   revalidatePath(`/transactions/${parsed.transactionId}`);
-  return { ok: true, id: result.id };
+  return { ok: true, id: result?.id };
 }

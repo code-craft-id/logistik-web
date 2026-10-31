@@ -41,5 +41,5 @@ export async function deliveryOutcomeAction(formData: FormData) {
   const result = await recordDeliveryOutcome(parsed, current.actor);
   revalidatePath("/manifest");
   revalidatePath("/operations");
-  return { ok: true, id: result.id };
+  return { ok: true, id: (result as any)?.id };
 }

@@ -17,3 +17,11 @@ export const ALLOWED_MANIFEST_TRANSITIONS: Record<string, string[]> = {
   [MANIFEST_STATUS.DELIVERED]: [MANIFEST_STATUS.CLOSED],
   [MANIFEST_STATUS.CLOSED]: [],
 };
+
+export function canTransitionManifestStatus(
+  current: string,
+  next: string,
+): boolean {
+  const allowed = ALLOWED_MANIFEST_TRANSITIONS[current] || [];
+  return allowed.includes(next);
+}

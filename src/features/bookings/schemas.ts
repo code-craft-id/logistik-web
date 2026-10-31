@@ -26,8 +26,16 @@ const emptyToUndefined = (v: unknown) => {
 };
 
 const optionalPositiveInt = z.preprocess(
-  emptyToUndefined,
-  z.coerce.number().int().positive().optional().nullable(),
+  (v) => {
+    const e = emptyToUndefined(v);
+    if (e === undefined || e === null) return undefined;
+    if (typeof e === "string") {
+      const t = e.trim();
+      if (t === "") return undefined;
+    }
+    return e;
+  },
+  z.coerce.number().int().positive().optional(),
 );
 
 const decimalField = (maxInt: number, scale: number) =>
@@ -69,7 +77,8 @@ export const createBookingSchema = z
     biaya: decimalField(13, 2),
     status: z.never().optional(),
   })
-  .strip();
+  .strip()
+  .passthrough();
 
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 
@@ -82,7 +91,18 @@ export const createTransactionSchema = z
     doNo: z.string().trim().max(50).optional().nullable(),
     senderName: z.string().trim().max(150).optional().nullable(),
     receiverName: z.string().trim().max(150).optional().nullable(),
-    originBranchId: z.preprocess(emptyToUndefined, z.coerce.number().int().positive()),
+    originBranchId: z.preprocess(
+      (v) => {
+        const e = emptyToUndefined(v);
+        if (e === undefined || e === null) return e;
+        if (typeof e === "string") {
+          const t = e.trim();
+          if (t === "") return undefined;
+        }
+        return e;
+      },
+      z.coerce.number().int().positive(),
+    ),
     destinationBranchId: optionalPositiveInt,
     koli: z.preprocess(
       emptyToUndefined,
@@ -94,7 +114,8 @@ export const createTransactionSchema = z
     courierId: optionalPositiveInt,
     status: z.never().optional(),
   })
-  .strip();
+  .strip()
+  .passthrough();
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 

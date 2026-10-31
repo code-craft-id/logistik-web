@@ -13,18 +13,63 @@ import {
   type UpdateTransactionStatusInput,
 } from "../schemas";
 
+type TxClient = Prisma.TransactionClient;
+
 export async function createBooking(input: CreateBookingInput, actor: AccessActor) {
   const data = createBookingSchema.parse(input);
-  if (data.branchId && !permitsBranch(actor, data.branchId)) {
+  if (!actor.branchIds || actor.branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
+  const branchId = data.branchId ?? actor.branchIds[0];
+  if (!branchId) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
+  if (!permitsBranch(actor, branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
   const { status: _status, ...bookingData } = data as any;
   return prisma.booking.create({
     data: {
       ...bookingData,
+      branchId,
       createdById: actor.id,
     },
   });
+}
+
+function normalizeDecimal(v: unknown) {
+  if (v == null) return null;
+  if (typeof v === "string") {
+    const t = v.trim();
+    if (t === "") return null;
+    // Normalize by removing unnecessary trailing zeros
+    if (t.includes(".")) {
+      const [intPart, fracPart] = t.split(".");
+      const fracTrimmed = fracPart.replace(/0+$/, "");
+      return fracTrimmed.length === 0 ? intPart || "0" : `${intPart}.${fracTrimmed}`;
+    }
+    return t;
+  }
+  if (typeof v === "number") {
+    if (!Number.isFinite(v)) return null;
+    return v.toString();
+  }
+  if (typeof v === "object" && v !== null && "toString" in v) {
+    const s = (v as any).toString();
+    // Try to normalize decimal string representation
+    try {
+      // Basic normalization
+      if (s.includes(".")) {
+        const [intPart, fracPart] = s.split(".");
+        const fracTrimmed = fracPart.replace(/0+$/, "");
+        return fracTrimmed.length === 0 ? intPart || "0" : `${intPart}.${fracTrimmed}`;
+      }
+      return s;
+    } catch {
+      return s;
+    }
+  }
+  return String(v);
 }
 
 function payloadMatchesExisting(existing: any, data: any) {
@@ -37,7 +82,6 @@ function payloadMatchesExisting(existing: any, data: any) {
     "receiverName",
     "originBranchId",
     "destinationBranchId",
-    "koli",
     "courierId",
   ];
   for (const f of fields) {
@@ -45,24 +89,27 @@ function payloadMatchesExisting(existing: any, data: any) {
     const b = data[f];
     if (a === b) continue;
     if (a == null && b == null) continue;
+    if (a == null && b === undefined) continue;
+    if (b == null && a === undefined) continue;
     // Normalize numbers
     if (typeof a === "number" && typeof b === "number" && a === b) continue;
     if (typeof a === "bigint" && typeof b === "bigint" && a === b) continue;
-    // For decimals/strings, compare string forms loosely
     if (String(a ?? null) !== String(b ?? null)) {
       return false;
     }
   }
-  // Compare decimals as strings
+  // Compare koli with server default 0
+  const aKoli = existing["koli"] ?? 0;
+  const bKoli = data["koli"] ?? 0;
+  if (Number(aKoli) !== Number(bKoli)) {
+    return false;
+  }
+  // Compare decimals as normalized strings
   const decFields = ["kilo", "volume", "biaya"];
   for (const f of decFields) {
-    const a = existing[f];
-    const b = data[f];
-    if (a == null && (b == null || b === undefined)) continue;
-    if ((a == null) !== ((b == null || b === undefined))) return false;
-    if (a != null && b != null) {
-      if (a.toString() !== b.toString()) return false;
-    }
+    const aNorm = normalizeDecimal(existing[f]);
+    const bNorm = normalizeDecimal(data[f]);
+    if (aNorm !== bNorm) return false;
   }
   return true;
 }
@@ -72,6 +119,9 @@ export async function createTransaction(
   actor: AccessActor,
 ) {
   const data = createTransactionSchema.parse(input) as any;
+  if (!actor.branchIds || actor.branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
   if (!permitsBranch(actor, data.originBranchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
@@ -82,38 +132,38 @@ export async function createTransaction(
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 
-  return prisma.$transaction(async (tx: any) => {
-    if (data.idempotencyKey) {
-      const existingByKey = await tx.transaction.findUnique({
-        where: { idempotencyKey: data.idempotencyKey },
-      });
-      if (existingByKey) {
-        if (!payloadMatchesExisting(existingByKey, data)) {
-          throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
+  try {
+    return await prisma.$transaction(async (tx: TxClient) => {
+      if (data.idempotencyKey) {
+        const existingByKey = await tx.transaction.findUnique({
+          where: { idempotencyKey: data.idempotencyKey },
+        });
+        if (existingByKey) {
+          if (!payloadMatchesExisting(existingByKey, data)) {
+            throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
+          }
+          return { transaction: existingByKey, created: false, idempotent: true };
         }
-        return { transaction: existingByKey, created: false, idempotent: true };
       }
-    }
-    if (data.awbNo && data.originBranchId) {
-      const existingByAwb = await tx.transaction.findFirst({
-        where: {
-          originBranchId: data.originBranchId,
-          awbNo: data.awbNo,
-          deletedAt: null,
-        },
-      });
-      if (existingByAwb) {
-        if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
-          throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+      if (data.awbNo && data.originBranchId) {
+        const existingByAwb = await tx.transaction.findFirst({
+          where: {
+            originBranchId: data.originBranchId,
+            awbNo: data.awbNo,
+            deletedAt: null,
+          },
+        });
+        if (existingByAwb) {
+          if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
+            throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+          }
+          if (!payloadMatchesExisting(existingByAwb, data)) {
+            throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
+          }
+          return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
         }
-        if (!payloadMatchesExisting(existingByAwb, data)) {
-          throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
-        }
-        return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
       }
-    }
 
-    try {
       const { status: _status, idempotencyKey, ...rest } = data;
       const created = await tx.transaction.create({
         data: {
@@ -133,44 +183,44 @@ export async function createTransaction(
         },
       });
       return { transaction: created, created: true, idempotent: false };
-    } catch (e: unknown) {
-      if (
-        e instanceof Prisma.PrismaClientKnownRequestError &&
-        e.code === "P2002"
-      ) {
-        if (data.idempotencyKey) {
-          const existingByKey = await tx.transaction.findUnique({
-            where: { idempotencyKey: data.idempotencyKey },
-          });
-          if (existingByKey) {
-            if (!payloadMatchesExisting(existingByKey, data)) {
-              throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
-            }
-            return { transaction: existingByKey, created: false, idempotent: true };
+    });
+  } catch (e: unknown) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
+      if (data.idempotencyKey) {
+        const existingByKey = await prisma.transaction.findUnique({
+          where: { idempotencyKey: data.idempotencyKey },
+        });
+        if (existingByKey) {
+          if (!payloadMatchesExisting(existingByKey, data)) {
+            throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
           }
-        }
-        if (data.awbNo && data.originBranchId) {
-          const existingByAwb = await tx.transaction.findFirst({
-            where: {
-              originBranchId: data.originBranchId,
-              awbNo: data.awbNo,
-              deletedAt: null,
-            },
-          });
-          if (existingByAwb) {
-            if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
-              throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
-            }
-            if (!payloadMatchesExisting(existingByAwb, data)) {
-              throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
-            }
-            return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
-          }
+          return { transaction: existingByKey, created: false, idempotent: true };
         }
       }
-      throw e;
+      if (data.awbNo && data.originBranchId) {
+        const existingByAwb = await prisma.transaction.findFirst({
+          where: {
+            originBranchId: data.originBranchId,
+            awbNo: data.awbNo,
+            deletedAt: null,
+          },
+        });
+        if (existingByAwb) {
+          if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
+            throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+          }
+          if (!payloadMatchesExisting(existingByAwb, data)) {
+            throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
+          }
+          return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
+        }
+      }
     }
-  });
+    throw e;
+  }
 }
 
 export async function updateTransactionStatus(
@@ -178,8 +228,11 @@ export async function updateTransactionStatus(
   actor: AccessActor,
 ) {
   const data = updateTransactionStatusSchema.parse(input);
+  if (!actor.branchIds || actor.branchIds.length === 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  }
 
-  return prisma.$transaction(async (tx: any) => {
+  return prisma.$transaction(async (tx: TxClient) => {
     const transaction = await tx.transaction.findFirst({
       where: {
         id: data.transactionId,
@@ -200,9 +253,16 @@ export async function updateTransactionStatus(
       throw new Error("INVALID_STATUS_TRANSITION");
     }
 
-    const updated = await tx.transaction.update({
-      where: { id: transaction.id },
+    const result = await tx.transaction.updateMany({
+      where: { id: transaction.id, status: transaction.status },
       data: { status: data.newStatus },
+    });
+    if (result.count !== 1) {
+      throw new Error("STATUS_CONCURRENTLY_UPDATED");
+    }
+
+    const updated = await tx.transaction.findUnique({
+      where: { id: transaction.id },
     });
 
     await tx.transactionStatusHistory.create({
