@@ -18,17 +18,29 @@ type TxClient = Prisma.TransactionClient;
 
 export async function createManifest(input: CreateManifestInput, actor: AccessActor) {
   const data = createManifestSchema.parse(input);
-  if (!actor.branchIds || actor.branchIds.length === 0) {
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
-  if (!data.branchId) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  if (data.branchId == null || !Number.isSafeInteger(data.branchId) || data.branchId <= 0) {
+    if (isAdministrator(actor)) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang manifest wajib diisi untuk administrator.");
+    }
+    throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang manifest wajib diisi.");
   }
   if (!permitsBranch(actor, data.branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
-
-  const { isAdministrator } = await import("@/features/identity/permissions");
+  if (data.originBranchId != null) {
+    if (!Number.isSafeInteger(data.originBranchId) || data.originBranchId <= 0) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang asal tidak valid.");
+    }
+  }
+  if (data.destinationBranchId != null) {
+    if (!Number.isSafeInteger(data.destinationBranchId) || data.destinationBranchId <= 0) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan tidak valid.");
+    }
+  }
 
   return prisma.$transaction(async (tx: TxClient) => {
     if (data.originBranchId && !permitsBranch(actor, data.originBranchId)) {
@@ -97,7 +109,8 @@ export async function assignTransactionToManifest(
   actor: AccessActor,
 ) {
   const data = assignToManifestSchema.parse(input);
-  if (!actor.branchIds || actor.branchIds.length === 0) {
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 
@@ -109,14 +122,16 @@ export async function assignTransactionToManifest(
       },
     });
     if (!manifest) throw new IdentityError("FORBIDDEN_BRANCH", 403);
-    if (!manifest.branchId || !actor.branchIds.includes(manifest.branchId)) {
+    if (!manifest.branchId) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    if (!permitsBranch(actor, manifest.branchId)) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
     if (manifest.status === "Closed") {
       throw new Error("MANIFEST_NOT_ASSIGNABLE");
     }
 
-    const { isAdministrator } = await import("@/features/identity/permissions");
     const transaction = await tx.transaction.findFirst({
       where: {
         id: data.transactionId,
@@ -171,18 +186,21 @@ export async function recordDeliveryOutcome(
   actor: AccessActor,
 ) {
   const data = deliveryOutcomeSchema.parse(input);
-  if (!actor.branchIds || actor.branchIds.length === 0) {
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 
   return prisma.$transaction(async (tx: TxClient) => {
-    const { isAdministrator } = await import("@/features/identity/permissions");
     const sheet = await tx.deliverySheet.findUnique({
       where: { id: data.deliverySheetId },
       include: { manifest: true },
     });
     if (!sheet) throw new Error("DELIVERY_SHEET_NOT_FOUND");
-    if (!sheet.manifest.branchId || (!isAdministrator(actor) && !actor.branchIds.includes(sheet.manifest.branchId))) {
+    if (!sheet.manifest.branchId) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    if (!permitsBranch(actor, sheet.manifest.branchId)) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
 

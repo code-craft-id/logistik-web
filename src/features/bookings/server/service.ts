@@ -18,18 +18,23 @@ type TxClient = Prisma.TransactionClient;
 
 export async function createBooking(input: CreateBookingInput, actor: AccessActor) {
   const data = createBookingSchema.parse(input);
-  if (!actor.branchIds || actor.branchIds.length === 0) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  let branchId = data.branchId;
+  if (branchId == null) {
+    if (isAdministrator(actor)) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan wajib diisi untuk administrator.");
+    }
+    if (!actor.branchIds || actor.branchIds.length === 0) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    branchId = actor.branchIds[0];
   }
-  const branchId = data.branchId ?? actor.branchIds[0];
-  if (!branchId) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  if (!branchId || !Number.isSafeInteger(branchId) || branchId <= 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan tidak valid.");
   }
   if (!permitsBranch(actor, branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
-
-  const { isAdministrator } = await import("@/features/identity/permissions");
 
   return prisma.$transaction(async (tx: TxClient) => {
     if (data.customerId) {
@@ -154,17 +159,38 @@ export async function createTransaction(
   actor: AccessActor,
 ) {
   const data = createTransactionSchema.parse(input) as any;
-  if (!actor.branchIds || actor.branchIds.length === 0) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  if (!data.originBranchId || !Number.isSafeInteger(data.originBranchId) || data.originBranchId <= 0) {
+    throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang asal wajib diisi dan tidak valid.");
   }
-  if (!permitsBranch(actor, data.originBranchId)) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  if (data.destinationBranchId != null) {
+    if (!Number.isSafeInteger(data.destinationBranchId) || data.destinationBranchId <= 0) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan tidak valid.");
+    }
   }
-  if (
-    data.destinationBranchId &&
-    !permitsBranch(actor, data.destinationBranchId)
-  ) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  if (isAdministrator(actor)) {
+    if (!permitsBranch(actor, data.originBranchId)) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    if (
+      data.destinationBranchId &&
+      !permitsBranch(actor, data.destinationBranchId)
+    ) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+  } else {
+    if (!actor.branchIds || actor.branchIds.length === 0) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    if (!permitsBranch(actor, data.originBranchId)) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    if (
+      data.destinationBranchId &&
+      !permitsBranch(actor, data.destinationBranchId)
+    ) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
   }
 
   try {
@@ -333,12 +359,12 @@ export async function updateTransactionStatus(
   actor: AccessActor,
 ) {
   const data = updateTransactionStatusSchema.parse(input);
-  if (!actor.branchIds || actor.branchIds.length === 0) {
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 
   return prisma.$transaction(async (tx: TxClient) => {
-    const { isAdministrator } = await import("@/features/identity/permissions");
     const transaction = await tx.transaction.findFirst({
       where: {
         id: data.transactionId,
