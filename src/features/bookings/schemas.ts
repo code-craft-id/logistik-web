@@ -81,11 +81,21 @@ export const createBookingSchema = z
 
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 
+const normalizeAwbSchema = (v: unknown) => {
+  if (v === null || v === undefined) return null;
+  if (typeof v === "string") {
+    const t = v.trim();
+    if (t === "") return null;
+    return t;
+  }
+  return v;
+};
+
 export const createTransactionSchema = z
   .object({
     idempotencyKey: z.preprocess(emptyToUndefined, z.string().min(8).max(64).optional()),
     bookingId: optionalPositiveInt,
-    awbNo: z.string().trim().max(50).optional().nullable(),
+    awbNo: z.preprocess(normalizeAwbSchema, z.string().min(1).max(50).nullable().optional()),
     transactionDate: z.coerce.date().optional(),
     doNo: z.string().trim().max(50).optional().nullable(),
     senderName: z.string().trim().max(150).optional().nullable(),
@@ -117,8 +127,18 @@ export const createTransactionSchema = z
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 
+const normalizeAwbLookupSchema = (v: unknown) => {
+  if (v === null || v === undefined) return v;
+  if (typeof v === "string") {
+    const t = v.trim();
+    if (t === "") return undefined;
+    return t;
+  }
+  return v;
+};
+
 export const transactionLookupSchema = z.object({
-  awbNo: z.string().trim().min(1).max(50),
+  awbNo: z.preprocess(normalizeAwbLookupSchema, z.string().min(1).max(50)),
   originBranchId: z.coerce.number().int().positive().optional(),
 });
 

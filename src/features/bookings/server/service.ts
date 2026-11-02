@@ -112,7 +112,56 @@ function normalizeDecimal(v: unknown) {
   return String(v);
 }
 
-function payloadMatchesExisting(existing: any, data: any) {
+function normalizeAwbValue(v: unknown) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === "string") {
+    const t = v.trim();
+    if (t === "") return null;
+    return t;
+  }
+  return v;
+}
+
+function normalizeDateValue(v: unknown) {
+  if (v == null) return null;
+  if (v instanceof Date) {
+    if (Number.isNaN(v.getTime())) return null;
+    return v.toISOString();
+  }
+  if (typeof v === "string") {
+    const t = v.trim();
+    if (t === "") return null;
+    const d = new Date(t);
+    if (Number.isNaN(d.getTime())) return t;
+    return d.toISOString();
+  }
+  if (typeof v === "number") {
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return String(v);
+    return d.toISOString();
+  }
+  if (typeof v === "object" && v !== null && "toISOString" in v) {
+    try {
+      const d = v as Date;
+      if (Number.isNaN(d.getTime())) return null;
+      return d.toISOString();
+    } catch {
+      return String(v);
+    }
+  }
+  return String(v);
+}
+
+function hasExplicitTransactionDate(input: unknown) {
+  if (!input || typeof input !== "object") return false;
+  if (!Object.prototype.hasOwnProperty.call(input, "transactionDate")) return false;
+  const v = (input as any).transactionDate;
+  if (v === undefined || v === null) return false;
+  if (typeof v === "string" && v.trim() === "") return false;
+  return true;
+}
+
+function payloadMatchesExisting(existing: any, data: any, opts?: { explicitTransactionDate?: boolean }) {
   // Compare key fields that define the business payload; ignore server-set fields
   const fields = [
     "bookingId",
@@ -126,7 +175,15 @@ function payloadMatchesExisting(existing: any, data: any) {
   ];
   for (const f of fields) {
     const a = existing[f];
-    const b = data[f];
+    const b = f === "awbNo" ? normalizeAwbValue(data[f]) : data[f];
+    if (f === "awbNo") {
+      if (a === b) continue;
+      if (a == null && b == null) continue;
+      if (String(a ?? null) !== String(b ?? null)) {
+        return false;
+      }
+      continue;
+    }
     if (a === b) continue;
     if (a == null && b == null) continue;
     if (a == null && b === undefined) continue;
@@ -135,6 +192,13 @@ function payloadMatchesExisting(existing: any, data: any) {
     if (typeof a === "number" && typeof b === "number" && a === b) continue;
     if (typeof a === "bigint" && typeof b === "bigint" && a === b) continue;
     if (String(a ?? null) !== String(b ?? null)) {
+      return false;
+    }
+  }
+  if (opts?.explicitTransactionDate) {
+    const aDate = normalizeDateValue(existing["transactionDate"]);
+    const bDate = normalizeDateValue(data["transactionDate"]);
+    if (aDate !== bDate) {
       return false;
     }
   }
@@ -159,6 +223,9 @@ export async function createTransaction(
   actor: AccessActor,
 ) {
   const data = createTransactionSchema.parse(input) as any;
+  const normalizedAwb = normalizeAwbValue(data.awbNo);
+  data.awbNo = normalizedAwb;
+  const explicitTransactionDate = hasExplicitTransactionDate(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
   if (!data.originBranchId || !Number.isSafeInteger(data.originBranchId) || data.originBranchId <= 0) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang asal wajib diisi dan tidak valid.");
@@ -240,7 +307,7 @@ export async function createTransaction(
           where: { idempotencyKey: data.idempotencyKey },
         });
         if (existingByKey) {
-          if (!payloadMatchesExisting(existingByKey, data)) {
+          if (!payloadMatchesExisting(existingByKey, data, { explicitTransactionDate })) {
             throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
           }
           return { transaction: existingByKey, created: false, idempotent: true };
@@ -258,7 +325,7 @@ export async function createTransaction(
           if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
             throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
           }
-          if (!payloadMatchesExisting(existingByAwb, data)) {
+          if (!payloadMatchesExisting(existingByAwb, data, { explicitTransactionDate })) {
             throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
           }
           return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
@@ -316,7 +383,7 @@ export async function createTransaction(
           where: { idempotencyKey: data.idempotencyKey },
         });
         if (existingByKey) {
-          if (!payloadMatchesExisting(existingByKey, data)) {
+          if (!payloadMatchesExisting(existingByKey, data, { explicitTransactionDate })) {
             throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
           }
           return { transaction: existingByKey, created: false, idempotent: true };
@@ -334,7 +401,7 @@ export async function createTransaction(
           if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
             throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
           }
-          if (!payloadMatchesExisting(existingByAwb, data)) {
+          if (!payloadMatchesExisting(existingByAwb, data, { explicitTransactionDate })) {
             throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
           }
           return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };

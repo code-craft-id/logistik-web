@@ -72,4 +72,56 @@ describe("booking/awb idempotency schema and behavior", () => {
       } as any),
     ).toThrow();
   });
+
+  it("normalizes empty string awbNo to null", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: 1,
+      awbNo: "",
+    });
+    expect(parsed.awbNo).toBeNull();
+  });
+
+  it("normalizes whitespace awbNo to null", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: 1,
+      awbNo: "   ",
+    });
+    expect(parsed.awbNo).toBeNull();
+  });
+
+  it("keeps valid awbNo", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: 1,
+      awbNo: "AWB-VALID-123",
+    });
+    expect(parsed.awbNo).toBe("AWB-VALID-123");
+  });
+
+  it("allows multiple transactions without awbNo on same branch", () => {
+    const parsed1 = createTransactionSchema.parse({
+      originBranchId: 5,
+      awbNo: "",
+    });
+    const parsed2 = createTransactionSchema.parse({
+      originBranchId: 5,
+      awbNo: "   ",
+    });
+    expect(parsed1.awbNo).toBeNull();
+    expect(parsed2.awbNo).toBeNull();
+  });
+
+  it("parses explicit transactionDate", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: 1,
+      transactionDate: "2024-01-01T00:00:00.000Z",
+    });
+    expect(parsed.transactionDate).toBeInstanceOf(Date);
+  });
+
+  it("treats missing transactionDate as undefined", () => {
+    const parsed = createTransactionSchema.parse({
+      originBranchId: 1,
+    });
+    expect(parsed.transactionDate).toBeUndefined();
+  });
 });
