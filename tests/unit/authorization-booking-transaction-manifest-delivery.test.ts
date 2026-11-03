@@ -276,7 +276,8 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       const { prisma } = await import("@/lib/db");
       (prisma.$transaction as any).mockImplementation(async (fn: any) => {
         const tx = {
-          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1, manifest: { branchId: 2 } }) },
+          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }) },
+          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 2, deletedAt: null }) },
         };
         return fn(tx);
       });
@@ -290,10 +291,11 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       const { prisma } = await import("@/lib/db");
       (prisma.$transaction as any).mockImplementation(async (fn: any) => {
         const tx = {
-          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1, manifest: { branchId: 5 } }) },
-          manifestItem: { findFirst: vi.fn().mockResolvedValue({ id: 1 }) },
+          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }) },
+          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 5, deletedAt: null }) },
+          manifestItem: { findFirst: vi.fn().mockResolvedValue({ id: 1, deletedAt: null }) },
           transaction: { findFirst: vi.fn().mockResolvedValue({ id: 1, status: "In Transit", originBranchId: 5 }), updateMany: vi.fn().mockResolvedValue({ count: 1 }), findUnique: vi.fn().mockResolvedValue({ id: 1, status: "Delivered" }) },
-          deliverySheetItem: { findUnique: vi.fn().mockResolvedValue({ id: 1 }), create: vi.fn().mockResolvedValue({ id: 1 }), updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
+          deliverySheetItem: { findUnique: vi.fn().mockResolvedValue({ id: 1, outcome: null }), create: vi.fn().mockResolvedValue({ id: 1 }), updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
           transactionStatusHistory: { create: vi.fn().mockResolvedValue({}) },
         };
         return fn(tx);
@@ -307,7 +309,8 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       const { prisma } = await import("@/lib/db");
       (prisma.$transaction as any).mockImplementation(async (fn: any) => {
         const tx = {
-          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1, manifest: { branchId: 9 } }) },
+          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }) },
+          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 9, deletedAt: null }) },
         };
         return fn(tx);
       });

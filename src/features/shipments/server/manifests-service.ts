@@ -194,32 +194,42 @@ export async function recordDeliveryOutcome(
   return prisma.$transaction(async (tx: TxClient) => {
     const sheet = await tx.deliverySheet.findUnique({
       where: { id: data.deliverySheetId },
-      include: { manifest: true },
     });
     if (!sheet) throw new Error("DELIVERY_SHEET_NOT_FOUND");
-    if (!sheet.manifest.branchId) {
+
+    const manifest = await tx.manifest.findFirst({
+      where: {
+        id: sheet.manifestId,
+        deletedAt: null,
+      },
+    });
+    if (!manifest) {
+      throw new Error("MANIFEST_NOT_FOUND");
+    }
+    if (!manifest.branchId) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
-    if (!permitsBranch(actor, sheet.manifest.branchId)) {
+    if (!permitsBranch(actor, manifest.branchId)) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
 
     const manifestItem = await tx.manifestItem.findFirst({
       where: {
-        manifestId: sheet.manifestId,
+        manifestId: manifest.id,
         transactionId: data.transactionId,
         releasedAt: null,
+        deletedAt: null,
       },
     });
     if (!manifestItem) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      throw new Error("MANIFEST_ITEM_NOT_FOUND");
     }
 
     const txRecord = await tx.transaction.findFirst({
       where: { id: data.transactionId, deletedAt: null },
     });
     if (!txRecord) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      throw new Error("TRANSACTION_NOT_FOUND");
     }
     // Ensure transaction is in scope
     if (!isAdministrator(actor)) {

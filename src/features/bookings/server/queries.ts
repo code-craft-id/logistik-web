@@ -160,12 +160,16 @@ export async function lookupTransactionByAwb(
   const current = await currentIdentity();
   const actor = current?.actor ?? null;
   if (isAdministrator(actor)) {
-    return prisma.transaction.findFirst({
-      where: {
-        awbNo,
-        deletedAt: null,
-        ...(originBranchId ? { originBranchId } : {}),
-      },
+    const where: any = {
+      awbNo,
+      deletedAt: null,
+    };
+    if (originBranchId) {
+      where.originBranchId = originBranchId;
+    }
+    const matches = await prisma.transaction.findMany({
+      where,
+      orderBy: [{ transactionDate: "desc" }, { id: "desc" }],
       include: {
         booking: true,
         originBranch: true,
@@ -176,19 +180,32 @@ export async function lookupTransactionByAwb(
         },
       },
     });
+    if (matches.length === 0) return null;
+    if (matches.length === 1) return matches[0];
+    if (originBranchId) return matches[0];
+    throw new IdentityError("FORBIDDEN_BRANCH", 409, "AWB ditemukan di beberapa cabang asal. Pilih cabang asal untuk melanjutkan.");
   }
   const branchIds = await getUserBranchScope();
   requireNonEmptyBranchScope(branchIds, actor);
-  return prisma.transaction.findFirst({
-    where: {
-      awbNo,
-      deletedAt: null,
-      ...(originBranchId ? { originBranchId } : {}),
-      OR: [
-        { originBranchId: { in: branchIds } },
-        { destinationBranchId: { in: branchIds } },
-      ],
-    },
+  if (originBranchId) {
+    if (!branchIds.includes(originBranchId)) {
+      throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+  }
+  const where: any = {
+    awbNo,
+    deletedAt: null,
+    OR: [
+      { originBranchId: { in: branchIds } },
+      { destinationBranchId: { in: branchIds } },
+    ],
+  };
+  if (originBranchId) {
+    where.originBranchId = originBranchId;
+  }
+  const matches = await prisma.transaction.findMany({
+    where,
+    orderBy: [{ transactionDate: "desc" }, { id: "desc" }],
     include: {
       booking: true,
       originBranch: true,
@@ -199,4 +216,8 @@ export async function lookupTransactionByAwb(
       },
     },
   });
+  if (matches.length === 0) return null;
+  if (matches.length === 1) return matches[0];
+  if (originBranchId) return matches[0];
+  throw new IdentityError("FORBIDDEN_BRANCH", 409, "AWB ditemukan di beberapa cabang asal. Pilih cabang asal untuk melanjutkan.");
 }
