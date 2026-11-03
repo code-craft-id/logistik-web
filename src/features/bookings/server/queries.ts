@@ -164,7 +164,7 @@ export async function lookupTransactionByAwb(
       awbNo,
       deletedAt: null,
     };
-    if (originBranchId) {
+    if (originBranchId !== undefined && originBranchId !== null) {
       where.originBranchId = originBranchId;
     }
     const matches = await prisma.transaction.findMany({
@@ -182,16 +182,13 @@ export async function lookupTransactionByAwb(
     });
     if (matches.length === 0) return null;
     if (matches.length === 1) return matches[0];
-    if (originBranchId) return matches[0];
-    throw new IdentityError("FORBIDDEN_BRANCH", 409, "AWB ditemukan di beberapa cabang asal. Pilih cabang asal untuk melanjutkan.");
+    if (originBranchId !== undefined && originBranchId !== null) {
+      return matches[0];
+    }
+    return matches;
   }
   const branchIds = await getUserBranchScope();
   requireNonEmptyBranchScope(branchIds, actor);
-  if (originBranchId) {
-    if (!branchIds.includes(originBranchId)) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403);
-    }
-  }
   const where: any = {
     awbNo,
     deletedAt: null,
@@ -200,7 +197,7 @@ export async function lookupTransactionByAwb(
       { destinationBranchId: { in: branchIds } },
     ],
   };
-  if (originBranchId) {
+  if (originBranchId !== undefined && originBranchId !== null) {
     where.originBranchId = originBranchId;
   }
   const matches = await prisma.transaction.findMany({
@@ -218,6 +215,20 @@ export async function lookupTransactionByAwb(
   });
   if (matches.length === 0) return null;
   if (matches.length === 1) return matches[0];
-  if (originBranchId) return matches[0];
-  throw new IdentityError("FORBIDDEN_BRANCH", 409, "AWB ditemukan di beberapa cabang asal. Pilih cabang asal untuk melanjutkan.");
+  if (originBranchId !== undefined && originBranchId !== null) {
+    return matches[0];
+  }
+  if (matches.length > 1) {
+    return matches;
+  }
+  // If somehow we get here with multiple matches and no origin filter and still passed scope,
+  // throw 409 to force disambiguation
+  if (matches.length > 1) {
+    throw new IdentityError(
+      "FORBIDDEN_BRANCH",
+      409,
+      "AWB ditemukan di beberapa cabang asal. Pilih cabang asal untuk melanjutkan.",
+    );
+  }
+  return null;
 }
