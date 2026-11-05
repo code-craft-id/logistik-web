@@ -249,6 +249,9 @@ export async function recordDeliveryOutcome(
         },
       },
     });
+    if (allowedItem?.deletedAt) {
+      throw new Error("DELIVERY_SHEET_ITEM_NOT_FOUND");
+    }
     if (!allowedItem) {
       await tx.deliverySheetItem.create({
         data: {
@@ -272,6 +275,7 @@ export async function recordDeliveryOutcome(
           deliverySheetId: data.deliverySheetId,
           transactionId: data.transactionId,
           outcome: allowedItem.outcome ?? null,
+          deletedAt: null,
         },
         data: {
           outcome: data.outcome || null,

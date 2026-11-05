@@ -35,6 +35,7 @@ export function AwbLookup() {
   const [awbValue, setAwbValue] = useState("");
   const [originBranchId, setOriginBranchId] = useState<string>("");
   const [branches, setBranches] = useState<BranchOption[]>([]);
+  const [resultOriginBranches, setResultOriginBranches] = useState<BranchOption[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [branchesLoaded, setBranchesLoaded] = useState(false);
 
@@ -80,6 +81,7 @@ export function AwbLookup() {
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setResultOriginBranches([]);
     const formData = new FormData();
     formData.append("awbNo", awbValue);
     if (originBranchId) {
@@ -88,6 +90,23 @@ export function AwbLookup() {
     startTransition(async () => {
       const res = (await lookupTransactionAction(formData)) as LookupResult;
       setResult(res);
+      if (res && res.found && "multiple" in res && Array.isArray(res.data)) {
+        const unique = new Map<number, BranchOption>();
+        for (const item of res.data) {
+          if (item.originBranch && item.originBranch.id) {
+            unique.set(item.originBranch.id, item.originBranch);
+          } else if (item.originBranchId) {
+            unique.set(item.originBranchId, {
+              id: item.originBranchId,
+              code: "",
+              name: String(item.originBranchId),
+            });
+          }
+        }
+        if (unique.size > 0) {
+          setResultOriginBranches(Array.from(unique.values()));
+        }
+      }
     });
   }
 
@@ -131,7 +150,7 @@ export function AwbLookup() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="any">Semua cabang dalam cakupan</SelectItem>
-              {branches.map((b) => (
+              {(resultOriginBranches.length > 0 ? resultOriginBranches : branches).map((b) => (
                 <SelectItem key={b.id} value={String(b.id)}>
                   {b.code ? `${b.code} - ${b.name}` : b.name}
                 </SelectItem>
