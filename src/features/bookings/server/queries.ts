@@ -1,10 +1,10 @@
 import "server-only";
 
-import { prisma } from "@/lib/db";
-import { getUserBranchScope } from "@/lib/auth/session";
-import { IdentityError } from "@/features/identity/server/access";
 import { isAdministrator } from "@/features/identity/permissions";
+import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
+import { getUserBranchScope } from "@/lib/auth/session";
+import { prisma } from "@/lib/db";
 
 function requireNonEmptyBranchScope(branchIds: number[], actor?: any) {
   if (isAdministrator(actor)) {
@@ -218,17 +218,6 @@ export async function lookupTransactionByAwb(
   if (originBranchId !== undefined && originBranchId !== null) {
     return matches[0];
   }
-  if (matches.length > 1) {
-    return matches;
-  }
-  // If somehow we get here with multiple matches and no origin filter and still passed scope,
-  // throw 409 to force disambiguation
-  if (matches.length > 1) {
-    throw new IdentityError(
-      "FORBIDDEN_BRANCH",
-      409,
-      "AWB ditemukan di beberapa cabang asal. Pilih cabang asal untuk melanjutkan.",
-    );
-  }
-  return null;
+  // Multiple matches without origin disambiguation: return all (scoped) for UI selection.
+  return matches;
 }
