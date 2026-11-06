@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -29,6 +29,28 @@ type LookupResult =
   | { found: true; data: LookupData }
   | { found: true; multiple: true; data: LookupData[] };
 
+function isMultipleResult(
+  result: LookupResult,
+): result is { found: true; multiple: true; data: LookupData[] } {
+  return result.found && "multiple" in result && result.multiple === true;
+}
+
+function isSingleResult(
+  result: LookupResult,
+): result is { found: true; data: LookupData } {
+  return result.found && !isMultipleResult(result);
+}
+
+function formatBranch(
+  branch: BranchOption | null | undefined,
+  branchId: number | null | undefined,
+): string {
+  if (branch) {
+    return branch.code ? `${branch.code} - ${branch.name}` : branch.name;
+  }
+  return branchId != null ? String(branchId) : "-";
+}
+
 export function AwbLookup() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<LookupResult | null>(null);
@@ -38,6 +60,7 @@ export function AwbLookup() {
   const [resultOriginBranches, setResultOriginBranches] = useState<
     BranchOption[]
   >([]);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,14 +99,19 @@ export function AwbLookup() {
   }, []);
 
   function onAwbChange(value: string) {
+    // Invalidate any in-flight lookup so a late response cannot repopulate
+    // results for the previous AWB (PR #9 regression).
+    requestIdRef.current += 1;
     setAwbValue(value);
-    // Reset origin filter when AWB changes to avoid stale filter carrying over (PR #9 regression).
+    // Reset origin filter and previous results when AWB changes.
     setOriginBranchId("");
     setResultOriginBranches([]);
+    setResult(null);
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const requestId = ++requestIdRef.current;
     setResultOriginBranches([]);
     const formData = new FormData();
     formData.append("awbNo", awbValue);
@@ -92,11 +120,13 @@ export function AwbLookup() {
     }
     startTransition(async () => {
       const res = (await lookupTransactionAction(formData)) as LookupResult;
+      // Ignore stale responses if a newer request was issued or input changed.
+      if (requestId !== requestIdRef.current) return;
       setResult(res);
-      if (res && res.found && "multiple" in res && Array.isArray(res.data)) {
+      if (isMultipleResult(res)) {
         const unique = new Map<number, BranchOption>();
         for (const item of res.data) {
-          if (item.originBranch && item.originBranch.id) {
+          if (item.originBranch?.id) {
             unique.set(item.originBranch.id, item.originBranch);
           } else if (item.originBranchId) {
             unique.set(item.originBranchId, {
@@ -193,71 +223,52 @@ export function AwbLookup() {
           </div>
         )}
       </form>
-      {result &&
-        result.found &&
-        "multiple" in result &&
-        Array.isArray(result.data) && (
-          <div className="space-y-2">
-            <div className="text-sm font-medium">
-              Ditemukan {result.data.length} hasil
-            </div>
-            {result.data.map((item) => (
-              <div key={item.id} className="border rounded p-4 space-y-1">
-                <div className="font-medium">AWB: {item.awbNo}</div>
-                <div>Status: {item.status}</div>
-                <div>Tanggal: {item.transactionDate}</div>
-                <div>
-                  Cabang asal:{" "}
-                  {item.originBranch
-                    ? item.originBranch.code
-                      ? `${item.originBranch.code} - ${item.originBranch.name}`
-                      : item.originBranch.name
-                    : (item.originBranchId ?? "-")}
-                </div>
-                <div>
-                  Cabang tujuan:{" "}
-                  {item.destinationBranch
-                    ? item.destinationBranch.code
-                      ? `${item.destinationBranch.code} - ${item.destinationBranch.name}`
-                      : item.destinationBranch.name
-                    : (item.destinationBranchId ?? "-")}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  ID Transaksi: {item.id}
-                </div>
+      {result && isMultipleResult(result) && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium">
+            Ditemukan {result.data.length} hasil
+          </div>
+          {result.data.map((item) => (
+            <div key={item.id} className="border rounded p-4 space-y-1">
+              <div className="font-medium">AWB: {item.awbNo}</div>
+              <div>Status: {item.status}</div>
+              <div>Tanggal: {item.transactionDate}</div>
+              <div>
+                Cabang asal:{" "}
+                {formatBranch(item.originBranch, item.originBranchId)}
               </div>
-            ))}
+              <div>
+                Cabang tujuan:{" "}
+                {formatBranch(item.destinationBranch, item.destinationBranchId)}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                ID Transaksi: {item.id}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {result && isSingleResult(result) && (
+        <div className="border rounded p-4 space-y-1">
+          <div className="font-medium">AWB: {result.data.awbNo}</div>
+          <div>Status: {result.data.status}</div>
+          <div>Tanggal: {result.data.transactionDate}</div>
+          <div>
+            Cabang asal:{" "}
+            {formatBranch(result.data.originBranch, result.data.originBranchId)}
           </div>
-        )}
-      {result &&
-        result.found &&
-        !("multiple" in result) &&
-        !Array.isArray((result as any).data) && (
-          <div className="border rounded p-4 space-y-1">
-            <div className="font-medium">AWB: {(result as any).data.awbNo}</div>
-            <div>Status: {(result as any).data.status}</div>
-            <div>Tanggal: {(result as any).data.transactionDate}</div>
-            <div>
-              Cabang asal:{" "}
-              {(result as any).data.originBranch
-                ? (result as any).data.originBranch.code
-                  ? `${(result as any).data.originBranch.code} - ${(result as any).data.originBranch.name}`
-                  : (result as any).data.originBranch.name
-                : ((result as any).data.originBranchId ?? "-")}
-            </div>
-            <div>
-              Cabang tujuan:{" "}
-              {(result as any).data.destinationBranch
-                ? (result as any).data.destinationBranch.code
-                  ? `${(result as any).data.destinationBranch.code} - ${(result as any).data.destinationBranch.name}`
-                  : (result as any).data.destinationBranch.name
-                : ((result as any).data.destinationBranchId ?? "-")}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              ID Transaksi: {(result as any).data.id}
-            </div>
+          <div>
+            Cabang tujuan:{" "}
+            {formatBranch(
+              result.data.destinationBranch,
+              result.data.destinationBranchId,
+            )}
           </div>
-        )}
+          <div className="text-xs text-muted-foreground">
+            ID Transaksi: {result.data.id}
+          </div>
+        </div>
+      )}
       {needsOriginBranch && (
         <div className="text-sm text-muted-foreground">
           AWB ditemukan di beberapa cabang asal. Pilih cabang asal pada filter
