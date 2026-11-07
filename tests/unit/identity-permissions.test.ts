@@ -3,8 +3,11 @@ import {
   type AccessActor,
   fullAccessPermission,
   isAdministrator,
+  permissionGrantCount,
+  permissionResources,
   permits,
   permitsBranch,
+  validPermission,
 } from "../../src/features/identity/permissions";
 import { IdentityError } from "../../src/features/identity/server/access";
 import { identityAction } from "../../src/features/identity/server/action";
@@ -33,6 +36,40 @@ const actor = (
   },
 });
 describe("group-owned roles and deny-by-default access", () => {
+  it("registers operational resources without granting them to existing groups", () => {
+    const operationalResources = [
+      "booking",
+      "transaction",
+      "manifest",
+      "delivery",
+    ];
+    for (const resource of operationalResources) {
+      expect(
+        permissionResources.find((entry) => entry.resource === resource)
+          ?.actions,
+      ).toEqual(["view", "create", "update"]);
+      expect(validPermission({ resource, action: "delete" })).toBe(false);
+      expect(permits(actor(), "view", resource)).toBe(false);
+      expect(
+        permits(actor([{ resource, action: "view" }]), "view", resource),
+      ).toBe(true);
+      expect(permits(actor([fullAccessPermission]), "update", resource)).toBe(
+        true,
+      );
+      expect(permits(actor([fullAccessPermission]), "delete", resource)).toBe(
+        false,
+      );
+    }
+  });
+  it("accepts a complete permission matrix after the inventory grows", () => {
+    const permissions = permissionResources.flatMap(({ resource, actions }) =>
+      actions.map((action) => ({ resource, action, granted: false })),
+    );
+    expect(permissions).toHaveLength(permissionGrantCount);
+    expect(
+      permissionMatrixSchema.safeParse({ groupId: 2, permissions }).success,
+    ).toBe(true);
+  });
   it("inherits grants only from an active group", () => {
     expect(permits(actor(), "view", "user")).toBe(true);
     expect(permits(actor(), "update", "user")).toBe(false);

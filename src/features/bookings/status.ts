@@ -1,0 +1,21 @@
+export const TRANSACTION_STATUS = {
+  OPEN: "Open",
+  IN_TRANSIT: "In Transit",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+} as const;
+
+export type TransactionStatus = (typeof TRANSACTION_STATUS)[keyof typeof TRANSACTION_STATUS];
+
+export const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  [TRANSACTION_STATUS.OPEN]: [
+    TRANSACTION_STATUS.IN_TRANSIT,
+    TRANSACTION_STATUS.CANCELLED,
+  ],
+  [TRANSACTION_STATUS.IN_TRANSIT]: [
+    TRANSACTION_STATUS.DELIVERED,
+    TRANSACTION_STATUS.CANCELLED,
+  ],
+  [TRANSACTION_STATUS.DELIVERED]: [],
+  [TRANSACTION_STATUS.CANCELLED]: [],
+};

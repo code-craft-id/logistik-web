@@ -50,6 +50,10 @@ model Office {
 model Branch {
   customers           Customer[]
   consignees          Consignee[]
+  bookings            Booking[]
+  manifests           Manifest[]
+  transactionsOrigin  Transaction[]       @relation("TransactionOriginBranch")
+  transactionsDest    Transaction[]       @relation("TransactionDestinationBranch")
   id                  Int                 @id @default(autoincrement())
   officeId            Int                 @map("office_id")
   code                String

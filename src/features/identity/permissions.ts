@@ -165,7 +165,32 @@ export const permissionResources = [
     label: "NPWP Vendor",
     actions: ["view", "create", "update", "delete"],
   },
+  {
+    resource: "booking",
+    label: "Booking",
+    actions: ["view", "create", "update"],
+  },
+  {
+    resource: "transaction",
+    label: "Transaksi / AWB",
+    actions: ["view", "create", "update"],
+  },
+  {
+    resource: "manifest",
+    label: "Manifest",
+    actions: ["view", "create", "update"],
+  },
+  {
+    resource: "delivery",
+    label: "Delivery Sheet",
+    actions: ["view", "create", "update"],
+  },
 ] as const;
+
+export const permissionGrantCount = permissionResources.reduce(
+  (count, entry) => count + entry.actions.length,
+  0,
+);
 
 export const fullAccessPermission = {
   resource: "system_admin",
@@ -176,6 +201,10 @@ export const fullAccessPermission = {
 export function permissionRestriction(resource: string): string | undefined {
   if (resource === "vendor_tax")
     return "Lihat dan kelola NPWP vendor khusus administrator.";
+  if (
+    ["booking", "transaction", "manifest", "delivery"].includes(resource)
+  )
+    return undefined;
   if (
     permissionResources.some((entry) => entry.resource === resource) &&
     ![
