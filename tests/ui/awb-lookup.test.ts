@@ -6,6 +6,61 @@ vi.mock("@/features/bookings/lookup-actions", () => ({
   lookupTransactionAction: vi.fn(),
 }));
 
+// Mock Radix Select as native elements so onValueChange is testable in happy-dom.
+vi.mock("@/components/ui/select", async () => {
+  const React = await import("react");
+  const Ctx = React.createContext<{
+    value: string;
+    onValueChange: (v: string) => void;
+  }>({ value: "any", onValueChange: () => {} });
+  return {
+    Select: ({
+      value,
+      onValueChange,
+      children,
+    }: {
+      value: string;
+      onValueChange: (v: string) => void;
+      children: React.ReactNode;
+    }) =>
+      React.createElement(
+        Ctx.Provider,
+        { value: { value, onValueChange } },
+        React.createElement("div", { "data-select-root": true }, children),
+      ),
+    SelectTrigger: ({
+      children,
+      id,
+    }: {
+      children: React.ReactNode;
+      id?: string;
+    }) =>
+      React.createElement("div", { id, "data-select-trigger": true }, children),
+    SelectValue: () => null,
+    SelectContent: ({ children }: { children: React.ReactNode }) => {
+      const ctx = React.useContext(Ctx);
+      return React.createElement(
+        "select",
+        {
+          id: "originBranchSelectNative",
+          "data-testid": "origin-branch-select",
+          value: ctx.value ?? "any",
+          onChange: (e: { target: { value: string } }) =>
+            ctx.onValueChange(e.target.value),
+        },
+        children,
+      );
+    },
+    SelectItem: ({
+      value,
+      children,
+    }: {
+      value: string;
+      children: React.ReactNode;
+    }) => React.createElement("option", { value }, children),
+  };
+});
+
 import { AwbLookup } from "../../src/features/bookings/components/awb-lookup";
 import { lookupTransactionAction } from "../../src/features/bookings/lookup-actions";
 
@@ -68,6 +123,24 @@ function setInputValue(el: HTMLInputElement, value: string) {
   el.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+function originSelect(): HTMLSelectElement {
+  const el = host.querySelector<HTMLSelectElement>(
+    '[data-testid="origin-branch-select"]',
+  );
+  if (!el) throw new Error("Missing origin branch select");
+  return el;
+}
+
+function setSelectValue(el: HTMLSelectElement, value: string) {
+  const setter = Object.getOwnPropertyDescriptor(
+    HTMLSelectElement.prototype,
+    "value",
+  )?.set;
+  if (!setter) throw new Error("Missing select value setter");
+  setter.call(el, value);
+  el.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 async function submitForm() {
   const form = host.querySelector("form");
   if (!form) throw new Error("Missing form");
@@ -87,7 +160,13 @@ beforeEach(async () => {
     "fetch",
     vi.fn(async () => ({
       ok: true,
-      json: async () => ({ branches: [], isAdmin: false }),
+      json: async () => ({
+        branches: [
+          { id: 1, code: "A", name: "Cabang A" },
+          { id: 3, code: "C", name: "Cabang C" },
+        ],
+        isAdmin: false,
+      }),
     })),
   );
   host = document.createElement("div");
@@ -163,4 +242,45 @@ it("ignores stale lookup responses when a newer request completes (PR #9 regress
   expect(host.textContent).toContain("ID Transaksi: 202");
   expect(host.textContent).not.toContain("AWB: AWB-FIRST");
   expect(host.textContent).not.toContain("ID Transaksi: 101");
+});
+
+it("invalidates in-flight lookup and clears stale results when origin branch changes (PR #9 regression)", async () => {
+  const pending = deferred<ReturnType<typeof singleResult>>();
+  mockLookup.mockReturnValueOnce(pending.promise);
+
+  setInputValue(awbInput(), "AWB123");
+  await submitForm();
+
+  // While request is in-flight, change origin filter to branch C (id 3).
+  await act(async () => {
+    setSelectValue(originSelect(), "3");
+    await Promise.resolve();
+  });
+
+  // UI should reflect selected branch and have no stale result rendered.
+  expect(originSelect().value).toBe("3");
+  expect(host.textContent).not.toContain("AWB: AWB123");
+  expect(host.textContent).not.toContain("ID Transaksi: 101");
+
+  // Resolve the in-flight (now stale) response for branch A.
+  await act(async () => {
+    pending.resolve(singleResult("AWB123", 101));
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+  // Flush any transition-driven state updates.
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
+  // Stale response must not repopulate results (option labels may still exist).
+  expect(originSelect().value).toBe("3");
+  expect(host.textContent).not.toContain("AWB: AWB123");
+  expect(host.textContent).not.toContain("ID Transaksi: 101");
+  expect(host.textContent).not.toContain("A - Cabang A - Cabang A"); // sanity: no duplicated stale render
+  // Result card branch lines should not show Cabang A as a lookup result.
+  expect(host.querySelector(".border.rounded.p-4")).toBeNull();
 });

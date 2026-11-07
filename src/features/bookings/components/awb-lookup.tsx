@@ -109,6 +109,16 @@ export function AwbLookup() {
     setResult(null);
   }
 
+  function onOriginBranchChange(value: string) {
+    // Invalidate any in-flight lookup so a late response cannot repopulate
+    // results for the previous filter (PR #9 regression).
+    requestIdRef.current += 1;
+    setOriginBranchId(value);
+    // Clear stale results; keep the selected option available via branchOptions.
+    setResult(null);
+    setResultOriginBranches([]);
+  }
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const requestId = ++requestIdRef.current;
@@ -194,7 +204,7 @@ export function AwbLookup() {
           <Label htmlFor="originBranchId">Cabang asal</Label>
           <Select
             value={originBranchId || "any"}
-            onValueChange={(v) => setOriginBranchId(v === "any" ? "" : v)}
+            onValueChange={(v) => onOriginBranchChange(v === "any" ? "" : v)}
           >
             <SelectTrigger id="originBranchId" className="w-full sm:w-[320px]">
               <SelectValue placeholder="Semua cabang dalam cakupan" />
