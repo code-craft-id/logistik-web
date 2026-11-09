@@ -32,6 +32,15 @@ If reassignment of released transactions is approved:
 - Queries: need to consider `releasedAt IS NULL` when checking active assignments (current logic already does).
 - Concurrency: partial unique index prevents two active assignments; P2002 becomes the enforcement mechanism.
 
-**Status:** BLOCKED - awaiting domain confirmation (D-08 re-manifest rules). No schema/migration changes made in this step.
+## Current mitigation (without changing the constraint)
+
+Because reassignment is still blocked by D-08 and the global unique constraint, the service fails closed before attempting a conflicting insert:
+- it rejects active assignments as `TRANSACTION_ALREADY_ASSIGNED`;
+- it rejects any released historical assignment as `TRANSACTION_REASSIGNMENT_BLOCKED_D08` (explicit D-08 blocker; do not treat as approved behavior);
+- DB P2002 remains a race fallback.
+
+This avoids ambiguous reassignment while preserving the constraint. Regression coverage lives in `tests/unit/authorization-booking-transaction-manifest-delivery.test.ts`.
+
+**Status:** BLOCKED - awaiting domain confirmation (D-08 re-manifest rules). No schema or migration changes made. If reassignment is approved, implement the partial-unique migration/design above with reviewed migration + regression tests.
 EOF
 echo "done"

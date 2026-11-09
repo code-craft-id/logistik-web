@@ -160,6 +160,22 @@ export async function assignTransactionToManifest(
       throw new Error("TRANSACTION_ALREADY_ASSIGNED");
     }
 
+    // D-08 (TBD): ManifestItem has @@unique([transactionId]) globally.
+    // A released historical assignment still blocks reassignment until domain
+    // confirms re-manifest rules and an approved migration/constraint strategy
+    // (e.g. partial unique on releasedAt IS NULL) is applied. Do not relax.
+    const historical = await tx.manifestItem.findFirst({
+      where: {
+        transactionId: data.transactionId,
+      },
+      select: { id: true, releasedAt: true },
+    });
+    if (historical) {
+      throw new Error(
+        "TRANSACTION_REASSIGNMENT_BLOCKED_D08: reassignment of a released transaction is not allowed until D-08 re-manifest rules are confirmed",
+      );
+    }
+
     try {
       const item = await tx.manifestItem.create({
         data: {
@@ -174,6 +190,8 @@ export async function assignTransactionToManifest(
         e instanceof Prisma.PrismaClientKnownRequestError &&
         e.code === "P2002"
       ) {
+        // Race/constraint fallback. Active conflicts map to the standard domain
+        // error; released-history conflicts remain blocked under D-08.
         throw new Error("TRANSACTION_ALREADY_ASSIGNED");
       }
       throw e;

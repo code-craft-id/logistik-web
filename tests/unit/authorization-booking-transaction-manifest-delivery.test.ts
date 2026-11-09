@@ -263,6 +263,32 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       await expect(assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
       expect(prisma.manifestItem.create).not.toHaveBeenCalled();
     });
+
+    it("blocks reassignment when a released historical assignment exists (D-08 TBD; no schema change)", async () => {
+      // BLOCKED: decision required, D-08 (re-manifest rules). Service must fail
+      // closed under the current @@unique([transactionId]) constraint rather than
+      // allowing reassignment or silently bypassing history.
+      const actor = makeActor([1], false);
+      const { prisma } = await import("@/lib/db");
+      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
+        const tx = {
+          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 1, status: "Draft", deletedAt: null }) },
+          transaction: { findFirst: vi.fn().mockResolvedValue({ id: 1, originBranchId: 1 }) },
+          manifestItem: {
+            findFirst: vi
+              .fn()
+              .mockResolvedValueOnce(null) // no active assignment (releasedAt: null)
+              .mockResolvedValueOnce({ id: 99, releasedAt: new Date("2026-01-01") }), // released historical row
+            create: vi.fn(),
+          },
+        };
+        return fn(tx);
+      });
+      await expect(
+        assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor),
+      ).rejects.toThrow(/TRANSACTION_REASSIGNMENT_BLOCKED_D08/);
+      expect(prisma.manifestItem.create).not.toHaveBeenCalled();
+    });
   });
 
   describe("recordDeliveryOutcome", () => {
