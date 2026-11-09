@@ -270,6 +270,7 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       // allowing reassignment or silently bypassing history.
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
+      const txManifestItemCreate = vi.fn();
       (prisma.$transaction as any).mockImplementation(async (fn: any) => {
         const tx = {
           manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 1, status: "Draft", deletedAt: null }) },
@@ -279,7 +280,7 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
               .fn()
               .mockResolvedValueOnce(null) // no active assignment (releasedAt: null)
               .mockResolvedValueOnce({ id: 99, releasedAt: new Date("2026-01-01") }), // released historical row
-            create: vi.fn(),
+            create: txManifestItemCreate,
           },
         };
         return fn(tx);
@@ -287,7 +288,7 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       await expect(
         assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor),
       ).rejects.toThrow(/TRANSACTION_REASSIGNMENT_BLOCKED_D08/);
-      expect(prisma.manifestItem.create).not.toHaveBeenCalled();
+      expect(txManifestItemCreate).not.toHaveBeenCalled();
     });
   });
 

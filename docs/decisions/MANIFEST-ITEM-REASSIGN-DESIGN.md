@@ -42,5 +42,3 @@ Because reassignment is still blocked by D-08 and the global unique constraint, 
 This avoids ambiguous reassignment while preserving the constraint. Regression coverage lives in `tests/unit/authorization-booking-transaction-manifest-delivery.test.ts`.
 
 **Status:** BLOCKED - awaiting domain confirmation (D-08 re-manifest rules). No schema or migration changes made. If reassignment is approved, implement the partial-unique migration/design above with reviewed migration + regression tests.
-EOF
-echo "done"
