@@ -1,11 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requirePermission } from "@/lib/auth/session";
-import { currentIdentity } from "@/features/identity/server/context";
 import { IdentityError } from "@/features/identity/server/access";
-import { createManifestSchema, assignToManifestSchema, deliveryOutcomeSchema } from "./manifests-schemas";
-import { assignTransactionToManifest, createManifest, recordDeliveryOutcome } from "./server/manifests-service";
+import { currentIdentity } from "@/features/identity/server/context";
+import { requirePermission } from "@/lib/auth/session";
+import {
+  assignToManifestSchema,
+  createManifestSchema,
+  deliveryOutcomeSchema,
+} from "./manifests-schemas";
+import {
+  assignTransactionToManifest,
+  createManifest,
+  recordDeliveryOutcome,
+} from "./server/manifests-service";
 
 export async function createManifestAction(formData: FormData) {
   await requirePermission("create", "manifest");
@@ -41,5 +49,6 @@ export async function deliveryOutcomeAction(formData: FormData) {
   const result = await recordDeliveryOutcome(parsed, current.actor);
   revalidatePath("/manifest");
   revalidatePath("/operations");
-  return { ok: true, id: (result as any)?.id };
+  if (!result) throw new IdentityError("DELIVERY_OUTCOME_NOT_FOUND", 404);
+  return { ok: true, id: result.id };
 }

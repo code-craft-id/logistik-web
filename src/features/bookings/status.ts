@@ -5,7 +5,8 @@ export const TRANSACTION_STATUS = {
   CANCELLED: "Cancelled",
 } as const;
 
-export type TransactionStatus = (typeof TRANSACTION_STATUS)[keyof typeof TRANSACTION_STATUS];
+export type TransactionStatus =
+  (typeof TRANSACTION_STATUS)[keyof typeof TRANSACTION_STATUS];
 
 export const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   [TRANSACTION_STATUS.OPEN]: [

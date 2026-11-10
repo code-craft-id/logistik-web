@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { createBookingSchema, createTransactionSchema } from "../../src/features/bookings/schemas";
+import {
+  createBookingSchema,
+  createTransactionSchema,
+} from "../../src/features/bookings/schemas";
 
 describe("bookings schemas", () => {
   it("createBookingSchema strips status and treats empty optional numbers as undefined", () => {
@@ -18,7 +21,8 @@ describe("bookings schemas", () => {
       volume: "2.000",
       biaya: "100000.00",
     });
-    expect((parsed as any).status).toBeUndefined();
+    // Schema uses z.never().optional() for status, so it's not in the parsed output
+    expect("status" in parsed).toBe(false);
     expect(parsed.branchId).toBeUndefined();
     expect(parsed.customerId).toBeUndefined();
     expect(parsed.koli).toBeUndefined();
@@ -45,7 +49,8 @@ describe("bookings schemas", () => {
       volume: "1.500",
       biaya: "50000.00",
     });
-    expect((parsed as any).status).toBeUndefined();
+    // Schema uses z.never().optional() for status, so it's not in the parsed output
+    expect("status" in parsed).toBe(false);
     expect(parsed.originBranchId).toBe(10);
     expect(parsed.destinationBranchId).toBeUndefined();
     expect(parsed.bookingId).toBeUndefined();
@@ -56,7 +61,9 @@ describe("bookings schemas", () => {
 
   it("createTransactionSchema requires originBranchId", () => {
     expect(() => createTransactionSchema.parse({ awbNo: "AWB-1" })).toThrow();
-    expect(() => createTransactionSchema.parse({ originBranchId: "" })).toThrow();
+    expect(() =>
+      createTransactionSchema.parse({ originBranchId: "" }),
+    ).toThrow();
   });
 
   it("createTransactionSchema preserves decimal strings without float conversion", () => {

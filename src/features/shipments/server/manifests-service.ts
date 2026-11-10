@@ -1,44 +1,79 @@
 import "server-only";
 
-import { Prisma } from "@/lib/db/generated/client";
-import { prisma } from "@/lib/db";
+import {
+  type AccessActor,
+  permitsBranch,
+} from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
-import { permitsBranch, type AccessActor } from "@/features/identity/permissions";
+import { prisma } from "@/lib/db";
+import { Prisma } from "@/lib/db/generated/client";
 import { ALLOWED_TRANSITIONS } from "../../bookings/status";
 import {
-  assignToManifestSchema,
-  createManifestSchema,
-  deliveryOutcomeSchema,
   type AssignToManifestInput,
+  assignToManifestSchema,
   type CreateManifestInput,
+  createManifestSchema,
   type DeliveryOutcomeInput,
+  deliveryOutcomeSchema,
 } from "../manifests-schemas";
 
 type TxClient = Prisma.TransactionClient;
 
-export async function createManifest(input: CreateManifestInput, actor: AccessActor) {
+export async function createManifest(
+  input: CreateManifestInput,
+  actor: AccessActor,
+) {
   const data = createManifestSchema.parse(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
-  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
+  if (
+    !isAdministrator(actor) &&
+    (!actor.branchIds || actor.branchIds.length === 0)
+  ) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
-  if (data.branchId == null || !Number.isSafeInteger(data.branchId) || data.branchId <= 0) {
+  if (
+    data.branchId == null ||
+    !Number.isSafeInteger(data.branchId) ||
+    data.branchId <= 0
+  ) {
     if (isAdministrator(actor)) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang manifest wajib diisi untuk administrator.");
+      throw new IdentityError(
+        "FORBIDDEN_BRANCH",
+        403,
+        "Cabang manifest wajib diisi untuk administrator.",
+      );
     }
-    throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang manifest wajib diisi.");
+    throw new IdentityError(
+      "FORBIDDEN_BRANCH",
+      403,
+      "Cabang manifest wajib diisi.",
+    );
   }
   if (!permitsBranch(actor, data.branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
   if (data.originBranchId != null) {
-    if (!Number.isSafeInteger(data.originBranchId) || data.originBranchId <= 0) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang asal tidak valid.");
+    if (
+      !Number.isSafeInteger(data.originBranchId) ||
+      data.originBranchId <= 0
+    ) {
+      throw new IdentityError(
+        "FORBIDDEN_BRANCH",
+        403,
+        "Cabang asal tidak valid.",
+      );
     }
   }
   if (data.destinationBranchId != null) {
-    if (!Number.isSafeInteger(data.destinationBranchId) || data.destinationBranchId <= 0) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan tidak valid.");
+    if (
+      !Number.isSafeInteger(data.destinationBranchId) ||
+      data.destinationBranchId <= 0
+    ) {
+      throw new IdentityError(
+        "FORBIDDEN_BRANCH",
+        403,
+        "Cabang tujuan tidak valid.",
+      );
     }
   }
 
@@ -46,7 +81,10 @@ export async function createManifest(input: CreateManifestInput, actor: AccessAc
     if (data.originBranchId && !permitsBranch(actor, data.originBranchId)) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
-    if (data.destinationBranchId && !permitsBranch(actor, data.destinationBranchId)) {
+    if (
+      data.destinationBranchId &&
+      !permitsBranch(actor, data.destinationBranchId)
+    ) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     }
 
@@ -54,7 +92,9 @@ export async function createManifest(input: CreateManifestInput, actor: AccessAc
       const vehicle = await tx.vehicle.findFirst({
         where: {
           id: data.vehicleId,
-          ...(isAdministrator(actor) ? {} : { branchId: { in: actor.branchIds } }),
+          ...(isAdministrator(actor)
+            ? {}
+            : { branchId: { in: actor.branchIds } }),
         },
       });
       if (!vehicle) {
@@ -70,10 +110,7 @@ export async function createManifest(input: CreateManifestInput, actor: AccessAc
           ...(isAdministrator(actor)
             ? {}
             : {
-                OR: [
-                  { branchId: { in: actor.branchIds } },
-                  { branchId: null },
-                ],
+                OR: [{ branchId: { in: actor.branchIds } }, { branchId: null }],
               }),
         },
       });
@@ -110,7 +147,10 @@ export async function assignTransactionToManifest(
 ) {
   const data = assignToManifestSchema.parse(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
-  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
+  if (
+    !isAdministrator(actor) &&
+    (!actor.branchIds || actor.branchIds.length === 0)
+  ) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 
@@ -205,7 +245,10 @@ export async function recordDeliveryOutcome(
 ) {
   const data = deliveryOutcomeSchema.parse(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
-  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
+  if (
+    !isAdministrator(actor) &&
+    (!actor.branchIds || actor.branchIds.length === 0)
+  ) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 
@@ -252,8 +295,10 @@ export async function recordDeliveryOutcome(
     // Ensure transaction is in scope
     if (!isAdministrator(actor)) {
       const inScope =
-        (txRecord.originBranchId && actor.branchIds.includes(txRecord.originBranchId)) ||
-        (txRecord.destinationBranchId && actor.branchIds.includes(txRecord.destinationBranchId));
+        (txRecord.originBranchId &&
+          actor.branchIds.includes(txRecord.originBranchId)) ||
+        (txRecord.destinationBranchId &&
+          actor.branchIds.includes(txRecord.destinationBranchId));
       if (!inScope) {
         throw new IdentityError("FORBIDDEN_BRANCH", 403);
       }

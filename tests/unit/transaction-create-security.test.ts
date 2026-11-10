@@ -6,7 +6,7 @@ describe("transaction creation security", () => {
     const result = createTransactionSchema.safeParse({
       originBranchId: 1,
       status: "Delivered",
-    } as any);
+    });
     expect(result.success).toBe(false);
   });
 
@@ -14,7 +14,7 @@ describe("transaction creation security", () => {
     const result = createTransactionSchema.safeParse({
       originBranchId: 1,
       status: "In Transit",
-    } as any);
+    });
     expect(result.success).toBe(false);
   });
 
@@ -25,6 +25,7 @@ describe("transaction creation security", () => {
       receiverName: "B",
     });
     expect(parsed.originBranchId).toBe(1);
-    expect((parsed as any).status).toBeUndefined();
+    // Schema uses z.never().optional() for status, so it's not in the parsed output
+    expect("status" in parsed).toBe(false);
   });
 });

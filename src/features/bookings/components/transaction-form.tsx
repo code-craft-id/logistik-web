@@ -1,17 +1,26 @@
 "use client";
 
-import { useTransition, useState } from "react";
-import { createTransactionAction, type CreateTransactionActionResult } from "../actions";
+import { useState, useTransition } from "react";
+import {
+  type CreateTransactionActionResult,
+  createTransactionAction,
+} from "../actions";
 
 export function TransactionForm() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const generateKey = () => {
-    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    if (
+      typeof crypto !== "undefined" &&
+      typeof crypto.randomUUID === "function"
+    ) {
       return crypto.randomUUID();
     }
-    if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    if (
+      typeof crypto !== "undefined" &&
+      typeof crypto.getRandomValues === "function"
+    ) {
       const bytes = new Uint8Array(16);
       crypto.getRandomValues(bytes);
       bytes[6] = (bytes[6] & 0x0f) | 0x40;
@@ -21,7 +30,9 @@ export function TransactionForm() {
         .join("");
       return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
     }
-    throw new Error("Secure cryptographic random generator is required for idempotency keys");
+    throw new Error(
+      "Secure cryptographic random generator is required for idempotency keys",
+    );
   };
 
   const [idempotencyKey, setIdempotencyKey] = useState(() => generateKey());
@@ -39,9 +50,14 @@ export function TransactionForm() {
     }
     startTransition(async () => {
       try {
-        const res: CreateTransactionActionResult = await createTransactionAction(formData);
+        const res: CreateTransactionActionResult =
+          await createTransactionAction(formData);
         if (res.ok) {
-          setSuccess(res.idempotent ? "AWB/Transaksi sudah ada (idempotent)." : "AWB/Transaksi berhasil disimpan.");
+          setSuccess(
+            res.idempotent
+              ? "AWB/Transaksi sudah ada (idempotent)."
+              : "AWB/Transaksi berhasil disimpan.",
+          );
           setIdempotencyKey(generateKey());
         } else {
           if (res.error === "VALIDATION") {
@@ -71,51 +87,133 @@ export function TransactionForm() {
       {success ? <div className="text-sm text-green-700">{success}</div> : null}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label htmlFor="awbNo" className="text-sm font-medium">AWB No. (opsional)</label>
-          <input id="awbNo" name="awbNo" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="awbNo" className="text-sm font-medium">
+            AWB No. (opsional)
+          </label>
+          <input
+            id="awbNo"
+            name="awbNo"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="doNo" className="text-sm font-medium">DO No.</label>
-          <input id="doNo" name="doNo" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="doNo" className="text-sm font-medium">
+            DO No.
+          </label>
+          <input
+            id="doNo"
+            name="doNo"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="originBranchId" className="text-sm font-medium">Cabang Asal (originBranchId) *</label>
-          <input id="originBranchId" name="originBranchId" type="number" required className="w-full border rounded px-2 py-1" />
+          <label htmlFor="originBranchId" className="text-sm font-medium">
+            Cabang Asal (originBranchId) *
+          </label>
+          <input
+            id="originBranchId"
+            name="originBranchId"
+            type="number"
+            required
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="destinationBranchId" className="text-sm font-medium">Cabang Tujuan (destinationBranchId)</label>
-          <input id="destinationBranchId" name="destinationBranchId" type="number" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="destinationBranchId" className="text-sm font-medium">
+            Cabang Tujuan (destinationBranchId)
+          </label>
+          <input
+            id="destinationBranchId"
+            name="destinationBranchId"
+            type="number"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="bookingId" className="text-sm font-medium">Booking ID (opsional)</label>
-          <input id="bookingId" name="bookingId" type="number" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="bookingId" className="text-sm font-medium">
+            Booking ID (opsional)
+          </label>
+          <input
+            id="bookingId"
+            name="bookingId"
+            type="number"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="senderName" className="text-sm font-medium">Pengirim</label>
-          <input id="senderName" name="senderName" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="senderName" className="text-sm font-medium">
+            Pengirim
+          </label>
+          <input
+            id="senderName"
+            name="senderName"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="receiverName" className="text-sm font-medium">Penerima</label>
-          <input id="receiverName" name="receiverName" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="receiverName" className="text-sm font-medium">
+            Penerima
+          </label>
+          <input
+            id="receiverName"
+            name="receiverName"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="koli" className="text-sm font-medium">Koli</label>
-          <input id="koli" name="koli" type="number" min="0" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="koli" className="text-sm font-medium">
+            Koli
+          </label>
+          <input
+            id="koli"
+            name="koli"
+            type="number"
+            min="0"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="kilo" className="text-sm font-medium">Kilo</label>
-          <input id="kilo" name="kilo" type="number" step="0.01" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="kilo" className="text-sm font-medium">
+            Kilo
+          </label>
+          <input
+            id="kilo"
+            name="kilo"
+            type="number"
+            step="0.01"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="volume" className="text-sm font-medium">Volume</label>
-          <input id="volume" name="volume" type="number" step="0.001" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="volume" className="text-sm font-medium">
+            Volume
+          </label>
+          <input
+            id="volume"
+            name="volume"
+            type="number"
+            step="0.001"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
         <div>
-          <label htmlFor="biaya" className="text-sm font-medium">Biaya (Rp.)</label>
-          <input id="biaya" name="biaya" type="number" step="0.01" className="w-full border rounded px-2 py-1" />
+          <label htmlFor="biaya" className="text-sm font-medium">
+            Biaya (Rp.)
+          </label>
+          <input
+            id="biaya"
+            name="biaya"
+            type="number"
+            step="0.01"
+            className="w-full border rounded px-2 py-1"
+          />
         </div>
       </div>
-      <button type="submit" disabled={isPending} className="px-4 py-2 bg-primary text-primary-foreground rounded">
+      <button
+        type="submit"
+        disabled={isPending}
+        className="px-4 py-2 bg-primary text-primary-foreground rounded"
+      >
         {isPending ? "Menyimpan..." : "Simpan AWB/Transaction"}
       </button>
     </form>

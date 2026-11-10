@@ -1,6 +1,6 @@
-import { identityResponse } from "@/features/identity/server/http";
-import { currentIdentity } from "@/features/identity/server/context";
 import { isAdministrator } from "@/features/identity/permissions";
+import { currentIdentity } from "@/features/identity/server/context";
+import { identityResponse } from "@/features/identity/server/http";
 import { prisma } from "@/lib/db";
 
 export async function GET() {

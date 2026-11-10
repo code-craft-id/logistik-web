@@ -1,8 +1,67 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import type {
+  CreateBookingInput,
+  CreateTransactionInput,
+  UpdateTransactionStatusInput,
+} from "@/features/bookings/schemas";
+import {
+  createBooking,
+  createTransaction,
+  updateTransactionStatus,
+} from "@/features/bookings/server/service";
+import {
+  type AccessActor,
+  permitsBranch,
+} from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
-import { permitsBranch, type AccessActor } from "@/features/identity/permissions";
-import { createBooking, createTransaction, updateTransactionStatus } from "@/features/bookings/server/service";
-import { createManifest, assignTransactionToManifest, recordDeliveryOutcome } from "@/features/shipments/server/manifests-service";
+import type {
+  AssignToManifestInput,
+  CreateManifestInput,
+  DeliveryOutcomeInput,
+} from "@/features/shipments/manifests-schemas";
+import {
+  assignTransactionToManifest,
+  createManifest,
+  recordDeliveryOutcome,
+} from "@/features/shipments/server/manifests-service";
+
+type MockFn<T extends (...args: unknown[]) => unknown> = Mock<T>;
+type MockTxClient = {
+  create?: MockFn<() => Promise<unknown>>;
+  findFirst?: MockFn<() => Promise<unknown>>;
+  findUnique?: MockFn<() => Promise<unknown>>;
+  updateMany?: MockFn<() => Promise<unknown>>;
+  findMany?: MockFn<() => Promise<unknown>>;
+  transactionItem?: Record<string, unknown>;
+  booking?: {
+    create?: MockFn<() => Promise<unknown>>;
+    findFirst?: MockFn<() => Promise<unknown>>;
+  };
+  transaction?: {
+    create?: MockFn<() => Promise<unknown>>;
+    findFirst?: MockFn<() => Promise<unknown>>;
+    findUnique?: MockFn<() => Promise<unknown>>;
+    updateMany?: MockFn<() => Promise<unknown>>;
+  };
+  transactionStatusHistory?: { create?: MockFn<() => Promise<unknown>> };
+  customer?: { findFirst?: MockFn<() => Promise<unknown>> };
+  courier?: { findFirst?: MockFn<() => Promise<unknown>> };
+  manifest?: {
+    create?: MockFn<() => Promise<unknown>>;
+    findFirst?: MockFn<() => Promise<unknown>>;
+  };
+  manifestItem?: {
+    findFirst?: MockFn<() => Promise<unknown>>;
+    create?: MockFn<() => Promise<unknown>>;
+  };
+  vehicle?: { findFirst?: MockFn<() => Promise<unknown>> };
+  deliverySheet?: { findUnique?: MockFn<() => Promise<unknown>> };
+  deliverySheetItem?: {
+    findUnique?: MockFn<() => Promise<unknown>>;
+    create?: MockFn<() => Promise<unknown>>;
+    updateMany?: MockFn<() => Promise<unknown>>;
+  };
+};
 
 vi.mock("@/lib/db", () => {
   const create = vi.fn();
@@ -10,7 +69,17 @@ vi.mock("@/lib/db", () => {
   const findUnique = vi.fn();
   const updateMany = vi.fn();
   const findMany = vi.fn();
-  const transaction = vi.fn(async (fn: any) => fn({ create, findFirst, findUnique, updateMany, findMany, transactionItem: {} }));
+  const transaction = vi.fn(
+    async (fn: (tx: MockTxClient) => Promise<unknown>) =>
+      fn({
+        create,
+        findFirst,
+        findUnique,
+        updateMany,
+        findMany,
+        transactionItem: {},
+      }),
+  );
   return {
     prisma: {
       $transaction: transaction,
@@ -67,15 +136,25 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
   describe("createBooking", () => {
     it("rejects administrator without explicit branchId (no fallback to first/implicit branch)", async () => {
       const actor = makeActor([], true);
-      await expect(createBooking({ bookingDate: new Date() } as any, actor)).rejects.toThrow(IdentityError);
-      await expect(createBooking({ bookingDate: new Date() } as any, actor)).rejects.toThrow(/Cabang tujuan wajib diisi/i);
+      await expect(
+        createBooking({ bookingDate: new Date() } as CreateBookingInput, actor),
+      ).rejects.toThrow(IdentityError);
+      await expect(
+        createBooking({ bookingDate: new Date() } as CreateBookingInput, actor),
+      ).rejects.toThrow(/Cabang tujuan wajib diisi/i);
     });
 
     it("allows administrator to create booking when explicit branchId is provided and authorized", async () => {
       const actor = makeActor([], true);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => fn({ booking: { create: vi.fn().mockResolvedValue({ id: 1 }) } }));
-      const result = await createBooking({ bookingDate: new Date(), branchId: 10 } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) =>
+          fn({ booking: { create: vi.fn().mockResolvedValue({ id: 1 }) } }),
+      );
+      const result = await createBooking(
+        { bookingDate: new Date(), branchId: 10 } as CreateBookingInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
 
@@ -88,63 +167,119 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
 
     it("rejects non-admin with empty branchIds", async () => {
       const actor = makeActor([], false);
-      await expect(createBooking({ bookingDate: new Date(), branchId: 5 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        createBooking(
+          { bookingDate: new Date(), branchId: 5 } as CreateBookingInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("allows non-admin with matching branch scope", async () => {
       const actor = makeActor([5], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => fn({ booking: { create: vi.fn().mockResolvedValue({ id: 1 }) }, customer: { findFirst: vi.fn().mockResolvedValue(null) } }));
-      const result = await createBooking({ bookingDate: new Date(), branchId: 5 } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) =>
+          fn({
+            booking: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+            customer: { findFirst: vi.fn().mockResolvedValue(null) },
+          }),
+      );
+      const result = await createBooking(
+        { bookingDate: new Date(), branchId: 5 } as CreateBookingInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
 
     it("rejects non-admin trying to access different branch", async () => {
       const actor = makeActor([5], false);
-      await expect(createBooking({ bookingDate: new Date(), branchId: 6 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        createBooking(
+          { bookingDate: new Date(), branchId: 6 } as CreateBookingInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
   });
 
   describe("createTransaction", () => {
     it("rejects non-admin with empty branchIds", async () => {
       const actor = makeActor([], false);
-      await expect(createTransaction({ originBranchId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        createTransaction(
+          { originBranchId: 1 } as CreateTransactionInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("allows non-admin with matching origin branch scope", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          transaction: { create: vi.fn().mockResolvedValue({ id: 1 }), findUnique: vi.fn(), findFirst: vi.fn() },
-          transactionStatusHistory: { create: vi.fn() },
-          booking: { findFirst: vi.fn().mockResolvedValue(null) },
-          courier: { findFirst: vi.fn().mockResolvedValue(null) },
-        };
-        return fn(tx);
-      });
-      const result = await createTransaction({ originBranchId: 1, transactionDate: new Date() } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            transaction: {
+              create: vi.fn().mockResolvedValue({ id: 1 }),
+              findUnique: vi.fn(),
+              findFirst: vi.fn(),
+            },
+            transactionStatusHistory: { create: vi.fn() },
+            booking: { findFirst: vi.fn().mockResolvedValue(null) },
+            courier: { findFirst: vi.fn().mockResolvedValue(null) },
+          };
+          return fn(tx);
+        },
+      );
+      const result = await createTransaction(
+        {
+          originBranchId: 1,
+          transactionDate: new Date(),
+        } as CreateTransactionInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
 
     it("rejects non-admin trying to create transaction for different origin branch", async () => {
       const actor = makeActor([1], false);
-      await expect(createTransaction({ originBranchId: 2, transactionDate: new Date() } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        createTransaction(
+          {
+            originBranchId: 2,
+            transactionDate: new Date(),
+          } as CreateTransactionInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("allows administrator with explicit branches (cross-branch allowed by policy)", async () => {
       const actor = makeActor([], true);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          transaction: { create: vi.fn().mockResolvedValue({ id: 1 }), findUnique: vi.fn(), findFirst: vi.fn() },
-          transactionStatusHistory: { create: vi.fn() },
-          booking: { findFirst: vi.fn().mockResolvedValue(null) },
-          courier: { findFirst: vi.fn().mockResolvedValue(null) },
-        };
-        return fn(tx);
-      });
-      const result = await createTransaction({ originBranchId: 99, transactionDate: new Date() } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            transaction: {
+              create: vi.fn().mockResolvedValue({ id: 1 }),
+              findUnique: vi.fn(),
+              findFirst: vi.fn(),
+            },
+            transactionStatusHistory: { create: vi.fn() },
+            booking: { findFirst: vi.fn().mockResolvedValue(null) },
+            courier: { findFirst: vi.fn().mockResolvedValue(null) },
+          };
+          return fn(tx);
+        },
+      );
+      const result = await createTransaction(
+        {
+          originBranchId: 99,
+          transactionDate: new Date(),
+        } as CreateTransactionInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
   });
@@ -152,19 +287,37 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
   describe("updateTransactionStatus", () => {
     it("rejects non-admin with empty branchIds", async () => {
       const actor = makeActor([], false);
-      await expect(updateTransactionStatus({ transactionId: 1, newStatus: "In Transit" } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        updateTransactionStatus(
+          {
+            transactionId: 1,
+            newStatus: "In Transit",
+          } as UpdateTransactionStatusInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("does not change database/state when denied (non-admin wrong branch)", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          transaction: { findFirst: vi.fn().mockResolvedValue(null) },
-        };
-        return fn(tx);
-      });
-      await expect(updateTransactionStatus({ transactionId: 1, newStatus: "In Transit" } as any, actor)).rejects.toThrow(IdentityError);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            transaction: { findFirst: vi.fn().mockResolvedValue(null) },
+          };
+          return fn(tx);
+        },
+      );
+      await expect(
+        updateTransactionStatus(
+          {
+            transactionId: 1,
+            newStatus: "In Transit",
+          } as UpdateTransactionStatusInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
       expect(prisma.transaction.updateMany).not.toHaveBeenCalled();
       expect(prisma.transactionStatusHistory.create).not.toHaveBeenCalled();
     });
@@ -172,18 +325,33 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
     it("allows administrator to update regardless of branchIds (policy-based)", async () => {
       const actor = makeActor([], true);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          transaction: {
-            findFirst: vi.fn().mockResolvedValue({ id: 1, status: "Open", originBranchId: 5, destinationBranchId: 10 }),
-            updateMany: vi.fn().mockResolvedValue({ count: 1 }),
-            findUnique: vi.fn().mockResolvedValue({ id: 1, status: "In Transit" }),
-          },
-          transactionStatusHistory: { create: vi.fn().mockResolvedValue({}) },
-        };
-        return fn(tx);
-      });
-      const result = await updateTransactionStatus({ transactionId: 1, newStatus: "In Transit" } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            transaction: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: 1,
+                status: "Open",
+                originBranchId: 5,
+                destinationBranchId: 10,
+              }),
+              updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+              findUnique: vi
+                .fn()
+                .mockResolvedValue({ id: 1, status: "In Transit" }),
+            },
+            transactionStatusHistory: { create: vi.fn().mockResolvedValue({}) },
+          };
+          return fn(tx);
+        },
+      );
+      const result = await updateTransactionStatus(
+        {
+          transactionId: 1,
+          newStatus: "In Transit",
+        } as UpdateTransactionStatusInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
   });
@@ -191,76 +359,163 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
   describe("createManifest", () => {
     it("rejects administrator without explicit branchId", async () => {
       const actor = makeActor([], true);
-      await expect(createManifest({ manifestNo: "M-1", manifestDate: new Date() } as any, actor)).rejects.toThrow(IdentityError);
-      await expect(createManifest({ manifestNo: "M-1", manifestDate: new Date() } as any, actor)).rejects.toThrow(/Cabang manifest wajib diisi/i);
+      await expect(
+        createManifest(
+          {
+            manifestNo: "M-1",
+            manifestDate: new Date(),
+          } as CreateManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
+      await expect(
+        createManifest(
+          {
+            manifestNo: "M-1",
+            manifestDate: new Date(),
+          } as CreateManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(/Cabang manifest wajib diisi/i);
     });
 
     it("rejects non-admin with empty branchIds", async () => {
       const actor = makeActor([], false);
-      await expect(createManifest({ manifestNo: "M-1", branchId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        createManifest(
+          { manifestNo: "M-1", branchId: 1 } as CreateManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("allows non-admin with matching branch scope", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = { manifest: { create: vi.fn().mockResolvedValue({ id: 1 }) }, vehicle: { findFirst: vi.fn() }, courier: { findFirst: vi.fn() } };
-        return fn(tx);
-      });
-      const result = await createManifest({ manifestNo: "M-1", branchId: 1 } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            manifest: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+            vehicle: { findFirst: vi.fn() },
+            courier: { findFirst: vi.fn() },
+          };
+          return fn(tx);
+        },
+      );
+      const result = await createManifest(
+        { manifestNo: "M-1", branchId: 1 } as CreateManifestInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
 
     it("rejects non-admin trying different branch", async () => {
       const actor = makeActor([1], false);
-      await expect(createManifest({ manifestNo: "M-1", branchId: 2 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        createManifest(
+          { manifestNo: "M-1", branchId: 2 } as CreateManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
   });
 
   describe("assignTransactionToManifest", () => {
     it("rejects non-admin with empty branchIds", async () => {
       const actor = makeActor([], false);
-      await expect(assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        assignTransactionToManifest(
+          { manifestId: 1, transactionId: 1 } as AssignToManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("rejects non-admin assigning when manifest belongs to different branch", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 2, status: "Draft", deletedAt: null }) },
-        };
-        return fn(tx);
-      });
-      await expect(assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            manifest: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: 1,
+                branchId: 2,
+                status: "Draft",
+                deletedAt: null,
+              }),
+            },
+          };
+          return fn(tx);
+        },
+      );
+      await expect(
+        assignTransactionToManifest(
+          { manifestId: 1, transactionId: 1 } as AssignToManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
       expect(prisma.manifestItem.create).not.toHaveBeenCalled();
     });
 
     it("allows administrator to assign across branches per policy (using permitsBranch)", async () => {
       const actor = makeActor([], true);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 5, status: "Draft", deletedAt: null }) },
-          transaction: { findFirst: vi.fn().mockResolvedValue({ id: 1, originBranchId: 5 }) },
-          manifestItem: { findFirst: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue({ id: 1 }) },
-        };
-        return fn(tx);
-      });
-      const result = await assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            manifest: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: 1,
+                branchId: 5,
+                status: "Draft",
+                deletedAt: null,
+              }),
+            },
+            transaction: {
+              findFirst: vi
+                .fn()
+                .mockResolvedValue({ id: 1, originBranchId: 5 }),
+            },
+            manifestItem: {
+              findFirst: vi.fn().mockResolvedValue(null),
+              create: vi.fn().mockResolvedValue({ id: 1 }),
+            },
+          };
+          return fn(tx);
+        },
+      );
+      const result = await assignTransactionToManifest(
+        { manifestId: 1, transactionId: 1 } as AssignToManifestInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
 
     it("does not create manifest assignment when denied", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 2, status: "Draft", deletedAt: null }) },
-        };
-        return fn(tx);
-      });
-      await expect(assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            manifest: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: 1,
+                branchId: 2,
+                status: "Draft",
+                deletedAt: null,
+              }),
+            },
+          };
+          return fn(tx);
+        },
+      );
+      await expect(
+        assignTransactionToManifest(
+          { manifestId: 1, transactionId: 1 } as AssignToManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
       expect(prisma.manifestItem.create).not.toHaveBeenCalled();
     });
 
@@ -271,22 +526,41 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
       const txManifestItemCreate = vi.fn();
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 1, status: "Draft", deletedAt: null }) },
-          transaction: { findFirst: vi.fn().mockResolvedValue({ id: 1, originBranchId: 1 }) },
-          manifestItem: {
-            findFirst: vi
-              .fn()
-              .mockResolvedValueOnce(null) // no active assignment (releasedAt: null)
-              .mockResolvedValueOnce({ id: 99, releasedAt: new Date("2026-01-01") }), // released historical row
-            create: txManifestItemCreate,
-          },
-        };
-        return fn(tx);
-      });
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            manifest: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: 1,
+                branchId: 1,
+                status: "Draft",
+                deletedAt: null,
+              }),
+            },
+            transaction: {
+              findFirst: vi
+                .fn()
+                .mockResolvedValue({ id: 1, originBranchId: 1 }),
+            },
+            manifestItem: {
+              findFirst: vi
+                .fn()
+                .mockResolvedValueOnce(null) // no active assignment (releasedAt: null)
+                .mockResolvedValueOnce({
+                  id: 99,
+                  releasedAt: new Date("2026-01-01"),
+                }), // released historical row
+              create: txManifestItemCreate,
+            },
+          };
+          return fn(tx);
+        },
+      );
       await expect(
-        assignTransactionToManifest({ manifestId: 1, transactionId: 1 } as any, actor),
+        assignTransactionToManifest(
+          { manifestId: 1, transactionId: 1 } as AssignToManifestInput,
+          actor,
+        ),
       ).rejects.toThrow(/TRANSACTION_REASSIGNMENT_BLOCKED_D08/);
       expect(txManifestItemCreate).not.toHaveBeenCalled();
     });
@@ -295,20 +569,38 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
   describe("recordDeliveryOutcome", () => {
     it("rejects non-admin with empty branchIds", async () => {
       const actor = makeActor([], false);
-      await expect(recordDeliveryOutcome({ deliverySheetId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      await expect(
+        recordDeliveryOutcome(
+          { deliverySheetId: 1, transactionId: 1 } as DeliveryOutcomeInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
     });
 
     it("rejects non-admin when delivery sheet manifest belongs to different branch", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }) },
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 2, deletedAt: null }) },
-        };
-        return fn(tx);
-      });
-      await expect(recordDeliveryOutcome({ deliverySheetId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            deliverySheet: {
+              findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }),
+            },
+            manifest: {
+              findFirst: vi
+                .fn()
+                .mockResolvedValue({ id: 1, branchId: 2, deletedAt: null }),
+            },
+          };
+          return fn(tx);
+        },
+      );
+      await expect(
+        recordDeliveryOutcome(
+          { deliverySheetId: 1, transactionId: 1 } as DeliveryOutcomeInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
       expect(prisma.deliverySheetItem.create).not.toHaveBeenCalled();
       expect(prisma.transaction.updateMany).not.toHaveBeenCalled();
     });
@@ -316,32 +608,76 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
     it("allows administrator per policy", async () => {
       const actor = makeActor([], true);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }) },
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 5, deletedAt: null }) },
-          manifestItem: { findFirst: vi.fn().mockResolvedValue({ id: 1, deletedAt: null }) },
-          transaction: { findFirst: vi.fn().mockResolvedValue({ id: 1, status: "In Transit", originBranchId: 5 }), updateMany: vi.fn().mockResolvedValue({ count: 1 }), findUnique: vi.fn().mockResolvedValue({ id: 1, status: "Delivered" }) },
-          deliverySheetItem: { findUnique: vi.fn().mockResolvedValue({ id: 1, outcome: null }), create: vi.fn().mockResolvedValue({ id: 1 }), updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
-          transactionStatusHistory: { create: vi.fn().mockResolvedValue({}) },
-        };
-        return fn(tx);
-      });
-      const result = await recordDeliveryOutcome({ deliverySheetId: 1, transactionId: 1, outcome: "DELIVERED" } as any, actor);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            deliverySheet: {
+              findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }),
+            },
+            manifest: {
+              findFirst: vi
+                .fn()
+                .mockResolvedValue({ id: 1, branchId: 5, deletedAt: null }),
+            },
+            manifestItem: {
+              findFirst: vi.fn().mockResolvedValue({ id: 1, deletedAt: null }),
+            },
+            transaction: {
+              findFirst: vi.fn().mockResolvedValue({
+                id: 1,
+                status: "In Transit",
+                originBranchId: 5,
+              }),
+              updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+              findUnique: vi
+                .fn()
+                .mockResolvedValue({ id: 1, status: "Delivered" }),
+            },
+            deliverySheetItem: {
+              findUnique: vi.fn().mockResolvedValue({ id: 1, outcome: null }),
+              create: vi.fn().mockResolvedValue({ id: 1 }),
+              updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+            },
+            transactionStatusHistory: { create: vi.fn().mockResolvedValue({}) },
+          };
+          return fn(tx);
+        },
+      );
+      const result = await recordDeliveryOutcome(
+        {
+          deliverySheetId: 1,
+          transactionId: 1,
+          outcome: "DELIVERED",
+        } as DeliveryOutcomeInput,
+        actor,
+      );
       expect(result).toBeDefined();
     });
 
     it("does not create delivery outcome or change status when denied", async () => {
       const actor = makeActor([1], false);
       const { prisma } = await import("@/lib/db");
-      (prisma.$transaction as any).mockImplementation(async (fn: any) => {
-        const tx = {
-          deliverySheet: { findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }) },
-          manifest: { findFirst: vi.fn().mockResolvedValue({ id: 1, branchId: 9, deletedAt: null }) },
-        };
-        return fn(tx);
-      });
-      await expect(recordDeliveryOutcome({ deliverySheetId: 1, transactionId: 1 } as any, actor)).rejects.toThrow(IdentityError);
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            deliverySheet: {
+              findUnique: vi.fn().mockResolvedValue({ id: 1, manifestId: 1 }),
+            },
+            manifest: {
+              findFirst: vi
+                .fn()
+                .mockResolvedValue({ id: 1, branchId: 9, deletedAt: null }),
+            },
+          };
+          return fn(tx);
+        },
+      );
+      await expect(
+        recordDeliveryOutcome(
+          { deliverySheetId: 1, transactionId: 1 } as DeliveryOutcomeInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
       expect(prisma.deliverySheetItem.create).not.toHaveBeenCalled();
       expect(prisma.transaction.updateMany).not.toHaveBeenCalled();
       expect(prisma.transactionStatusHistory.create).not.toHaveBeenCalled();

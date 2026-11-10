@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { createBookingSchema, createTransactionSchema } from "../../../src/features/bookings/schemas";
+import {
+  createBookingSchema,
+  createTransactionSchema,
+} from "../../../src/features/bookings/schemas";
 
 describe("booking/awb idempotency schema and behavior", () => {
   it("creates valid transaction payload without client status", () => {
@@ -11,7 +14,8 @@ describe("booking/awb idempotency schema and behavior", () => {
       volume: "0.5",
       biaya: "10000.00",
     });
-    expect((parsed as any).status).toBeUndefined();
+    // Schema uses z.never().optional() for status, so it's not in the parsed output
+    expect("status" in parsed).toBe(false);
     expect(parsed.originBranchId).toBe(10);
     expect(parsed.kilo).toBe("1.50");
   });
@@ -34,7 +38,9 @@ describe("booking/awb idempotency schema and behavior", () => {
 
   it("rejects payload without required originBranchId", () => {
     expect(() => createTransactionSchema.parse({ awbNo: "AWB-X" })).toThrow();
-    expect(() => createTransactionSchema.parse({ originBranchId: "" })).toThrow();
+    expect(() =>
+      createTransactionSchema.parse({ originBranchId: "" }),
+    ).toThrow();
   });
 
   it("rejects client-supplied status", () => {
@@ -57,7 +63,7 @@ describe("booking/awb idempotency schema and behavior", () => {
         status: "Delivered",
         ownerBranchId: 2,
         extra: "x",
-      } as any),
+      }),
     ).toThrow();
 
     expect(() =>
@@ -69,7 +75,7 @@ describe("booking/awb idempotency schema and behavior", () => {
         deletedAt: new Date(),
         status: "Delivered",
         internalFlag: true,
-      } as any),
+      }),
     ).toThrow();
   });
 

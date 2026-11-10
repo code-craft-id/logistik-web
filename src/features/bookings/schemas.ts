@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 const decimalString = (maxInt: number, scale: number) => {
-  const max = 10 ** maxInt - 10 ** (-scale);
-  const regex = new RegExp(
-    String.raw`^-?(?:0|[1-9][0-9]*)(?:\.[0-9]{1,` + scale + "})?$",
-  );
+  const max = 10 ** maxInt - 10 ** -scale;
+  const regex = new RegExp(`^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]{1,${scale}})?$`);
   return z
     .string()
     .trim()
@@ -25,18 +23,15 @@ const emptyToUndefined = (v: unknown) => {
   return v;
 };
 
-const optionalPositiveInt = z.preprocess(
-  (v) => {
-    const e = emptyToUndefined(v);
-    if (e === undefined || e === null) return undefined;
-    if (typeof e === "string") {
-      const t = e.trim();
-      if (t === "") return undefined;
-    }
-    return e;
-  },
-  z.coerce.number().int().positive().optional(),
-);
+const optionalPositiveInt = z.preprocess((v) => {
+  const e = emptyToUndefined(v);
+  if (e === undefined || e === null) return undefined;
+  if (typeof e === "string") {
+    const t = e.trim();
+    if (t === "") return undefined;
+  }
+  return e;
+}, z.coerce.number().int().positive().optional());
 
 const decimalField = (maxInt: number, scale: number) =>
   z
@@ -93,25 +88,28 @@ const normalizeAwbSchema = (v: unknown) => {
 
 export const createTransactionSchema = z
   .object({
-    idempotencyKey: z.preprocess(emptyToUndefined, z.string().min(8).max(64).optional()),
+    idempotencyKey: z.preprocess(
+      emptyToUndefined,
+      z.string().min(8).max(64).optional(),
+    ),
     bookingId: optionalPositiveInt,
-    awbNo: z.preprocess(normalizeAwbSchema, z.string().min(1).max(50).nullable().optional()),
+    awbNo: z.preprocess(
+      normalizeAwbSchema,
+      z.string().min(1).max(50).nullable().optional(),
+    ),
     transactionDate: z.coerce.date().optional(),
     doNo: z.string().trim().max(50).optional().nullable(),
     senderName: z.string().trim().max(150).optional().nullable(),
     receiverName: z.string().trim().max(150).optional().nullable(),
-    originBranchId: z.preprocess(
-      (v) => {
-        const e = emptyToUndefined(v);
-        if (e === undefined || e === null) return e;
-        if (typeof e === "string") {
-          const t = e.trim();
-          if (t === "") return undefined;
-        }
-        return e;
-      },
-      z.coerce.number().int().positive(),
-    ),
+    originBranchId: z.preprocess((v) => {
+      const e = emptyToUndefined(v);
+      if (e === undefined || e === null) return e;
+      if (typeof e === "string") {
+        const t = e.trim();
+        if (t === "") return undefined;
+      }
+      return e;
+    }, z.coerce.number().int().positive()),
     destinationBranchId: optionalPositiveInt,
     koli: z.preprocess(
       emptyToUndefined,

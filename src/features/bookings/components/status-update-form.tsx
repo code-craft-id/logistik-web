@@ -19,14 +19,19 @@ export function StatusUpdateForm({
     startTransition(async () => {
       try {
         await updateTransactionStatusAction(formData);
-      } catch (e) {
+      } catch (e: unknown) {
+        console.error("Status update failed:", e);
         alert("Gagal mengubah status. Pastikan transisi valid.");
       }
     });
   }
 
   if (allowed.length === 0) {
-    return <div className="text-sm text-muted-foreground">Tidak ada transisi status yang diizinkan.</div>;
+    return (
+      <div className="text-sm text-muted-foreground">
+        Tidak ada transisi status yang diizinkan.
+      </div>
+    );
   }
 
   return (
@@ -34,11 +39,21 @@ export function StatusUpdateForm({
       <div className="flex gap-2 items-center">
         <select name="newStatus" className="border rounded px-2 py-1">
           {allowed.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
-        <input name="reason" placeholder="Alasan (opsional)" className="border rounded px-2 py-1 flex-1" />
-        <button type="submit" disabled={isPending} className="px-3 py-1 border rounded">
+        <input
+          name="reason"
+          placeholder="Alasan (opsional)"
+          className="border rounded px-2 py-1 flex-1"
+        />
+        <button
+          type="submit"
+          disabled={isPending}
+          className="px-3 py-1 border rounded"
+        >
           {isPending ? "Menyimpan..." : "Ubah Status"}
         </button>
       </div>

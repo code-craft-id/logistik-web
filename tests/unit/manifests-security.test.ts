@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { permitsBranch, type AccessActor } from "../../src/features/identity/permissions";
+import {
+  type AccessActor,
+  permitsBranch,
+} from "../../src/features/identity/permissions";
 
 const actor = (branchIds: number[], isAdmin = false): AccessActor => ({
   id: 1,
@@ -18,7 +21,10 @@ const actor = (branchIds: number[], isAdmin = false): AccessActor => ({
         name: "User",
         status: "ACTIVE",
         deletedAt: null,
-        permissions: [{ resource: "manifest", action: "update" }, { resource: "delivery", action: "update" }],
+        permissions: [
+          { resource: "manifest", action: "update" },
+          { resource: "delivery", action: "update" },
+        ],
       },
 });
 

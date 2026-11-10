@@ -1,6 +1,6 @@
-import { Metadata } from "next";
-import { requirePermission } from "@/lib/auth/session";
+import type { Metadata } from "next";
 import { TransactionForm } from "@/features/bookings/components/transaction-form";
+import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Tambah AWB/Transaction" };
 
@@ -9,9 +9,12 @@ export default async function Page() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Tambah AWB / On Site Outbound</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Tambah AWB / On Site Outbound
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Input transaksi/AWB. Idempotensi diterapkan via kunci permintaan; relasi booking bersifat opsional (D-05 belum terkonfirmasi).
+          Input transaksi/AWB. Idempotensi diterapkan via kunci permintaan;
+          relasi booking bersifat opsional (D-05 belum terkonfirmasi).
         </p>
       </div>
       <TransactionForm />

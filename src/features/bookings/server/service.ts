@@ -1,28 +1,39 @@
 import "server-only";
 
-import { Prisma } from "@/lib/db/generated/client";
-import { prisma } from "@/lib/db";
-import { IdentityError } from "@/features/identity/server/access";
-import { permitsBranch, type AccessActor } from "@/features/identity/permissions";
-import { ALLOWED_TRANSITIONS } from "../status";
 import {
-  createBookingSchema,
-  createTransactionSchema,
-  updateTransactionStatusSchema,
+  type AccessActor,
+  permitsBranch,
+} from "@/features/identity/permissions";
+import { IdentityError } from "@/features/identity/server/access";
+import { prisma } from "@/lib/db";
+import type { Transaction } from "@/lib/db/generated/client";
+import { Prisma } from "@/lib/db/generated/client";
+import {
   type CreateBookingInput,
   type CreateTransactionInput,
+  createBookingSchema,
+  createTransactionSchema,
   type UpdateTransactionStatusInput,
+  updateTransactionStatusSchema,
 } from "../schemas";
+import { ALLOWED_TRANSITIONS } from "../status";
 
 type TxClient = Prisma.TransactionClient;
 
-export async function createBooking(input: CreateBookingInput, actor: AccessActor) {
+export async function createBooking(
+  input: CreateBookingInput,
+  actor: AccessActor,
+) {
   const data = createBookingSchema.parse(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
   let branchId = data.branchId;
   if (branchId == null) {
     if (isAdministrator(actor)) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan wajib diisi untuk administrator.");
+      throw new IdentityError(
+        "FORBIDDEN_BRANCH",
+        403,
+        "Cabang tujuan wajib diisi untuk administrator.",
+      );
     }
     if (!actor.branchIds || actor.branchIds.length === 0) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
@@ -30,7 +41,11 @@ export async function createBooking(input: CreateBookingInput, actor: AccessActo
     branchId = actor.branchIds[0];
   }
   if (!branchId || !Number.isSafeInteger(branchId) || branchId <= 0) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan tidak valid.");
+    throw new IdentityError(
+      "FORBIDDEN_BRANCH",
+      403,
+      "Cabang tujuan tidak valid.",
+    );
   }
   if (!permitsBranch(actor, branchId)) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
@@ -45,10 +60,7 @@ export async function createBooking(input: CreateBookingInput, actor: AccessActo
           ...(isAdministrator(actor)
             ? {}
             : {
-                OR: [
-                  { branchId: { in: actor.branchIds } },
-                  { branchId: null },
-                ],
+                OR: [{ branchId: { in: actor.branchIds } }, { branchId: null }],
               }),
         },
       });
@@ -86,7 +98,9 @@ function normalizeDecimal(v: unknown) {
     if (t.includes(".")) {
       const [intPart, fracPart] = t.split(".");
       const fracTrimmed = fracPart.replace(/0+$/, "");
-      return fracTrimmed.length === 0 ? intPart || "0" : `${intPart}.${fracTrimmed}`;
+      return fracTrimmed.length === 0
+        ? intPart || "0"
+        : `${intPart}.${fracTrimmed}`;
     }
     return t;
   }
@@ -95,14 +109,16 @@ function normalizeDecimal(v: unknown) {
     return v.toString();
   }
   if (typeof v === "object" && v !== null && "toString" in v) {
-    const s = (v as any).toString();
+    const s = (v as { toString: () => string }).toString();
     // Try to normalize decimal string representation
     try {
       // Basic normalization
       if (s.includes(".")) {
         const [intPart, fracPart] = s.split(".");
         const fracTrimmed = fracPart.replace(/0+$/, "");
-        return fracTrimmed.length === 0 ? intPart || "0" : `${intPart}.${fracTrimmed}`;
+        return fracTrimmed.length === 0
+          ? intPart || "0"
+          : `${intPart}.${fracTrimmed}`;
       }
       return s;
     } catch {
@@ -112,14 +128,14 @@ function normalizeDecimal(v: unknown) {
   return String(v);
 }
 
-function normalizeAwbValue(v: unknown) {
+function normalizeAwbValue(v: unknown): string | null | undefined {
   if (v === null || v === undefined) return null;
   if (typeof v === "string") {
     const t = v.trim();
     if (t === "") return null;
     return t;
   }
-  return v;
+  return undefined;
 }
 
 function normalizeDateValue(v: unknown) {
@@ -154,14 +170,18 @@ function normalizeDateValue(v: unknown) {
 
 function hasExplicitTransactionDate(input: unknown) {
   if (!input || typeof input !== "object") return false;
-  if (!Object.prototype.hasOwnProperty.call(input, "transactionDate")) return false;
-  const v = (input as any).transactionDate;
+  if (!Object.hasOwn(input, "transactionDate")) return false;
+  const v = (input as Record<string, unknown>).transactionDate;
   if (v === undefined || v === null) return false;
   if (typeof v === "string" && v.trim() === "") return false;
   return true;
 }
 
-function payloadMatchesExisting(existing: any, data: any, opts?: { explicitTransactionDate?: boolean }) {
+function payloadMatchesExisting(
+  existing: Record<string, unknown>,
+  data: Record<string, unknown>,
+  opts?: { explicitTransactionDate?: boolean },
+) {
   // Compare key fields that define the business payload; ignore server-set fields
   const fields = [
     "bookingId",
@@ -196,15 +216,15 @@ function payloadMatchesExisting(existing: any, data: any, opts?: { explicitTrans
     }
   }
   if (opts?.explicitTransactionDate) {
-    const aDate = normalizeDateValue(existing["transactionDate"]);
-    const bDate = normalizeDateValue(data["transactionDate"]);
+    const aDate = normalizeDateValue(existing.transactionDate);
+    const bDate = normalizeDateValue(data.transactionDate);
     if (aDate !== bDate) {
       return false;
     }
   }
   // Compare koli with server default 0
-  const aKoli = existing["koli"] ?? 0;
-  const bKoli = data["koli"] ?? 0;
+  const aKoli = existing.koli ?? 0;
+  const bKoli = data.koli ?? 0;
   if (Number(aKoli) !== Number(bKoli)) {
     return false;
   }
@@ -221,18 +241,42 @@ function payloadMatchesExisting(existing: any, data: any, opts?: { explicitTrans
 export async function createTransaction(
   input: CreateTransactionInput,
   actor: AccessActor,
-) {
-  const data = createTransactionSchema.parse(input) as any;
+): Promise<
+  | { transaction: Transaction; created: true; idempotent: false }
+  | {
+      transaction: Transaction;
+      created: false;
+      idempotent: true;
+      matchedBy?: string;
+    }
+> {
+  const parsed = createTransactionSchema.parse(input);
+  const data: CreateTransactionInput = parsed;
   const normalizedAwb = normalizeAwbValue(data.awbNo);
   data.awbNo = normalizedAwb;
   const explicitTransactionDate = hasExplicitTransactionDate(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
-  if (!data.originBranchId || !Number.isSafeInteger(data.originBranchId) || data.originBranchId <= 0) {
-    throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang asal wajib diisi dan tidak valid.");
+  if (
+    !data.originBranchId ||
+    !Number.isSafeInteger(data.originBranchId) ||
+    data.originBranchId <= 0
+  ) {
+    throw new IdentityError(
+      "FORBIDDEN_BRANCH",
+      403,
+      "Cabang asal wajib diisi dan tidak valid.",
+    );
   }
   if (data.destinationBranchId != null) {
-    if (!Number.isSafeInteger(data.destinationBranchId) || data.destinationBranchId <= 0) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403, "Cabang tujuan tidak valid.");
+    if (
+      !Number.isSafeInteger(data.destinationBranchId) ||
+      data.destinationBranchId <= 0
+    ) {
+      throw new IdentityError(
+        "FORBIDDEN_BRANCH",
+        403,
+        "Cabang tujuan tidak valid.",
+      );
     }
   }
   if (isAdministrator(actor)) {
@@ -262,7 +306,9 @@ export async function createTransaction(
 
   try {
     return await prisma.$transaction(async (tx: TxClient) => {
-      const { isAdministrator } = await import("@/features/identity/permissions");
+      const { isAdministrator } = await import(
+        "@/features/identity/permissions"
+      );
       if (data.bookingId) {
         const booking = await tx.booking.findFirst({
           where: {
@@ -307,10 +353,18 @@ export async function createTransaction(
           where: { idempotencyKey: data.idempotencyKey },
         });
         if (existingByKey) {
-          if (!payloadMatchesExisting(existingByKey, data, { explicitTransactionDate })) {
+          if (
+            !payloadMatchesExisting(existingByKey, data, {
+              explicitTransactionDate,
+            })
+          ) {
             throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
           }
-          return { transaction: existingByKey, created: false, idempotent: true };
+          return {
+            transaction: existingByKey,
+            created: false,
+            idempotent: true,
+          } as const;
         }
       }
       if (data.awbNo && data.originBranchId) {
@@ -322,13 +376,28 @@ export async function createTransaction(
           },
         });
         if (existingByAwb) {
-          if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
-            throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+          if (
+            data.idempotencyKey &&
+            existingByAwb.idempotencyKey &&
+            existingByAwb.idempotencyKey !== data.idempotencyKey
+          ) {
+            throw new Error(
+              "IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY",
+            );
           }
-          if (!payloadMatchesExisting(existingByAwb, data, { explicitTransactionDate })) {
+          if (
+            !payloadMatchesExisting(existingByAwb, data, {
+              explicitTransactionDate,
+            })
+          ) {
             throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
           }
-          return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
+          return {
+            transaction: existingByAwb,
+            created: false,
+            idempotent: true,
+            matchedBy: "awb",
+          } as const;
         }
         const existingByAwbAny = await tx.transaction.findFirst({
           where: {
@@ -336,7 +405,7 @@ export async function createTransaction(
             awbNo: data.awbNo,
           },
         });
-        if (existingByAwbAny && existingByAwbAny.deletedAt) {
+        if (existingByAwbAny?.deletedAt) {
           throw new Error("AWB_ALREADY_USED");
         }
       }
@@ -371,7 +440,11 @@ export async function createTransaction(
           actorId: actor.id,
         },
       });
-      return { transaction: created, created: true, idempotent: false };
+      return {
+        transaction: created,
+        created: true,
+        idempotent: false,
+      } as const;
     });
   } catch (e: unknown) {
     if (
@@ -383,10 +456,18 @@ export async function createTransaction(
           where: { idempotencyKey: data.idempotencyKey },
         });
         if (existingByKey) {
-          if (!payloadMatchesExisting(existingByKey, data, { explicitTransactionDate })) {
+          if (
+            !payloadMatchesExisting(existingByKey, data, {
+              explicitTransactionDate,
+            })
+          ) {
             throw new Error("IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD");
           }
-          return { transaction: existingByKey, created: false, idempotent: true };
+          return {
+            transaction: existingByKey,
+            created: false,
+            idempotent: true,
+          } as const;
         }
       }
       if (data.awbNo && data.originBranchId) {
@@ -398,13 +479,28 @@ export async function createTransaction(
           },
         });
         if (existingByAwb) {
-          if (data.idempotencyKey && existingByAwb.idempotencyKey && existingByAwb.idempotencyKey !== data.idempotencyKey) {
-            throw new Error("IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY");
+          if (
+            data.idempotencyKey &&
+            existingByAwb.idempotencyKey &&
+            existingByAwb.idempotencyKey !== data.idempotencyKey
+          ) {
+            throw new Error(
+              "IDEMPOTENCY_CONFLICT_AWB_EXISTS_WITH_DIFFERENT_KEY",
+            );
           }
-          if (!payloadMatchesExisting(existingByAwb, data, { explicitTransactionDate })) {
+          if (
+            !payloadMatchesExisting(existingByAwb, data, {
+              explicitTransactionDate,
+            })
+          ) {
             throw new Error("AWB_EXISTS_WITH_DIFFERENT_PAYLOAD");
           }
-          return { transaction: existingByAwb, created: false, idempotent: true, matchedBy: "awb" };
+          return {
+            transaction: existingByAwb,
+            created: false,
+            idempotent: true,
+            matchedBy: "awb",
+          } as const;
         }
         const existingByAwbAny = await prisma.transaction.findFirst({
           where: {
@@ -412,7 +508,7 @@ export async function createTransaction(
             awbNo: data.awbNo,
           },
         });
-        if (existingByAwbAny && existingByAwbAny.deletedAt) {
+        if (existingByAwbAny?.deletedAt) {
           throw new Error("AWB_ALREADY_USED");
         }
       }
@@ -427,7 +523,10 @@ export async function updateTransactionStatus(
 ) {
   const data = updateTransactionStatusSchema.parse(input);
   const { isAdministrator } = await import("@/features/identity/permissions");
-  if (!isAdministrator(actor) && (!actor.branchIds || actor.branchIds.length === 0)) {
+  if (
+    !isAdministrator(actor) &&
+    (!actor.branchIds || actor.branchIds.length === 0)
+  ) {
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   }
 

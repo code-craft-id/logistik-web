@@ -1,24 +1,36 @@
 "use server";
 
+import { IdentityError } from "@/features/identity/server/access";
 import { requirePermission } from "@/lib/auth/session";
+import type { Transaction } from "@/lib/db/generated/client";
 import { transactionLookupSchema } from "./schemas";
 import { lookupTransactionByAwb } from "./server/queries";
-import { IdentityError } from "@/features/identity/server/access";
+
+type LookupTransactionResult = Transaction & {
+  originBranch: { id: number; name: string; code: string } | null;
+  destinationBranch: { id: number; name: string; code: string } | null;
+};
 
 export async function lookupTransactionAction(formData: FormData) {
   await requirePermission("view", "transaction");
   const raw = Object.fromEntries(formData.entries());
   try {
     const parsed = transactionLookupSchema.parse(raw);
-    const res = await lookupTransactionByAwb(parsed.awbNo, parsed.originBranchId);
+    const res = await lookupTransactionByAwb(
+      parsed.awbNo,
+      parsed.originBranchId,
+    );
     if (!res) return { found: false };
     const isArray = Array.isArray(res);
     const items = isArray ? res : [res];
-    const mapItem = (r: any) => ({
+    const mapItem = (r: LookupTransactionResult) => ({
       id: r.id,
       awbNo: r.awbNo,
       status: r.status,
-      transactionDate: r.transactionDate instanceof Date ? r.transactionDate.toISOString().slice(0, 10) : String(r.transactionDate).slice(0, 10),
+      transactionDate:
+        r.transactionDate instanceof Date
+          ? r.transactionDate.toISOString().slice(0, 10)
+          : String(r.transactionDate).slice(0, 10),
       originBranchId: r.originBranchId,
       destinationBranchId: r.destinationBranchId,
       originBranch: r.originBranch
@@ -46,7 +58,7 @@ export async function lookupTransactionAction(formData: FormData) {
       return { found: true, multiple: true, data: items.map(mapItem) };
     }
     return { found: false };
-  } catch (e: any) {
+  } catch (e: unknown) {
     if (e instanceof IdentityError) {
       if (e.status === 409) {
         return {
@@ -61,7 +73,7 @@ export async function lookupTransactionAction(formData: FormData) {
       }
       return { found: false, error: e.message, code: e.code };
     }
-    if (e?.message) {
+    if (e instanceof Error && e.message) {
       return { found: false, error: e.message };
     }
     throw e;

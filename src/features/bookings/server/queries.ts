@@ -1,13 +1,18 @@
 import "server-only";
 
+import type { AccessActor } from "@/features/identity/permissions";
 import { isAdministrator } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { getUserBranchScope } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@/lib/db/generated/client";
 
-function requireNonEmptyBranchScope(branchIds: number[], actor?: any) {
-  if (isAdministrator(actor)) {
+export function requireNonEmptyBranchScope(
+  branchIds: number[],
+  actor: AccessActor | null | undefined,
+) {
+  if (isAdministrator(actor ?? null)) {
     return;
   }
   if (!branchIds || branchIds.length === 0) {
@@ -160,7 +165,7 @@ export async function lookupTransactionByAwb(
   const current = await currentIdentity();
   const actor = current?.actor ?? null;
   if (isAdministrator(actor)) {
-    const where: any = {
+    const where: Prisma.TransactionWhereInput = {
       awbNo,
       deletedAt: null,
     };
@@ -189,7 +194,7 @@ export async function lookupTransactionByAwb(
   }
   const branchIds = await getUserBranchScope();
   requireNonEmptyBranchScope(branchIds, actor);
-  const where: any = {
+  const where: Prisma.TransactionWhereInput = {
     awbNo,
     deletedAt: null,
     OR: [

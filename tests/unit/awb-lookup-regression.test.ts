@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import type { Transaction } from "@/lib/db/generated/client";
 
 vi.mock("@/features/identity/server/context", () => ({
   currentIdentity: vi.fn(),
@@ -14,14 +15,17 @@ vi.mock("@/features/identity/permissions", () => ({
 
 vi.mock("@/features/identity/server/access", () => {
   class IdentityError extends Error {
-    constructor(public code: string, public status: number, message?: string) {
+    constructor(
+      public code: string,
+      public status: number,
+      message?: string,
+    ) {
       super(message || code);
       this.name = "IdentityError";
     }
   }
   return {
     IdentityError,
-    requireNonEmptyBranchScope: vi.fn(),
   };
 });
 
@@ -33,14 +37,29 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-import { lookupTransactionByAwb } from "@/features/bookings/server/queries";
-import { prisma } from "@/lib/db";
+vi.mock("@/features/bookings/server/queries", async () => {
+  const actual = await vi.importActual("@/features/bookings/server/queries");
+  return {
+    ...actual,
+    requireNonEmptyBranchScope: vi.fn(),
+  };
+});
+
+import {
+  lookupTransactionByAwb,
+  requireNonEmptyBranchScope,
+} from "@/features/bookings/server/queries";
+import { isAdministrator } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { getUserBranchScope } from "@/lib/auth/session";
-import { isAdministrator } from "@/features/identity/permissions";
-import * as access from "@/features/identity/server/access";
-const requireNonEmptyBranchScope = (access as any).requireNonEmptyBranchScope;
+import { prisma } from "@/lib/db";
+
+const isAdminMock = isAdministrator as Mock;
+const currentIdentityMock = currentIdentity as Mock;
+const getUserBranchScopeMock = getUserBranchScope as Mock;
+const requireNonEmptyBranchScopeMock = requireNonEmptyBranchScope as Mock;
+const prismaTransactionFindManyMock = prisma.transaction.findMany as Mock;
 
 describe("AWB lookup regression (PR #9)", () => {
   const txAtoB = {
@@ -68,24 +87,22 @@ describe("AWB lookup regression (PR #9)", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    if (requireNonEmptyBranchScope) {
-      (requireNonEmptyBranchScope as any).mockImplementation(() => {});
-    }
+    requireNonEmptyBranchScopeMock.mockImplementation(() => {});
   });
 
   it("branch B user without origin filter sees both A→B and C→B", async () => {
-    (isAdministrator as any).mockReturnValue(false);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 10 } });
-    (getUserBranchScope as any).mockResolvedValue([2]);
-    (prisma.transaction.findMany as any).mockResolvedValue([txAtoB, txCtoB]);
+    isAdminMock.mockReturnValue(false);
+    currentIdentityMock.mockResolvedValue({ actor: { id: 10 } });
+    getUserBranchScopeMock.mockResolvedValue([2]);
+    prismaTransactionFindManyMock.mockResolvedValue([txAtoB, txCtoB]);
 
     const res = await lookupTransactionByAwb("AWB123");
     expect(Array.isArray(res)).toBe(true);
-    const arr = res as any[];
+    const arr = res as Transaction[];
     expect(arr.length).toBe(2);
     const ids = arr.map((x) => x.id).sort();
     expect(ids).toEqual([101, 102]);
-    const call = (prisma.transaction.findMany as any).mock.calls[0][0];
+    const call = prismaTransactionFindManyMock.mock.calls[0][0];
     expect(call.where.OR).toEqual([
       { originBranchId: { in: [2] } },
       { destinationBranchId: { in: [2] } },
@@ -94,15 +111,15 @@ describe("AWB lookup regression (PR #9)", () => {
   });
 
   it("branch B user with originBranchId A gets A→B without 403", async () => {
-    (isAdministrator as any).mockReturnValue(false);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 10 } });
-    (getUserBranchScope as any).mockResolvedValue([2]);
-    (prisma.transaction.findMany as any).mockResolvedValue([txAtoB]);
+    isAdminMock.mockReturnValue(false);
+    currentIdentityMock.mockResolvedValue({ actor: { id: 10 } });
+    getUserBranchScopeMock.mockResolvedValue([2]);
+    prismaTransactionFindManyMock.mockResolvedValue([txAtoB]);
 
     const res = await lookupTransactionByAwb("AWB123", 1);
     expect(Array.isArray(res)).toBe(false);
-    expect((res as any).id).toBe(101);
-    const call = (prisma.transaction.findMany as any).mock.calls[0][0];
+    expect((res as Transaction).id).toBe(101);
+    const call = prismaTransactionFindManyMock.mock.calls[0][0];
     expect(call.where.originBranchId).toBe(1);
     expect(call.where.OR).toEqual([
       { originBranchId: { in: [2] } },
@@ -111,14 +128,14 @@ describe("AWB lookup regression (PR #9)", () => {
   });
 
   it("user with access to other branch only cannot see A→B or C→B", async () => {
-    (isAdministrator as any).mockReturnValue(false);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 11 } });
-    (getUserBranchScope as any).mockResolvedValue([5]);
-    (prisma.transaction.findMany as any).mockResolvedValue([]);
+    isAdminMock.mockReturnValue(false);
+    currentIdentityMock.mockResolvedValue({ actor: { id: 11 } });
+    getUserBranchScopeMock.mockResolvedValue([5]);
+    prismaTransactionFindManyMock.mockResolvedValue([]);
 
     const res = await lookupTransactionByAwb("AWB123");
     expect(res).toBeNull();
-    const call = (prisma.transaction.findMany as any).mock.calls[0][0];
+    const call = prismaTransactionFindManyMock.mock.calls[0][0];
     expect(call.where.OR).toEqual([
       { originBranchId: { in: [5] } },
       { destinationBranchId: { in: [5] } },
@@ -126,51 +143,62 @@ describe("AWB lookup regression (PR #9)", () => {
   });
 
   it("non-admin without branch scope throws 403 via requireNonEmptyBranchScope", async () => {
-    (isAdministrator as any).mockReturnValue(false);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 12 } });
-    (getUserBranchScope as any).mockResolvedValue([]);
-    (requireNonEmptyBranchScope as any).mockImplementation(() => {
+    isAdminMock.mockReturnValue(false);
+    currentIdentityMock.mockResolvedValue({ actor: { id: 12 } });
+    getUserBranchScopeMock.mockResolvedValue([]);
+    requireNonEmptyBranchScopeMock.mockImplementation(() => {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     });
 
-    await expect(lookupTransactionByAwb("AWB123")).rejects.toBeInstanceOf(IdentityError);
-    await expect(lookupTransactionByAwb("AWB123")).rejects.toMatchObject({ status: 403 });
+    await expect(lookupTransactionByAwb("AWB123")).rejects.toBeInstanceOf(
+      IdentityError,
+    );
+    await expect(lookupTransactionByAwb("AWB123")).rejects.toMatchObject({
+      status: 403,
+    });
   });
 
   it("administrator follows global access contract and can see multiple matches", async () => {
-    (isAdministrator as any).mockReturnValue(true);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 1, group: { permissions: [{ resource: "system_admin", action: "manage" }] } } });
-    (prisma.transaction.findMany as any).mockResolvedValue([txAtoB, txCtoB]);
+    isAdminMock.mockReturnValue(true);
+    currentIdentityMock.mockResolvedValue({
+      actor: {
+        id: 1,
+        group: {
+          permissions: [{ resource: "system_admin", action: "manage" }],
+        },
+      },
+    });
+    prismaTransactionFindManyMock.mockResolvedValue([txAtoB, txCtoB]);
 
     const res = await lookupTransactionByAwb("AWB123");
     expect(Array.isArray(res)).toBe(true);
-    expect((res as any[]).length).toBe(2);
-    const call = (prisma.transaction.findMany as any).mock.calls[0][0];
+    expect((res as Transaction[]).length).toBe(2);
+    const call = prismaTransactionFindManyMock.mock.calls[0][0];
     expect(call.where.OR).toBeUndefined();
     expect(call.where.deletedAt).toBeNull();
   });
 
   it("filters by originBranchId for admin without OR scope", async () => {
-    (isAdministrator as any).mockReturnValue(true);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 1 } });
-    (prisma.transaction.findMany as any).mockResolvedValue([txAtoB]);
+    isAdminMock.mockReturnValue(true);
+    currentIdentityMock.mockResolvedValue({ actor: { id: 1 } });
+    prismaTransactionFindManyMock.mockResolvedValue([txAtoB]);
 
     const res = await lookupTransactionByAwb("AWB123", 1);
     expect(Array.isArray(res)).toBe(false);
-    expect((res as any).id).toBe(101);
-    const call = (prisma.transaction.findMany as any).mock.calls[0][0];
+    expect((res as Transaction).id).toBe(101);
+    const call = prismaTransactionFindManyMock.mock.calls[0][0];
     expect(call.where.originBranchId).toBe(1);
     expect(call.where.OR).toBeUndefined();
   });
 
   it("only returns active records (deletedAt null)", async () => {
-    (isAdministrator as any).mockReturnValue(false);
-    (currentIdentity as any).mockResolvedValue({ actor: { id: 10 } });
-    (getUserBranchScope as any).mockResolvedValue([2]);
-    (prisma.transaction.findMany as any).mockResolvedValue([]);
+    isAdminMock.mockReturnValue(false);
+    currentIdentityMock.mockResolvedValue({ actor: { id: 10 } });
+    getUserBranchScopeMock.mockResolvedValue([2]);
+    prismaTransactionFindManyMock.mockResolvedValue([]);
 
     await lookupTransactionByAwb("AWB123");
-    const call = (prisma.transaction.findMany as any).mock.calls[0][0];
+    const call = prismaTransactionFindManyMock.mock.calls[0][0];
     expect(call.where.deletedAt).toBeNull();
   });
 });

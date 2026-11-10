@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { permitsBranch, type AccessActor } from "../../src/features/identity/permissions";
+import {
+  type AccessActor,
+  permitsBranch,
+} from "../../src/features/identity/permissions";
 
 const actor = (branchIds: number[], isAdmin = false): AccessActor => ({
   id: 1,

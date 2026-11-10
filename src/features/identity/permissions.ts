@@ -201,9 +201,7 @@ export const fullAccessPermission = {
 export function permissionRestriction(resource: string): string | undefined {
   if (resource === "vendor_tax")
     return "Lihat dan kelola NPWP vendor khusus administrator.";
-  if (
-    ["booking", "transaction", "manifest", "delivery"].includes(resource)
-  )
+  if (["booking", "transaction", "manifest", "delivery"].includes(resource))
     return undefined;
   if (
     permissionResources.some((entry) => entry.resource === resource) &&
