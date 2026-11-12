@@ -3,14 +3,15 @@
 **Tanggal:** 2026-11-12  
 **Dari:** Dev 2 (Sales, Customer Service, Operations)  
 **Kepada:** Dev 3 (Accounting, Reports, Ticketing, Dashboard)  
-**Branch/PR:** `devnanda` — PR #9 *fix(dev2): authorization alignment for booking/transaction/manifest/delivery* (HEAD `2c2763d`, base `main`)  
-**Status PR:** OPEN, code fixes accepted pada re-review Codex; `reviewDecision: CHANGES_REQUESTED` (butuh re-review/approval formal `z4fL` setelah evidence staging ditinjau). CI workflow tidak ditemukan di `.github/workflows/` (hasil verifikasi saat ini lokal/author-reported).
+**Branch/PR:** `devnanda` — PR #9 *fix(dev2): authorization alignment for booking/transaction/manifest/delivery* (HEAD `0d4003f`, base `main`, synced dengan `origin/main`)  
+**Status PR:** OPEN, code fixes accepted pada re-review Codex terdahulu (tidak ada defect aplikasi baru pada commit dokumentasi/merge); `reviewDecision: CHANGES_REQUESTED` (butuh re-review/approval formal `z4fL` setelah evidence staging ditinjau). CI workflow tidak ditemukan di `.github/workflows/` (hasil verifikasi saat ini lokal/author-reported).
 
 ## 1) Ringkasan status
 
 - **Cakupan Dev 2 yang diserahkan (runtime):** Booking, Transaksi/AWB, AWB lookup, riwayat status transaksi, Manifest (create/assign), Delivery outcome recording — dengan auth server-side, permission, branch scope, validasi, idempotency, dan guard konkuren/transaksional sesuai implementasi saat ini.
-- **Verifikasi lokal (HEAD `8de8d8e`, dilaporkan & konsisten dengan state PR):** `npm run typecheck` lulus, `npm run lint` lulus, `npm test` lulus (**42 files, 410 tests**), `npm run build` lulus. Commit `2c2763d` menambah dokumen evidence staging (tanpa perubahan kode aplikasi).
-- **Staging smoke test:** **dilaporkan sudah dicoba dan dites oleh user/tim** (user-reported, bukan observasi otomatis di workspace ini). Checklist & template evidence: `docs/decisions/evidence/pr-9-staging-smoke.md` dan body PR #9. Mohon lampirkan bukti aktual (PASS/FAIL, tester, waktu, commit SHA, URL/env, screenshot/log, kasus allowed+denied) pada template/PR sebelum merge.
+- **Riwayat commit relevan:** perbaikan kode aplikasi `8de8d8e` (TypeScript/test issues PR #9 review); `2c2763d`/`43a2a6d` menambah dokumen evidence/handoff; `0d4003f` merge sync `origin/main` untuk mergeability (tanpa konflik, tanpa perubahan runtime aplikasi).
+- **Verifikasi lokal (pada state kode aplikasi, rerun 2026-11-12):** `npm run typecheck` lulus, `npm run lint` lulus, `npm test` lulus (**42 files, 410 tests**), `npm run build` lulus.
+- **Staging smoke test:** **dilaporkan sudah dicoba dan dites oleh user/tim** (user-reported, bukan observasi otomatis di workspace ini) untuk authentication, branch authorization, AWB lookup, transaction creation, dan delivery workflows — user melaporkan tidak ada error/bug/duplikasi. Checklist & template evidence: `docs/decisions/evidence/pr-9-staging-smoke.md` dan body PR #9. **Bukti aktual (PASS/FAIL per skenario, tester, tanggal/waktu, commit SHA yang di-deploy, URL/env, screenshot/log, kasus allowed+denied) masih perlu dilampirkan** pada template/PR sebelum merge (gate review).
 - **Batasan:** ini serah terima kontrak/data operasional Dev 2; **bukan** persetujuan aturan finansial/akuntansi, invoice, ledger, P&L, atau perilaku provider yang belum dikonfirmasi.
 
 ## 2) Kontrak & artefak yang relevan untuk Dev 3

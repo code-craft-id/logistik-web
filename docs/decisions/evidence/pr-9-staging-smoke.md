@@ -2,12 +2,12 @@
 
 **PR:** #9 `fix(dev2): authorization alignment for booking/transaction/manifest/delivery`  
 **Branch:** `devnanda` → `main`  
-**HEAD (commit):** `8de8d8ec71e274e2c9d50fc56df7b8022fb2d7c7` (`8de8d8e`)  
-**Tanggal eksekusi:** _isi_  
-**Tester:** _isi_  
-**Environment / URL staging:** _isi_  
-**Database/seed context (jika relevan):** _isi_  
-**Catatan umum:** _isi_
+**HEAD (commit, branch saat ini):** `0d4003f` (merge sync dengan `origin/main`, 2026-11-12). Perbaikan kode aplikasi yang dites: `8de8d8e` (`fix: resolve TypeScript and test issues from PR #9 review`); `2c2763d`/`43a2a6d`/`0d4003f` adalah dokumen/merge tanpa perubahan runtime.  
+**Tanggal eksekusi:** _user-reported; detail waktu belum dilampirkan_  
+**Tester:** _user/tim (user-reported); nama belum dilampirkan_  
+**Environment / URL staging:** _belum dilampirkan_  
+**Database/seed context (jika relevan):** _belum dilampirkan_  
+**Catatan umum:** User melaporkan staging smoke test sudah dicoba dan dites untuk area auth, branch authorization, AWB lookup, transaction creation, dan delivery workflows — **tidak ditemukan error/bug/duplikasi** (user-reported, bukan observasi otomatis di workspace ini). **Bukti aktual (PASS/FAIL per skenario, screenshot/log, tester, tanggal/waktu, commit SHA yang di-deploy, URL/env, kasus allowed+denied) masih perlu dilampirkan** untuk menutup gate review.
 
 > `npm run build` bukan pengganti staging smoke test. Isi `PASS/FAIL/BLOCKED/SKIP` + bukti (screenshot/log/catatan singkat). Uji jalur **allowed** dan **denied** (cross-branch/unauthorized) sesuai scope.
 
@@ -15,11 +15,11 @@
 
 | Area | Status | Catatan singkat |
 |---|---|---|
-| Authentication | ⏳ |  |
-| Branch authorization | ⏳ |  |
-| AWB lookup | ⏳ |  |
-| Transaction creation | ⏳ |  |
-| Delivery workflows | ⏳ |  |
+| Authentication | REPORTED PASS (evidence pending) | User-reported: diuji, tidak ada error/bug. Bukti detail belum dilampirkan. |
+| Branch authorization | REPORTED PASS (evidence pending) | User-reported: diuji, tidak ada error/bug. Bukti allowed+denied belum dilampirkan. |
+| AWB lookup | REPORTED PASS (evidence pending) | User-reported: diuji, tidak ada error/bug. Bukti anti-stale/race & multi-match belum dilampirkan. |
+| Transaction creation | REPORTED PASS (evidence pending) | User-reported: diuji, tidak ada error/bug. Bukti idempotency/validasi belum dilampirkan. |
+| Delivery workflows | REPORTED PASS (evidence pending) | User-reported: diuji, tidak ada error/bug. Bukti outcome/scope/konkuren belum dilampirkan. |
 
 ## Checklist detail
 
