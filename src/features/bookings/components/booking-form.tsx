@@ -30,7 +30,9 @@ export function BookingForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  function onSubmit(formData: FormData) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     formData.delete("status");
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -45,7 +47,7 @@ export function BookingForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-4 max-w-2xl">
+    <form onSubmit={onSubmit} className="space-y-4 max-w-2xl">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="bookingNo" className="text-sm font-medium">

@@ -28,16 +28,19 @@ afterEach(async () => {
 });
 
 async function submit() {
+  const form = host.querySelector<HTMLFormElement>("form");
+  if (!form) throw new Error("form not found");
   await act(async () => {
-    host
-      .querySelector("form")
-      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    form.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    );
   });
-  // flush async transition
-  await act(async () => {
-    await Promise.resolve();
-    await Promise.resolve();
-  });
+  // Allow async server action + React transition/state updates to settle.
+  for (let i = 0; i < 10; i++) {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
 }
 
 describe("BookingForm", () => {
@@ -50,11 +53,14 @@ describe("BookingForm", () => {
     await act(async () => root.render(createElement(BookingForm)));
     await submit();
 
-    const alert = host.querySelector('[role="alert"]');
-    expect(alert?.textContent).toContain(
-      "Anda tidak memiliki akses ke cabang yang dipilih.",
-    );
-    expect(host.querySelector('[role="status"]')).toBeNull();
+    await vi.waitFor(() => {
+      expect(createBookingActionMock).toHaveBeenCalled();
+      const alert = host.querySelector('[role="alert"]');
+      expect(alert?.textContent).toContain(
+        "Anda tidak memiliki akses ke cabang yang dipilih.",
+      );
+    });
+    expect(host.querySelector("output")).toBeNull();
   });
 
   it("shows a success message when createBookingAction returns ok:true", async () => {
@@ -63,8 +69,12 @@ describe("BookingForm", () => {
     await act(async () => root.render(createElement(BookingForm)));
     await submit();
 
-    const status = host.querySelector('[role="status"]');
-    expect(status?.textContent).toContain("Booking berhasil disimpan.");
+    await vi.waitFor(() => {
+      expect(createBookingActionMock).toHaveBeenCalled();
+      expect(host.querySelector("output")?.textContent).toContain(
+        "Booking berhasil disimpan.",
+      );
+    });
     expect(host.querySelector('[role="alert"]')).toBeNull();
   });
 });
