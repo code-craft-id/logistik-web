@@ -92,6 +92,7 @@ export async function createManifest(
       const vehicle = await tx.vehicle.findFirst({
         where: {
           id: data.vehicleId,
+          deletedAt: null,
           ...(isAdministrator(actor)
             ? {}
             : { branchId: { in: actor.branchIds } }),

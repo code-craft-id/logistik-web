@@ -409,6 +409,54 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       expect(result).toBeDefined();
     });
 
+    it("rejects soft-deleted vehicle (cannot create manifest with deleted vehicle)", async () => {
+      const actor = makeActor([1], false);
+      const { prisma } = await import("@/lib/db");
+      (prisma.$transaction as Mock).mockImplementation(
+        async (fn: (tx: MockTxClient) => Promise<unknown>) => {
+          const tx = {
+            manifest: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+            vehicle: { findFirst: vi.fn().mockResolvedValue(null) },
+            courier: { findFirst: vi.fn() },
+          };
+          return fn(tx);
+        },
+      );
+
+      await expect(
+        createManifest(
+          {
+            manifestNo: "M-DEL-VEH",
+            branchId: 1,
+            vehicleId: 77,
+          } as CreateManifestInput,
+          actor,
+        ),
+      ).rejects.toThrow(IdentityError);
+
+      const txCallback = (prisma.$transaction as Mock).mock.calls[0]?.[0] as
+        | ((tx: MockTxClient) => Promise<unknown>)
+        | undefined;
+      expect(txCallback).toBeDefined();
+      // Verify the service queried vehicle with deletedAt: null (deleted vehicles excluded)
+      const mockTx: MockTxClient = {
+        manifest: { create: vi.fn() },
+        vehicle: { findFirst: vi.fn().mockResolvedValue(null) },
+        courier: { findFirst: vi.fn() },
+      };
+      await expect(
+        txCallback ? txCallback(mockTx) : Promise.reject(new Error("no tx")),
+      ).rejects.toThrow(IdentityError);
+      expect(mockTx.vehicle?.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            id: 77,
+            deletedAt: null,
+          }),
+        }),
+      );
+    });
+
     it("rejects non-admin trying different branch", async () => {
       const actor = makeActor([1], false);
       await expect(

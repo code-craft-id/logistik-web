@@ -1,15 +1,46 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { createBookingAction } from "../actions";
+
+type BookingActionError =
+  | "UNAUTHENTICATED"
+  | "FORBIDDEN_BRANCH"
+  | "VALIDATION"
+  | "CONFLICT"
+  | "UNKNOWN";
+
+function getErrorMessage(error: BookingActionError) {
+  switch (error) {
+    case "UNAUTHENTICATED":
+      return "Sesi Anda berakhir. Silakan masuk kembali.";
+    case "FORBIDDEN_BRANCH":
+      return "Anda tidak memiliki akses ke cabang yang dipilih.";
+    case "VALIDATION":
+      return "Data booking tidak valid. Periksa kembali isian Anda.";
+    case "CONFLICT":
+      return "Booking tidak dapat disimpan karena terjadi konflik data.";
+    default:
+      return "Gagal menyimpan booking. Silakan coba lagi.";
+  }
+}
 
 export function BookingForm() {
   const [isPending, startTransition] = useTransition();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   function onSubmit(formData: FormData) {
     formData.delete("status");
+    setErrorMessage(null);
+    setSuccessMessage(null);
     startTransition(async () => {
-      await createBookingAction(formData);
+      const result = await createBookingAction(formData);
+      if (result.ok) {
+        setSuccessMessage("Booking berhasil disimpan.");
+        return;
+      }
+      setErrorMessage(getErrorMessage(result.error));
     });
   }
 
@@ -127,6 +158,16 @@ export function BookingForm() {
           />
         </div>
       </div>
+      {errorMessage ? (
+        <p role="alert" className="text-sm text-red-600">
+          {errorMessage}
+        </p>
+      ) : null}
+      {successMessage ? (
+        <output className="block text-sm text-green-700">
+          {successMessage}
+        </output>
+      ) : null}
       <button
         type="submit"
         disabled={isPending}
