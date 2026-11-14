@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import fsPromises, { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { createServer, request } from "node:http";
+import { syncBuiltinESMExports } from "node:module";
 import { connect } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -14,6 +15,62 @@ const fixture = {
   columns: ["Name", "<img src=x>"],
   rows: [["Fake & only", "'quoted'"]],
 };
+
+test("rejects network/device and ambiguous Windows paths before filesystem I/O", async () => {
+  const originalOpen = fsPromises.open;
+  const intercepted = new Error("intercepted open; no filesystem access");
+  let calls = 0;
+  fsPromises.open = async () => {
+    calls++;
+    throw intercepted;
+  };
+  syncBuiltinESMExports();
+  try {
+    // Prove that the actual named import used by the harness is intercepted
+    // using a harmless local path BEFORE supplying any network-shaped input.
+    await assert.rejects(
+      startObservationServer({ fixturePath: "synthetic-spy-check.json" }),
+      (error) => error === intercepted,
+    );
+    assert.equal(calls, 1);
+    calls = 0;
+    for (const fixturePath of [
+      "\\\\synthetic.invalid\\share\\fixture.json",
+      "//synthetic.invalid/share/fixture.json",
+      "\\/synthetic.invalid/share/fixture.json",
+      "/\\synthetic.invalid/share/fixture.json",
+      "\\\\?\\UNC\\synthetic.invalid\\share\\fixture.json",
+      "\\\\?\\C:\\fixture.json",
+      "\\\\.\\C:\\fixture.json",
+      "//?/UNC/synthetic.invalid/share/fixture.json",
+      "//./C:/fixture.json",
+      "\\??\\UNC\\synthetic.invalid\\share\\fixture.json",
+      "\\Device\\Mup\\synthetic.invalid\\share\\fixture.json",
+      "\\fixture.json",
+      ...(process.platform === "win32"
+        ? ["/fixture.json", "/??/UNC/synthetic.invalid/share/fixture.json"]
+        : []),
+      "C:fixture.json",
+      "C:..\\fixture.json",
+      "C:",
+      "http://synthetic.invalid/fixture.json",
+      "file://synthetic.invalid/share/fixture.json",
+      "file:fixture.json",
+      "\\\\synthetic.invalid\\share\\..\\fixture.json",
+      "//synthetic.invalid/share/./fixture.json",
+    ]) {
+      await assert.rejects(
+        startObservationServer({ fixturePath }),
+        (error) => error !== intercepted,
+        "path must fail validation before reaching the intercepted filesystem",
+      );
+    }
+    assert.equal(calls, 0, "rejected paths must cause zero filesystem calls");
+  } finally {
+    fsPromises.open = originalOpen;
+    syncBuiltinESMExports();
+  }
+});
 
 async function setup(t, value = fixture) {
   const dir = await mkdtemp(join(tmpdir(), "observation-test-"));

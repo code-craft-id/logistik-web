@@ -49,6 +49,15 @@ Parser errors fail closed without echoing input. Responses use restrictive CSP
 no-store, nosniff and no-referrer. There are no cookies, CORS grants, telemetry
 or raw request logs.
 
+Explicit UNC paths (backslash, slash or mixed separators), NT/device namespace
+prefixes, URL schemes and Windows drive-relative paths are rejected before any
+filesystem operation. Windows root-relative paths are also rejected; use an
+ordinary relative path or an explicit absolute local drive path. This is a
+syntactic guard, not proof that the resolved file is local: the working
+directory/local roots, mapped drives, junctions, symlinks and other filesystem
+redirections must be independently trusted. A mapped drive or a link can still
+resolve to remote storage. This tool does not inspect or sandbox that resolution.
+
 ## Limits and verification
 
 This server does **not** establish browser egress isolation, an OS/process or
