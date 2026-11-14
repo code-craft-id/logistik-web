@@ -1,17 +1,16 @@
 # Dev 3 current state
 
-- Checkpoint: 2026-11-14 14:41:08 UTC (21:41:08 Asia/Bangkok); exact final Git bookkeeping appended after commit.
-- Repository/worktree: code-craft-id/logistik-web, C:/Development/logistik-web.
-- Branch: docs/disc-04-dev3-readiness.
-- Actual HEAD at this write / verified code baseline: c40650299674faca3f4d5e6cb92a8675ac6c1ffc; matched current remote main at preflight. PR #9 merged at this SHA, final PR head 561a382746e96eab46e47d9dc4dc1b3be7863688 approved; old handoff OPEN status stale.
-- Worktree DIRTY. On arrival: .gitignore/AGENTS.md modified; policies/prompts/state untracked. Preserved unrelated setup. Lead changes only six docs/agent-state/dev3 Markdown files. Scoped local commit planned, no push/merge/deploy.
-- Ticket DISC-04: available repository/offline discovery and readiness packet DONE; formal provider-observation/owner-acceptance criteria BLOCKED. Entire Dev 3 is not DONE.
-- DONE: requirements/source/offline specialists, eight-decision matrix, 22-report catalogue with 19 primary +4 supplemental local synthetic views, source mapping/dependency graph, five-ticket blockers. No runtime implementation candidate proven READY.
-- WIP: local commit metadata only; final document checks passed, all specialist/reviewer tasks completed.
-- Independent QA: sole P2 missing AR/AP supplemental views/footer corrected in catalogue/DISC-04; reviewer recheck confirmed resolved. No other actionable findings.
-- BLOCKED: D-11..D-16,D-19,D-21 all exact PRD status TBD; named business approvers/sample reconciliations absent. OPS-04 type-only; DeliverySheet generation absent. SUP-01/RPT-01/RPT-02/FIN-01/FIN-02 not READY.
-- Legacy: NOT_VERIFIED / DENY, no allowed routes/enforcement/explicit authorization. Authentication UNVERIFIED; no legacy DOM/navigation/login or credentials handled. Only existing tab URL metadata seen during local-tool recovery; no fresh provider observation.
-- Local server: listener3000 PID9828 preserved. Browser local10s/curl HEAD20s/direct15s timeouts, zero bytes. HTTP/UI unavailable during checks; authenticated/responsive/staging comparison UNVERIFIED. Listener Node26.13.0 vs package engine24 mismatch; timeout cause unproven.
-- Tests: lint/typecheck/unit/integration/build/migration/staging NOT_RUN. Historical PR results are not fresh baseline proof. Documentation existence/nonignore/word-limit/path/whitespace checks recorded in RUN_LOG; post-review checks PASS at 2026-11-14 14:42:36 UTC (six files/nonignore/counts/path bounds/whitespace; no functional test claim).
-- Ownership: lead sole writer six checkpoint docs; specialists read-only, completed; no pending agent tasks. Source/schema/contracts untouched.
-- Next safe task: D-15/D-19 transaction-detail approval using catalogue/source map; D-16 alternative ticket packet. Human evidence/sign-off required before any implementation. Preserve user governance setup, whose policies/prompts remain untracked outside scoped commit.
+- Checkpoint: 2026-11-14 16:01:15 UTC (23:01:15 Asia/Bangkok).
+- Branch/worktree: docs/disc-04-dev3-readiness; C:/Development/logistik-web.
+- Actual HEAD: 0cf4554937d63b954ee85d61833c9acbd085c2db. Prior code baseline c40650299674faca3f4d5e6cb92a8675ac6c1ffc; no new baseline or PR review repeated.
+- Ticket: DISC-04 migration-first legacy parity; documentation-only. Six docs/agent-state/dev3 Markdown files are lead-owned; no feature/schema/shared-contract/gate edits.
+- DIRTY: six checkpoint changes plus pre-existing .gitignore, AGENTS.md, prisma/seed.mjs; governance/prompts untracked. Preserve all unrelated changes, especially newly noticed seed edit. No credentials stored/used.
+- DONE: resumed persisted record; assessed runtime CDP capability metadata and policies; legacy_observer OFFLINE safety review; concrete qualifying access workflow and proposed parity acceptance cases saved in DISC-04. Prior repository/source/catalogue discovery retained, not repeated.
+- REPO_VERIFIED: active Chrome DevTools lab list_pages connection succeeded with reference legacy-origin tab, metadata only. Separate primary-config chrome-devtools entry disabled; active tool backend/profile provenance UNVERIFIED. No enforcement established by either.
+- BLOCKED / COLLECTION_AUTHORIZATION: gate NOT_VERIFIED, routes NONE; no independent comprehensive read-only protection/reviewer evidence or explicit final scope authorization. Loaded-page DOM is not an exception. No legacy content/network/auth inspection or navigation; no live observation delegated. Authentication UNVERIFIED; no login requested.
+- BEHAVIOR_EVIDENCE: no new LEGACY_VERIFIED business behavior. Direct report/ticket/accounting/dashboard workflow/calculation evidence remains UNVERIFIED/incomplete. Existing 22 inherited report leaves and 19+4 synthetic local views do not complete missing provider discovery.
+- FORMAL_APPROVAL: D-11..D-16,D-19,D-21 remain PRD TBD, separately pending adoption. Missing approval is not missing legacy behavior. DECISIONS now classifies observation-answerable questions and real escalation triggers. No READY implementation candidate.
+- WIP: scoped commit/bookkeeping only. Independent narrow QA complete, no actionable corrections; document checks PASS; all specialist/reviewer tasks finished. No implementation/tests/DB/migrations/merge/deploy.
+- Local server: preserved; availability not rechecked this continuation. Previous listener/timeout evidence historical, not current HTTP success or failure proof. Local auth details not used.
+- Next required human action: provide independently reviewed protected read-only replica (preferred) or equivalent comprehensive read-only enforcement evidence, approved environment/session/routes/privacy scope, reviewer/date and explicit observation authorization. Human-controlled LEGACY-ACCESS-GATE must reflect actual independent verification; agent cannot approve it.
+- After gate and authorization only: user authenticates manually if needed; then delegate approved observation to legacy_observer. Do not request credentials or login now. Formal approvals follow evidence collection under existing contract.
