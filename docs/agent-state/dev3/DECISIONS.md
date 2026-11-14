@@ -49,3 +49,26 @@ Historical pre-reconnection checkpoint: tool configuration alternatives/native-k
 - D19 OBSERVED formatting only: Indonesian/mixed English labels, dateYYYY-MM-DD and November/year controls; prior dashboard activity WIB label is display evidence only, not storage/report TZ/cutoff proof. Formal TBD.
 - D21 OBSERVED approval structures in ticket list/separate page, but approver authority/thresholds/order and financial approvals UNVERIFIED. Formal TBD. D24 remains PARTIAL; nothing here broadens finance/config/integration approval.
 - Current tool blocker RESOLVED: chrome-devtools-lab navigation/click/snapshot work in authenticated session. Remaining gaps concern output/rules/source/role evidence and formal adoption; do not request MCP reconfiguration/replica or repeat infrastructure investigations.
+
+## Query-result and scope clarification LD036–043
+
+D15 coverage expanded: GP11 labels, recapGP6, AR7(initial) and AP5(both tabs), detail populated date query and explicit billing-status filter options/mapping. D16 priorities Low/Normal/High now OBSERVED. No formulas/financial lifecycle/permission rules invented. D19 date-range retention observed, storage/TZ/cutoffs unverified. D11/D13/D14 still lack actual formula/posting/reconciliation evidence; empty reports cannot settle those questions.
+
+D16 scope: user delegated target reasoning after explicit legacy-vs-FR07 conflict. Lead selects observed legacy support/menu/URL structure for migration; unobserved category/AWB/customer/assignee/history extensions deferred for contract review. Formal D16 remainsTBD for lifecycle/assignment/visibility/reopen/privacy; this scope recommendation is not business-state-machine approval. Need actual existing rules/histories and required owner review. No change to PRD decision status or invented transition graph.
+
+Explicit report-query exception is collection authorization only. It neither approves business rules nor permits lifecycle/financial tests. No eligible product slice proved; do not mistake an OBSERVED filter query for reviewed modern source contract.
+
+LD044–046 close AR tab/GP variant/date-query collection gaps only. They do not approve D11–16/D19/D21, establish formula correctness or supply missing lifecycle/role histories. Migration-first target choice retains modern authorization requirements. Finance formulas remain genuinely UNVERIFIED after tested empty outputs; finance deferral does not falsely satisfy mandatory discovery evidence.
+
+## Concrete adoption packet after LD046 (no inferred approval)
+
+User does not know which financial period/branch has populated data; no repeated request for them to locate pages or datasets. Known available shipment periodNovember2026 already queried; current GP variants/AR/AP and one historical GP comparison were empty. More random queries cannot replace source evidence.
+
+| ID / proposed bounded acceptance | Evidence already reviewable | What cannot be approved from this packet |
+| --- | --- | --- |
+| D15 structural parity | Adopt exact LD header/control definitions: Detail14; Pengantaran14; GP11; GPRecap6; Vendor parameters; remaining catalogue entries as qualified. Detail billing Status mapping is distinct from shipment-status output. | Query joins/date basis/inclusion/rounding/exports/reconciliation still need source-domain evidence; approving labels does not approve those unknowns. |
+| D16 migration target | Prefer observed legacy fields/priorities/menu/URL/file structures, list8/detail/approval4; defer unobserved FR07 expansions for contract review. | Initial state, allowed transitions, assignment/reopen/history/branch/privacy and actual approval authority still require existing rules or permitted historical oracle; no generated default workflow. |
+| D19 display evidence | YYYY-MM-DD date controls, Indonesian/mixed labels, observed WIB activity label; preserve verified labels where applicable. | Storage/query timezone and cutoffs cannot be inferred from display; no timezone selected by agent. |
+| D11–14 finance | Defer implementation consistently with ROADMAP accounting deferral; catalogue the actual observed screens and tested empty results. | This deferral is NOT verified formula/posting/profit recognition, business confirmation or DISC04 full closure. |
+
+Required reviewers remain report/support domain owner, Dev2 source-contract owner and Dev1 permission owner as applicable. A structural-only acceptance may permit design review/preparation, but does not make a false end-to-end READY feature. The first implementation candidate remains SUP01 after actual D16 rules/model/auth review, or RPT01 after source/date/status/TZ/grants/reconciliation adoption. No missing stakeholder signature is mislabeled as missing observed UI.
