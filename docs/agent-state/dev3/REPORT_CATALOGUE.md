@@ -44,7 +44,7 @@ AR renders Belum Lunas and Lunas supplemental views (P:1239-1310); AP renders th
 
 ## Acceptance evidence to request
 
-For each selected report, provide permitted sanitized textual source records or synthetic examples plus expected rows/totals, date-boundary and status cases, cross-branch allowed/denied results, export scope, and named owner approval. Do not archive private screenshots: PRD D-29:175,243 supersedes ROADMAP:111 archival suggestion. No live legacy access until independent enforcement, reviewed routes and explicit human authorization. No report is READY from labels alone.
+For each selected report, provide permitted sanitized textual source records or synthetic examples plus expected rows/totals, date-boundary and status cases, cross-branch allowed/denied results, export scope, and named owner approval. Do not archive private screenshots: PRD D-29:175,243 supersedes ROADMAP:111 archival suggestion. Direct collection follows the separately authorized procedural mode in LEGACY-ACCESS-GATE.md; independent enforcement remains required for protected/isolated modes. No report is READY from labels alone.
 
 ## Candidate source mappings (REPO_VERIFIED fields; joins and semantics NOT approved)
 
@@ -75,8 +75,8 @@ For EACH of the 22 stable parity IDs above, track these separate axes:
 
 | Axis | Current recorded state | What changes it |
 | --- | --- | --- |
-| Direct legacy behavior coverage | PARTIAL/OBSERVED for qualified LD facts: LP-R01/02/17 and candidate LP-R10 identity; other report coverage UNVERIFIED beyond inherited labels. P remains REPO_VERIFIED preview metadata, not oracle. | Actual route/role/time plus qualified observed controls/outputs and reconciled source cases; not approval signatures alone |
-| Safe collection authorization | ACTIVE DIRECT_NON_MUTATING_DISCOVERY grant for current task/session/origin; procedural restrictions only. Protected technical record NOT_VERIFIED is separate; registered click-tool reload pending. | Current explicit direct scope/applicability and per-control classification; independent enforcement additionally required only for protected/isolated modes |
+| Direct legacy behavior coverage | PARTIAL/OBSERVED initial structures for all22 report identities, using LD001–005 and LD012–035; LP-R10 menu identity now observed. Outputs/source/formulas/role behavior remain incomplete. P remains REPO_VERIFIED preview metadata, not oracle. | Actual route/role/time plus qualified observed controls/outputs and reconciled source cases; not approval signatures alone |
+| Safe collection authorization | ACTIVE DIRECT_NON_MUTATING_DISCOVERY grant for current task/session/origin; procedural restrictions only. Protected technical record NOT_VERIFIED is separate; registered MCP clicks/navigation/snapshots operational in authenticated approved session. | Current explicit direct scope/applicability and per-control classification; independent enforcement additionally required only for protected/isolated modes |
 | Formal adoption approval | PENDING under unchanged PRD D-15 and related D-IDs; not a statement about whether the legacy report exists | Required domain-owner/stakeholder dated acceptance of an exact evidence-backed rule |
 | Proposed parity acceptance | Observed static headers/filter controls/defaults/empty states support bounded structural assertions; report behavior NOT YET COMPLETE | Remaining functional/source/formula/permission evidence plus required adoption approval; no inference from labels alone |
 
@@ -105,7 +105,7 @@ Source: single native Sol direct observer via approved Chrome page1; authenticat
 
 Mapping impact for LP-R01: candidate Transaction.awbNo/koli/kilo fields exist, but visible Moda/Servis/Deskripsi/Komentar/Diterima Oleh require reviewed source mapping; do not infer missing domain columns from labels. Asal/Tujuan could have different semantics from branch IDs; query/date/status/authorization remain unverified. A visible empty result under default dates does not prove no records or a successful applied query.
 
-Direct observation continues for remaining required reports. Native Chrome menu expansion is currently limited by capture/geometry availability; MCP ordinary link navigation remains operational. Skip inaccessible/uncertain interactions instead of stopping unrelated views. Actual remaining-page evidence is not replaced by preview metadata.
+Historical continuation before LD012–035: native Chrome menu expansion was limited by capture/geometry availability. Current registered MCP menu navigation works and all22 initial report surfaces have been reached. Skip inaccessible/uncertain interactions instead of stopping unrelated views. Actual remaining-page evidence is not replaced by preview metadata.
 
 
 LD-006 Dashboard UI (17:09-17:10UTC, seconds not recorded): filter datesNov1/Nov14, November2026, Semua Cabang; actual KPI labels Total Transaksi/Total Shipment Success/Delivery/AWB Pending/Invoice Outstanding/Piutang, Unpaid/Paid sublabels and analytics CASH/KREDIT/COD/TRANSFER/JUMLAH AWB/AVG per AWB/CUSTOMER AKTIF. Sections include AI Executive Insight, sales/customer/status/activity/POD/announcements; details and skipped controls in DISC-04. Current displayed structures differ from local preview labels. No record identities/amounts retained, refresh/AI/personalization not executed. Metric definitions/date/source/branch semantics/formulas remain UNVERIFIED; D15/D19/financial adoption approval separate.
@@ -129,3 +129,32 @@ Additional source views: LD008 /index.php/manifests showed only navigation shell
 | LD009-DRS-UI-01 | Operational DRS view exposes recorded form defaults and11-column empty list | Not Pengantaran report equivalence or approved sheet creation/status/numbering; no field/submit/action executed |
 
 These bounded cases are proposed acceptance inputs, not passing regression tests or READY vertical slices. End-to-end functional scope still requires unvisited views, source mappings, permitted reconciliations and applicable formal decisions. Do not manufacture sample expectations from labels or reproduce unsafe legacy behavior.
+
+## Current direct coverage: LD012–035 supersedes unvisited-view claims above
+
+Source of exact routes, labels, default values, columns and limits: DISC-04.md current-session LD012–035 tables (2026-11-14). All22 report identities now have direct ordinary-menu provenance; prior N/P inventory remains historical/synthetic, never merged into live evidence. No report is behavior-complete/READY.
+
+| Catalogue | Current direct evidence | Output observed / missing |
+| --- | --- | --- |
+| LP-R01/02/17/10 | Reuse LD001/002/003/005; LP-R10 menu identity now LD035 | Existing coverage retained without repeat. |
+| LP-R03 | LD012 | 14 visible labels; initial filter/date/cabang, no output rows/reconciliation. |
+| LP-R04 | LD023 | Month/year/branch + Excel only; output columns UNVERIFIED. |
+| LP-R05 | LD013 | 14 actual headers/empty/search/page-size/sort affordances; differs materially from local per-AWB preview. |
+| LP-R06 | LD014 | Month/year/status + Show; output/formula UNVERIFIED. Preview status values not live verified. |
+| LP-R07 | LD024 | Date/branch + Cetak only; output UNVERIFIED. |
+| LP-R08 | LD015 | Date pair/Branch Origin displaying All Destination/Nopol; Show/Excel. Output/formula UNVERIFIED. |
+| LP-R09 | LD016/035 | Month/year/vendor/user + Daftar Manifes; output columns UNVERIFIED. Menu-to-title naming identity OBSERVED. |
+| LP-R11 | LD025 | 10 actual headers; month/year/user/destination/search/Excel. |
+| LP-R12/13 | LD026/027 | Month/year/branch + Excel only; output/grouping/formula UNVERIFIED. |
+| LP-R14 | LD028 | 14 actual headers; month/year/origin/destination/customer/payment/mode/status/sheet controls. Different from preview; inbound source semantics UNVERIFIED. |
+| LP-R15 | LD029 | 3 headers/date pair/Export/Search; initial Processing..., settled result UNVERIFIED. |
+| LP-R16 | LD030 | 15 actual headers/empty period/origin/courier/status controls. SLA/Acc. in/L.Time meanings UNVERIFIED. |
+| LP-R18 | LD022 | Month/year/vendor/Cari/Excel/Menunjukan; output/aging columns UNVERIFIED. |
+| LP-R19 | LD031 | 15 actual headers/empty period/customer/destination/search/export; differs from preview extra lead-time/row-number assumptions. |
+| LP-R20 | LD032 | 9 actual headers/empty period/origin/destination/customer/search/export. |
+| LP-R21 | LD033 | 14 actual headers/empty period/origin/destination/customer/payment/status/search/export/page-size10. Totals UNVERIFIED. |
+| LP-R22 | LD034 | Date pair/origin/destination/customer/billing type + Excel only; output columns UNVERIFIED. |
+
+Every row still requires approved source query/relations, actual business date basis/TZ, status inclusion, branch authorization, units/precision/rounding, totals/formulas, export content/scope and sanitized reconciliation. Visible date/branch controls do not settle those requirements. No export or form query was executed; skipping submission is a scope limit, not evidence the report lacks output. Existing source-mapping table remains candidate-only. D15 approval pending separately.
+
+Proposed regression cases (NOT IMPLEMENTED/RUN): LP-R03/05/11/14/15/16/19/20/21 preserve the exact current LD header order and known initial controls/empty or loading state; parameter-only reports preserve observed parameter structure without invented result tables. Distinguish two daily report routes and vendor title/menu mapping. Functional filters/sorting/aggregates require evidence-backed synthetic expected results; do not assert they passed from affordances. Ticket UI regression proposals: eight-column list; required create-field structure; readonly detail fields; separate four-column approval list. These do not select or authorize lifecycle/approval behavior.
