@@ -16,7 +16,17 @@ const SECURITY_HEADERS = {
 async function snapshot(fixturePath) {
   if (
     typeof fixturePath !== "string" ||
-    /^[a-z][a-z\d+.-]*:\/\//i.test(fixturePath)
+    fixturePath.length === 0 ||
+    fixturePath.includes("\0") ||
+    // Reject UNC (including mixed separators) and NT/device namespaces before
+    // opening anything: a rejected open can already initiate SMB/auth on Windows.
+    /^[\\/]{2}/.test(fixturePath) ||
+    /^\\/.test(fixturePath) ||
+    (process.platform === "win32" && fixturePath.startsWith("/")) ||
+    // Only an explicit absolute drive path may use a colon prefix. This denies
+    // URL schemes and Windows drive-relative paths such as C:fixture.json.
+    (/^[a-z][a-z\d+.-]*:/i.test(fixturePath) &&
+      !/^[a-z]:[\\/]/i.test(fixturePath))
   ) {
     throw new Error("A local synthetic JSON file path is required");
   }
