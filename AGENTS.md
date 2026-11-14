@@ -4,9 +4,9 @@
 
 ## This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+This version has breaking changes â€” APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+This block is written and re-added by `next dev` â€” verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
 
@@ -178,3 +178,35 @@ UI (rules in section 5):
 - Verified at 375px (mobile), 768px (tablet), and 1440px (desktop).
 - No horizontal page overflow, clipped controls, or inaccessible navigation.
 - Forms, tables, dialogs, and navigation work with keyboard and touch.
+
+<!-- BEGIN DEV3 AGENT GOVERNANCE -->
+## Dev 3 autonomous team governance
+
+For Dev 3 discovery, implementation, testing, and review, follow
+`docs/agent-policies/DEV3-OPERATING-CONTRACT.md` and
+`docs/agent-policies/LEGACY-READONLY.md`.
+
+**Legacy application:** An Administrator account is available but only
+non-mutating discovery is authorized within the user's actual access rights.
+Use the canonical access mode in LEGACY-ACCESS-GATE.md. User-authorized
+DIRECT_NON_MUTATING_DISCOVERY permits procedurally restricted navigation
+and observation, not a technical zero-write guarantee or approval of the
+stricter PROTECTED_AUTONOMOUS gate. Unknown actions remain prohibited.
+
+`docs/agent-policies/LEGACY-ACCESS-GATE.md` defaults to NOT_VERIFIED.
+No intentional business-record edits, form/workflow submissions, status changes,
+imports, approvals or exports. Direct-mode navigation/background/session side
+effects remain possible and are not a zero-write guarantee. Skip ambiguous actions.
+Do not repair or revert legacy data automatically.
+
+`OBSERVED` does not mean `CONFIRMED`. Never invent financial, ticket,
+report, accounting, provider, or business decisions. Protect unrelated
+modules and migrations, use one owner per ticket and migration coordinator,
+and never merge or deploy without human approval.
+<!-- END DEV3 AGENT GOVERNANCE -->
+<!-- DEV3 PERSISTENCE UPGRADE -->
+Dev 3 lead must follow `docs/agent-policies/DEV3-CHECKPOINT-PROTOCOL.md`.
+Save verified progress under `docs/agent-state/dev3/`: keep STATE.md,
+append-only RUN_LOG.md, DECISIONS.md and HANDOFF.md current at every
+meaningful milestone and before session handoff. Only lead writes shared
+state. Resume by verifying Git SHA and disk records, not chat memory.
