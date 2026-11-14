@@ -28,7 +28,7 @@ Control status is a third axis: current DIRECT_NON_MUTATING_DISCOVERY collection
 
 Mode-aware infrastructure/governance is authorized by repository owner; no external legacy authorization or D-ID adoption is inferred. Fresh audit found no usable isolation runtime or provider-equivalent replica. Local synthetic harness tests cannot answer D-15/D-16 business behavior or approve financial logic. Required decision statuses remain unchanged; source-field/case mappings are retained, not rediscovered. D-24 remains PARTIAL (bounded existing company configuration/vendor NPWP storage), not approval of invoices/payments/ledger/integrations.
 
-PROMPT02 priority is SUP01 -> RPT01 -> RPT02 -> FIN01 -> FIN02, each only when READY under actual dependencies. None qualifies now: SUP D16/DISC04; RPT01 D15/D19/source/grants; RPT02 OPS03 or approved narrower source/per-report definitions; FIN01 OPS04/D11/D12/D21; FIN02 FIN01/D13/D14. Missing provider evidence and pending adoption approvals remain separate blockers. Complete local protection/regression work without fabricating business decisions.
+PROMPT02 priority is SUP01 -> RPT01 -> RPT02 -> FIN01 -> FIN02, each only when READY under actual dependencies. No runtime slice qualifies now: SUP scoped D16 read contract/model/visibility/grants/population (DISC04 satisfied); RPT01 D15/D19/source/grants; RPT02 OPS03 or approved narrower source/per-report definitions; FIN01 OPS04/D11/D12/D21; FIN02 FIN01/D13/D14. Missing provider evidence and pending adoption approvals remain separate blockers. Complete local protection/regression work without fabricating business decisions.
 
 
 ## Direct evidence reevaluation (current procedural mode)
@@ -79,10 +79,16 @@ Required reviewers remain report/support domain owner, Dev2 source-contract owne
 
 | Ticket | DISC04 gate | Next authorized action | Remaining runtime gate (not discovery closure) |
 | --- | --- | --- | --- |
-| SUP-01 | SATISFIED | ACTIVE: review minimal legacy-parity model/API/auth proposal in SUP-01-contract.md | D16 lifecycle/visibility/assignment/reopen + cross-domain model/auth review; no assumed initial state or transition graph |
+| SUP-01 | SATISFIED | ACTIVE: review minimal legacy-parity model/API/auth proposal in SUP-01-contract.md | Scoped D16 read fields/visibility + model/read grant/population/presentation review; later lifecycle/assignment/reopen/approval/attachment gates apply only to those later behaviors |
 | RPT-01 | Not a listed ROADMAP prerequisite; consume accepted evidence | Per-report source/date/status/grant contract preparation after SUP proposal | Applicable D15/D19, stable source mappings and deterministic reconciliation |
 | RPT-02 | No global discovery blocker | Bounded source contract preparation when OPS03/narrower contract approved | OPS03 or approved narrower sources, per-report D15 |
 | FIN-01 | SATISFIED | Deferred finance rule/source review | OPS01/OPS04 and applicable D11/D12/D21; no unapproved invoice/payment logic |
 | FIN-02 | No global discovery blocker | Deferred | FIN01 and D13/D14 posting/recognition/formulas |
 
 Discovery acceptance does not approve the proposed SUP model/permission inventory. Scoped technical review and approval remain normal engineering work. Do not reopen DISC04 when encountering a known note; resolve the note under its consuming ticket.
+
+## SUP-01 bounded read-contract continuation (2026-11-15)
+
+Requirements and source specialists verified the existing proposal without reopening DISC04. List/detail may be approved independently of later assignment/resolution/reopen rules. Current blocker is **D-16 bounded read semantics and record visibility**, plus Dev1 read-grant/admin-scope review and coordinator model/population review; D-19 only where selecting date/locale conventions. The completed review packet and conditional tests are in docs/decisions/SUP-01-contract.md. Agent technical review does not confirm D-16 or supply stakeholder signatures.
+
+No runtime Dev3 ticket is currently READY. PR9 MERGED/APPROVED and main c406502 were reverified; OPS03 remains partial, OPS04 proposal remains non-emitted. No new legacy evidence, runtime authority or import authorization. Next executable action is normal owner review of that concrete packet; once bounded adoption and model/auth approvals are recorded, select the first list/detail vertical slice. Do not require full later lifecycle approval to implement an independently accepted read contract.

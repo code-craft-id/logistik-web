@@ -1,11 +1,13 @@
 # Dev 3 cold-start handoff
 
-Checkpoint 2026-11-14 18:43:55 UTC; main C:/Development/logistik-web, docs/disc-04-dev3-readiness, actual HEAD8c661db365bc39250c540e7d779bc733cc515de5. Chat helper worktree differs. Preserve unrelated .gitignore/prisma/seed.mjs.
+2026-11-14 18:56:50 UTC; docs/disc-04-dev3-readiness @ pre-commit 928027627f0d2780d2d275b81435f552f4d75178; main/origin main c40650299674faca3f4d5e6cb92a8675ac6c1ffc fetched and ancestor. Preserve unrelated .gitignore/prisma/seed.mjs.
 
-DISC04 **DONE WITH NOTES**, explicitly owner-accepted2026-11-15 for findings available as-is. ROADMAP and DISC-04.md closure are authoritative. Do not reopen global DISC04 block for known notes or demand populated finance examples to restore closure. Reuse LD001–046/22-report catalogue; no new business evidence or formula verification is claimed.
+DISC04 DONE WITH NOTES; do not reopen. SUP01 contract-preparation increment complete in docs/decisions/SUP-01-contract.md: bounded owner packet, exact source/security caveats and conditional test matrix. Runtime list/detail awaits scoped D16 fields/visibility/FR07 boundary, Dev1 read grant/admin scope, coordinator model/population and safe presentation; D19 only if adopting conventions. Later lifecycle/attachment gates are separate. Other runtime Dev3 tickets remain gated per DECISIONS/STATE; finance drafts inactive.
 
-Unknown financial/lifecycle/role/date/source/export/ledger behavior remains notes on consuming tickets. Formal D11–16/D19/D21TBD,D24PARTIAL; discovery acceptance does not confirm them, approve finance or rewrite FR07. SUP01/FIN01 discovery prerequisite satisfied; their actual feature approvals remain separate.
+Requirements/source (Sol Medium) complete; independent QA (Sol High) PASS. Minor baseline wording corrected. No agents/tests/browser work pending. Scoped diff/UTF8/tracked-location/17 source-line bounds/word limits/scope/hash checks PASS. App lint/typecheck/tests/integration/build/staging NOT RUN (documentation only). No stale SHA results transferred.
 
-ACTIVE SUP01 contract-preparation WIP: read docs/decisions/SUP-01-contract.md. Concrete field/list/detail/priority parity, current preview gaps, proposed model/grants/service boundaries and owner-review checklist prepared. No schema/runtime code changed. Next Dev1/support/migration-owner contract review, then first approved list/detail slice with scoped worker/tests/QA. Never claim runtimeREADY while its own D16/model/auth gates are unresolved.
+PR9 MERGED/APPROVED, final561a382; no open PRs. OPS03 partial; OPS04 proposed. No live legacy access this run; task/session direct grant applicability not reverified or extended.
 
-No browser/config/infrastructure work this continuation. Direct procedural access/report-query exception retained, protected technical NOT_VERIFIED unchanged. Existing server lastHTTP200, not restarted. Independent closure/draft QA PASS; scoped documentation commit next. Six checkpoints owned by lead. PROMPT02/03 consume closure without rediscovery or inferred business approval.
+Next: owner review of the concrete SUP packet; record named/date/reference/accepted rows and scoped PRD rule, then coordinator model/auth review before first worker/TDD slice. Lead alone owns checkpoints.
+
+Prepared PR summary: SUP-01 — prepare bounded list/detail owner-review contract. Five documentation files; no runtime/DB changes. Includes four decision packets, source reuse boundaries and conditional security/UI/test acceptance. Independent document QA and scoped checks pass; runtime acceptance pending. Local commit next; no push/open PR/merge/deploy authorized by this checkpoint.
