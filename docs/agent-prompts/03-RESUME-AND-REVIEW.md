@@ -14,3 +14,5 @@ The canonical access contract is `docs/agent-policies/LEGACY-ACCESS-GATE.md`; do
 Output: persisted checkpoint file paths, actual branch/HEAD, DONE/WIP/BLOCKED/UNVERIFIED, tests/approvals/PR status, one next action. Never mark D-xx CONFIRMED without stakeholder proof.
 
 Scoped report-query authorization, when applicable: follow the explicit exception in LEGACY-READONLY.md (Show/Cari/Search/Menunjukan for report display only). This overrides broad form/generate wording only for that bounded observational query; no business/financial mutation, export/download or business approval is authorized. Restore its actual human authorization and current scope, never infer it from a checkpoint.
+
+DISC-04 closure: owner accepted available discovery as DONE WITH NOTES on2026-11-15; consume ROADMAP and DISC-04.md closure. Never re-block the DISC04 dependency because an accepted note remains unresolved. Attach notes to the exact consuming ticket/behavior; retain its applicable business/source/security approvals. This is neither automatic D-ID confirmation nor authority to implement unknown rules. Active continuation is SUP-01 contract preparation, not repeated discovery.

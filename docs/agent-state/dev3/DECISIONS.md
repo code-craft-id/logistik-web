@@ -1,5 +1,7 @@
 # Dev 3 decisions: legacy parity evidence and approval
 
+Current ticket disposition: DISC-04 **DONE WITH NOTES**, accepted by project owner on2026-11-15 Asia/Bangkok for available evidence including gaps (DISC-04.md closure). This changes the discovery deliverable gate only. Formal D11–16/D19/D21 remainTBD,D24PARTIAL; observations/unknowns unchanged. Prior assertions that missing financial formulas prevent DISC04 closure are superseded by this bounded acceptance. Remaining questions attach to dependent feature behavior, not a global discovery blocker.
+
 Migration-first clarification (2026-11-14) supersedes the earlier brainstorming alternatives in this checkpoint. Reproduce directly verified legacy business behavior through the modern architecture/security contract. Do not ask business to redesign established behavior merely because its formal adoption approval is pending. No PRD decision was edited or promoted; D-11..D-16, D-19 and D-21 remain **TBD**, as recorded in docs/PRD.md:157-167.
 
 Two independent axes apply to EVERY row: **behavior evidence coverage** (what is actually known about legacy) and **formal approval** (whether the project's required owner/stakeholder has approved adoption). Missing approval does not mean behavior is missing. Current direct UI evidence is PARTIAL/OBSERVED under explicit DIRECT_NON_MUTATING_DISCOVERY authorization (LD evidence below). Unvisited facts/hidden behavior remain UNVERIFIED; registered MCP navigation now works; remaining limits concern output/rule/source/role evidence. Inherited menu notes establish limited labels/affordances only; previews establish repository presentation only.
@@ -72,3 +74,15 @@ User does not know which financial period/branch has populated data; no repeated
 | D11–14 finance | Defer implementation consistently with ROADMAP accounting deferral; catalogue the actual observed screens and tested empty results. | This deferral is NOT verified formula/posting/profit recognition, business confirmation or DISC04 full closure. |
 
 Required reviewers remain report/support domain owner, Dev2 source-contract owner and Dev1 permission owner as applicable. A structural-only acceptance may permit design review/preparation, but does not make a false end-to-end READY feature. The first implementation candidate remains SUP01 after actual D16 rules/model/auth review, or RPT01 after source/date/status/TZ/grants/reconciliation adoption. No missing stakeholder signature is mislabeled as missing observed UI.
+
+## Feature-specific dispositions after accepted DISC04 closure
+
+| Ticket | DISC04 gate | Next authorized action | Remaining runtime gate (not discovery closure) |
+| --- | --- | --- | --- |
+| SUP-01 | SATISFIED | ACTIVE: review minimal legacy-parity model/API/auth proposal in SUP-01-contract.md | D16 lifecycle/visibility/assignment/reopen + cross-domain model/auth review; no assumed initial state or transition graph |
+| RPT-01 | Not a listed ROADMAP prerequisite; consume accepted evidence | Per-report source/date/status/grant contract preparation after SUP proposal | Applicable D15/D19, stable source mappings and deterministic reconciliation |
+| RPT-02 | No global discovery blocker | Bounded source contract preparation when OPS03/narrower contract approved | OPS03 or approved narrower sources, per-report D15 |
+| FIN-01 | SATISFIED | Deferred finance rule/source review | OPS01/OPS04 and applicable D11/D12/D21; no unapproved invoice/payment logic |
+| FIN-02 | No global discovery blocker | Deferred | FIN01 and D13/D14 posting/recognition/formulas |
+
+Discovery acceptance does not approve the proposed SUP model/permission inventory. Scoped technical review and approval remain normal engineering work. Do not reopen DISC04 when encountering a known note; resolve the note under its consuming ticket.

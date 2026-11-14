@@ -1,6 +1,16 @@
 # DISC-04: Dev 3 discovery and readiness
 
-Current continuation: **PARTIAL**, direct authenticated provider UI observation active under explicitly user-authorized DIRECT_NON_MUTATING_DISCOVERY. Current LD evidence section/catalogue supersedes historical no-live/protected-infrastructure blockers for this procedural mode. Business approvals remain separate; full acceptance not yet met.
+## Accepted discovery closure — DONE WITH NOTES (2026-11-15 Asia/Bangkok)
+
+The project owner explicitly instructed: “temuan dari legacy website kita ambil seadanya saja” and requested DISC-04 “DONE atau DONE with NOTES” so other Dev3 work is not blocked by DISC04. This is acceptance of the discovery deliverable **as available**, including documented unknowns. It supersedes earlier PARTIAL/financial-formula completeness assessments as a ticket-closure criterion; it does not change the recorded observations or approve unverified business behavior. Earlier chronological sections below are historical where status differs.
+
+- DISC-04: **DONE WITH NOTES**; discovery dependency is satisfied for SUP-01/FIN-01 and downstream planning. No requirement to find a populated finance period, repeat provider navigation or resolve every D-ID to close DISC04.
+- Accepted deliverables: LD001–046 qualified evidence,22-report catalogue, ticketing/accounting/dashboard structures, source mappings, parity/regression proposals, decision packet and dependency handoff. No new provider evidence is fabricated by closure.
+- Carried notes: unverified financial formulas/reconciliation; report/export outputs not safely observed; ticket lifecycle/assignment/reopening/history; role/branch cases; date/TZ/source semantics; ledger/category/P&L not reached. Keep these as feature-specific open questions, never generic DISC04 blockers.
+- D11–16/D19/D21 remain formalTBD,D24PARTIAL. User discovery acceptance is not confirmation of these rules, approval of FR07 amendments, finance implementation or protected-autonomous access. Runtime gates apply only to behavior that actually depends on each unresolved rule.
+- Next active work: SUP-01 contract preparation/review, using observed legacy structure. Concrete draft in docs/decisions/SUP-01-contract.md. Runtime CRUD/lifecycle is not yet READY until its specific D16/model/authorization approvals; DISC04 must not be listed among its remaining blockers. RPT01 likewise retains only applicable D15/D19/source/grant gates. FIN remains deferred on actual financial/source decisions, not discovery completion.
+
+Historical pre-acceptance continuation: **PARTIAL**, direct authenticated provider UI observation under explicitly user-authorized DIRECT_NON_MUTATING_DISCOVERY. Current LD evidence section/catalogue supersedes historical no-live/protected-infrastructure blockers for this procedural mode. Business approvals remain separate; full acceptance not yet met.
 
 Baseline: c40650299674faca3f4d5e6cb92a8675ac6c1ffc, verified remote main 2026-11-14. Branch: docs/disc-04-dev3-readiness. Initial discovery baseline was documentation-only. Current continuation performs authorized direct provider observation; no product feature, migration, seed, financial/shared domain contract or merge/deploy. Earlier infrastructure-only stages below are historical. See execution-preparation continuation below. Repository/offline discovery deliverable complete for available evidence; formal DISC-04 full-behavior/owner-acceptance criteria remain PARTIAL. Independent QA completed; sole P2 corrected and bounded recheck confirmed resolved.
 
