@@ -85,3 +85,8 @@ Per-report verification uses DISC-04.md LP-REPORT-STRUCTURE, LP-REPORT-ROWS, LP-
 For example, LP-R01 Detail Transaksi is currently REPO_VERIFIED for preview metadata and candidate Transaction fields only. Its actual legacy date basis, row membership, branch attribution, tariff/total meanings and export contract are UNVERIFIED. D-15/D-19 adoption approval is independently pending. Once safe observation verifies a bounded rule, propose an acceptance assertion against that recorded output; do not choose a new report design just to fill an evidence gap.
 
 The 19 primary and four AR/AP supplemental local views remain synthetic; supplemental views belong to LP-R17 AR and LP-R18 AP, not four additional provider reports. Original labels/order retained. No new provider observation or calculation evidence has been obtained, and no report catalogue gap is declared resolved by this document update.
+
+
+## Protective-infrastructure continuation
+
+All LP-R01..LP-R22 behavior evidence states above remain unchanged: no new direct provider observation. The tools/legacy-observation synthetic fixture and negative tests validate only immutable local delivery/protocol rejection. They are not a provider report, approved sanitized replica, real formula, ticket lifecycle or authorization result; never cite them as LEGACY_VERIFIED/OBSERVED. Mode eligibility/approval lives in the canonical LEGACY-ACCESS-GATE.md and current tests/limits in LEGACY-OBSERVATION-INFRASTRUCTURE.md. Autonomous collection is still UNVERIFIED/denied; actual report coverage and formal D-ID approvals remain distinct.

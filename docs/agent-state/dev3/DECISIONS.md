@@ -20,3 +20,10 @@ No row has sufficient direct evidence yet for a behavior-complete proposed accep
 Escalate only ambiguous, contradictory, absent, unsafe or new behavior. For a sufficiently verified behavior, ask the existing approval mechanism to adopt that exact evidence-backed parity rule, rather than presenting new business alternatives. Approval still gates dependent implementation under existing PRD/AGENTS rules. Authoritative future approvals need named human/domain owner, dated reference, exact bounded rule and examples; this file cannot supply them.
 
 Control status is a third axis: LEGACY-ACCESS-GATE.md remains NOT_VERIFIED; no independently verified comprehensive enforcement, reviewer evidence or approved routes. This blocks collection, not the existence of legacy behavior. Once controls and scoped authorization exist, observe first, then reassess evidence sufficiency and formal approval separately. No credentials or live data are stored here.
+
+
+## Implementation-authorized continuation
+
+Mode-aware infrastructure/governance is authorized by repository owner; no external legacy authorization or D-ID adoption is inferred. Fresh audit found no usable isolation runtime or provider-equivalent replica. Local synthetic harness tests cannot answer D-15/D-16 business behavior or approve financial logic. Required decision statuses remain unchanged; source-field/case mappings are retained, not rediscovered. D-24 remains PARTIAL (bounded existing company configuration/vendor NPWP storage), not approval of invoices/payments/ledger/integrations.
+
+PROMPT02 priority is SUP01 -> RPT01 -> RPT02 -> FIN01 -> FIN02, each only when READY under actual dependencies. None qualifies now: SUP D16/DISC04; RPT01 D15/D19/source/grants; RPT02 OPS03 or approved narrower source/per-report definitions; FIN01 OPS04/D11/D12/D21; FIN02 FIN01/D13/D14. Missing provider evidence and pending adoption approvals remain separate blockers. Complete local protection/regression work without fabricating business decisions.
