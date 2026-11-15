@@ -1,6 +1,6 @@
 # RPT-01A verification —2026-11-15
 
-IMPLEMENTED + LOCAL VERIFIED for the bounded nine-column non-financial report. Full RPT-01 remains PARTIAL for deferred parity. Code SHA723dce61309cc6157d2a374a2fba4220b9181ce1, basea26e8487bbe8d1b332c585e9fce0f66a7f61e169. Final documentation commits do not change this tested source. No new PR, merge or deployment.
+IMPLEMENTED + LOCAL VERIFIED for the bounded nine-column non-financial report. RPT-01 is DONE by owner-accepted v1 closure on2026-11-15; deferred parity is separate RPT-03/RPT-04. Code SHA723dce61309cc6157d2a374a2fba4220b9181ce1, basea26e8487bbe8d1b332c585e9fce0f66a7f61e169. Final documentation commits do not change this tested source. No new PR, merge or deployment.
 
 ## Scope and authority
 
@@ -49,4 +49,4 @@ ChromeDevToolsLab against local productionbuild127.0.0.1:3021, guarded logistik_
 
 Initial RTK npm-lint wrapper expectedESLintJSON andfailed parsingBiomeoutput; documentedRTKbypass exposedactualcleanlint. No repository/configfix. Worker fixture corrections: shortenedtoo-longfakeAWB, selectedexactzero-fixture assertion, correctedmodelnameagainstsource. Ownedimportsorting/nullmarkup lint fixed, thenrelevantchecks passed. Repeats followedactualfailures/fixes, not blindloops.
 
-Staging, physicaldevice/browsermatrix, finalhuman codeapproval/release NOTRUN/DEFERRED. Finalreview is not a developmentapprovalgate. Migrationdiff not rerun for schema-freeRPT; previouslyrecorded Dev2 timestampdrift anddependencyadvisories remainseparatefollowups. Missing-source columns/filters, exports andfinance deferred in [contract](../../RPT-01-contract.md). SUP01A unchanged/fullSUP PARTIAL. See [final review queue](../../DEV3-FINAL-REVIEW.md).
+Staging, physicaldevice/browsermatrix, finalhuman codeapproval/release NOTRUN/DEFERRED. Finalreview is not a developmentapprovalgate. Migrationdiff not rerun for schema-freeRPT; previouslyrecorded Dev2 timestampdrift anddependencyadvisories remainseparatefollowups. Missing-source columns/filters, exports andfinance deferred in [contract](../../RPT-01-contract.md). SUP01A code unchanged; SUP-01 DONE for accepted v1, later features moved to SUP-02/SUP-03. See [final review queue](../../DEV3-FINAL-REVIEW.md).

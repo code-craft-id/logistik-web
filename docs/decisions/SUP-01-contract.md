@@ -1,6 +1,8 @@
+Current ticket status: **SUP-01 DONE — owner-accepted v1 on2026-11-15**. Final review/hardening/release remain separate. [Closure and follow-ups](DEV3-V1-CLOSURE.md).
+
 # SUP-01: bounded create, list and detail contract
 
-Status: **bounded authorization/provenance contract accepted by Dev1; core implemented and locally verified**. Formal project-owner identity record remains PARTIAL; selected user scope/model direction is retained. Updated 2026-11-15. Dev3 owns the slice; Dev1 owns the shared authorization contract. This note describes current scope only, not full SUP-01 completion.
+Status: **bounded authorization/provenance contract accepted by Dev1; core implemented and locally verified**. Formal project-owner identity record remains PARTIAL; selected user scope/model direction is retained. Updated 2026-11-15. Dev3 owns the slice; Dev1 owns the shared authorization contract. Owner explicitly accepted SUP-01 as DONE for this v1 scope on2026-11-15; lifecycle/extensions are separate SUP-02/SUP-03, not unfinished SUP-01. See DEV3-V1-CLOSURE.md.
 
 ## Decision and approval record
 

@@ -283,3 +283,7 @@ If the prototype and the provider app differ, the provider app wins. An `OBSERVE
 **Parity check.** Each feature gets a side-by-side check against the provider app (same inputs, same outputs, same permissions), documented in the PR (D-29). Intentional deviations are listed and approved by the domain owner. If the provider app has a defect or a behavior that should not be replicated, record it as a decision instead of silently copying or fixing it.
 
 **Coverage warning.** The models cover master data visible in the provider UI. Operational rules (AWB numbering, status transitions, manifest and delivery flow) have no model, so D-05 to D-09 must come from observing the provider app and sample documents. A field inventory is not a transition matrix.
+
+## Owner-accepted Dev3 v1 closure —2026-11-15
+
+Owner explicitly closes SUP-01 and RPT-01 as DONE for their delivered, locally verified v1 scopes. This supersedes earlier full-ticket PARTIAL wording in this document: ticket create/list/detail and nine-column non-financial Transaction Detail Report are the accepted v1 deliverables. FR07 enhancements move to SUP-02/SUP-03; extra report parity/export to RPT-03/RPT-04. Required final review/hardening/staging remains DEV3-HARD-01; this is not merge/deployment acceptance. Global D-IDs and formal named-approver records retain their actual status without reopening accepted v1 or requesting the same approval again. [Closure/evidence/follow-ups](decisions/DEV3-V1-CLOSURE.md).

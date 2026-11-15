@@ -1,3 +1,5 @@
+Current closure2026-11-15: **SUP-01 DONE for owner-accepted v1**. The following original SHA-specific checks remain unchanged; later lifecycle/extensions are SUP-02/SUP-03 and pre-merge findings DEV3-HARD-01. [Closure](../../DEV3-V1-CLOSURE.md). No tests rerun for this documentation-only acceptance.
+
 # SUP-01 bounded core verification
 
 Date: 2026-11-15 (Asia/Bangkok). Runtime code commit: **5575d1273ca210528f08af1406697b2baac3e752**, following implementation commit 08042c1972e04515cd47d233ec1a23f23ff5b70b. Base contract 4bef2d6239d627a19af55e1014ede860c97e27ed; actual Dev1 contract acceptance [review5908594183](https://github.com/code-craft-id/logistik-web/pull/10#pullrequestreview-5908594183).

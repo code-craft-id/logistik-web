@@ -1,6 +1,6 @@
 # RPT-01A — non-financial Transaction Detail Report
 
-IMPLEMENTED + LOCAL VERIFIED on2026-11-15 at code723dce61309cc6157d2a374a2fba4220b9181ce1. Full RPT-01 PARTIAL for deferred parity. [Actual checks/limits](evidence/rpt-01/verification.md).
+IMPLEMENTED + LOCAL VERIFIED on2026-11-15 at code723dce61309cc6157d2a374a2fba4220b9181ce1. RPT-01 DONE by explicit owner v1 acceptance on2026-11-15; deferred parity/export now RPT-03/RPT-04. [Actual checks/limits](evidence/rpt-01/verification.md).
 
 ## Decision and authority
 
@@ -52,4 +52,4 @@ TDD worker70focused/7guardedDB tests, lint/typechecks; independent QA PASS noP0/
 
 Deferredmissing-source columns: Moda, Servis, Deskripsi, Komentar, Diterima Oleh. Do not inferfromBooking/partialOPS03/masterdata/preview. Deferred filters: separatelegacyorigin/destination, customer/payment/mode/billing-labelledstatus; columnsorting/Refresh/export andfinance/aggregates. These are followups, not global DISC04 reopening. No biaya/tariff/volume/revenue/profit/invoice data introduced.
 
-Staging, physicaldevice/browsermatrix and finalhuman code/release acceptance remain pending; finalownerreview is not a developmentblocker. FullSUP remainsPARTIAL; SUP01A untouched. FullDev3 notDONE.
+Staging, physicaldevice/browsermatrix and finalhuman code/release acceptance remain pending; finalownerreview is not a developmentblocker. SUP-01 DONE for owner-accepted v1; SUP01A code untouched. FullDev3 notDONE. See [closure](DEV3-V1-CLOSURE.md).
