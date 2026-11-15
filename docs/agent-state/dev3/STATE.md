@@ -1,29 +1,21 @@
 # Dev3 current state
 
-Updated 2026-11-15 06:12 UTC. Lead owns shared checkpoints. RPT-02 is DONE for delegated source-backed v1, implemented and locally verified. SUP-01 and RPT-01 remain DONE for their accepted v1; not reopened or independently retested.
+2026-11-15. Lead owns shared checkpoints. Canonical C:/Development/logistik-web, archive branch docs/disc-04-dev3-readiness@e76ff2bef5640ef4aa0d12feb53e2b44cf6f5db2. Feature worktree C:/Users/Administrator/.codex/worktrees/sup-01-core/logistik-web, branch feat/rpt-02-operational-reports@7245649b949e5b1ae285e87c18b535ddd1ed9295 (HARD01 worker commit, not pushed yet). Fetched main/origin/main c406502 unchanged; live PR9 merged at same SHA. No new PR/merge/deploy.
 
-## Repository and ownership
+## Accepted and approved scope
+DISC04 DONE WITH NOTES; SUP01/RPT01/RPT02 accepted DONE v1 unchanged. RPT02 final original evidence at9b76457:565unit/119guardedDB/build68routes/local responsive/QA; cf75bb8 docs-only/source identity verified. No rerun of that suite.
 
-Active worktree: C:/Users/Administrator/.codex/worktrees/sup-01-core/logistik-web. Branch feat/rpt-02-operational-reports, HEAD cf75bb8469a56e8b69a1b32b51c334212653ee5b, pushed to origin. Final tested code SHA 9b76457d804d7fbc385a965144f8c6ae0fb5fe8c; final commit documentation only, source/tests/prisma/packages identity verified. Fresh main at task start c40650299674faca3f4d5e6cb92a8675ac6c1ffc. Only excluded .serena metadata remains untracked in feature worktree. Current feature PR search returns []; no new PR created.
+Owner explicitly answered “A — Setujui paket scope minimum” this session. SUP02 lifecycle/approval/assignment/history/edit/delete and SUP03 attachments NOT NEEDED for current migration; category/AWB/customer ticket extensions not adopted. RPT05 vendor report NOT NEEDED and NOT implemented; no invented source/attribution. Five unsupported RPT03 headers CLOSED WITH NOTES; receivedBy/notes remain existing DRS-item output. Approved implementation: RPT03 separate origin/destination filters+sorting for nine real fields, then RPT04 UTF8 CSV same9fields/view+export grants/scope/date/cap5000 overflow refusal/formula safety. Wider business decisions unchanged. Source and acceptance docs/decisions/DEV3-SUP-RPT-FOLLOWUPS.md; PRD/ROADMAP/closure updated truthfully.
 
-Implementation worker owned approved operational-report module/routes, narrow permission/navigation registration and scoped tests. Independent QA read-only completed full review and scoped UI fix review. All agents complete; no test/server/browser/fixture jobs pending. Lead owns contracts, plan, verification and checkpoint files.
+## Active implementation/review
+HARD01 worker committed4files: shared ticket-create lock, ticket inventory after delivery/reports, actual DB independent creator and exclusive-writer revocation proof. Worker RED -> GREEN18focusedunits/10guardedDB, Node24.15 typecheck/Biome/diffcheck pass reported; lead minimal source diff checked. Independent qa_reviewer active, final verdict pending; no final lead quality yet. Only implementation worker writes owned source; now idle. Next RPT03 plan prepared; do not overlap new source writer until QA disposition. Lead owns docs/checkpoints. No owned browser fixture/server/job started.
 
-## Delivered and limits
+## Legacy / safety
+Current DIRECT scope revalidated through Chrome Lab page1 at approved origin/authenticated ordinary view. Targeted ticket list->eye detail->approval list: readonly fields/file controls, approval empty, no transition/history/assignment established. No mutation/form/export/download/JS/API/private evidence storage. Bounded absence only; protected technical status stays NOT_VERIFIED. No further discovery needed for approved omission packet. Provider original tab retained.
 
-Real manifest report uses owning manifest branch and stored type/status/courier; delivery provides per-DRS and item views with explicit deliveryDate basis and manifest-owner plus transaction-branch intersection; operational dashboard shows raw scoped counts. Registered separate report permissions, fresh actor/branch validation, RepeatableRead snapshots, bounded UTC31-day filters, literal search and stable pagination. Real browser invalid-input clearing regression fixed with display-only whitelisted values, without parser/auth/query changes.
+## Worktree preservation
+Canonical inherited .gitignore/AGENTS/three policy/prisma seed modifications untouched/excluded. Feature .serena preserved. Old harness@6aaa8dd has4local commits not main; contract-review@4bef2d6 included feature/remote. Both tracked clean/.serena untracked+ignored metadata retained. Verified full-history refs bundle plus hash-compared metadata copies and canonical user diff backup under C:/Users/Administrator/.codex/backups/dev3-sup-rpt-20261115. No worktree/branch deleted yet. Cleanup/FIN worktree only after SUP/RPT implemented/dispositioned and safe checks.
 
-Vendor attribution report is NOT implemented. Guarded honest readiness page only, vendor navigation unlinked. No Manifest/Vehicle to Vendor FK exists; RPT-05 requires explicit attribution/capture design, never name/branch guessing. OPS-03 generation remains separate; existing stored DeliverySheet/item read source used under delegated narrower scope. No financial totals, invented lifecycle/status, export or schema/migration change.
-
-## Verification
-
-At exact tested code 9b76457: pinned Node24.15; rtk bypass npm run lint PASS377 files; npm run typecheck PASS; npm test PASS60 files/565 tests; npm run test:integration PASS14 files/119 tests on guarded local test DB; installed next build via temporary helper PASS68 routes. Detector15 changed TSX and final2 UI components returned []; diffcheck PASS. Actual browser fake fixtures confirmed counts2 transactions/2 manifests/1 DRS/2 items, 375/768/1440 native views, keyboard/pagination, empty and four denied routes/profile escape. Final invalid submit + hard reload +375 proof retained five safe fields and recovered valid report. Sheet Escape closure observed; final focus restoration not separately captured. Two owned fixture cycles, pages, servers and helper/metadata cleaned. No physical-device or staging claim.
-
-Independent QA PASS full and scoped fix, not human owner approval. Nonfatal pg8.23 queued-query deprecation exact producer unproven, no speculative fix; final-hardening compatibility followup. Detailed commands/provenance/limits: docs/decisions/evidence/rpt-02/verification.md.
-
-## Decisions, safety and next action
-
-User delegates suitable RPT-02 recommendation/implementation and defers all Dev1/Dev2 reviews to final combined Dev3 PR. No development approval gate, no new PR until agreed Dev3 work complete; no auto merge/deploy. Final review/staging/release NOT RUN/queued, not required to pretend locally delivered scope includes them. No full Dev3 DONE claim or financial authorization.
-
-Accepted DISC04/catalogue reused. Only targeted vendor page observation 05:05:14–47 UTC under current explicit DIRECT_NON_MUTATING_DISCOVERY grant, canonical gate unchanged; bounded view limit, not global absence. Original legacy page left untouched; technical protected-mode NOT_VERIFIED not promoted.
-
-Next executable action: consume ROADMAP/PRD for next READY Dev3 slice, especially FIN-01 source/decision reconciliation; draft finance is not runtime authorization. Retain RPT-05/extended reporting and DEV3-HARD-01 as separate followups. Do not reopen accepted SUP/RPT v1. Canonical archive branch docs/disc-04-dev3-readiness; preserve inherited .gitignore, AGENTS, three policy files and prisma/seed edits. Commit/push only scoped documentation/checkpoints; record resulting archive SHA afterward.
+## Next
+Finish HARD01 QA, persist/push; bounded RPT03 then QA; bounded RPT04 then QA/final appropriate checks/UI/security. Update exact SHA/evidence, safely clean obsolete worktrees, prepare FIN from preserved unmerged stack. FIN runtime remains gated by real finance rules/sources. Staging/final human review remain separate NOT RUN; pg warning cause unproven/no speculative fix.
+`nUpdate: HARD01 independent QA PASS at7245649, no P0-P2. RPT03 worker authorized next. Final lead batch deferred until RPT04 stable; no full completion claim.
