@@ -90,9 +90,8 @@ export function TransactionReportView({
           tidak ditampilkan.
         </p>
         <p className="max-w-prose text-sm text-muted-foreground">
-          Laporan dan CSV UTF-8 menampilkan sembilan kolom yang tersedia. Data
-          finansial dan kolom legacy lain belum tersedia. Asal dan Tujuan adalah
-          cabang; Kilo ditampilkan sesuai nilai tersimpan.
+          Laporan dan CSV UTF-8 menampilkan sembilan kolom non-finansial. Asal
+          dan Tujuan adalah cabang; Kilo ditampilkan sesuai nilai tersimpan.
         </p>
       </header>
       <section
@@ -239,8 +238,7 @@ export function TransactionReportView({
               id="report-export-hint"
               className="text-sm text-muted-foreground"
             >
-              Seluruh hasil sesuai filter dan urutan, maksimal 5000 baris. CSV
-              ini menggunakan format target; bukan salinan Excel legacy.
+              Seluruh hasil sesuai filter dan urutan, maksimal 5000 baris.
             </p>
           </div>
         )}
