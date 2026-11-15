@@ -1,3 +1,11 @@
+# Current PR10 review disposition — 2026-11-15
+
+Actual Dev1 review approved documentation after corrections only; it explicitly did not accept the implementation contract. Source: PR10 review5908528451 on5bc8387. All requested documentation/technical corrections are in4bef2d6, with actual re-review requested and REVIEW_REQUIRED verified. Current authorization/provenance contract still needs explicit Dev1 acceptance.
+
+Formal D16 record now PARTIAL per reviewer alternative because no named approver identity was supplied (user reaffirmed being approver, not a name/handle). Actual A/model direction is preserved; no new policy selected or publisher identity inferred. D19/D22 global policies remain open; local target display/omissions remain stated direction. No repeat A/model approval request.
+
+DISC04 is still DONE WITH NOTES; evidence branch not merged/main dependency documented, no global discovery reblock. Technical choices resolved: creator-leading order index, explicit branch-loss read/replay denial, no support-agent workflow, safe inert URL schemes, priority CHECK and bounded UUID idempotency key. Existing SUP note owns current contract; no code/schema/migration or app-test completion claim. Prior approval/gate statuses below are historical where superseded.
+
 # Current approval and review disposition — 2026-11-15
 
 - SUP-01 Option A business/security scope approved by user; bounded D16/FR07 and explicitly local ID/UTC/D19/D22 acceptance only. Lifecycle/status/approval/files remain deferred; no global confirmation.
