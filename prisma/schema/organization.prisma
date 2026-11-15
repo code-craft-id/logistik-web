@@ -80,6 +80,7 @@ model Branch {
   vehicles            Vehicle[]
   marketingPeople     MarketingPerson[]
   userAllowedBranches UserAllowedBranch[]
+  tickets             Ticket[]
 
   @@index([officeId])
   @@index([status])

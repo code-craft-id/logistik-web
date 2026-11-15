@@ -48,6 +48,7 @@ model User {
   manifestsCreated         Manifest[]               @relation("ManifestCreatedBy")
   manifestItemsAssigned    ManifestItem[]           @relation("ManifestItemAssignedBy")
   deliverySheetsDelivered  DeliverySheet[]          @relation("DeliverySheetDeliveredBy")
+  ticketsCreated           Ticket[]
 
   @@map("auth_users")
 }

@@ -15,6 +15,7 @@ import {
 
 // A route enters this inventory only when its workflow is implemented.
 const routeResources: Record<string, readonly string[]> = {
+  "/ticketting": ["ticket"],
   "/group-user": ["user_group"],
   "/user-management": ["user"],
   "/hak-akses-menu": ["permission"],

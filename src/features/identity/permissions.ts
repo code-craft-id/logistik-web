@@ -1,6 +1,11 @@
 /** Dev 1 permission inventory only. A configured right never activates an unfinished workflow. */
 export const permissionResources = [
   {
+    resource: "ticket",
+    label: "Ticketing",
+    actions: ["view", "create"],
+  },
+  {
     resource: "system_admin",
     label: "Administrator — akses penuh semua cabang",
     actions: ["manage"],
@@ -201,7 +206,11 @@ export const fullAccessPermission = {
 export function permissionRestriction(resource: string): string | undefined {
   if (resource === "vendor_tax")
     return "Lihat dan kelola NPWP vendor khusus administrator.";
-  if (["booking", "transaction", "manifest", "delivery"].includes(resource))
+  if (
+    ["booking", "transaction", "manifest", "delivery", "ticket"].includes(
+      resource,
+    )
+  )
     return undefined;
   if (
     permissionResources.some((entry) => entry.resource === resource) &&
