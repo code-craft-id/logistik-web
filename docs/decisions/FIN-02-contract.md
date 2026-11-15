@@ -1,8 +1,10 @@
 # FIN-01 / FIN-02 consolidated adoption packet
 
-2026-11-15. **PROPOSED, NOT APPROVED.** Required adopter: project/finance owner.
-This packet requests business adoption, not release approval. FIN-02 remains a
-required deliverable. No runtime, migration, or decision confirmation is implied.
+2026-11-15. **ADOPTED A+B.** Project/finance owner explicitly answered
+“Adopt A+B as written” to the consolidated question below. This approves the
+bounded business target, not release. FIN-02 remains required. Implementation
+and additive migration preparation are authorized; coordination, final human
+review and staging gates remain. Wider D-ID rules remain TBD.
 
 ## Existing evidence and exact gate
 

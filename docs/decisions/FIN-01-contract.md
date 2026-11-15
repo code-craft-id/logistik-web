@@ -1,6 +1,6 @@
 # FIN-01A — proposed customer invoice and payment contract
 
-**Status: PROPOSED — NOT APPROVED. No runtime or migration authorized by this document.**
+**Status: ADOPTED — bounded P1–P5 target and reconciliation.** Project/finance owner explicitly answered “Adopt A+B as written” on 2026-11-15 to the consolidated FIN-02-contract.md adoption question. Runtime implementation is authorized within this scope; migration coordination and final human review remain required. Broader D-11/D-12/D-21 rules remain TBD.
 
 2026-11-15. Owner selected “A — Kontrak target FIN-01” after the bounded legacy check. That selects preparation of this concrete target proposal; it does not approve the policies below. Required adopter: project/finance owner. Dev1/Dev2 code/source reviews remain queued for the final combined PR, not a pre-development availability gate.
 

@@ -15,3 +15,6 @@ One consolidated adoption/correction question submitted; no answer yet. No
 business decision CONFIRMED. Wider D-ID scope stays unresolved even after a
 future bounded adoption. No financial behavior inferred from legacy labels,
 draft models, agent review or general implementation authorization.
+
+## Adoption 2026-11-15
+Owner answered Adopt A+B as written. Prior pending entries above are historical. D-11/D-21 PARTIAL (bounded finance adopted, broader TBD); D-12/D-13/D-14 CONFIRMED only for adopted contracts. See updated PRD and FIN-01/FIN-02 contracts. No release approval implied.

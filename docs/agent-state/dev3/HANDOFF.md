@@ -1,29 +1,20 @@
-# Finance handoff — adoption pending
+# Dev3 finance state
 
-Continue ONLY in this worktree on feat/fin-01-billing-contract. Baseline
-92602bf7ff8922ffad3eb784841ad0e76d890fb3; use git to resolve later documentation
-commit. Preserve initial untracked .serena/ and docs/handoffs/. Older discovery
-checkpoint remains at C:/Development/logistik-web/docs/agent-state/dev3 and is
-historical; this worktree's STATE.md is current for this mission.
+2026-11-15. Worktree C:/Users/Administrator/.codex/worktrees/fin-01-ready/logistik-web;
+branch feat/fin-01-billing-contract. Owner explicitly answered “Adopt A+B as written”.
+Bounded FIN-01 P1–P5 and FIN-02 B approved; broader financial rules stay TBD.
+No orchestrator/Superpowers/subagents. Existing SUP/RPT and initial untracked
+.serena/ and docs/handoffs/ preserved; no push/merge/deploy.
 
-Owner requires one implementation agent, no orchestrator/Superpowers/delegation.
-Financial/security/migration/human-review gates remain. DISC-04 DONE WITH NOTES;
-SUP/RPT accepted implementation untouched. Do not rerun its gates absent impact.
+FIN-01 WIP: schema/service/Server Actions/UI and first migration implemented.
+Guarded PostgreSQL 4 tests, money/date unit 2 tests, changed-file Biome and
+TypeScript PASS. See docs/decisions/FIN-implementation.md for commands and limits.
+Migration applied only to loopback logistik_web_test. Local existing PostgreSQL
+cluster started after stopped-server diagnosis. Issued financial history is not
+soft-deleted. UI/browser checks and integrated accounting posting remain pending.
 
-Read docs/decisions/FIN-02-contract.md and the user's pending adoption answer.
-One consolidated async question asks whether to adopt A (existing FIN-01 P1–P5)
-and B (specific accounting target), or correct them. Do not confuse this mission
-or earlier target-preparation approval with actual adoption. D-IDs remain TBD.
-
-FIN-01 BLOCKED D-11/D-12/D-21; FIN-02 BLOCKED D-13/D-14 plus authority, required
-and unimplemented. No financial code/schema/migration can start under current
-guards. No live legacy work, production DB actions, tests or build performed.
-
-After adoption: record exact subsets, resolve minimal technical design and
-migration coordination, implement invoice then receipts with money/auth/race
-tests, then required FIN-02 scope and REL-01 readiness. A+B recommendations are
-proposals, including invoice-date revenue, documented actual costs and immutable
-closed periods; confirm the answer covers them before implementation.
-
-REL-01 NOT READY. Current changes are documentation only. No agents/background
-jobs pending. No push/merge/deploy authorized.
+FIN-02 NEXT: implement adopted chart/mapping/journal/actual cost/period/cashflow/
+P&L/GP/recap behavior; no existing DRAFT accounting runtime. Journal integration
+must be atomic with invoice/receipt changes. REL-01 not ready. Final full gates
+and human review/staging/UAT/backup-restore remain. Resolve actual latest commit
+with Git; this snapshot is committed with the FIN-01 slice.

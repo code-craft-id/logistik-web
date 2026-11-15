@@ -1,0 +1,82 @@
+// Adopted FIN-01/FIN-02 target. Posted history is immutable, not soft-deleted.
+model FinInvoice {
+  id           Int              @id @default(autoincrement())
+  branchId     Int
+  branch       Branch           @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  customerId   Int
+  customer     Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status       String           @default("DRAFT") @db.VarChar(10)
+  revision     Int              @default(1)
+  currency     String           @default("IDR") @db.VarChar(3)
+  invoiceDate  DateTime         @db.Date
+  dueDate      DateTime         @db.Date
+  total        Decimal          @db.Decimal(15, 2)
+  number       String?          @unique
+  snapshot     Json?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  items        FinInvoiceItem[]
+  reservations FinReservation[]
+  receipts     FinReceipt[]
+
+  @@index([branchId, invoiceDate, status])
+  @@map("fin_invoices")
+}
+
+model FinInvoiceItem {
+  id            Int         @id @default(autoincrement())
+  invoiceId     Int
+  invoice       FinInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount        Decimal     @db.Decimal(15, 2)
+
+  @@unique([invoiceId, transactionId])
+  @@map("fin_invoice_items")
+}
+
+model FinReservation {
+  transactionId Int         @id
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  invoiceId     Int
+  invoice       FinInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([invoiceId])
+  @@map("fin_reservations")
+}
+
+model FinReceipt {
+  id           Int         @id @default(autoincrement())
+  invoiceId    Int
+  invoice      FinInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount       Decimal     @db.Decimal(15, 2)
+  receivedDate DateTime    @db.Date
+  method       String      @db.VarChar(80)
+  reference    String      @db.VarChar(160)
+  note         String      @db.VarChar(500)
+  reversalOfId Int?        @unique
+  original     FinReceipt? @relation("ReceiptReversal", fields: [reversalOfId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reversal     FinReceipt? @relation("ReceiptReversal")
+  createdAt    DateTime    @default(now())
+
+  @@index([invoiceId])
+  @@map("fin_receipts")
+}
+
+// Immutable actor-scoped idempotency and audit record, committed with its result.
+model FinCommand {
+  id        Int      @id @default(autoincrement())
+  actorId   Int
+  actor     User     @relation(fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  key       String   @db.VarChar(64)
+  action    String   @db.VarChar(60)
+  branchId  Int?
+  branch    Branch?  @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  payload   Json
+  result    Json
+  createdAt DateTime @default(now())
+
+  @@unique([actorId, key])
+  @@index([branchId, createdAt])
+  @@map("fin_commands")
+}

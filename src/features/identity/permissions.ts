@@ -210,6 +210,41 @@ export const permissionResources = [
     label: "Ticketing",
     actions: ["view", "create"],
   },
+  {
+    resource: "invoice",
+    label: "Invoice",
+    actions: ["view", "create", "update", "issue", "void"],
+  },
+  {
+    resource: "payment",
+    label: "Pembayaran",
+    actions: ["view", "create", "reverse"],
+  },
+  {
+    resource: "finance_account",
+    label: "Akun dan kategori",
+    actions: ["view", "manage"],
+  },
+  {
+    resource: "journal",
+    label: "Jurnal",
+    actions: ["view", "create", "post", "reverse"],
+  },
+  {
+    resource: "finance_cost",
+    label: "Biaya aktual",
+    actions: ["view", "create", "finalize", "reverse"],
+  },
+  {
+    resource: "finance_period",
+    label: "Periode akuntansi",
+    actions: ["view", "close"],
+  },
+  {
+    resource: "financial_report",
+    label: "Laporan keuangan",
+    actions: ["view"],
+  },
 ] as const;
 
 export const permissionGrantCount = permissionResources.reduce(

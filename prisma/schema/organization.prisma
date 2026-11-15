@@ -48,6 +48,8 @@ model Office {
 }
 
 model Branch {
+  finInvoices FinInvoice[]
+  finCommands FinCommand[]
   customers           Customer[]
   consignees          Consignee[]
   bookings            Booking[]

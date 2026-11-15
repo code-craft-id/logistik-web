@@ -24,3 +24,6 @@ remains untouched at C:/Development/logistik-web/docs/agent-state/dev3/RUN_LOG.m
   are documentation only. Documentation diff validation and commit follow.
 
 - Documentation self-review: proposal remains unapproved; explicit cost completeness, retained supplier liabilities on invoice void, and accounting-period movement basis stated. git diff --cached --check PASS (six scoped documentation files); no runtime verification claimed. Commit contains this record; resolve its SHA with git log -1. No push.
+
+## 2026-11-15 — A+B adoption and FIN-01 slice
+Owner explicitly adopted A+B as written; PRD bounded D-IDs and contracts updated. New FIN-01 schema/service/UI/migration; guarded DB4/unit2/typecheck/changed-file Biome PASS. Details in FIN-implementation.md. Initial stopped-DB failures resolved by starting existing local cluster; only test DB migrated. UI browser verification and FIN-02 integration pending. Sole-agent execution; no push/merge/deploy. Milestone commit follows.
