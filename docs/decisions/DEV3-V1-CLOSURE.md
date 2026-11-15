@@ -40,3 +40,5 @@ No additional legacy visit is needed merely to accept these already-verified v1 
 
 ## Owner follow-up disposition —2026-11-15
 Explicit owner packet A closes SUP-02/SUP-03/RPT-05 as NOT NEEDED for current migration scope, and unsupported RPT-03 headers CLOSED WITH NOTES. RPT-03 sourced filters/sorting and RPT-04 capped permissioned CSV are approved pending implementation/verification. This supersedes the earlier backlog recommendations for this scope only, never claims unimplemented behavior delivered or global legacy absence. See [approved packet and evidence](DEV3-SUP-RPT-FOLLOWUPS.md).
+
+Follow-up completion2026-11-15: RPT-03/RPT-04 and relevant HARD-01 runtime are IMPLEMENTED + VERIFIED; explicit NOT NEEDED/CLOSED WITH NOTES dispositions above retained. See [final scope matrix](DEV3-SUP-RPT-FOLLOWUPS.md) and [actual verification](evidence/dev3-sup-rpt-followups/verification.md).

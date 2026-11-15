@@ -53,3 +53,6 @@ TDD worker70focused/7guardedDB tests, lint/typechecks; independent QA PASS noP0/
 Deferredmissing-source columns: Moda, Servis, Deskripsi, Komentar, Diterima Oleh. Do not inferfromBooking/partialOPS03/masterdata/preview. Deferred filters: separatelegacyorigin/destination, customer/payment/mode/billing-labelledstatus; columnsorting/Refresh/export andfinance/aggregates. These are followups, not global DISC04 reopening. No biaya/tariff/volume/revenue/profit/invoice data introduced.
 
 Staging, physicaldevice/browsermatrix and finalhuman code/release acceptance remain pending; finalownerreview is not a developmentblocker. SUP-01 DONE for owner-accepted v1; SUP01A code untouched. FullDev3 notDONE. See [closure](DEV3-V1-CLOSURE.md).
+
+## RPT-03/RPT-04 extension —2026-11-15
+Owner packet A adopted separate endpoint filters, nine-column sorting and capped5000 permissioned UTF8CSV. Implemented/local verified at core8d25df1/finalcopybe1d2e6; fixed-order/export-deferred paragraphs above describe original accepted v1. New authoritative [extension contract/disposition](DEV3-SUP-RPT-FOLLOWUPS.md) and [SHA-specific verification](evidence/dev3-sup-rpt-followups/verification.md). Nine fields/current scope/UTC date basis unchanged; five unsourced headers CLOSED WITH NOTES, no finance/vendor join invented.
