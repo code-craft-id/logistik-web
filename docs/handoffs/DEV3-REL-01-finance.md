@@ -1,10 +1,39 @@
 # Dev3 REL-01 finance handoff
 
-2026-11-15. Branch `feat/fin-01-billing-contract`, exact worktree
-`C:/Users/Administrator/.codex/worktrees/fin-01-ready/logistik-web`.
+2026-11-15. Current consolidated branch `codex/dev3-ready-for-review`, working copy
+`C:/Development/logistik-web`. The former FIN linked worktree was retired after
+its commits and local artifacts were preserved.
 Source checkpoint **7997505**; FIN-01 slice **b2808bf**; adopted target documented
 following owner's explicit **“Adopt A+B as written”** answer. No push/merge/deploy.
 Existing SUP/RPT stack/history and initial untracked material preserved.
+
+## Local Git consolidation — 2026-11-15
+
+Discovery, SUP/RPT/FIN and both equivalent observation-harness histories are now
+ancestors of this one Dev3 branch; original commit IDs were retained, not squashed
+or rebased. Merge checkpoints: 92098c0 and c6706ca. Seven redundant local Dev3
+branch refs and two linked worktrees were retired only after ancestor checks and
+verified recovery backups. Main and remote branches were not merged/modified.
+
+Application source, schema, application tests, package/lockfile and Next/Vitest
+configuration are byte-identical to c087243. Existing FIN verification below
+remains anchored to 7997505. The newly consolidated offline harness passed all
+6 Node24 tests; fresh canonical-checkout typecheck and lint416 PASS. Dependencies,
+Prisma client and Next route types were regenerated; no DB migration or seed ran.
+
+Backup: `C:/Users/Administrator/.codex/backups/dev3-consolidation-20261115-120804`.
+It contains a verified original refs bundle, raw WIP copies/patch/hashes,
+untracked handoff packet, local metadata, ignored environment/log files and
+residual build caches. Recursive cache deletion was rejected by automatic policy;
+non-destructive archival completed cleanup instead. No forced deletion was used.
+
+The six original tracked WIP files remain in stash/backup ref
+`refs/backups/dev3-consolidation-wip-20261115` (676ecab). Five relevant
+ignore/policy updates are included here; the unrelated raw seed-error change is
+preserved privately and excluded from the ready branch. Do not blindly pop that
+old stash onto this consolidated branch; recover individual files if needed.
+New local bug fixes belong on this branch. Push requires a later explicit request;
+all financial acceptance/release gates below still apply.
 
 ## Status
 

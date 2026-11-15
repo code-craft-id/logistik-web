@@ -1,27 +1,24 @@
-# Dev3 handoff — finance implementation locally verified
+# Resume Dev3 on the consolidated local branch
 
-Continue exact fin-01-ready/logistik-web worktree, feat/fin-01-billing-contract.
-Source799750549ecd40e0558014f3f67a8586353803d5; FIN-01b2808bf. Current doc-only
-HEAD is resolved with git log. No source changes after final source verification.
+Working copy: C:/Development/logistik-web.
+Branch: codex/dev3-ready-for-review. Source consolidation c6706ca; current doc HEAD
+is resolved with git log -1. All original Dev3 commit histories remain ancestors.
+Seven redundant local Dev3 refs and two linked worktrees retired; main/remote
+unchanged. One Dev3 branch is ready for local bug fixes and later push, not release.
 
-Owner explicitly adopted A+B as written. FIN-01/FIN-02 runtime and UI complete
-within that target; tickets PARTIAL pending human/migration/staging acceptance.
-Read docs/handoffs/DEV3-REL-01-finance.md for exact review/rollout packet.
-FinalPASS: Node24 lint412/typecheck/unitUI664/guardedDB138/build/schemavalidate;
-11finance tests plus local browser critical flows and375/768/1440 measurements.
+Read docs/handoffs/DEV3-REL-01-finance.md. Owner adopted A+B; FIN runtimes/UI
+implemented and locally verified (source7997505, docs c087243). Application code,
+schema, tests, dependencies/config unchanged in consolidation. Existing664unitUI,
+138DB/build/schema evidence applies to that unchanged source. Added harness6PASS;
+fresh canonical lint416/typecheck PASS after dependency/Prisma/Next type setup.
 
-Only schema-diff exception: preexisting Dev2 updated_at defaults on manifest_items
-and delivery_sheet_items. No finance drift. Coordinator must disposition it.
-Both finance migrations test-DB-only; FIN-02 refuses activation over existing
-issued FIN-01/receipt history without reviewed catch-up. Stop finance writers
-before both migrations; do not run an old FIN-01 binary against activated FIN-02.
-Real mappings/rights configuration, independent review, staging/UAT/reconciliation,
-backup/restore and release approval remain. REL-01 handoff prepared; no deployment
-readiness claim. No push/merge/deploy authorized.
+Human/migration review, staging/UAT/backup-restore and existing Dev2 updated_at
+default drift remain gates. FIN tickets PARTIAL for acceptance; no re-adoption
+question, no DISC-04/SUP/RPT reopening. No new DB migration, seed or deployment.
 
-No agents, orchestrator or Superpowers. Preserve accepted DISC-04/SUP/RPT and
-initial untracked .serena/ and docs/handoffs/ files. No tests/browser jobs pending;
-owned fake fixtures/session and server cleaned; tabblank/emulation reset. Existing
-local PostgreSQL stays running. Never re-ask A+B adoption or promote wider rules.
-Next safe task: review source7997505 and handoff, then resolve coordinator/human
-gates; no repeated full verification absent relevant changes.
+Backup C:/Users/Administrator/.codex/backups/dev3-consolidation-20261115-120804.
+Original six WIP files retained in stash/ref676ecab and raw hash-verified copies;
+only five relevant ignore/policy files integrated. Unrelated seed error logging
+change excluded. Untracked handoff ZIP/MD, ignored env/logs, residual cache and
+worktree metadata archived. Do not blindly apply the old stash. No pending jobs.
+Use this branch for remaining minor fixes; push only when the user explicitly asks.

@@ -1,35 +1,35 @@
-# Dev3 finance state
+# Dev3 current state — consolidated local branch
 
-2026-11-15. Branch feat/fin-01-billing-contract; exact worktree
-C:/Users/Administrator/.codex/worktrees/fin-01-ready/logistik-web.
-Verified source SHA 799750549ecd40e0558014f3f67a8586353803d5 (FIN-02), FIN-01 b2808bf.
-Subsequent checkpoint commit is documentation only; resolve current doc HEAD with Git.
+2026-11-15. Working copy C:/Development/logistik-web; branch
+codex/dev3-ready-for-review. Consolidation source checkpoint c6706ca, merging
+92098c0 discovery/feature history and equivalent harness history. Current HEAD
+also contains this documentation-only checkpoint; resolve it with git log -1.
+All seven original Dev3 branch tips remain ancestors; their redundant local refs
+and both linked worktrees were retired with verified backup. Main c406502 and
+remote branches were not modified. No push/merge to main/deploy.
 
-FIN-01 and FIN-02 implementation/local verification COMPLETE for owner-adopted
-A+B. Ticket acceptance remains PARTIAL: independent human/migration review and
-staging/UAT are mandatory and pending. FIN-02 remains required. DISC-04 DONE WITH
-NOTES and accepted SUP/RPT stack preserved; no unapproved DRAFT accounting runtime.
-No orchestrator, Superpowers or delegation used; sole implementation/self-review.
+FIN source799750549ecd40e0558014f3f67a8586353803d5, final FIN docs c087243;
+SUP/RPT accepted scope and DISC-04 DONE WITH NOTES retained. FIN-01/FIN-02 runtime
+and local verification complete against adopted A+B. Ticket acceptance PARTIAL
+only for mandatory human/migration/staging gates; REL-01 handoff prepared, release
+NOT READY. Existing Dev2 updated_at default drift remains a coordinator item.
 
-Final source gates PASS on Node24.15.0: lint412, typecheck,664unit/UI,138guarded
-PostgreSQL tests (11 finance), production build, schema validation. Both additive
-migrations applied only to loopback logistik_web_test. Local browser critical
-flows, keyboard and24loaded-route checks375/768/1440 passed. Evidence metadata,
-screenshots and exact commands: docs/handoffs/DEV3-REL-01-finance.md and
- docs/decisions/evidence/finance/verification.json.
+Application src/prisma/tests/package+lockfile/Next/Vitest config exactly match
+c087243; no financial implementation or migration changed during consolidation.
+Earlier664unitUI/138DB/build/schema checks remain anchored to their recorded
+finance source. Additional merged harness:6tests PASS Node24. Fresh primary
+checkout lint416/typecheck PASS; npm ci, Prisma generate and Next typegen done.
+No DB operation during cleanup. One implementation agent, no disabled skills or
+delegation. No repeated full unit/DB/build gates for unchanged application code.
 
-Schema diff exits2 for ONLY existing Dev2 manifest_items/delivery_sheet_items
-updated_at default-now mismatch; finance schema matches. Coordinator disposition
-required; applied migrations and Dev2 behavior left intact. No pending business
-adoption for A+B. Wider D-11/D-21 rules stay outside adopted scope.
+Recovery backup C:/Users/Administrator/.codex/backups/dev3-consolidation-20261115-120804:
+verified original Git bundle, WIP snapshots/patch/hash manifest, untracked packet,
+ignored env/log files and residual cache/metadata. Six original WIP files retained
+in stash and refs/backups/dev3-consolidation-wip-20261115@676ecab; five relevant
+policy/ignore updates integrated, unrelated raw seed-error edit excluded. Recursive
+cache deletion was policy-rejected; safe archival removed residual paths instead.
 
-Dev3 REL-01 HANDOFF PREPARED; release NOT READY. Next: human review7997505,
-coordinator drift/migration review, actual account/branch mapping and rights
-configuration, writer-stopped staging rollout/UAT/reconciliation, backup/restore
-and explicit release approval. FIN-02 activation refuses preexisting FIN-01
-financial history needing catch-up. No historical balances/import inferred.
-
-Owned fake browser fixtures/session removed; owned dev server stopped, tabblank,
-emulation cleared; existing local PostgreSQL cluster remains running. Initial
-.serena/ and docs/handoffs/ user files preserved. No background tests/agents,
-no new worktree/reset/main merge, no push/merge/deploy/production or legacy writes.
+Next: use this branch in this primary checkout for small fixes and final owner
+review. Do not restore the retired worktrees or blindly pop old WIP. Read
+ docs/handoffs/DEV3-REL-01-finance.md for gate/recovery details. Push only upon
+explicit request. No pending agents, tests, server or cleanup jobs.
