@@ -91,7 +91,7 @@ describe("transaction report filter preparation", () => {
       page: "1000",
       pageSize: "100",
       branchId: "2147483647",
-      search: "A".repeat(100),
+      search: "A".repeat(50),
     });
     expect(result.status).toBe("valid");
     if (result.status !== "valid") throw new Error("Expected valid filters");
@@ -122,7 +122,7 @@ describe("transaction report filter preparation", () => {
     { branchId: "2147483648" },
     { branchId: "1.2" },
     { branchId: true },
-    { search: "x".repeat(101) },
+    { search: "x".repeat(51) },
     { search: null },
     { status: "Paid" },
     { actorId: "1" },

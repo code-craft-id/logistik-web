@@ -89,10 +89,10 @@ export function parseTransactionReportFilters(
   if (query.branchId && branchId === null) {
     issues.push({ field: "branchId", message: "ID cabang tidak valid." });
   }
-  if ((query.search ?? "").length > 100) {
+  if ((query.search ?? "").length > 50) {
     issues.push({
       field: "search",
-      message: "Pencarian AWB maksimal 100 karakter.",
+      message: "Pencarian AWB maksimal 50 karakter.",
     });
   }
   if (issues.length || page === null || pageSize === null) {

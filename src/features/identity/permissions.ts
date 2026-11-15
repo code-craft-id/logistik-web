@@ -190,6 +190,11 @@ export const permissionResources = [
     label: "Delivery Sheet",
     actions: ["view", "create", "update"],
   },
+  {
+    resource: "transaction_report",
+    label: "Laporan Detail Transaksi",
+    actions: ["view"],
+  },
 ] as const;
 
 export const permissionGrantCount = permissionResources.reduce(
@@ -207,9 +212,14 @@ export function permissionRestriction(resource: string): string | undefined {
   if (resource === "vendor_tax")
     return "Lihat dan kelola NPWP vendor khusus administrator.";
   if (
-    ["booking", "transaction", "manifest", "delivery", "ticket"].includes(
-      resource,
-    )
+    [
+      "booking",
+      "transaction",
+      "manifest",
+      "delivery",
+      "ticket",
+      "transaction_report",
+    ].includes(resource)
   )
     return undefined;
   if (
