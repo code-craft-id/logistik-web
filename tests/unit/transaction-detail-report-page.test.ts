@@ -42,3 +42,20 @@ it("passes only the independently authorized service result into the view", asyn
     result,
   );
 });
+
+it("passes the original query for display-only invalid-filter recovery", async () => {
+  const query = {
+    startDate: "2026-11-01",
+    sortBy: "kilo",
+    sortDirection: "asc",
+    originBranchId: "10",
+  };
+  read.mockResolvedValue({
+    state: "invalid",
+    parsed: { status: "invalid", issues: [] },
+    branches: [],
+    items: [],
+    total: 0,
+  });
+  expect((await TransactionReportPage({ query })).props.query).toBe(query);
+});

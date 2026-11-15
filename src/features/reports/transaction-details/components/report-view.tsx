@@ -15,7 +15,11 @@ import {
   type TransactionReportResult,
   transactionReportRoute,
 } from "../contracts";
-import type { TransactionReportFilters } from "../filters";
+import {
+  type TransactionReportFilters,
+  transactionReportFormValues,
+  transactionReportSortFields,
+} from "../filters";
 import { ReportSubmitButton } from "./submit-button";
 
 const headers = [
@@ -35,9 +39,15 @@ function pageUrl(f: TransactionReportFilters, page: number) {
     endDate: f.endDate,
     pageSize: String(f.pageSize),
     page: String(page),
+    sortBy: f.sortBy,
+    sortDirection: f.sortDirection,
   });
   if (f.search) query.set("search", f.search);
   if (f.branchId !== null) query.set("branchId", String(f.branchId));
+  if (f.originBranchId !== null)
+    query.set("originBranchId", String(f.originBranchId));
+  if (f.destinationBranchId !== null)
+    query.set("destinationBranchId", String(f.destinationBranchId));
   return `${transactionReportRoute}?${query}`;
 }
 function value(item: string | number | null) {
@@ -52,11 +62,19 @@ function value(item: string | number | null) {
 }
 export function TransactionReportView({
   result,
+  query,
 }: {
   result: TransactionReportResult;
+  query?: Record<string, string | string[] | undefined>;
 }) {
   const filters =
     result.parsed.status === "valid" ? result.parsed.filters : null;
+  const display =
+    filters ??
+    transactionReportFormValues(
+      result.state === "invalid" ? query : undefined,
+      result.branches,
+    );
   const issues = result.parsed.status === "invalid" ? result.parsed.issues : [];
   return (
     <div className="min-w-0 space-y-6">
@@ -92,7 +110,7 @@ export function TransactionReportView({
                 type="date"
                 name="startDate"
                 required
-                defaultValue={filters?.startDate ?? ""}
+                defaultValue={display.startDate}
                 aria-describedby="report-period-hint"
                 className="min-h-11"
               />
@@ -104,25 +122,65 @@ export function TransactionReportView({
                 type="date"
                 name="endDate"
                 required
-                defaultValue={filters?.endDate ?? ""}
+                defaultValue={display.endDate}
                 aria-describedby="report-period-hint"
                 className="min-h-11"
               />
             </div>
+            {[
+              ["branchId", "Cabang asal atau tujuan (gabungan)"],
+              ["originBranchId", "Cabang asal"],
+              ["destinationBranchId", "Cabang tujuan"],
+            ].map(([name, label]) => (
+              <div key={name} className="space-y-2">
+                <Label htmlFor={`report-${name}`}>{label}</Label>
+                <select
+                  id={`report-${name}`}
+                  name={name}
+                  defaultValue={
+                    display[
+                      name as
+                        | "branchId"
+                        | "originBranchId"
+                        | "destinationBranchId"
+                    ] ?? ""
+                  }
+                  className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                >
+                  <option value="">Semua cabang yang diizinkan</option>
+                  {result.branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
             <div className="space-y-2">
-              <Label htmlFor="report-branch">Cabang asal atau tujuan</Label>
+              <Label htmlFor="report-sort">Urutkan menurut</Label>
               <select
-                id="report-branch"
-                name="branchId"
-                defaultValue={filters?.branchId ?? ""}
+                id="report-sort"
+                name="sortBy"
+                defaultValue={display.sortBy}
                 className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
               >
-                <option value="">Semua cabang yang diizinkan</option>
-                {result.branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.name}
+                {transactionReportSortFields.map((field, index) => (
+                  <option key={field} value={field}>
+                    {headers[index]}
                   </option>
                 ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="report-direction">Arah urutan</Label>
+              <select
+                id="report-direction"
+                name="sortDirection"
+                defaultValue={display.sortDirection}
+                className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+              >
+                <option value="asc">Menaik</option>
+                <option value="desc">Menurun</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -131,7 +189,7 @@ export function TransactionReportView({
                 id="report-search"
                 name="search"
                 maxLength={50}
-                defaultValue={filters?.search ?? ""}
+                defaultValue={display.search}
                 placeholder="Nomor AWB"
                 className="min-h-11"
               />
@@ -146,7 +204,7 @@ export function TransactionReportView({
                 max={100}
                 step={1}
                 required
-                defaultValue={filters?.pageSize ?? 20}
+                defaultValue={display.pageSize}
                 className="min-h-11"
               />
             </div>

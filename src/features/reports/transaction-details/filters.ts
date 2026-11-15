@@ -1,9 +1,26 @@
+export const transactionReportSortFields = [
+  "awbNo",
+  "transactionDate",
+  "originBranch",
+  "destinationBranch",
+  "senderName",
+  "receiverName",
+  "koli",
+  "kilo",
+  "status",
+] as const;
+export type TransactionReportSortField =
+  (typeof transactionReportSortFields)[number];
 export type TransactionReportFilters = {
   startDate: string;
   endDate: string;
   from: Date;
   toExclusive: Date;
   branchId: number | null;
+  originBranchId: number | null;
+  destinationBranchId: number | null;
+  sortBy: TransactionReportSortField;
+  sortDirection: "asc" | "desc";
   search: string;
   page: number;
   pageSize: number;
@@ -20,6 +37,10 @@ const fields = new Set([
   "startDate",
   "endDate",
   "branchId",
+  "originBranchId",
+  "destinationBranchId",
+  "sortBy",
+  "sortDirection",
   "search",
   "page",
   "pageSize",
@@ -80,6 +101,35 @@ export function parseTransactionReportFilters(
   const branchId = query.branchId
     ? positiveInteger(query.branchId, 2_147_483_647)
     : null;
+  const originBranchId = query.originBranchId
+    ? positiveInteger(query.originBranchId, 2_147_483_647)
+    : null;
+  const destinationBranchId = query.destinationBranchId
+    ? positiveInteger(query.destinationBranchId, 2_147_483_647)
+    : null;
+  for (const [field, value] of [
+    ["originBranchId", originBranchId],
+    ["destinationBranchId", destinationBranchId],
+  ] as const) {
+    if (query[field] && value === null)
+      issues.push({ field, message: "ID cabang tidak valid." });
+  }
+  const sortBy =
+    query.sortBy === undefined
+      ? "transactionDate"
+      : transactionReportSortFields.find((field) => field === query.sortBy);
+  if (!sortBy)
+    issues.push({ field: "sortBy", message: "Kolom urutan tidak valid." });
+  const sortDirection = query.sortDirection === "asc" ? "asc" : "desc";
+  if (
+    query.sortDirection !== undefined &&
+    query.sortDirection !== "asc" &&
+    query.sortDirection !== "desc"
+  )
+    issues.push({
+      field: "sortDirection",
+      message: "Arah urutan tidak valid.",
+    });
   if (page === null) {
     issues.push({ field: "page", message: "Halaman harus antara 1 dan 1000." });
   }
@@ -95,7 +145,7 @@ export function parseTransactionReportFilters(
       message: "Pencarian AWB maksimal 50 karakter.",
     });
   }
-  if (issues.length || page === null || pageSize === null) {
+  if (issues.length || page === null || pageSize === null || !sortBy) {
     return { status: "invalid", issues };
   }
 
@@ -140,11 +190,49 @@ export function parseTransactionReportFilters(
       from,
       toExclusive: new Date(end.getTime() + dayMilliseconds),
       branchId,
+      originBranchId,
+      destinationBranchId,
+      sortBy,
+      sortDirection,
       search: (query.search ?? "").trim(),
       page,
       pageSize,
       skip: (page - 1) * pageSize,
       take: pageSize,
     },
+  };
+}
+
+/** Bounded display recovery only; the original query must still pass full service validation. */
+export function transactionReportFormValues(
+  query: Record<string, string | string[] | undefined> | undefined,
+  branches: { id: number; name: string }[],
+) {
+  const scalar = (value: unknown, max: number) =>
+    typeof value === "string" && value.length <= max ? value : "";
+  const date = (value: unknown) => {
+    const text = scalar(value, 10);
+    return calendarDate(text) ? text : "";
+  };
+  const branch = (value: unknown) => {
+    const text = scalar(value, 10);
+    return positiveInteger(text, 2_147_483_647) !== null &&
+      branches.some((option) => String(option.id) === text)
+      ? text
+      : "";
+  };
+  const size = scalar(query?.pageSize, 3);
+  return {
+    startDate: date(query?.startDate),
+    endDate: date(query?.endDate),
+    branchId: branch(query?.branchId),
+    originBranchId: branch(query?.originBranchId),
+    destinationBranchId: branch(query?.destinationBranchId),
+    search: scalar(query?.search, 50),
+    pageSize: positiveInteger(size, 100) ?? 20,
+    sortBy:
+      transactionReportSortFields.find((field) => field === query?.sortBy) ??
+      "transactionDate",
+    sortDirection: query?.sortDirection === "asc" ? "asc" : "desc",
   };
 }

@@ -24,6 +24,10 @@ describe("transaction report filter preparation", () => {
       from: new Date("2026-11-01T00:00:00.000Z"),
       toExclusive: new Date("2026-11-16T00:00:00.000Z"),
       branchId: 17,
+      originBranchId: null,
+      destinationBranchId: null,
+      sortBy: "transactionDate",
+      sortDirection: "desc",
       search: "AWB-42",
       page: 1,
       pageSize: 20,
@@ -176,4 +180,55 @@ describe("transaction report filter preparation", () => {
     expect(result.status).toBe("invalid");
     expect(JSON.stringify(result)).not.toContain("secret");
   });
+});
+
+it.each([
+  "awbNo",
+  "transactionDate",
+  "originBranch",
+  "destinationBranch",
+  "senderName",
+  "receiverName",
+  "koli",
+  "kilo",
+  "status",
+])("accepts only approved sort column %s with either direction", (sortBy) => {
+  for (const sortDirection of ["asc", "desc"]) {
+    expect(
+      parseTransactionReportFilters({
+        ...period,
+        originBranchId: "17",
+        destinationBranchId: "23",
+        sortBy,
+        sortDirection,
+      }),
+    ).toMatchObject({
+      status: "valid",
+      filters: {
+        originBranchId: 17,
+        destinationBranchId: 23,
+        sortBy,
+        sortDirection,
+      },
+    });
+  }
+});
+it.each([
+  { originBranchId: "01" },
+  { originBranchId: "0" },
+  { destinationBranchId: "2147483648" },
+  { destinationBranchId: " 2" },
+  { originBranchId: ["1", "2"] },
+  { destinationBranchId: ["2"] },
+  { sortBy: "id" },
+  { sortBy: "__proto__" },
+  { sortBy: "transactionDate desc" },
+  { sortBy: ["kilo"] },
+  { sortDirection: "ASC" },
+  { sortDirection: "" },
+  { sortDirection: ["asc", "desc"] },
+])("rejects malformed endpoint/sort controls %j", (extra) => {
+  expect(parseTransactionReportFilters({ ...period, ...extra }).status).toBe(
+    "invalid",
+  );
 });

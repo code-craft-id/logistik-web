@@ -13,7 +13,10 @@ import type {
   TransactionReportResult,
   TransactionReportRow,
 } from "../contracts";
-import { parseTransactionReportFilters } from "../filters";
+import {
+  parseTransactionReportFilters,
+  type TransactionReportFilters,
+} from "../filters";
 
 const select = {
   id: true,
@@ -41,6 +44,21 @@ const dto = (row: SourceRow): TransactionReportRow => ({
   status: row.status,
 });
 
+function orderBy(
+  f: TransactionReportFilters,
+): Prisma.TransactionOrderByWithRelationInput[] {
+  const direction = f.sortDirection;
+  let primary: Prisma.TransactionOrderByWithRelationInput;
+  if (f.sortBy === "originBranch" || f.sortBy === "destinationBranch") {
+    // Prisma cannot set null placement on relations; use PostgreSQL's native placement.
+    primary = { [f.sortBy]: { name: direction } };
+  } else if (f.sortBy === "transactionDate" || f.sortBy === "status") {
+    primary = { [f.sortBy]: direction };
+  } else {
+    primary = { [f.sortBy]: { sort: direction, nulls: "last" } };
+  }
+  return [primary, { id: direction }];
+}
 export function createTransactionReportService(
   db: PrismaClient,
   resolve: () => Promise<AccessActor | null>,
@@ -74,8 +92,10 @@ export function createTransactionReportService(
             return { ...base, state: parsed.status };
           const f = parsed.filters;
           if (
-            f.branchId !== null &&
-            !branches.some((branch) => branch.id === f.branchId)
+            [f.branchId, f.originBranchId, f.destinationBranchId].some(
+              (id) =>
+                id !== null && !branches.some((branch) => branch.id === id),
+            )
           ) {
             throw new IdentityError("FORBIDDEN", 403);
           }
@@ -96,6 +116,10 @@ export function createTransactionReportService(
                 { destinationBranchId: f.branchId },
               ],
             });
+          if (f.originBranchId !== null)
+            and.push({ originBranchId: f.originBranchId });
+          if (f.destinationBranchId !== null)
+            and.push({ destinationBranchId: f.destinationBranchId });
           const where: Prisma.TransactionWhereInput = {
             deletedAt: null,
             transactionDate: { gte: f.from, lt: f.toExclusive },
@@ -112,7 +136,7 @@ export function createTransactionReportService(
           const items = await tx.transaction.findMany({
             where,
             select,
-            orderBy: [{ transactionDate: "desc" }, { id: "desc" }],
+            orderBy: orderBy(f),
             skip: f.skip,
             take: f.take,
           });

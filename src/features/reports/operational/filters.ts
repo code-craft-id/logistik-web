@@ -24,6 +24,12 @@ export function parseOperationalFilters(
   )
     return { view, parsed: parseTransactionReportFilters(input) };
   const query = { ...input } as Record<string, unknown>;
+  if (
+    ["originBranchId", "destinationBranchId", "sortBy", "sortDirection"].some(
+      (field) => Object.hasOwn(query, field),
+    )
+  )
+    return invalid("Parameter tidak didukung.");
   if (kind === "delivery") {
     if (
       query.view !== undefined &&

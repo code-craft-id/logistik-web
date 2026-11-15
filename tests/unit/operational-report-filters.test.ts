@@ -54,3 +54,23 @@ describe("operational report query boundaries", () => {
       );
   });
 });
+
+it.each([
+  "manifest",
+  "delivery",
+  "dashboard",
+  "vendor",
+] as const)("keeps transaction-only keys out of %s reports", (kind) => {
+  for (const key of [
+    "originBranchId",
+    "destinationBranchId",
+    "sortBy",
+    "sortDirection",
+  ]) {
+    for (const value of ["1", "", undefined])
+      expect(
+        parseOperationalFilters(kind, { ...period, [key]: value }).parsed
+          .status,
+      ).toBe("invalid");
+  }
+});

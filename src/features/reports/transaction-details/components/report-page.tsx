@@ -12,7 +12,7 @@ export async function TransactionReportPage({
 }) {
   try {
     const result = await transactionReportService.read(query);
-    return <TransactionReportView result={result} />;
+    return <TransactionReportView result={result} query={query} />;
   } catch (error) {
     if (error instanceof IdentityError) {
       if (error.status === 401) redirect("/login");

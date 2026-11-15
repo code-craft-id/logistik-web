@@ -392,3 +392,150 @@ describe("RPT-01A guarded real PostgreSQL report", () => {
     expect((await service(users[1]).read(period)).total).toBe(before + 1);
   });
 });
+
+it("intersects separate endpoints and legacy OR filters with fresh membership, including administrator option validation", async () => {
+  const input = {
+    ...period,
+    search: `${tag}-endpoints`,
+    originBranchId: String(branches[0]),
+    destinationBranchId: String(branches[1]),
+    branchId: String(branches[1]),
+  };
+  const match = await record({
+    awbNo: `${tag}-endpoints-match`,
+    transactionDate: new Date("2026-11-03T00:00:00Z"),
+    originBranchId: branches[0],
+    destinationBranchId: branches[1],
+  });
+  await record({
+    awbNo: `${tag}-endpoints-reverse`,
+    transactionDate: new Date("2026-11-03T00:00:00Z"),
+    originBranchId: branches[1],
+    destinationBranchId: branches[0],
+  });
+  expect(
+    (await service(users[1]).read(input)).items.map((row) => row.id),
+  ).toEqual([match]);
+  await expect(
+    service(users[1]).read({ ...input, branchId: String(branches[2]) }),
+  ).rejects.toHaveProperty("status", 403);
+  expect(
+    (await service(users[0]).read({ ...input, branchId: String(branches[2]) }))
+      .total,
+  ).toBe(0);
+  for (const field of ["originBranchId", "destinationBranchId"]) {
+    await expect(
+      service(users[1]).read({ ...period, [field]: String(branches[2]) }),
+    ).rejects.toHaveProperty("status", 403);
+    await expect(
+      service(users[0]).read({ ...period, [field]: "2147483647" }),
+    ).rejects.toHaveProperty("status", 403);
+  }
+  await db.userAllowedBranch.deleteMany({
+    where: { userId: users[1], branchId: branches[1] },
+  });
+  try {
+    await expect(service(users[1]).read(input)).rejects.toHaveProperty(
+      "status",
+      403,
+    );
+  } finally {
+    await db.userAllowedBranch.create({
+      data: { userId: users[1], branchId: branches[1] },
+    });
+  }
+});
+
+it("sorts all nine stored fields numerically or by relation name with nulls and stable same-direction ID paging", async () => {
+  const rows = [
+    {
+      awbNo: `${tag}-sort-A`,
+      transactionDate: new Date("2026-11-03T00:00:00Z"),
+      originBranchId: branches[1],
+      destinationBranchId: branches[0],
+      senderName: "B",
+      receiverName: "A",
+      koli: 2,
+      kilo: "2",
+      status: "Open",
+    },
+    {
+      awbNo: `${tag}-sort-B`,
+      transactionDate: new Date("2026-11-02T00:00:00Z"),
+      originBranchId: branches[0],
+      destinationBranchId: branches[1],
+      senderName: "A",
+      receiverName: "B",
+      koli: 10,
+      kilo: "10",
+      status: "Cancelled",
+    },
+    {
+      awbNo: `${tag}-sort-C`,
+      transactionDate: new Date("2026-11-01T00:00:00Z"),
+      originBranchId: null,
+      destinationBranchId: branches[0],
+      senderName: null,
+      receiverName: null,
+      koli: null,
+      kilo: null,
+      status: "Delivered",
+    },
+    {
+      awbNo: `${tag}-sort-D`,
+      transactionDate: new Date("2026-11-02T00:00:00Z"),
+      originBranchId: branches[0],
+      destinationBranchId: null,
+      senderName: "A",
+      receiverName: "B",
+      koli: 10,
+      kilo: "10",
+      status: "Cancelled",
+    },
+  ];
+  const ids: number[] = [];
+  for (const row of rows) ids.push(await record(row));
+  await record({
+    ...rows[0],
+    awbNo: `${tag}-sort-hidden`,
+    originBranchId: branches[2],
+    destinationBranchId: branches[2],
+  });
+  const expectations = [
+    ["awbNo", [0, 1, 2, 3], [3, 2, 1, 0]],
+    ["transactionDate", [2, 1, 3, 0], [0, 3, 1, 2]],
+    ["originBranch", [1, 3, 0, 2], [2, 0, 3, 1]],
+    ["destinationBranch", [0, 2, 1, 3], [3, 1, 2, 0]],
+    ["senderName", [1, 3, 0, 2], [0, 3, 1, 2]],
+    ["receiverName", [0, 1, 3, 2], [3, 1, 0, 2]],
+    ["koli", [0, 1, 3, 2], [3, 1, 0, 2]],
+    ["kilo", [0, 1, 3, 2], [3, 1, 0, 2]],
+    ["status", [1, 3, 2, 0], [0, 2, 3, 1]],
+  ] as const;
+  for (const [sortBy, asc, desc] of expectations) {
+    for (const [sortDirection, order] of [
+      ["asc", asc],
+      ["desc", desc],
+    ] as const) {
+      const query = {
+        ...period,
+        search: `${tag}-sort-`,
+        sortBy,
+        sortDirection,
+      };
+      const result = await service(users[1]).read(query);
+      expect(result.total).toBe(4);
+      expect(
+        result.items.map((row) => row.id),
+        `${sortBy} ${sortDirection}`,
+      ).toEqual(order.map((index) => ids[index]));
+      const page = await service(users[1]).read({
+        ...query,
+        pageSize: "1",
+        page: "3",
+      });
+      expect(page.total).toBe(4);
+      expect(page.items.map((row) => row.id)).toEqual([ids[order[2]]]);
+    }
+  }
+});

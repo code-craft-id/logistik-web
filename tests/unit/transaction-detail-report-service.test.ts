@@ -175,3 +175,66 @@ describe("transaction report fresh scope and exact projection", () => {
     });
   });
 });
+
+it("intersects endpoint filters with legacy branch and current OR scope", async () => {
+  const result = await service().read({
+    ...period,
+    branchId: "10",
+    originBranchId: "10",
+    destinationBranchId: "20",
+    sortBy: "kilo",
+    sortDirection: "asc",
+  });
+  expect(result.state).toBe("ready");
+  expect(db.transaction.findMany.mock.calls[0][0]).toMatchObject({
+    where: {
+      AND: [
+        {
+          OR: [
+            { originBranchId: { in: [10, 20] } },
+            { destinationBranchId: { in: [10, 20] } },
+          ],
+        },
+        { OR: [{ originBranchId: 10 }, { destinationBranchId: 10 }] },
+        { originBranchId: 10 },
+        { destinationBranchId: 20 },
+      ],
+    },
+    orderBy: [{ kilo: { sort: "asc", nulls: "last" } }, { id: "asc" }],
+  });
+  expect(db.transaction.count.mock.calls[0][0].where).toEqual(
+    db.transaction.findMany.mock.calls[0][0].where,
+  );
+});
+it.each([
+  "originBranchId",
+  "destinationBranchId",
+])("denies unauthorized %s for ordinary and administrator actors", async (field) => {
+  for (const admin of [false, true]) {
+    if (admin)
+      fixture().group.permissions = [
+        { resource: "system_admin", action: "manage" },
+      ];
+    await expect(
+      service().read({ ...period, [field]: "99" }),
+    ).rejects.toHaveProperty("status", 403);
+  }
+  expect(db.transaction.findMany).not.toHaveBeenCalled();
+});
+it.each([
+  ["awbNo", { awbNo: { sort: "desc", nulls: "last" } }],
+  ["transactionDate", { transactionDate: "desc" }],
+  ["originBranch", { originBranch: { name: "desc" } }],
+  ["destinationBranch", { destinationBranch: { name: "desc" } }],
+  ["senderName", { senderName: { sort: "desc", nulls: "last" } }],
+  ["receiverName", { receiverName: { sort: "desc", nulls: "last" } }],
+  ["koli", { koli: { sort: "desc", nulls: "last" } }],
+  ["kilo", { kilo: { sort: "desc", nulls: "last" } }],
+  ["status", { status: "desc" }],
+])("uses typed %s ordering and an ID tiebreaker", async (sortBy, primary) => {
+  await service().read({ ...period, sortBy, sortDirection: "desc" });
+  expect(db.transaction.findMany.mock.calls[0][0].orderBy).toEqual([
+    primary,
+    { id: "desc" },
+  ]);
+});
