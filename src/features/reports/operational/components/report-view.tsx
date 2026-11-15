@@ -164,12 +164,51 @@ function reportTable(result: OperationalReportResult) {
     </Table>
   );
 }
+type DisplayQuery = Record<string, string | string[] | undefined>;
+/** Display recovery only; these values never authorize or execute a report query. */
+function invalidFormValues(
+  query: DisplayQuery | undefined,
+  branches: OperationalReportResult["branches"],
+) {
+  const scalar = (value: unknown, maximum: number) =>
+    typeof value === "string" && value.length <= maximum ? value : "";
+  const calendar = (value: unknown) => {
+    const text = scalar(value, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(text) || text.startsWith("0000")) return "";
+    const date = new Date(`${text}T00:00:00.000Z`);
+    return Number.isFinite(date.getTime()) &&
+      date.toISOString().slice(0, 10) === text
+      ? text
+      : "";
+  };
+  const size = scalar(query?.pageSize, 3);
+  const branch = scalar(query?.branchId, 10);
+  return {
+    startDate: calendar(query?.startDate),
+    endDate: calendar(query?.endDate),
+    search: scalar(query?.search, 50),
+    pageSize: /^[1-9]\d{0,2}$/.test(size) && Number(size) <= 100 ? size : "20",
+    branchId:
+      /^[1-9]\d{0,9}$/.test(branch) &&
+      branches.some((option) => String(option.id) === branch)
+        ? branch
+        : "",
+  };
+}
 export function OperationalReportView({
   result,
+  query,
 }: {
   result: OperationalReportResult;
+  query?: DisplayQuery;
 }) {
   const f = result.parsed.status === "valid" ? result.parsed.filters : null;
+  const display =
+    f ??
+    invalidFormValues(
+      result.state === "invalid" ? query : undefined,
+      result.branches,
+    );
   const issues = result.parsed.status === "invalid" ? result.parsed.issues : [];
   const delivery = result.kind === "sheets" || result.kind === "items";
   const dashboard = result.kind === "dashboard";
@@ -256,7 +295,7 @@ export function OperationalReportView({
                 type="date"
                 name="startDate"
                 required
-                defaultValue={f?.startDate ?? ""}
+                defaultValue={display.startDate}
                 aria-describedby="operational-period-hint"
                 className="min-h-11"
               />
@@ -268,7 +307,7 @@ export function OperationalReportView({
                 type="date"
                 name="endDate"
                 required
-                defaultValue={f?.endDate ?? ""}
+                defaultValue={display.endDate}
                 aria-describedby="operational-period-hint"
                 className="min-h-11"
               />
@@ -280,7 +319,7 @@ export function OperationalReportView({
               <select
                 id="op-branch"
                 name="branchId"
-                defaultValue={f?.branchId ?? ""}
+                defaultValue={display.branchId ?? ""}
                 className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
               >
                 <option value="">Semua cabang yang diizinkan</option>
@@ -305,7 +344,7 @@ export function OperationalReportView({
                     id="op-search"
                     name="search"
                     maxLength={50}
-                    defaultValue={f?.search ?? ""}
+                    defaultValue={display.search}
                     className="min-h-11"
                   />
                 </div>
@@ -319,7 +358,7 @@ export function OperationalReportView({
                     max={100}
                     step={1}
                     required
-                    defaultValue={f?.pageSize ?? 20}
+                    defaultValue={display.pageSize}
                     className="min-h-11"
                   />
                 </div>

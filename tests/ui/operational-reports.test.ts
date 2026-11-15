@@ -19,8 +19,11 @@ const base = {
   total: 21,
   links: { manifest: true, delivery: false, transaction: false },
 };
-const render = (result: OperationalReportResult) =>
-  renderToStaticMarkup(createElement(OperationalReportView, { result }));
+const render = (
+  result: OperationalReportResult,
+  query?: Record<string, string | string[] | undefined>,
+) =>
+  renderToStaticMarkup(createElement(OperationalReportView, { result, query }));
 it("renders scoped manifest rows with accessible filters/table and no invented Driver/money", () => {
   const html = render({
     ...base,
@@ -157,4 +160,101 @@ it("distinguishes unavailable vendor, initial, empty and invalid states", () => 
       items: [],
     }),
   ).toContain('role="alert"');
+});
+
+const invalidManifest: OperationalReportResult = {
+  ...base,
+  kind: "manifest",
+  state: "invalid",
+  parsed: {
+    status: "invalid",
+    issues: [{ field: "endDate", message: "Periode maksimal 31 hari." }],
+  },
+  items: [],
+  total: 0,
+};
+function formValues(html: string) {
+  const host = document.createElement("div");
+  host.innerHTML = html;
+  return {
+    start: host.querySelector<HTMLInputElement>('input[name="startDate"]')
+      ?.value,
+    end: host.querySelector<HTMLInputElement>('input[name="endDate"]')?.value,
+    search: host.querySelector<HTMLInputElement>('input[name="search"]')?.value,
+    branch: host.querySelector<HTMLSelectElement>('select[name="branchId"]')
+      ?.value,
+    size: host.querySelector<HTMLInputElement>('input[name="pageSize"]')?.value,
+  };
+}
+it("preserves safe input values on a fresh invalid SSR without treating the range as valid", () => {
+  const html = render(invalidManifest, {
+    startDate: "2026-11-01",
+    endDate: "2026-12-02",
+    search: "NO_MATCH",
+    branchId: "1",
+    pageSize: "1",
+  });
+  expect(formValues(html)).toEqual({
+    start: "2026-11-01",
+    end: "2026-12-02",
+    search: "NO_MATCH",
+    branch: "1",
+    size: "1",
+  });
+  expect(html).toContain('role="alert"');
+  expect(html).not.toContain("<table");
+});
+it("does not reflect malformed, duplicate, oversized, forged or unknown query values", () => {
+  for (const query of [
+    {
+      startDate: "2026-02-30",
+      endDate: "<date>",
+      search: ["DUPLICATE_SECRET"],
+      branchId: "999",
+      pageSize: "01",
+      password: "UNKNOWN_SECRET",
+    },
+    {
+      startDate: ["2026-11-01"],
+      endDate: ["2026-11-15"],
+      search: "OVERSIZED_SECRET".repeat(4),
+      branchId: ["1"],
+      pageSize: ["1"],
+      token: "UNKNOWN_SECRET",
+    },
+  ]) {
+    const html = render(invalidManifest, query);
+    expect(formValues(html)).toEqual({
+      start: "",
+      end: "",
+      search: "",
+      branch: "",
+      size: "20",
+    });
+    expect(html).not.toMatch(
+      /DUPLICATE_SECRET|OVERSIZED_SECRET|UNKNOWN_SECRET|value="999"|2026-02-30/,
+    );
+    expect(html).toContain('role="alert"');
+    expect(html).not.toContain("<table");
+  }
+});
+it("uses normalized service filters rather than display-only query on valid results", () => {
+  const html = render(
+    { ...base, kind: "manifest", items: [], total: 0 },
+    {
+      startDate: "2030-01-01",
+      endDate: "2030-01-02",
+      branchId: "1",
+      search: "RAW_QUERY",
+      pageSize: "1",
+    },
+  );
+  expect(formValues(html)).toEqual({
+    start: "2026-11-01",
+    end: "2026-11-15",
+    search: "",
+    branch: "",
+    size: "20",
+  });
+  expect(html).not.toContain("RAW_QUERY");
 });

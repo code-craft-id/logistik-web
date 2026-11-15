@@ -17,6 +17,7 @@ export async function OperationalReportPage({
     return (
       <OperationalReportView
         result={await operationalReportService.read(kind, query)}
+        query={query}
       />
     );
   } catch (error) {
