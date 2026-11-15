@@ -58,3 +58,7 @@ Parameter strings prove visible link mapping only, not backend filtering, status
 UNVERIFIED: authoritative customer amount/currency/components, source grouping, invoice number/date rules, payment allocation/correction history, approval authority/posting rules. No rule has been confirmed by this observation and no dependent runtime becomes READY.
 
 Next consolidated choice: (A) establish an explicit target FIN01 billing/payment contract with the project/finance owner and reconciled synthetic examples, then implement one approved slice; or (B) defer runtime until actual business definitions/example become available. Recommend A to advance without fabricating parity. Choosing that direction alone would NOT approve an amount/formula/state machine/permission; the concrete contract still needs actual adoption. No repeated request for the user to locate pages or a populated legacy period.
+
+## Target-contract direction selected
+
+Owner answered **“A — Kontrak target FIN-01”** to the bounded target-contract-vs-defer question. This authorizes a concrete proposal, not financial rules/runtime. The reviewable P1–P5 candidate and synthetic reconciliation are in [FIN-01-contract.md](FIN-01-contract.md), status PROPOSED. It uses manual declared final customer charges instead of asserting the meaning of Transaction.biaya, direct source references instead of a nonexistent event producer, explicit ownership and immutable receipt corrections. Independent consistency QA and one actual adoption/correction decision precede runtime.
