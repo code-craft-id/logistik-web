@@ -1,3 +1,15 @@
+# Current approval and review disposition — 2026-11-15
+
+- SUP-01 Option A business/security scope approved by user; bounded D16/FR07 and explicitly local ID/UTC/D19/D22 acceptance only. Lifecycle/status/approval/files remain deferred; no global confirmation.
+- User is migration coordinator and explicitly approved the concrete one-table/additive-model design, no production migration authority. This supersedes earlier current-looking coordinator identity/model-approval gaps.
+- Actual Dev1 is Ardiputra614 (Ardianto Putra Pratomo), identified through user guidance and repo/profile/Dev1 PR8 evidence. PR10 OPEN at5bc8387, reviewer request verified and REVIEW_REQUIRED. Mandatory review is requested, not supplied by subagent or repo-admin status.
+- MCP smoke and authenticated current-origin snapshot PASS; one targeted SUP gap check found no scope/history oracle. A remains an approved target policy. No further replay of accepted DISC04 or identical views.
+- Existing SUP contract owns the model/create-read/idempotency/predicate packet. Independent SolHigh documentation QA PASS. No runtime/schema/migration or app-test completion claimed. Next: consume Dev1 review then execute approved core slice.
+
+# Current bounded approval update — 2026-11-15
+
+Project owner selected Option A in the consolidated SUP-01 request: own-created tickets in currently allowed branches for create/list/detail, labelled internal ID/UTC creation time, later lifecycle/files/unsupported fields deferred. PRD FR-07/D-16 records CONFIRMED bounded create/read scope; remaining D-16 rules are TBD. D-19 and D-22 are accepted only for the explicitly described local display/omissions; global policies remain open. Actual Dev1 permission/admin-scope and migration-coordinator model review remain pending. This supersedes historical blanket D16-TBD/no-owner-choice statements below only for the accepted bounded scope. No new runtime, human cross-domain review or legacy visibility evidence is claimed.
+
 # Dev 3 decisions: legacy parity evidence and approval
 
 Current ticket disposition: DISC-04 **DONE WITH NOTES**, accepted by project owner on2026-11-15 Asia/Bangkok for available evidence including gaps (DISC-04.md closure). This changes the discovery deliverable gate only. Formal D11–16/D19/D21 remainTBD,D24PARTIAL; observations/unknowns unchanged. Prior assertions that missing financial formulas prevent DISC04 closure are superseded by this bounded acceptance. Remaining questions attach to dependent feature behavior, not a global discovery blocker.
@@ -92,3 +104,9 @@ Discovery acceptance does not approve the proposed SUP model/permission inventor
 Requirements and source specialists verified the existing proposal without reopening DISC04. List/detail may be approved independently of later assignment/resolution/reopen rules. Current blocker is **D-16 bounded read semantics and record visibility**, plus Dev1 read-grant/admin-scope review and coordinator model/population review; D-19 only where selecting date/locale conventions. The completed review packet and conditional tests are in docs/decisions/SUP-01-contract.md. Agent technical review does not confirm D-16 or supply stakeholder signatures.
 
 No runtime Dev3 ticket is currently READY. PR9 MERGED/APPROVED and main c406502 were reverified; OPS03 remains partial, OPS04 proposal remains non-emitted. No new legacy evidence, runtime authority or import authorization. Next executable action is normal owner review of that concrete packet; once bounded adoption and model/auth approvals are recorded, select the first list/detail vertical slice. Do not require full later lifecycle approval to implement an independently accepted read contract.
+
+## Autonomous resolution protocol / current SUP recommendation (2026-11-15)
+
+For all subsequent Dev3 decisions: Lead resolves technical matters in approved scope, reuses verified evidence, proposes 2–3 feasible options and one recommendation for real business/security gaps, consolidates one owner request, and keeps cross-domain human review distinct from agent QA. Do not repeat unchanged blockers or spawn reconfirmation agents. Recommendations remain unapproved until traceable human acceptance.
+
+Current single packet: docs/decisions/SUP-01-contract.md, Lead decision packet. Recommended A creates/lists/reads minimal observed ticket fields with creator-only+allowed-branch access; B broadens ordinary visibility to shared allowed branches; C requires a legitimate populated read source. The functional create path resolves prior read-only population dependency without importing private data. D-16 access/create policy and scoped migration differences remain TBD; technical bounds/order/inert text decisions are Lead choices. Prior QA applies only to the previous packet. Await one scoped owner choice plus real Dev1/coordinator review; no runtime authority or D-ID confirmation inferred.
