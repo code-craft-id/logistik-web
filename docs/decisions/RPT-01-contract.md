@@ -38,8 +38,10 @@ No schema/migration or production operation is proposed.
 security/boundary/reconciliation tests, independent QA and quality gates; commit and
 push this feature branch. No new PR, merge or deployment.
 
-**Independent progress:** finalize this mapping, synthetic acceptance cases and plan;
-independent review of the packet. No report runtime or DB changes before required reviews.
+**Independent progress:** approved date/AWB/page validation can be implemented and tested
+as an unconnected pure module without consuming Dev2 data or changing Dev1 contracts.
+No query, permission registration, source DTO or report route is wired before required
+reviews. This is preparation within the same vertical slice, not a second ticket.
 
 ## Proposed bounded contract
 
@@ -130,18 +132,20 @@ each subsequent page is a new snapshot and may reflect legitimate source changes
 Pinned project Prisma is7.10.1. Context7 resolution `/prisma/web` returned newer API
 material; do not copy its `db.orm`/`db.transaction` v8 calls. Versioned official Prisma
 [sequential transaction docs](https://github.com/prisma/web/blob/v6/content/200-orm/200-prisma-client/100-queries/058-transactions.mdx)
-describe `$transaction([...], { isolationLevel })`; verify compatibility against installed
-7.10.1 client declarations before implementation. Installed Next16.4.2 docs govern
+describe `$transaction([...], { isolationLevel })`; compatibility confirmed against installed
+7.10.1 generated `internal/class.ts:183` and `internal/prismaNamespace.ts:4726` (`RepeatableRead`). Installed Next16.4.2 `page.md` docs govern
 route/searchParams/cache behavior. No verification run or test PASS is claimed by this
 proposed design. SUP checks remain anchored to their earlier code SHA only.
 
 ## Approval record
 
 - Business D-15/D-19/D-22 subset: **APPROVED OPTION A**, user/project owner/migration coordinator explicitly answered the consolidated request on2026-11-15: “A — Sembilan kolom bersumber nyata (rekomendasi)”. The full request included the nine fields, UTC/31-day dates, all stored statuses including Cancelled, deleted exclusion, filters and deferred features. Task-local explicit approval; no additional name/identity approval is requested or inferred. Global decisions remain open outside this subset.
-- Dev2 source contract review: **PENDING**.
-- Dev1 permission/scope review: **PENDING**.
+- Dev2 source contract review: **PENDING**, [requested](https://github.com/code-craft-id/logistik-web/pull/9#issuecomment-6888823469) against caefd2c.
+- Dev1 permission/scope review: **PENDING**, [requested](https://github.com/code-craft-id/logistik-web/pull/10#issuecomment-6888823788) against caefd2c.
 - Independent packet QA: **PASS**, read-only qa_reviewer on2026-11-15, noP0/P1/P2.
   Two technical clarifications (exact page/offset bound and branch option sets) incorporated;
   this is not human approval. No runtime/tests were reviewed or executed.
-- Implementation/tests: **NOT STARTED**, gated on the above mandatory human decisions.
+- Pure filter preparation **IMPLEMENTED / VERIFIED** at64d9ea2:57focusedtests, lint2,
+  typecheck and independent focusedQA PASS. [Actual checks/limits](evidence/rpt-01/verification.md).
+  Connected report implementation/tests remain **NOT STARTED**, gated on mandatory owner reviews.
 - SUP-01A remains IMPLEMENTED + LOCAL VERIFIED; full SUP-01 remains PARTIAL.

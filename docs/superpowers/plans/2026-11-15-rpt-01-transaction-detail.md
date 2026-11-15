@@ -13,7 +13,7 @@
 ## Global constraints
 
 - One bounded end-to-end slice, one implementation writer; lead alone edits shared checkpoint/design/PRD/ROADMAP files.
-- No implementation before actual human Dev1 report-permission/scope and Dev2 source reviews. Agent review is not their approval.
+- No query/permission/DTO/route implementation before actual human Dev1 report-permission/scope and Dev2 source reviews. Independent pure filter validation may proceed under approved OptionA without touching those contracts. Agent review is not their approval.
 - No new PR until all agreed Dev3 work finishes; push focused feature commits, no merge/deploy.
 - No legacy/production DB operations, exports, finance, unsupported field inference or schema migration.
 - SUP-01A remains implemented/local verified; full SUP PARTIAL, do not reopen its tests/approvals.
@@ -43,6 +43,7 @@
 - [x] Source/requirements investigations completed independently, no repeated legacy discovery.
 - [x] One consolidated human decision received: OptionA D15/D19/D22 bounded adoption.
 - [x] Independent packetQA PASS; page/branch technical clarifications incorporated.
+- [x] Independent preparation: TDD pure `filters.ts` + `tests/unit/transaction-detail-report-filters.test.ts`, no DB/auth/route/DTO imports. Code64d9ea2;57tests/Biome2/typecheckPASS; independentfocusedQA PASS noP0/P1/P2. Lead owns all other paths until owner reviews arrive.
 - [ ] Actual Dev1 report inventory/navigation/scope review recorded with URL/SHA.
 - [ ] Actual Dev2 nine-field/date/currentstatus/branch mapping review recorded with URL/SHA.
 - [ ] Lead updates STATE allowed paths/owner/acceptance and delegates implementation_worker in this isolated branch/worktree.
@@ -60,3 +61,5 @@
 ## Execution ledger
 
 2026-11-15: baseline9b41f1f, mainc406502 verified ancestor. Branch created in existing isolated worktree, preserves completed SUP01A commits for eventual combined review. Design/business approved; independent packet review PASS. No runtime implementation or tests started while required owner reviews pending.
+
+2026-11-15: independently executable pure filter preparation completed at64d9ea24e38a96338c8ba45ca64724f2e2399e74; RED55expectedfail/2initialpass -> GREEN57PASS; lint2/typecheckPASS; independent codeQA PASS. This unconnected module adds no report authorization/query/DTO/route. Human Dev1/Dev2 contract reviews remain pending; connected steps above deliberately unexecuted. [Evidence](../../decisions/evidence/rpt-01/verification.md).
