@@ -79,8 +79,8 @@ One owner per ticket. Every ticket specifies FE, server, schema impact, authoriz
 | OPS-02 | 2 | Dev 2 | Shipment status, tracking, history | OPS-01 | D-07 |
 | OPS-03 | 3 | Dev 2 | Manifest (transit, inbound, outbound) and delivery flow | OPS-02, PLT-03 | D-08, D-09 |
 | OPS-04 | 4 | Dev 2 | Fee/vendor reference validation and shipment billing event contract | OPS-03 | D-11 |
-| SUP-01 | 2 | Dev 3 | Ticket CRUD/lifecycle with role/branch authorization. **BOUNDED CORE IMPLEMENTED / LOCALLY VERIFIED (2026-11-15):** create/list/detail, creator/current-branch scope, admin rules and idempotency. [Checks/limits](decisions/evidence/sup-01-core/verification.md). Explicit Dev1 contract accepted; full lifecycle remains deferred/PARTIAL. Staging/final human code acceptance pending; new PR deferred by owner until all agreed Dev3 work finished. | PLT-01, accepted DISC-04 (evidence branch not yet merged) | D-16 bounded record PARTIAL; remaining rules TBD |
-| RPT-01 | 2 | Dev 3 | Transaction Detail Report. **RPT-01A IMPLEMENTED + LOCAL VERIFIED (2026-11-15):** nine sourced non-financial columns, UTC31-day period, literal AWB50/branch filters, scoped paging/snapshot. [Evidence and limits](decisions/evidence/rpt-01/verification.md). Full ticket PARTIAL: remaining columns/filters/export/finance deferred. Owner defers Dev1/Dev2 code review to final combined Dev3 PR; no pre-implementation gate or new PR now. | Merged OPS-01 source; accepted DISC04; owner-selected bounded OptionA | D-15/D-19/D-22 task-local selection; formal named record PARTIAL; final code/release acceptance deferred |
+| SUP-01 | 2 | Dev 3 | **DONE — owner-accepted v1 (2026-11-15):** ticket create/list/detail, creator/current-branch access, administrator rules and idempotency, locally verified. [Closure/follow-ups](decisions/DEV3-V1-CLOSURE.md). Lifecycle and extensions moved to SUP-02/SUP-03; pre-merge findings remain DEV3-HARD-01. Final review/staging/release separate; no new PR now. | PLT-01, accepted DISC-04 | D-16 accepted v1 scope; wider rules/formal record retain actual statuses |
+| RPT-01 | 2 | Dev 3 | **DONE — owner-accepted v1 (2026-11-15):** nine sourced non-financial columns, UTC31-day period, branch/literalAWB50 filters, scoped paging/snapshot, locally verified. [Closure/follow-ups](decisions/DEV3-V1-CLOSURE.md). Remaining columns/filters/export moved to RPT-03/RPT-04; final review/staging/release separate. | Merged OPS-01 source; accepted DISC04; owner-selected v1 | D-15/D-19/D-22 accepted v1 selection; wider rules/formal record retain actual statuses |
 | RPT-02 | 3 | Dev 3 | Manifest, delivery, vendor, and dashboard reports | OPS-03 | D-15 |
 | FIN-01 | 4 | Dev 3 | Invoice and payment workflows | OPS-01, OPS-04, DISC-04 | D-11, D-12, D-21 |
 | FIN-02 | 5 | Dev 3 | Ledger, categories, P&L, gross profit and recap with reconciled formulas | FIN-01 | D-13, D-14 |
@@ -111,3 +111,15 @@ The historical [implementation matrix](experiments/legacy-crud-integration.md) s
 | Losing access to the provider app: side-by-side checks need a stable way to run it and archived sample documents | Secure a test account or sandbox and archive screens and sample documents early (D-29) |
 | Skipping Phase 0 gates: starting PLT-01 before D-03 and D-04 means guessing the permission model | Gate before PLT-01 (section 4) |
 | Uneven workload: Dev 3 scope may exceed one person's capacity | Adjust phase priorities or move bounded features to another dev, keeping one owner per feature |
+
+### Owner-accepted v1 closure and separate follow-ups (2026-11-15)
+
+SUP-01 and RPT-01 are DONE by explicit owner acceptance of delivered/local-verified v1, superseding earlier full-ticket PARTIAL labels. Future enhancements and final review remain separate; see [scope/evidence/recommendations](decisions/DEV3-V1-CLOSURE.md). No unknown behavior is asserted implemented. No Dev1/Dev2 pre-implementation gate or new PR now.
+
+| ID | Phase | Owner | Deliverable | Requires | Decisions |
+| --- | --- | --- | --- | --- | --- |
+| SUP-02 | 5 | Dev3 | Follow-up: lifecycle/assignment/comments/history and approved edit/delete | SUP-01; targeted existing evidence or scoped business choice | D-16 later rules TBD |
+| SUP-03 | 5 | Dev3 | Follow-up: secure attachments and adopted category/AWB/customer links | SUP-01; storage/privacy/source definitions | D-16/D-25/D-22 subset |
+| RPT-03 | 5 | Dev3 | Follow-up: additional sourced transaction columns/filters/sorting | RPT-01; real source mappings | D-15 subset |
+| RPT-04 | 5 | Dev3 | Follow-up: bounded authorized non-financial export | RPT-01; selected format/access/limits | D-15 export subset |
+| DEV3-HARD-01 | 6 | Dev3 | Final hardening/review queue, required pre-merge fixes and staging evidence | Completed agreed Dev3 slices | Existing review/release gates; no development approval gate |
