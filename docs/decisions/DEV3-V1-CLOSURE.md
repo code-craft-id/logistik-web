@@ -37,3 +37,6 @@ verify current origin/session, user-only login if needed, no mutations/JS/API/ex
 If behavior is absent from the inspected view, record that bounded absence, not global
 absence. Provide a suitable recommendation with observed/proposed/approved separated.
 No additional legacy visit is needed merely to accept these already-verified v1 scopes.
+
+## Owner follow-up disposition —2026-11-15
+Explicit owner packet A closes SUP-02/SUP-03/RPT-05 as NOT NEEDED for current migration scope, and unsupported RPT-03 headers CLOSED WITH NOTES. RPT-03 sourced filters/sorting and RPT-04 capped permissioned CSV are approved pending implementation/verification. This supersedes the earlier backlog recommendations for this scope only, never claims unimplemented behavior delivered or global legacy absence. See [approved packet and evidence](DEV3-SUP-RPT-FOLLOWUPS.md).
