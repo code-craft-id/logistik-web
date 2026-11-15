@@ -46,3 +46,9 @@ schema/dependency/lifecycle/financial posting rule. Full Dev3 completion is not 
 unknown report/finance rules still need business evidence/decisions, not invention.
 
 DEV3-HARD-01 now tracks this final review queue separately from the DONE v1 tickets. Required before-merge findings stay open. [Scope closure](DEV3-V1-CLOSURE.md).
+
+## RPT-02 source-backed v1
+
+DONE development/local verification at code9b76457: real manifest/DRS/item reports and raw dashboard counts. Final Dev1 report-permission/query code review and Dev2 source/date/intersection semantics review queued here, no development gate. Actual full/scoped agentQA and565unit/119DB/build/local responsive/security proof PASS. Source/cardinality/population for real vendor attribution is RPT-05, not implemented by the readiness page; OPS-03 generation and legacy aggregates remain separate.
+
+Final hardening diagnostic: pg8.23 queued-client.query deprecation observed during integration/local use, no functional failure, isolated trace did not reproduce. Exact producer unproven; investigate adapter/driver compatibility with a reproducible case before any pg9 upgrade, no speculative dependency patch. Current pinned version and sequential report service calls retained. Staging/final human acceptance still required, no merge/deploy claim.
