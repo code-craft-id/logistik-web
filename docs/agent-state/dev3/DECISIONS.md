@@ -18,3 +18,5 @@ draft models, agent review or general implementation authorization.
 
 ## Adoption 2026-11-15
 Owner answered Adopt A+B as written. Prior pending entries above are historical. D-11/D-21 PARTIAL (bounded finance adopted, broader TBD); D-12/D-13/D-14 CONFIRMED only for adopted contracts. See updated PRD and FIN-01/FIN-02 contracts. No release approval implied.
+
+Implementation disposition: all A+B business rules implemented within v1 target. No transfer of cost ownership or historical finance import inferred. Operational account mappings still require real finance configuration; first posting fails closed without valid mappings. Dev2 updated_at default drift is a coordinator integration item, not a confirmed finance-policy change.

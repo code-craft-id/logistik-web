@@ -58,6 +58,7 @@ export const invoiceCommand = z.discriminatedUnion("action", [
     reference: z.string().trim().max(160),
     note: z.string().trim().max(500),
     cashAccountId: id,
+    cashflowCategoryId: id,
   }),
   z.object({
     ...base,

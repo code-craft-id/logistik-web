@@ -245,22 +245,65 @@ const leaf = (item: LegacyItem): NavigationLeaf => {
 };
 export const navigation: readonly NavigationGroup[] = [
   ...legacyMenu.map(
-    (item: LegacyItem): NavigationGroup => ({
-      ...leaf(item),
-      ...(item.children
+    (item: LegacyItem): NavigationGroup =>
+      item.label === "Akunting"
         ? {
-            entries: item.children.map((child) =>
-              child.children
-                ? {
-                    label: child.label,
-                    providerPath: [child.label],
-                    items: child.children.map(leaf),
-                  }
-                : leaf(child),
-            ),
+            label: item.label,
+            providerLabel: item.label,
+            entries: [
+              {
+                label: "Ikhtisar akuntansi",
+                providerLabel: "Ikhtisar akuntansi",
+                href: "/finance/accounting",
+              },
+              {
+                label: "Invoice",
+                providerLabel: "Invoice",
+                href: "/finance/invoices",
+              },
+              {
+                label: "Akun & kategori",
+                providerLabel: "Akun & kategori",
+                href: "/finance/accounting/accounts",
+              },
+              {
+                label: "Jurnal",
+                providerLabel: "Jurnal",
+                href: "/finance/accounting/journals",
+              },
+              {
+                label: "Biaya aktual",
+                providerLabel: "Biaya aktual",
+                href: "/finance/accounting/costs",
+              },
+              {
+                label: "Periode",
+                providerLabel: "Periode",
+                href: "/finance/accounting/periods",
+              },
+              {
+                label: "P&L, GP & arus kas",
+                providerLabel: "P&L, GP & arus kas",
+                href: "/finance/accounting/reports",
+              },
+            ],
           }
-        : {}),
-    }),
+        : {
+            ...leaf(item),
+            ...(item.children
+              ? {
+                  entries: item.children.map((child) =>
+                    child.children
+                      ? {
+                          label: child.label,
+                          providerPath: [child.label],
+                          items: child.children.map(leaf),
+                        }
+                      : leaf(child),
+                  ),
+                }
+              : {}),
+          },
   ),
   {
     label: "More previews",
@@ -268,6 +311,7 @@ export const navigation: readonly NavigationGroup[] = [
     entries: implementedPreviewRoutes
       .filter(
         (item) =>
+          !item.href.startsWith("/finance/") &&
           !legacyMenu.some(
             (group: LegacyItem) =>
               (group.href &&
@@ -361,12 +405,38 @@ export function navigationPath(
   pathname: string,
   groups: readonly NavigationGroup[] = navigation,
 ) {
+  const financeRoot = !navigationDestinations(groups).some(
+    ({ item }) => item.href === pathname,
+  )
+    ? ["/finance/invoices", "/finance/accounting"].find((root) =>
+        pathname.startsWith(`${root}/`),
+      )
+    : undefined;
+  const financeLabels: Record<string, string> = {
+    accounts: "Akun & kategori",
+    journals: "Jurnal",
+    costs: "Biaya aktual",
+    periods: "Periode",
+    reports: "Laporan keuangan",
+    new: "Buat invoice",
+  };
+  const suffix = financeRoot
+    ? [
+        financeLabels[pathname.slice(financeRoot.length + 1)] ??
+          "Detail invoice",
+      ]
+    : [];
+  if (financeRoot) pathname = financeRoot;
   for (const group of groups) {
-    if (group.href === pathname) return { group, labels: [group.label] };
+    if (group.href === pathname)
+      return { group, labels: [group.label, ...suffix] };
     for (const entry of navigationEntries(group)) {
       if (!isNavigationSection(entry)) {
         if (entry.href === pathname)
-          return { group, labels: [group.providerLabel, entry.providerLabel] };
+          return {
+            group,
+            labels: [group.providerLabel, entry.providerLabel, ...suffix],
+          };
         continue;
       }
       const section = entry;
@@ -379,6 +449,7 @@ export function navigationPath(
             group.providerLabel,
             ...section.providerPath,
             leaf.providerLabel,
+            ...suffix,
           ],
         };
     }

@@ -428,6 +428,7 @@ export function AppShell({
           "/vendor",
           "/shipment-status",
           "/ticketting",
+          "/finance",
           "/branch-reports/transaction-details",
           "/branch-reports/manifest-outbound",
           "/branch-reports/manifest-vendor",

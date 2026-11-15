@@ -1,4 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { accessibleNavigation } from "../../src/components/shell/accessible-navigation";
+import {
+  navigationDestinations,
+  navigationPath,
+} from "../../src/components/shell/navigation";
 import {
   date,
   invoiceCommand,
@@ -7,6 +12,42 @@ import {
 } from "../../src/features/finance/contracts";
 
 describe("adopted finance input", () => {
+  it("links only granted finance pages under Akunting and resolves the active detail path", () => {
+    const actor = {
+      id: 1,
+      status: "ACTIVE",
+      branchIds: [1],
+      group: {
+        id: 1,
+        name: "FAKE",
+        status: "ACTIVE",
+        deletedAt: null,
+        permissions: [{ resource: "invoice", action: "view" }],
+      },
+    };
+    const groups = accessibleNavigation(actor);
+    const hrefs = navigationDestinations(groups)
+      .map(({ item }) => item.href)
+      .filter((p) => p?.startsWith("/finance/"));
+    expect(hrefs).toEqual(["/finance/invoices"]);
+    expect(navigationPath("/finance/invoices/123", groups)?.labels).toEqual([
+      "Akunting",
+      "Invoice",
+      "Detail invoice",
+    ]);
+    actor.group.permissions = [
+      { resource: "financial_report", action: "view" },
+    ];
+    const reports = accessibleNavigation(actor);
+    expect(
+      navigationPath("/finance/accounting/reports", reports)?.labels,
+    ).toEqual(["Akunting", "P&L, GP & arus kas"]);
+    expect(
+      navigationDestinations(accessibleNavigation(null)).some(({ item }) =>
+        item.href?.startsWith("/finance/"),
+      ),
+    ).toBe(false);
+  });
   it("keeps exact scale and rejects excess precision, overflow, exponent and nonpositive amounts", () => {
     expect(money.parse("0.10")).toBe("0.10");
     expect(sum(["0.10", "0.20"]).toFixed(2)).toBe("0.30");

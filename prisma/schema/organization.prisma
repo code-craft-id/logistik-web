@@ -48,6 +48,10 @@ model Office {
 }
 
 model Branch {
+  finMappings FinMapping[]
+  finJournals FinJournal[]
+  finCostStates FinCostState[]
+  finClosedPeriods FinClosedPeriod[]
   finInvoices FinInvoice[]
   finCommands FinCommand[]
   customers           Customer[]

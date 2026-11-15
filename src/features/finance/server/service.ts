@@ -1,4 +1,5 @@
 import "server-only";
+import { z } from "zod";
 import {
   type AccessActor,
   isAdministrator,
@@ -11,7 +12,14 @@ import {
   loadAccessActor,
 } from "@/features/identity/server/access";
 import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
+import { accountingCommand } from "../accounting-contracts";
 import { asDate, day, id, invoiceCommand, listInput, sum } from "../contracts";
+import {
+  accountingWrite,
+  invoicePosting,
+  receiptPosting,
+  reverseSource,
+} from "./accounting";
 
 type Tx = Prisma.TransactionClient;
 const fail = (message: string): never => {
@@ -20,11 +28,19 @@ const fail = (message: string): never => {
 const include = { items: true, receipts: { orderBy: { id: "asc" as const } } };
 type Invoice = Prisma.FinInvoiceGetPayload<{ include: typeof include }>;
 export function invoiceDTO(row: Invoice, payments = true) {
+  const snapshot = row.snapshot as {
+    customer?: { name?: string };
+    branch?: { name?: string };
+    sources?: { transactionId: number; awbNo: string | null }[];
+  } | null;
   const net = sum(
     row.receipts.map((r) => (r.reversalOfId ? r.amount.negated() : r.amount)),
   );
   return {
     ...row,
+    issuedCustomerName: snapshot?.customer?.name ?? null,
+    issuedBranchName: snapshot?.branch?.name ?? null,
+    issuedSources: snapshot?.sources ?? [],
     total: row.total.toFixed(2),
     invoiceDate: day(row.invoiceDate),
     dueDate: day(row.dueDate),
@@ -146,15 +162,19 @@ export function createFinanceService(
   return {
     // Short finance writes serialize with each other; identity writers use the existing policy lock.
     async execute(input: unknown) {
-      const data = invoiceCommand.parse(input);
+      const data = z.union([invoiceCommand, accountingCommand]).parse(input);
       const [resource, action] = data.action.split(".");
-      const initial = await actor(db, resource, action);
+      const permission =
+        resource === "journal" && ["expense", "transfer"].includes(action)
+          ? "post"
+          : action;
+      const initial = await actor(db, resource, permission);
       return db.$transaction(
         async (tx) => {
           await tx.$executeRaw`SET LOCAL lock_timeout = '5s'`;
           await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock_shared(71642, 1)`;
           await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(71643, 1)`;
-          const current = await actor(tx, resource, action, initial.id);
+          const current = await actor(tx, resource, permission, initial.id);
           const previous = await tx.finCommand.findUnique({
             where: { actorId_key: { actorId: current.id, key: data.key } },
           });
@@ -166,6 +186,20 @@ export function createFinanceService(
             )
               fail("Kunci pengiriman digunakan untuk isi berbeda.");
             return previous.result as { id: number };
+          }
+          if (isAccounting(data)) {
+            const result = await accountingWrite(tx, current, data);
+            await tx.finCommand.create({
+              data: {
+                actorId: current.id,
+                key: data.key,
+                action: data.action,
+                branchId: result.branchId,
+                payload: JSON.parse(JSON.stringify(data)),
+                result: { id: result.id },
+              },
+            });
+            return { id: result.id };
           }
           let resultId: number;
           let branchId: number;
@@ -272,6 +306,7 @@ export function createFinanceService(
                   },
                 },
               });
+              await invoicePosting(tx, row.id);
             } else {
               if (row.status === "VOID") fail("Invoice telah dibatalkan.");
               if (
@@ -282,6 +317,15 @@ export function createFinanceService(
                 ).eq(0)
               )
                 fail("Balikkan semua pembayaran dahulu.");
+              if (row.status === "ISSUED")
+                await reverseSource(
+                  tx,
+                  `invoice:${row.id}`,
+                  data.accountingDate,
+                  data.reason,
+                  "INVOICE_VOID",
+                  row.id,
+                );
               await tx.finInvoice.update({
                 where: { id: row.id },
                 data: { status: "VOID", revision: { increment: 1 } },
@@ -294,6 +338,7 @@ export function createFinanceService(
             resultId = row.id;
           } else if (data.action === "payment.create") {
             const row = await invoice(tx, current, data.invoiceId);
+            await branch(tx, current, row.branchId);
             if (row.status !== "ISSUED")
               fail("Pembayaran memerlukan invoice terbit.");
             const balance = row.total.minus(
@@ -317,6 +362,12 @@ export function createFinanceService(
                 },
               })
             ).id;
+            await receiptPosting(
+              tx,
+              resultId,
+              data.cashAccountId,
+              data.cashflowCategoryId,
+            );
             branchId = row.branchId;
           } else {
             const original = await tx.finReceipt.findUnique({
@@ -344,6 +395,14 @@ export function createFinanceService(
                 },
               })
             ).id;
+            await reverseSource(
+              tx,
+              `receipt:${original.id}`,
+              data.accountingDate,
+              data.reason,
+              "RECEIPT_REVERSAL",
+              resultId,
+            );
             branchId = row.branchId;
           }
           const result = { id: resultId };
@@ -412,16 +471,31 @@ export function createFinanceService(
                       },
                     ]
                   : []),
+                ...(payments
+                  ? row.receipts.map((r) => ({
+                      action: "payment.reverse",
+                      result: { path: ["id"], equals: r.id },
+                    }))
+                  : []),
               ],
             },
-            select: { id: true, actorId: true, action: true, createdAt: true },
-            orderBy: { id: "asc" },
+            select: {
+              id: true,
+              actorId: true,
+              action: true,
+              createdAt: true,
+              payload: true,
+            },
+            orderBy: { id: "desc" },
             take: 200,
           });
           return {
             ...invoiceDTO(row, payments),
             audit: audit.map((r) => ({
-              ...r,
+              id: r.id,
+              actorId: r.actorId,
+              action: r.action,
+              reason: (r.payload as { reason?: string }).reason ?? null,
               createdAt: r.createdAt.toISOString(),
             })),
           };
@@ -518,4 +592,11 @@ function sameJSON(a: unknown, b: unknown): boolean {
         : value,
     );
   return stable(a) === stable(b);
+}
+function isAccounting(
+  data: z.infer<typeof invoiceCommand> | z.infer<typeof accountingCommand>,
+): data is z.infer<typeof accountingCommand> {
+  return (
+    !data.action.startsWith("invoice.") && !data.action.startsWith("payment.")
+  );
 }

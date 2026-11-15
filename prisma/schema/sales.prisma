@@ -140,6 +140,8 @@ model Booking {
 
 /// Transaction/AWB - operational document. Idempotent creation required (AC-02).
 model Transaction {
+  finLines FinLine[]
+  finCostState FinCostState?
   finInvoiceItems FinInvoiceItem[]
   finReservation FinReservation?
   id                    Int                        @id @default(autoincrement())

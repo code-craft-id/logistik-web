@@ -15,6 +15,19 @@ import {
 
 // A route enters this inventory only when its workflow is implemented.
 const routeResources: Record<string, readonly string[]> = {
+  "/finance/invoices": ["invoice"],
+  "/finance/accounting": [
+    "finance_account",
+    "journal",
+    "finance_cost",
+    "finance_period",
+    "financial_report",
+  ],
+  "/finance/accounting/accounts": ["finance_account"],
+  "/finance/accounting/journals": ["journal"],
+  "/finance/accounting/costs": ["finance_cost"],
+  "/finance/accounting/periods": ["finance_period"],
+  "/finance/accounting/reports": ["financial_report"],
   "/dashboard": ["dashboard_report"],
   "/branch-reports/manifest-outbound": ["manifest_report"],
   "/branch-reports/delivery": ["delivery_report"],

@@ -1,20 +1,21 @@
-# Dev3 finance state
+# Dev3 finance state — final verification
 
-2026-11-15. Worktree C:/Users/Administrator/.codex/worktrees/fin-01-ready/logistik-web;
-branch feat/fin-01-billing-contract. Owner explicitly answered “Adopt A+B as written”.
-Bounded FIN-01 P1–P5 and FIN-02 B approved; broader financial rules stay TBD.
-No orchestrator/Superpowers/subagents. Existing SUP/RPT and initial untracked
-.serena/ and docs/handoffs/ preserved; no push/merge/deploy.
+2026-11-15. Exact worktree fin-01-ready/logistik-web, feat/fin-01-billing-contract.
+Parent b2808bf; FIN-02 source commit follows this checkpoint. Owner adopted A+B
+as written; bounded financial rules approved. No agents/disabled skills used.
 
-FIN-01 WIP: schema/service/Server Actions/UI and first migration implemented.
-Guarded PostgreSQL 4 tests, money/date unit 2 tests, changed-file Biome and
-TypeScript PASS. See docs/decisions/FIN-implementation.md for commands and limits.
-Migration applied only to loopback logistik_web_test. Local existing PostgreSQL
-cluster started after stopped-server diagnosis. Issued financial history is not
-soft-deleted. UI/browser checks and integrated accounting posting remain pending.
+FIN-01 and FIN-02 runtime/UI implemented against adopted contracts, including
+atomic journals, actual costs, completeness, periods, P&L/GP/recap and cashflow.
+See FIN-implementation.md. Focused DB11/unit3 and local browser critical flows
+passed; 24 loaded-route viewport checks and keyboard tabs/scroll passed.
+Production build PASS on pinned Node24.15.0. Final full lint/typecheck/tests/DB
+being collected after test inventory/lifecycle updates and browser-fixture cleanup.
+Initial broad DB failures from owned temporary admin/account contamination were
+identified; only owned UI fixtures removed. No baseline test expectations weakened.
 
-FIN-02 NEXT: implement adopted chart/mapping/journal/actual cost/period/cashflow/
-P&L/GP/recap behavior; no existing DRAFT accounting runtime. Journal integration
-must be atomic with invoice/receipt changes. REL-01 not ready. Final full gates
-and human review/staging/UAT/backup-restore remain. Resolve actual latest commit
-with Git; this snapshot is committed with the FIN-01 slice.
+Schema validate PASS. Diff exits2 for two preexisting Dev2 updated_at defaults
+(manifest_items/delivery_sheet_items); no finance differences. Coordinator must
+resolve or explicitly disposition before release. Both migrations test-DB only.
+Human/migration review, staging/UAT and release/backup-restore gates remain.
+No push/merge/deploy. Preserve initial .serena/ and docs/handoffs/ contents.
+REL-01 handoff next after final results. Source tree frozen; no pending agents.

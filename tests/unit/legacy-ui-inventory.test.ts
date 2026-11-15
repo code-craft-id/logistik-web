@@ -36,6 +36,15 @@ describe("legacy inventory coverage and presentation routing", () => {
       "/ui-examples",
       ...implementedPreviewRoutes.map((item) => item.href),
     ]);
+    // FIN is an adopted live workflow, outside the frozen 43-screen preview inventory.
+    const finance = navigationDestinations().filter(({ item }) =>
+      item.href?.startsWith("/finance/"),
+    );
+    expect(finance).toHaveLength(7);
+    for (const { item } of finance) {
+      expect(existsSync(`src/app/(dashboard)${item.href}/page.tsx`)).toBe(true);
+      if (item.href) available.add(item.href);
+    }
     for (const { item } of navigationDestinations())
       if (item.href) expect(available.has(item.href)).toBe(true);
     for (const { href } of implementedPreviewRoutes)

@@ -15,15 +15,23 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { id, listInput } from "../contracts";
-import { financeService } from "../server/context";
+import { accountingQueries, financeService } from "../server/context";
 import { CommandForm } from "./command-form";
+import { FinanceField } from "./fields";
 import { InvoiceForm } from "./invoice-form";
 
 export const financeLink = "text-primary underline underline-offset-4";
-export async function financeEntry(resource = "invoice", action = "view") {
+export async function financeEntry(
+  resource: string | readonly string[] = "invoice",
+  action = "view",
+) {
   const current = await currentIdentity();
   if (!current) redirect("/login");
-  return permits(current.actor, action, resource) ? current.actor : null;
+  return (typeof resource === "string" ? [resource] : resource).some((r) =>
+    permits(current.actor, action, r),
+  )
+    ? current.actor
+    : null;
 }
 const denied = (
   <ErrorState
@@ -160,6 +168,10 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
   const parsed = id.safeParse(invoiceId);
   if (!parsed.success) notFound();
   const row = await financeService.detail(parsed.data);
+  const paymentChoices =
+    row.status === "ISSUED" && permits(actor, "create", "payment")
+      ? await accountingQueries.paymentChoices()
+      : null;
   return (
     <div className="space-y-6">
       <Link className={financeLink} href="/finance/invoices">
@@ -169,7 +181,8 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
         {row.number ?? `Draft #${row.id}`}
       </h1>
       <p>
-        Cabang {row.branchId} · Pelanggan {row.customerId} · {row.paymentStatus}
+        Cabang {row.issuedBranchName ?? row.branchId} · Pelanggan{" "}
+        {row.issuedCustomerName ?? row.customerId} · {row.paymentStatus}
       </p>
       <dl className="grid gap-4 sm:grid-cols-3">
         <div>
@@ -197,7 +210,11 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
         <TableBody>
           {row.items.map((i) => (
             <TableRow key={i.id}>
-              <TableCell>{i.transactionId}</TableCell>
+              <TableCell>
+                {row.issuedSources.find(
+                  (s) => s.transactionId === i.transactionId,
+                )?.awbNo ?? `Transaksi #${i.transactionId}`}
+              </TableCell>
               <TableCell className="tabular-nums">{i.amount}</TableCell>
             </TableRow>
           ))}
@@ -254,7 +271,6 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
                 ["receivedDate", "Tanggal diterima", "date"],
                 ["method", "Metode", "text"],
                 ["reference", "Referensi", "text"],
-                ["cashAccountId", "ID akun kas / bank", "number"],
               ].map(([name, label, type]) => (
                 <FormField key={name} id={`receipt-${name}`} label={label}>
                   <Input
@@ -266,6 +282,23 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
                   />
                 </FormField>
               ))}
+              <FinanceField
+                prefix="receipt"
+                name="cashAccountId"
+                label="Akun kas / bank"
+                options={
+                  paymentChoices?.accounts.map((a) => ({
+                    id: a.id,
+                    name: `${a.code} · ${a.name}`,
+                  })) ?? []
+                }
+              />
+              <FinanceField
+                prefix="receipt"
+                name="cashflowCategoryId"
+                label="Kategori arus kas"
+                options={paymentChoices?.categories ?? []}
+              />
             </div>
           </CommandForm>
         </section>
@@ -315,10 +348,13 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
         </section>
       )}
       <section className="space-y-3 border-t pt-5">
-        <h2 className="text-lg font-semibold">Riwayat tindakan</h2>
+        <h2 className="text-lg font-semibold">
+          Riwayat tindakan (200 terbaru)
+        </h2>
         {row.audit.map((e) => (
           <p key={e.id} className="break-words text-sm">
             {e.createdAt} · {e.action} · Pengguna #{e.actorId}
+            {e.reason ? ` · ${e.reason}` : ""}
           </p>
         ))}
       </section>
