@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LoadingState } from "@/components/patterns/content-state";
 import { TicketDetailPage } from "@/features/ticketing/components/ticket-pages";
+// Authenticated dynamic detail follows the existing transaction detail route.
+export const instant = false;
+
 export const metadata: Metadata = { title: "Detail tiket" };
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
