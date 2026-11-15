@@ -195,6 +195,21 @@ export const permissionResources = [
     label: "Laporan Detail Transaksi",
     actions: ["view"],
   },
+  {
+    resource: "manifest_report",
+    label: "Laporan Manifes Cabang",
+    actions: ["view"],
+  },
+  {
+    resource: "delivery_report",
+    label: "Laporan Pengantaran",
+    actions: ["view"],
+  },
+  {
+    resource: "dashboard_report",
+    label: "Ringkasan Operasional",
+    actions: ["view"],
+  },
 ] as const;
 
 export const permissionGrantCount = permissionResources.reduce(
@@ -219,6 +234,9 @@ export function permissionRestriction(resource: string): string | undefined {
       "delivery",
       "ticket",
       "transaction_report",
+      "manifest_report",
+      "delivery_report",
+      "dashboard_report",
     ].includes(resource)
   )
     return undefined;

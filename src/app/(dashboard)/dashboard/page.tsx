@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { DashboardOverview } from "@/features/dashboard/components/dashboard-overview";
-import { getServerSession } from "@/lib/auth/session";
-
-export const metadata: Metadata = { title: "Dashboard" };
-
-async function AuthenticatedDashboard() {
-  const session = await getServerSession();
-  if (!session?.user) redirect("/login");
-  return <DashboardOverview />;
-}
-
-export default function DashboardPage() {
+import { LoadingState } from "@/components/patterns/content-state";
+import { OperationalReportPage } from "@/features/reports/operational/components/report-page";
+export const metadata: Metadata = { title: "Ringkasan Operasional" };
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   return (
-    <Suspense fallback={<output>Memuat dashboard...</output>}>
-      <AuthenticatedDashboard />
+    <Suspense fallback={<LoadingState label="Memuat laporan…" />}>
+      <Content searchParams={searchParams} />
     </Suspense>
   );
+}
+async function Content({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return <OperationalReportPage kind="dashboard" query={await searchParams} />;
 }

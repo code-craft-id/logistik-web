@@ -15,6 +15,9 @@ import {
 
 // A route enters this inventory only when its workflow is implemented.
 const routeResources: Record<string, readonly string[]> = {
+  "/dashboard": ["dashboard_report"],
+  "/branch-reports/manifest-outbound": ["manifest_report"],
+  "/branch-reports/delivery": ["delivery_report"],
   "/branch-reports/transaction-details": ["transaction_report"],
   "/ticketting": ["ticket"],
   "/group-user": ["user_group"],
