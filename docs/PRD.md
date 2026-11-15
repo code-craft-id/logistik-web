@@ -117,7 +117,9 @@ Every step needs explicit decisions on cancellation, returns, retries, partial d
 - Losing the owning branch from current scope removes list/detail and replay access; tickets do not transfer automatically. Only the explicit administrator may read others' tickets in the proposed scope. This increment has no support-agent follow-up, assignment or resolution workflow.
 - Internal ID and labelled ISO8601 UTC creation display are bounded target differences. Status/approval, files, edit/delete, assignment/resolve/reopen, comments/history and unobserved FR-07 extensions remain deferred, not removed from the full requirement.
 - The self-identified project owner/migration coordinator selected Option A and accepted one additive Ticket model in the current task. Name/GitHub approver identity is not supplied, so the formal record is PARTIAL under PR #10 review; this does not undo the stated direction or supply Dev1 approval. See [current contract and dated approval record](decisions/SUP-01-contract.md#decision-and-approval-record). No production migration execution is authorized.
-- Actual Dev1 review of the revised permission/branch/admin/provenance contract and eventual migration/code review remain required before dependent implementation.
+- Dev1 explicitly accepted the revised permission/branch/admin/provenance contract on 2026-11-15 in [PR #10](https://github.com/code-craft-id/logistik-web/pull/10#pullrequestreview-5908594183). Record actor/server time is sufficient provenance for this increment; no extra audit event. Implementation permission/predicate/tests and migrations still require owner PR review before human merge.
+
+- Implementation checkpoint, 2026-11-15: bounded SUP-01 create/list/detail is implemented and locally verified with creator/current-branch security, admin rules and idempotent creation. [Verification](decisions/evidence/sup-01-core/verification.md) records exact code SHA, checks and known preexisting migration drift. This is not full FR-07 lifecycle, staging, production migration or final human code acceptance. New PR creation is deferred by the owner until all agreed Dev3 work is finished.
 
 ### FR-08. Sales and marketing
 - Build only workflows explicitly approved by the business owner.
@@ -164,7 +166,7 @@ D-30 records the user's technical SCH-01 approval on 2026-10-18 separately from 
 | D-13 | Financial | Chart of accounts and posting rules? | FR-05 | DISC-04 | FIN-02 | TBD |
 | D-14 | Financial | Profit calculation and recognition date? | FR-05, FR-06 | DISC-04 | FIN-02 | TBD |
 | D-15 | Reports | Exact columns, formulas, export formats, date/time basis, access scope, and sample outputs per report? | FR-06 | DISC-04 | RPT-01, RPT-02 (per report) | TBD |
-| D-16 | Ticketing | Visibility, assignment, and resolved/reopened rules? | FR-07 | DISC-04 | SUP-01 | PARTIAL: Option A create/read direction selected 2026-11-15; named formal approval record incomplete; later lifecycle rules TBD; actual Dev1 contract confirmation pending |
+| D-16 | Ticketing | Visibility, assignment, and resolved/reopened rules? | FR-07 | DISC-04 | SUP-01 | PARTIAL: Option A create/read direction selected 2026-11-15; named formal approval record incomplete; later lifecycle rules TBD; Dev1 bounded contract accepted 2026-11-15; implementation code review remains required |
 | D-17 | Delivery | Launch scope and date? | All | DISC-01 | Phase 1 start | TBD |
 | D-18 | Delivery | Required integrations? Baileys in a separate stakeholder-supplied project is selected for branch WhatsApp; preparatory setup is approved under D-34. Transport and sending rules, plus other integrations, remain TBD. | TBD per integration | DISC-01, WA-01 | Before each live integration | PARTIAL |
 | D-19 | Delivery | Localization and time zone conventions? | FR-06 | FND-01 | FND-01, RPT-01 | TBD globally; labelled ISO8601 UTC creation display selected for bounded SUP-01 direction; formal approval record PARTIAL |

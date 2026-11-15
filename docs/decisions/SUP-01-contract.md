@@ -1,6 +1,6 @@
 # SUP-01: bounded create, list and detail contract
 
-Status: **documentation under review; implementation contract not yet accepted**. Updated 2026-11-15. Dev3 owns the slice; Dev1 owns the shared authorization contract. This note describes current scope only, not full SUP-01 completion.
+Status: **bounded authorization/provenance contract accepted by Dev1; core implemented and locally verified**. Formal project-owner identity record remains PARTIAL; selected user scope/model direction is retained. Updated 2026-11-15. Dev3 owns the slice; Dev1 owns the shared authorization contract. This note describes current scope only, not full SUP-01 completion.
 
 ## Decision and approval record
 
@@ -8,7 +8,7 @@ Status: **documentation under review; implementation contract not yet accepted**
 | --- | --- | --- |
 | Option A: create/list/detail of own-created tickets in currently allowed branches | Project owner, self-identified user in the current task; name/GitHub identity not supplied. On 2026-11-15 answered “A — Tiket sendiri dalam cabang yang diizinkan (rekomendasi)” to the consolidated scope request. | Direction accepted in the task. Formal PRD record **PARTIAL** pending named, traceable approval; this does not invent a different scope or require the user to choose A again. |
 | One additive Ticket table and protected User/Branch relations | Same user, explicitly self-identified as migration coordinator; answered “Setuju usulan model dan migrasi additive tersebut” on 2026-11-15. | Model direction accepted; named formal approval record incomplete. No production migration execution authorized. |
-| Dev1 permission/branch contract | [Ardiputra614 review, 2026-11-15 02:02:22 UTC](https://github.com/code-craft-id/logistik-web/pull/10#pullrequestreview-5908528451) | APPROVED badge covers documentation after corrections; review body explicitly does not accept an implementation contract. Request explicit confirmation against this revised note. |
+| Dev1 permission/branch contract | [Ardiputra614 explicit contract confirmation, 2026-11-15 02:25:35 UTC](https://github.com/code-craft-id/logistik-web/pull/10#pullrequestreview-5908594183) | Accepted registered view/create, SQL scope, active hierarchy/admin, scope-loss replay denial and record actor/time provenance at 4bef2d6. Code/permission/predicate/tests still require review in the implementation PR; no merge/deploy authority. |
 
 The owner confirmed being the approver when asked for identity, but supplied no name or handle. Use the reviewer's PARTIAL alternative; do not infer that the publishing GitHub account is the business approver. Recommendations, repository administrator rights and agent QA never substitute for owner approval.
 
@@ -24,13 +24,13 @@ Defer status/approval/approver values, edit/delete, assignment/resolve/reopen, c
 
 Alternatives already considered: branch-shared visibility increases collaboration and disclosure; read-only first needs a legitimate separate population source. Owner selected creator-only create/read, which provides local populated records with less disclosure and no legacy import. Those alternatives are not pending questions.
 
-## Authorization contract for explicit Dev1 confirmation
+## Authorization contract explicitly accepted by Dev1
 
 - Register ticket:view and ticket:create through the existing inventory; registration gives ordinary groups no grant. Grant assignment remains an authorized identity operation. Unknown resource/action must deny even administrator.
 - Every create/list/detail entry loads a fresh active actor/group and authorizes independently. Creator comes only from the server. No client actor, number, timestamps, status or approval fields are accepted.
 - Ordinary creation requires ticket:create and an existing active target branch within current allowed scope, with active/nondeleted office and nondeleted company. Explicit system_admin:manage creation also validates that target hierarchy; a positive integer branch ID alone is insufficient.
 - Ordinary reads require ticket:view and one SQL predicate: nondeleted Ticket, createdById equals current actor, branchId is in current allowed memberships. Apply it to rows, count and direct lookup. No membership means no rows. Missing and inaccessible IDs return the same not-found result.
-- Proposed explicit administrator read scope is all nondeleted tickets; administrator identity derives from system_admin:manage, never group name. Dev1 must confirm this and creation provenance/audit handling explicitly. Existing assigned-branch and administrator branch helpers are not interchangeable.
+- Accepted explicit administrator read scope is all nondeleted tickets; administrator identity derives from system_admin:manage, never group name. Dev1 explicitly confirmed this and accepted record actor/server time as sufficient provenance for this increment; no separate audit event is required. Existing assigned-branch and administrator branch helpers are not interchangeable.
 - **Branch-loss consequence:** when the owning branch leaves a creator's current scope, list/detail and same-token replay of that ticket are denied. Moving to another branch does not transfer the ticket. There is no reassignment, exception access or migration of ownership in this increment.
 
 Source baseline: main commit c40650299674faca3f4d5e6cb92a8675ac6c1ffc. Reuse src/features/identity/permissions.ts (AccessActor, activeActor, permits, permitsBranch), server/context.ts (currentIdentity), server/access.ts (loadAccessActor/assertPermission) and the existing scoped query/error patterns. Identity's unexported audit helper is not a generic ticket-history API. src/app/(dashboard)/ticketting/page.tsx is synthetic only; its preview statuses/Medium priority are not domain contracts.
@@ -64,4 +64,6 @@ Required tests after contract acceptance: active/denied/inactive actor/group/gra
 
 Run TDD and targeted unit/UI tests, guarded local logistik_web_test integration tests, lint/typecheck/build, additive migration/schema review and responsive proof. Document provider comparison and eventual staging. None of these app/migration gates has been run for this documentation PR.
 
-Next: accept the named approval record or explicitly accept its PARTIAL documentation disposition; obtain actual Dev1 confirmation of the revised authorization/provenance contract; then assign one isolated end-to-end implementation worker and independent code review. No automatic merge/deploy and no dependent runtime/schema/auth implementation from the documentation APPROVED badge alone.
+Execution: the user directs completion of the selected bounded scope, the additive model direction is retained, and Dev1 explicitly accepted the revised authorization/provenance contract on 2026-11-15. One isolated end-to-end worker implemented create/list/detail with TDD; independent code review and scoped lead-fix review passed. Runtime code commit5575d12 is locally verified; [actual verification results](evidence/sup-01-core/verification.md) distinguish passed checks from preexisting migration drift and release gates. Full D16/lifecycle and the named owner-record remain PARTIAL; do not promote unrelated rules or repeat answered scope/model questions. Implementation permission/predicate/tests and migrations still receive actual owner PR review before human merge; no automatic merge/deploy.
+
+Publication constraint: the user instructs no new PR until all agreed Dev3 work is finished. Save this increment on feat/sup-01-core; do not open a per-slice PR, merge PR10 or infer final human/staging acceptance. Full later SUP-01 lifecycle remains deferred.

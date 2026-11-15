@@ -1,3 +1,13 @@
+# Current bounded SUP-01 outcome — 2026-11-15
+
+Selected Option A core is implemented and locally verified on feat/sup-01-core, runtime5575d12/docshead9b41f1f. User scope/model direction and actual Dev1 review5908594183 accepted the bounded contract. Full D16/lifecycle/global approval record remains PARTIAL; no unrelated business decision promoted. Create/list/detail code/test/UI security proofs and limitations live in the existing verification artifact; no further unchanged A/model/name question.
+
+No newPR until all agreed Dev3 work finished, per latest user instruction. Code branch pushed; actual human code/staging/release review and production migration remain pending. No merge/deploy. Full SUP and all Dev3 not declared complete.
+
+Technical follow-up D30/Dev2: read-only schema diffEXIT2 only existing manifest_items/delivery_sheet_items updated_at defaults; source/migration unchanged from base, noTicketdiff. Recommend reviewed modeldefault alignment to preserve DBbehavior; alternative forward removal changes direct-SQL behavior. No automatic old-migration edit or cross-domain cleanup.
+
+Existing dependency5advisories retained auth/CI follow-up, source/plugin applicability inspected; no forced upgrade or release-safety claim. Next candidate RPT01 needs a bounded D15/D19/source/grant packet using accepted evidence; finance runtime gates unchanged. Earlier current-looking pending-Dev1/no-code statements below are historical where superseded.
+
 # Current PR10 review disposition — 2026-11-15
 
 Actual Dev1 review approved documentation after corrections only; it explicitly did not accept the implementation contract. Source: PR10 review5908528451 on5bc8387. All requested documentation/technical corrections are in4bef2d6, with actual re-review requested and REVIEW_REQUIRED verified. Current authorization/provenance contract still needs explicit Dev1 acceptance.

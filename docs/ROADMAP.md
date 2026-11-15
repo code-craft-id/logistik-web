@@ -79,7 +79,7 @@ One owner per ticket. Every ticket specifies FE, server, schema impact, authoriz
 | OPS-02 | 2 | Dev 2 | Shipment status, tracking, history | OPS-01 | D-07 |
 | OPS-03 | 3 | Dev 2 | Manifest (transit, inbound, outbound) and delivery flow | OPS-02, PLT-03 | D-08, D-09 |
 | OPS-04 | 4 | Dev 2 | Fee/vendor reference validation and shipment billing event contract | OPS-03 | D-11 |
-| SUP-01 | 2 | Dev 3 | Ticket CRUD/lifecycle with role/branch authorization. Bounded Option A create/list/detail direction selected; formal approval record PARTIAL and revised Dev1 contract confirmation pending in PR #10. Full lifecycle deferred. | PLT-01, accepted DISC-04 (evidence branch not yet merged) | D-16 bounded record PARTIAL; remaining rules TBD |
+| SUP-01 | 2 | Dev 3 | Ticket CRUD/lifecycle with role/branch authorization. **BOUNDED CORE IMPLEMENTED / LOCALLY VERIFIED (2026-11-15):** create/list/detail, creator/current-branch scope, admin rules and idempotency. [Checks/limits](decisions/evidence/sup-01-core/verification.md). Explicit Dev1 contract accepted; full lifecycle remains deferred/PARTIAL. Staging/final human code acceptance pending; new PR deferred by owner until all agreed Dev3 work finished. | PLT-01, accepted DISC-04 (evidence branch not yet merged) | D-16 bounded record PARTIAL; remaining rules TBD |
 | RPT-01 | 2 | Dev 3 | Transaction detail and first operational report | OPS-01, stable source contracts | D-15, D-19 |
 | RPT-02 | 3 | Dev 3 | Manifest, delivery, vendor, and dashboard reports | OPS-03 | D-15 |
 | FIN-01 | 4 | Dev 3 | Invoice and payment workflows | OPS-01, OPS-04, DISC-04 | D-11, D-12, D-21 |
