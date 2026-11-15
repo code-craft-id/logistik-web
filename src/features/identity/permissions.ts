@@ -1,11 +1,6 @@
 /** Dev 1 permission inventory only. A configured right never activates an unfinished workflow. */
 export const permissionResources = [
   {
-    resource: "ticket",
-    label: "Ticketing",
-    actions: ["view", "create"],
-  },
-  {
     resource: "system_admin",
     label: "Administrator — akses penuh semua cabang",
     actions: ["manage"],
@@ -209,6 +204,11 @@ export const permissionResources = [
     resource: "dashboard_report",
     label: "Ringkasan Operasional",
     actions: ["view"],
+  },
+  {
+    resource: "ticket",
+    label: "Ticketing",
+    actions: ["view", "create"],
   },
 ] as const;
 

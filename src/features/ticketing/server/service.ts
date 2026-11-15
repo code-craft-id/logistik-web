@@ -185,9 +185,9 @@ export function createTicketService(
       try {
         return await db.$transaction(
           async (tx) => {
-            // Reuse the organization/identity mutation lock to serialize current scope changes.
+            // Shared creators coexist; exclusive identity/organization writers still block scope checks.
             await tx.$executeRaw`SET LOCAL lock_timeout = '5s'`;
-            await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(71642, 1)`;
+            await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock_shared(71642, 1)`;
             const fresh = await actor("create", tx, initial.id);
             await creationBranch(tx, fresh, data.branchId);
             const previous = await replay(tx, fresh, data);

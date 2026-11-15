@@ -31,6 +31,45 @@ const payload = (extra = {}) => ({
   idempotencyKey: randomUUID(),
   ...extra,
 });
+function gate() {
+  let release!: () => void;
+  const promise = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  return { promise, release };
+}
+async function bounded<T>(
+  work: Promise<T>,
+  message: string,
+  milliseconds = 2500,
+) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), milliseconds);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+async function waitForBlockedCreator(writerPid: number) {
+  const deadline = Date.now() + 2500;
+  while (Date.now() < deadline) {
+    const [state] = await db.$queryRaw<{ waiting: boolean }[]>`
+      SELECT EXISTS (
+        SELECT 1 FROM pg_locks
+        WHERE locktype = 'advisory' AND classid = 71642 AND objid = 1
+          AND objsubid = 2 AND NOT granted
+          AND ${writerPid} = ANY(pg_blocking_pids(pid))
+      ) AS waiting`;
+    if (state.waiting) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  throw new Error("Ticket creator did not wait for the exclusive writer");
+}
 beforeAll(async () => {
   const company = await db.company.create({
     data: { name: tag, isDepositAgent: false, showPriceOnPrint: false },
@@ -117,6 +156,120 @@ describe("SUP-01 guarded PostgreSQL acceptance", () => {
     expect(await service(users[1]).detail(first.id)).not.toHaveProperty(
       "idempotencyKey",
     );
+  });
+  it("allows independent creators to finish while another creator holds its policy lock", async () => {
+    const acquired = gate(),
+      release = gate();
+    let resolutions = 0;
+    const firstService = createTicketService(db, async () => {
+      if (++resolutions === 2) {
+        acquired.release();
+        await bounded(release.promise, "Held creator was not released", 8000);
+      }
+      return loadAccessActor(db, users[1]);
+    });
+    const first = firstService.create(payload());
+    // Observe every rejection immediately, including failures before the handshake.
+    void first.catch(() => {});
+    let second: ReturnType<typeof firstService.create> | undefined;
+    try {
+      await bounded(acquired.promise, "First creator did not acquire its lock");
+      second = service(users[2]).create(payload());
+      const created = await bounded(
+        second,
+        "Independent creator was serialized behind another creator",
+      );
+      expect(await service(users[2]).detail(created.id)).toMatchObject({
+        createdById: users[2],
+      });
+    } finally {
+      release.release();
+      await Promise.allSettled([first, ...(second ? [second] : [])]);
+    }
+    await expect(first).resolves.toMatchObject({ createdById: users[1] });
+  });
+  it.each([
+    "membership",
+    "grant",
+    "hierarchy",
+  ] as const)("waits for an exclusive writer and denies creation after %s revocation commits", async (kind) => {
+    const locked = gate(),
+      revoke = gate();
+    let writerPid = 0;
+    const input = payload();
+    const writer = db.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SET LOCAL lock_timeout = '5s'`;
+        await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(71642, 1)`;
+        const [backend] = await tx.$queryRaw<
+          { pid: number }[]
+        >`SELECT pg_backend_pid() AS pid`;
+        writerPid = backend.pid;
+        locked.release();
+        await bounded(revoke.promise, "Writer was not released", 8000);
+        if (kind === "membership")
+          await tx.userAllowedBranch.deleteMany({
+            where: { userId: users[1], branchId: branches[0] },
+          });
+        else if (kind === "grant")
+          await tx.permission.deleteMany({
+            where: { groupId: groups[1], resource: "ticket", action: "create" },
+          });
+        else
+          await tx.branch.update({
+            where: { id: branches[0] },
+            data: { status: "INACTIVE" },
+          });
+      },
+      { timeout: 12000 },
+    );
+    void writer.catch(() => {});
+    let creation: ReturnType<ReturnType<typeof service>["create"]> | undefined;
+    try {
+      await bounded(locked.promise, "Writer did not acquire its lock");
+      creation = service(users[1]).create(input);
+      void creation.catch(() => {});
+      await waitForBlockedCreator(writerPid);
+      revoke.release();
+      await writer;
+      await expect(creation).rejects.toHaveProperty("status", 403);
+      expect(
+        await db.ticket.count({
+          where: {
+            createdById: users[1],
+            idempotencyKey: input.idempotencyKey,
+          },
+        }),
+      ).toBe(0);
+    } finally {
+      revoke.release();
+      await Promise.allSettled([writer, ...(creation ? [creation] : [])]);
+      if (kind === "membership")
+        await db.userAllowedBranch.upsert({
+          where: {
+            userId_branchId: { userId: users[1], branchId: branches[0] },
+          },
+          create: { userId: users[1], branchId: branches[0] },
+          update: {},
+        });
+      else if (kind === "grant")
+        await db.permission.upsert({
+          where: {
+            action_resource_groupId: {
+              groupId: groups[1],
+              resource: "ticket",
+              action: "create",
+            },
+          },
+          create: { groupId: groups[1], resource: "ticket", action: "create" },
+          update: {},
+        });
+      else
+        await db.branch.update({
+          where: { id: branches[0] },
+          data: { status: "ACTIVE" },
+        });
+    }
   });
   it("makes simultaneous identical-key creates one row and rejects changed payload", async () => {
     const input = payload();
