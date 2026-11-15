@@ -33,7 +33,7 @@ Request the real existing rule/example or prepare an explicitly proposed target 
 
 ## Status and handoff
 
-FIN-01 source/decision preparation started; runtime **BLOCKED: decision required D-11/D-12/D-21**, plus a real approved billing-source contract. This is not a new Dev1/Dev2 gate or a generic DISC-04 blocker. FIN-02 remains deferred. No runtime/test/schema/package modifications in this worktree; no tests rerun for this documentation-only note. Canonical lead state stays C:/Development/logistik-web/docs/agent-state/dev3; resume from those disk records and real Git, not chat memory.
+FIN-01 source/decision preparation started; runtime **BLOCKED: decision required D-11/D-12/D-21**, plus a real approved billing-source contract. This is not a new Dev1/Dev2 gate or a generic DISC-04 blocker. FIN-02 is required and **BLOCKED: D-13/D-14**, not deferred or NOT NEEDED. The [consolidated adoption packet](FIN-02-contract.md) covers both tickets. No runtime/test/schema/package modifications in this worktree; no tests rerun for documentation-only changes. Current mission checkpoints live in this worktree's docs/agent-state/dev3; older canonical records remain historical context and are not overwritten.
 
 ## Owner-directed legacy follow-up in progress
 
