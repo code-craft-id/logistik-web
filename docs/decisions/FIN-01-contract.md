@@ -1,4 +1,4 @@
-# FIN-01A — proposed customer invoice and payment contract
+# FIN-01A — adopted customer invoice and payment contract
 
 **Status: ADOPTED — bounded P1–P5 target and reconciliation.** Project/finance owner explicitly answered “Adopt A+B as written” on 2026-11-15 to the consolidated FIN-02-contract.md adoption question. Runtime implementation is authorized within this scope; migration coordination and final human review remain required. Broader D-11/D-12/D-21 rules remain TBD.
 
@@ -83,6 +83,6 @@ Only after P1–P5 and reconciliation are explicitly adopted: document the appro
 
 First bounded vertical slice: scoped draft create/list/detail + issue/void with source reservation, validation/audit/idempotency and real DB concurrency tests/UI375/768/1440. Then receipt/reversal as the next bounded slice under the same adopted policy. Do not implement a FE-only mock, event bus, tax engine, reconciliation import, bank transfer, vendor settlement, P&L, legacy-data import or export merely to finish FIN-01.
 
-## Decision requested
+## Adoption disposition
 
-Adopt this specific **manual-customer-billing v1 target** (P1–P5 and synthetic reconciliation), request concrete corrections, or defer runtime. Approving only “prepare a target contract” is not adoption. This remains PROPOSED until the actual project/finance owner answers; all unselected/global rules remain TBD. Independent agent review assesses safety/consistency only and cannot approve business policy or impersonate Dev1/Dev2.
+The project/finance owner explicitly answered **“Adopt A+B as written”** to the consolidated FIN-02-contract.md question on 2026-11-15, adopting P1–P5 and this reconciliation. Earlier proposal-preparation and independent consistency review were not approval; the later owner answer is. Historical “proposed” wording above describes the target's provenance. Implementation/local verification: 7997505 and FIN-implementation.md. Unselected/global rules remain TBD; final human/migration review and staging acceptance remain required.

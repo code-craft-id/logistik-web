@@ -1,21 +1,27 @@
-# Dev3 finance state — final verification
+# Dev3 handoff — finance implementation locally verified
 
-2026-11-15. Exact worktree fin-01-ready/logistik-web, feat/fin-01-billing-contract.
-Parent b2808bf; FIN-02 source commit follows this checkpoint. Owner adopted A+B
-as written; bounded financial rules approved. No agents/disabled skills used.
+Continue exact fin-01-ready/logistik-web worktree, feat/fin-01-billing-contract.
+Source799750549ecd40e0558014f3f67a8586353803d5; FIN-01b2808bf. Current doc-only
+HEAD is resolved with git log. No source changes after final source verification.
 
-FIN-01 and FIN-02 runtime/UI implemented against adopted contracts, including
-atomic journals, actual costs, completeness, periods, P&L/GP/recap and cashflow.
-See FIN-implementation.md. Focused DB11/unit3 and local browser critical flows
-passed; 24 loaded-route viewport checks and keyboard tabs/scroll passed.
-Production build PASS on pinned Node24.15.0. Final full lint/typecheck/tests/DB
-being collected after test inventory/lifecycle updates and browser-fixture cleanup.
-Initial broad DB failures from owned temporary admin/account contamination were
-identified; only owned UI fixtures removed. No baseline test expectations weakened.
+Owner explicitly adopted A+B as written. FIN-01/FIN-02 runtime and UI complete
+within that target; tickets PARTIAL pending human/migration/staging acceptance.
+Read docs/handoffs/DEV3-REL-01-finance.md for exact review/rollout packet.
+FinalPASS: Node24 lint412/typecheck/unitUI664/guardedDB138/build/schemavalidate;
+11finance tests plus local browser critical flows and375/768/1440 measurements.
 
-Schema validate PASS. Diff exits2 for two preexisting Dev2 updated_at defaults
-(manifest_items/delivery_sheet_items); no finance differences. Coordinator must
-resolve or explicitly disposition before release. Both migrations test-DB only.
-Human/migration review, staging/UAT and release/backup-restore gates remain.
-No push/merge/deploy. Preserve initial .serena/ and docs/handoffs/ contents.
-REL-01 handoff next after final results. Source tree frozen; no pending agents.
+Only schema-diff exception: preexisting Dev2 updated_at defaults on manifest_items
+and delivery_sheet_items. No finance drift. Coordinator must disposition it.
+Both finance migrations test-DB-only; FIN-02 refuses activation over existing
+issued FIN-01/receipt history without reviewed catch-up. Stop finance writers
+before both migrations; do not run an old FIN-01 binary against activated FIN-02.
+Real mappings/rights configuration, independent review, staging/UAT/reconciliation,
+backup/restore and release approval remain. REL-01 handoff prepared; no deployment
+readiness claim. No push/merge/deploy authorized.
+
+No agents, orchestrator or Superpowers. Preserve accepted DISC-04/SUP/RPT and
+initial untracked .serena/ and docs/handoffs/ files. No tests/browser jobs pending;
+owned fake fixtures/session and server cleaned; tabblank/emulation reset. Existing
+local PostgreSQL stays running. Never re-ask A+B adoption or promote wider rules.
+Next safe task: review source7997505 and handoff, then resolve coordinator/human
+gates; no repeated full verification absent relevant changes.

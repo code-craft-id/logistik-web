@@ -1,22 +1,23 @@
-# Finance decision registry
+# Finance decisions — current registry
 
-2026-11-15. Source of current statuses: docs/PRD.md; proposed rules:
-docs/decisions/FIN-01-contract.md and FIN-02-contract.md.
+2026-11-15. Owner explicitly answered **Adopt A+B as written** to the consolidated
+FIN-02-contract.md question. Earlier proposal preparation was not approval; this
+later answer adopts the bounded target. Current source: PRD and FIN contracts.
 
-| ID | Current status | Required adoption and consequence |
+| ID | Status | Adopted subset / remaining scope |
 |---|---|---|
-| D-11 | TBD; FIN-01 BLOCKED | Project/finance owner: manual final IDR charges/direct source rules; no biaya charge/cost assumption |
-| D-12 | TBD; FIN-01 BLOCKED | Owner: P1–P5 invoice/receipt lifecycle and reconciliation |
-| D-13 | TBD; FIN-02 BLOCKED | Owner: chart/mappings, balanced source posting, actual cost capture, cashflow and periods |
-| D-14 | TBD; FIN-02 BLOCKED | Owner: recognition dates, costing completeness, P&L/GP/recap movement definitions and reconciliation |
-| D-21 | TBD; finance BLOCKED | Owner: explicit finance rights, same-actor issue/post/reverse/close, no mandatory second approver |
+| D-11 | PARTIAL | Manual final IDR billing, direct sources and explicit actual cost declarations adopted; broader tariff/tax/COD/vendor settlement rules remain TBD |
+| D-12 | CONFIRMED (bounded) | FIN-01 P1–P5 lifecycle, receipts/reversals and reconciliation adopted |
+| D-13 | CONFIRMED (bounded) | FIN-02 B account/mapping, balanced postings, actual costs, cashflow and period target adopted |
+| D-14 | CONFIRMED (bounded) | FIN-02 B accounting dates, completeness and P&L/GP/recap reconciliation adopted |
+| D-21 | PARTIAL | Explicit finance rights and same-actor issue/post/reverse/close without mandatory second approver adopted; wider operational approval policy TBD |
 
-One consolidated adoption/correction question submitted; no answer yet. No
-business decision CONFIRMED. Wider D-ID scope stays unresolved even after a
-future bounded adoption. No financial behavior inferred from legacy labels,
-draft models, agent review or general implementation authorization.
+Both runtimes implemented and locally verified at7997505. Independent human,
+migration and staging/UAT acceptance is still mandatory; not business re-adoption.
+No source/event pipeline or DRAFT model grants authority. No historical financial
+import or automatic cross-branch cost ownership transfer approved. Actual account
+mappings and group rights must be explicitly configured before financial use.
 
-## Adoption 2026-11-15
-Owner answered Adopt A+B as written. Prior pending entries above are historical. D-11/D-21 PARTIAL (bounded finance adopted, broader TBD); D-12/D-13/D-14 CONFIRMED only for adopted contracts. See updated PRD and FIN-01/FIN-02 contracts. No release approval implied.
-
-Implementation disposition: all A+B business rules implemented within v1 target. No transfer of cost ownership or historical finance import inferred. Operational account mappings still require real finance configuration; first posting fails closed without valid mappings. Dev2 updated_at default drift is a coordinator integration item, not a confirmed finance-policy change.
+Existing Dev2 updated_at default drift requires coordinator disposition. No
+applied migration/model was changed to hide it. REL-01 is not release-approved;
+no D-17 or broader business/security decision is promoted by local test results.

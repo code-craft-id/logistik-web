@@ -93,11 +93,13 @@ overflow or clipped controls. Keyboard arrow tabs retain mounted date fields;
 keyboard table scroll moves 0→40px at 375. Final report captures show the
 post-void supplier cost retained. Evidence is under evidence/finance/.
 
-Production build PASS on Node24.15.0. Final full tests/lint/typecheck are being
-collected after updating the frozen legacy inventory and explicit lifecycle
-exceptions. Initial full DB tests were contaminated by the owned browser admin;
-that fixture was removed before the final run. No existing test was weakened to
-permit an extra administrator/account. Final results will be in the REL-01 handoff.
+Final gates on the source tree committed as 7997505: Node24.15.0 lint412 files,
+typecheck, 664unit/UI tests, 138guarded PostgreSQL tests, production build and
+schema validation PASS. Frozen legacy inventory and explicit lifecycle tests
+were updated for the approved finance scope. Initial full DB tests were
+contaminated by the owned browser admin; that fixture was removed before the
+final passing run. No existing test was weakened to permit an extra
+administrator/account. Exact results and remaining gates are in the REL-01 handoff.
 
 Schema validation PASS. Guarded DB→schema diff exits2 ONLY for preexisting
 manifest_items.updated_at and delivery_sheet_items.updated_at default-now versus

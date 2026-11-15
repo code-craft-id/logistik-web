@@ -1,8 +1,15 @@
 # FIN-01 readiness and next bounded contract
 
+**Current checkpoint, 2026-11-15:** owner explicitly adopted A+B as written.
+FIN-01/FIN-02 implementation and local verification are complete at 7997505;
+ticket acceptance remains PARTIAL pending mandatory human/migration/staging gates.
+See [REL-01 handoff](../handoffs/DEV3-REL-01-finance.md). The sections below are
+historical preparation/source evidence at the pre-implementation base, not current
+runtime readiness. They do not revoke the later adoption or reopen DISC-04.
+
 2026-11-15. SUP/RPT prerequisite work is reconciled and complete for the explicitly approved migration scope. [Current disposition](DEV3-SUP-RPT-FOLLOWUPS.md), [exact verification](evidence/dev3-sup-rpt-followups/verification.md). FIN worktree C:/Users/Administrator/.codex/worktrees/fin-01-ready/logistik-web, branch feat/fin-01-billing-contract, base a5b779cee0ff144a25d2f5e5ea4c4bdfdc658cb2 preserves all unmerged SUP/RPT. Main remains c406502. No merge/rebase to main, no new PR/deploy.
 
-## Current source facts (verified on this base)
+## Historical source facts (verified on the pre-implementation base)
 
 - `src/features/bookings/billing-contract.ts` is the only src/tests reference to ShipmentBillingEvent/SHIPMENT_BILLABLE. It defines a proposed shape; no producer, validator, persistence, dedupe or consumer exists. The historical OPS-04 note named billing-events.ts; that documentation path is now corrected to actual billing-contract.ts without changing the proposed contract or runtime.
 - Transaction provides operational identifiers, date, branches, stored current shipment status and nullable biaya Decimal(15,2). A numeric field does not prove customer receivable, final charge, currency, tax treatment or billability. Do not reinterpret shipment status as invoice/payment status.

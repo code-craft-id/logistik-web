@@ -9,17 +9,17 @@ review and staging gates remain. Wider D-ID rules remain TBD.
 ## Existing evidence and exact gate
 
 - [FIN-01 P1–P5](FIN-01-contract.md) already defines the reviewed manual-billing
-  target and reconciliation; actual adoption is still absent.
+  target and reconciliation; owner adopted it as part A on 2026-11-15.
 - [Readiness](FIN-01-readiness.md) records bounded empty invoice views and the
   absence of usable payment examples. Repeating those reads cannot establish
   recognition or costing policy. DISC-04 remains DONE WITH NOTES.
 - [OPS-04](OPS-04-contract.md) is a proposed type without an event producer.
-- PRD D-11/D-12/D-13/D-14/D-21 remain TBD. Accounting schema is explicitly DRAFT;
+- PRD records bounded adoption: D-11/D-21 PARTIAL and D-12/D-13/D-14 CONFIRMED for this target only. The older accounting schema remains explicitly DRAFT;
   `Ledger` is an account grouping, not a journal/posting engine. Existing account
   fields and Customer/VendorAccounting references do not establish mappings.
 - Transaction.biaya is not an approved customer charge or vendor cost.
 
-## One adoption question
+## One adoption question — answered “Adopt A+B as written”
 
 **Adopt A+B below as the bounded target, or specify corrections to A/B (including
 any required approver, recognition trigger, or actual costing source)?**
@@ -143,5 +143,7 @@ focused self-review, no orchestration skill, Superpowers, or delegation. It
 changes execution strategy only. Human final review, migration coordination,
 financial adoption, security, staging/UAT and release gates still apply.
 
-REL-01 is NOT READY: both FIN runtimes are unimplemented, this packet unadopted,
-final integration gates unrun, and human review/staging/backup-restore/UAT remain.
+Implementation and local verification of both FIN runtimes are complete at
+7997505; see [REL-01 handoff](../handoffs/DEV3-REL-01-finance.md). Ticket acceptance
+remains PARTIAL and release NOT READY pending human/migration review,
+staging/UAT/backup-restore and disposition of existing Dev2 schema-default drift.
