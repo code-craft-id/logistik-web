@@ -126,30 +126,33 @@ export function createTicketService(
   }
   return {
     async list(input: unknown = {}) {
-      const current = await actor("view");
-      const { page, pageSize, search } = ticketListInput.parse(input);
-      const where: Prisma.TicketWhereInput = {
-        ...visible(current),
-        ...(search
-          ? {
-              OR: [
-                { subject: { contains: search, mode: "insensitive" } },
-                { menuName: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      };
-      const [rows, total] = await Promise.all([
-        db.ticket.findMany({
-          where,
-          select: publicSelect,
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        }),
-        db.ticket.count({ where }),
-      ]);
-      return { items: rows.map(dto), total, page, pageSize, search };
+      return db.$transaction(
+        async (tx) => {
+          const current = await actor("view", tx);
+          const { page, pageSize, search } = ticketListInput.parse(input);
+          const where: Prisma.TicketWhereInput = {
+            ...visible(current),
+            ...(search
+              ? {
+                  OR: [
+                    { subject: { contains: search, mode: "insensitive" } },
+                    { menuName: { contains: search, mode: "insensitive" } },
+                  ],
+                }
+              : {}),
+          };
+          const rows = await tx.ticket.findMany({
+            where,
+            select: publicSelect,
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          });
+          const total = await tx.ticket.count({ where });
+          return { items: rows.map(dto), total, page, pageSize, search };
+        },
+        { isolationLevel: "RepeatableRead" },
+      );
     },
     async detail(inputId: unknown) {
       const current = await actor("view");

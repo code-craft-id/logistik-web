@@ -3,7 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { loadAccessActor } from "../../src/features/identity/server/access";
 import { createTicketService } from "../../src/features/ticketing/server/service";
-import { PrismaClient } from "../../src/lib/db/generated/client";
+import { type Prisma, PrismaClient } from "../../src/lib/db/generated/client";
 import { testDatabaseUrl } from "../support/test-database-url";
 
 const db = new PrismaClient({
@@ -146,6 +146,10 @@ describe("SUP-01 guarded PostgreSQL acceptance", () => {
     expect(list.total).toBe(2);
     expect(list.items.map((x) => x.id)).toEqual([second.id, first.id]);
     expect(await service(users[1]).detail(other.id)).toBeNull();
+    expect(await service(users[0]).detail(other.id)).toMatchObject({
+      id: other.id,
+      createdById: users[2],
+    });
     expect(await service(users[1]).detail(2147483647)).toBeNull();
     expect((await service(users[0]).list({ search: tag })).total).toBe(3);
     expect(await service(users[1]).detail(first.id)).toMatchObject({
@@ -415,4 +419,78 @@ describe("SUP-01 guarded PostgreSQL acceptance", () => {
       db.branch.delete({ where: { id: branches[0] } }),
     ).rejects.toHaveProperty("code", "P2003");
   });
+});
+
+it("keeps ticket rows/count in one snapshot when an independent insert commits between the actual reads", async () => {
+  const subject = `${tag} snapshot`;
+  const baseline = await service(users[1]).create(payload({ subject }));
+  const rowsRead = gate();
+  let insertedId: number | undefined;
+  const wrap = (connection: Prisma.TransactionClient) =>
+    new Proxy(connection, {
+      get(target, property) {
+        if (property !== "ticket") return Reflect.get(target, property);
+        return new Proxy(target.ticket, {
+          get(model, method) {
+            if (method === "findMany")
+              return async (args: Prisma.TicketFindManyArgs) => {
+                const rows = await target.ticket.findMany(args);
+                rowsRead.release();
+                return rows;
+              };
+            if (method === "count")
+              return async (args: Prisma.TicketCountArgs) => {
+                await bounded(
+                  rowsRead.promise,
+                  "Count did not observe the completed row query",
+                );
+                const inserted = await db.ticket.create({
+                  data: { ...payload({ subject }), createdById: users[1] },
+                });
+                insertedId = inserted.id;
+                return target.ticket.count(args);
+              };
+            return Reflect.get(model, method);
+          },
+        });
+      },
+    });
+  const connection = wrap(db);
+  const wrapped = new Proxy(db, {
+    get(target, property) {
+      if (property === "$transaction")
+        return (
+          work: (tx: Prisma.TransactionClient) => Promise<unknown>,
+          options: object,
+        ) => target.$transaction((tx) => work(wrap(tx)), options);
+      return Reflect.get(connection, property);
+    },
+  });
+  const pending = createTicketService(wrapped, () =>
+    loadAccessActor(db, users[1]),
+  ).list({ search: subject, pageSize: 100 });
+  void pending.catch(() => {});
+  try {
+    const result = await pending;
+    expect(insertedId).toBeDefined();
+    expect(result.items.map((row) => row.id)).toEqual([baseline.id]);
+    expect(result.total).toBe(1);
+    const next = await service(users[1]).list({
+      search: subject,
+      pageSize: 100,
+    });
+    expect(next.total).toBe(2);
+    expect(next.items.map((row) => row.id)).toEqual([insertedId, baseline.id]);
+  } finally {
+    rowsRead.release();
+    await Promise.allSettled([pending]);
+    await db.ticket.deleteMany({
+      where: {
+        id: {
+          in: [baseline.id, ...(insertedId === undefined ? [] : [insertedId])],
+        },
+        createdById: users[1],
+      },
+    });
+  }
 });

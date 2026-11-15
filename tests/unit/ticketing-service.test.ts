@@ -75,6 +75,9 @@ beforeEach(() => {
 describe("ticket server authorization and atomic creation", () => {
   it("uses the same creator/current-membership SQL predicate for rows/count/detail", async () => {
     await service().list({});
+    expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: "RepeatableRead",
+    });
     await service().detail(5);
     const where = {
       deletedAt: null,
@@ -196,4 +199,20 @@ describe("ticket server authorization and atomic creation", () => {
     await expect(service().detail(5)).resolves.toBeNull();
     await expect(service().detail(999)).resolves.toBeNull();
   });
+});
+
+it("reloads list scope inside its transaction rather than trusting an earlier session", async () => {
+  db.$transaction.mockImplementation(async (work) => {
+    fixture().branchIds = [20];
+    return work(db);
+  });
+  await service().list({ page: 3, pageSize: 10, search: " Menu " });
+  expect(db.ticket.findMany.mock.calls[0][0]).toMatchObject({
+    where: { createdById: 1, branchId: { in: [20] } },
+    skip: 20,
+    take: 10,
+  });
+  expect(db.ticket.findMany.mock.calls[0][0].where).toEqual(
+    db.ticket.count.mock.calls[0][0].where,
+  );
 });
