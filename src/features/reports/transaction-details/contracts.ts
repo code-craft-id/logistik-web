@@ -14,6 +14,7 @@ export type TransactionReportRow = {
   status: string;
 };
 export type TransactionReportResult = {
+  canExport: boolean;
   state: "initial" | "invalid" | "ready";
   parsed: TransactionReportFilterResult;
   branches: { id: number; name: string }[];

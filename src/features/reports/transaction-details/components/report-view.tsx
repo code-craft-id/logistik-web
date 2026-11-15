@@ -33,22 +33,24 @@ const headers = [
   "Kilo",
   "Status Pengiriman",
 ];
-function pageUrl(f: TransactionReportFilters, page: number) {
+function reportUrl(f: TransactionReportFilters, page?: number) {
   const query = new URLSearchParams({
     startDate: f.startDate,
     endDate: f.endDate,
-    pageSize: String(f.pageSize),
-    page: String(page),
     sortBy: f.sortBy,
     sortDirection: f.sortDirection,
   });
+  if (page !== undefined) {
+    query.set("pageSize", String(f.pageSize));
+    query.set("page", String(page));
+  }
   if (f.search) query.set("search", f.search);
   if (f.branchId !== null) query.set("branchId", String(f.branchId));
   if (f.originBranchId !== null)
     query.set("originBranchId", String(f.originBranchId));
   if (f.destinationBranchId !== null)
     query.set("destinationBranchId", String(f.destinationBranchId));
-  return `${transactionReportRoute}?${query}`;
+  return `${transactionReportRoute}${page === undefined ? "/export" : ""}?${query}`;
 }
 function value(item: string | number | null) {
   return item === null ? (
@@ -88,8 +90,8 @@ export function TransactionReportView({
           tidak ditampilkan.
         </p>
         <p className="max-w-prose text-sm text-muted-foreground">
-          Tahap ini menampilkan sembilan kolom yang tersedia. Data finansial,
-          ekspor dan kolom legacy lain belum tersedia. Asal dan Tujuan adalah
+          Laporan dan CSV UTF-8 menampilkan sembilan kolom yang tersedia. Data
+          finansial dan kolom legacy lain belum tersedia. Asal dan Tujuan adalah
           cabang; Kilo ditampilkan sesuai nilai tersimpan.
         </p>
       </header>
@@ -223,6 +225,25 @@ export function TransactionReportView({
           )}
           <ReportSubmitButton />
         </Form>
+        {result.state === "ready" && filters && result.canExport && (
+          <div className="mt-4 space-y-2">
+            <a
+              href={reportUrl(filters)}
+              download
+              aria-describedby="report-export-hint"
+              className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
+            >
+              Unduh CSV
+            </a>
+            <p
+              id="report-export-hint"
+              className="text-sm text-muted-foreground"
+            >
+              Seluruh hasil sesuai filter dan urutan, maksimal 5000 baris. CSV
+              ini menggunakan format target; bukan salinan Excel legacy.
+            </p>
+          </div>
+        )}
       </section>
       {result.state === "initial" && (
         <EmptyState
@@ -258,7 +279,7 @@ export function TransactionReportView({
                 result.total ? (
                   <Link
                     className="text-primary underline underline-offset-4"
-                    href={pageUrl(filters, 1)}
+                    href={reportUrl(filters, 1)}
                   >
                     Ke halaman pertama
                   </Link>
@@ -333,7 +354,7 @@ export function TransactionReportView({
                   prefetch={false}
                   className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
                   aria-label="Halaman sebelumnya"
-                  href={pageUrl(filters, filters.page - 1)}
+                  href={reportUrl(filters, filters.page - 1)}
                 >
                   Sebelumnya
                 </Link>
@@ -344,7 +365,7 @@ export function TransactionReportView({
                     prefetch={false}
                     className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
                     aria-label="Halaman berikutnya"
-                    href={pageUrl(filters, filters.page + 1)}
+                    href={reportUrl(filters, filters.page + 1)}
                   >
                     Berikutnya
                   </Link>

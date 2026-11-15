@@ -238,3 +238,125 @@ it.each([
     { id: "desc" },
   ]);
 });
+
+function allowExport() {
+  fixture().group.permissions.push({
+    resource: "transaction_report",
+    action: "export",
+  });
+}
+it("exports the entire identical predicate/order/projection in one bounded repeatable snapshot regardless of pagination", async () => {
+  allowExport();
+  const input = {
+    ...period,
+    branchId: "10",
+    originBranchId: "10",
+    destinationBranchId: "20",
+    search: "_%",
+    sortBy: "kilo",
+    sortDirection: "asc",
+    page: "9",
+    pageSize: "1",
+  };
+  const read = await service().read(input);
+  expect(read.canExport).toBe(true);
+  const pageQuery = db.transaction.findMany.mock.calls[0][0];
+  db.transaction.count.mockClear();
+  const csv = await service().export(input);
+  expect(db.$transaction).toHaveBeenLastCalledWith(expect.any(Function), {
+    isolationLevel: "RepeatableRead",
+  });
+  expect(db.transaction.findMany.mock.calls[1][0]).toEqual({
+    ...pageQuery,
+    skip: 0,
+    take: 5001,
+  });
+  expect(db.transaction.count).not.toHaveBeenCalled();
+  expect(csv).toContain('"12.34"');
+  expect(csv).not.toMatch(/secret|private|idempotencyKey|biaya|createdById/);
+});
+it.each([
+  "anonymous",
+  "view-only",
+  "export-only",
+  "revoked",
+  "inactive",
+])("denies %s export before reading source rows", async (kind) => {
+  if (kind === "anonymous") current = null;
+  if (kind === "export-only")
+    fixture().group.permissions = [
+      { resource: "transaction_report", action: "export" },
+    ];
+  if (kind === "revoked") {
+    allowExport();
+    db.user.findUnique.mockResolvedValue({
+      ...actor(),
+      allowedBranches: [{ branchId: 10 }],
+    });
+  }
+  if (kind === "inactive") {
+    allowExport();
+    fixture().status = "INACTIVE";
+  }
+  await expect(service().export(period)).rejects.toHaveProperty(
+    "status",
+    kind === "anonymous" || kind === "inactive" ? 401 : 403,
+  );
+  expect(db.transaction.findMany).not.toHaveBeenCalled();
+});
+it("keeps UI capability derived from fresh authorization and never grants view-only export", async () => {
+  expect((await service().read(period)).canExport).toBe(false);
+  allowExport();
+  expect((await service().read(period)).canExport).toBe(true);
+  db.user.findUnique.mockResolvedValue({
+    ...actor(),
+    allowedBranches: [{ branchId: 10 }],
+  });
+  expect((await service().read(period)).canExport).toBe(false);
+});
+it("lets explicit administrators export while still validating selected branch options", async () => {
+  fixture().group.permissions = [
+    { resource: "system_admin", action: "manage" },
+  ];
+  await expect(service().export(period)).resolves.toContain("FAKE-AWB");
+  await expect(
+    service().export({ ...period, originBranchId: "99" }),
+  ).rejects.toHaveProperty("status", 403);
+});
+it.each([
+  {},
+  { ...period, sortBy: ["kilo", "status"] },
+  { ...period, unknown: "secret" },
+  { ...period, endDate: "2026-12-31" },
+])("rejects incomplete or malformed export filters without source reads: %j", async (input) => {
+  allowExport();
+  await expect(service().export(input)).rejects.toHaveProperty("status", 400);
+  expect(db.transaction.findMany).not.toHaveBeenCalled();
+});
+it("requires current authorized endpoint options for export", async () => {
+  allowExport();
+  for (const field of ["branchId", "originBranchId", "destinationBranchId"])
+    await expect(
+      service().export({ ...period, [field]: "99" }),
+    ).rejects.toHaveProperty("status", 403);
+  expect(db.transaction.findMany).not.toHaveBeenCalled();
+});
+it("exports header-only empty scope/results and accepts 5000 rows while refusing 5001", async () => {
+  allowExport();
+  db.transaction.findMany.mockResolvedValue([]);
+  const empty = await service().export(period);
+  expect(empty.split("\r\n")).toHaveLength(2);
+  db.transaction.findMany.mockResolvedValue(
+    Array.from({ length: 5000 }, () => row),
+  );
+  expect((await service().export(period)).split("\r\n")).toHaveLength(5002);
+  db.transaction.findMany.mockResolvedValue(
+    Array.from({ length: 5001 }, () => row),
+  );
+  await expect(service().export(period)).rejects.toHaveProperty("status", 422);
+  fixture().branchIds = [];
+  db.branch.findMany.mockResolvedValue([]);
+  db.transaction.findMany.mockClear();
+  expect(await service().export(period)).toBe(empty);
+  expect(db.transaction.findMany).not.toHaveBeenCalled();
+});

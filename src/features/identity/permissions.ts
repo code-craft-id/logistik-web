@@ -188,7 +188,7 @@ export const permissionResources = [
   {
     resource: "transaction_report",
     label: "Laporan Detail Transaksi",
-    actions: ["view"],
+    actions: ["view", "export"],
   },
   {
     resource: "manifest_report",

@@ -11,6 +11,7 @@ vi.mock("next/form", () => ({
 }));
 const ready: TransactionReportResult = {
   state: "ready",
+  canExport: false,
   parsed: parseTransactionReportFilters({
     startDate: "2026-11-01",
     endDate: "2026-11-15",
@@ -231,4 +232,51 @@ it("preserves only bounded valid authorized controls when another query field is
   expect(
     (host.querySelector('[name="pageSize"]') as HTMLInputElement)?.value,
   ).toBe("20");
+});
+
+it("shows a native bounded CSV download only with fresh capability and valid filters", () => {
+  const host = document.createElement("div");
+  host.innerHTML = render({
+    ...ready,
+    canExport: true,
+    parsed: parseTransactionReportFilters({
+      startDate: "2026-11-01",
+      endDate: "2026-11-15",
+      search: "FAKE",
+      branchId: "1",
+      originBranchId: "1",
+      destinationBranchId: "1",
+      sortBy: "kilo",
+      sortDirection: "asc",
+      page: "2",
+      pageSize: "1",
+    }),
+  });
+  const anchor = host.querySelector("a[download]");
+  expect(anchor?.textContent).toContain("Unduh CSV");
+  const url = new URL(
+    anchor?.getAttribute("href") ?? "/missing",
+    "http://localhost",
+  );
+  expect(url.pathname).toBe("/branch-reports/transaction-details/export");
+  expect(Object.fromEntries(url.searchParams)).toMatchObject({
+    search: "FAKE",
+    branchId: "1",
+    originBranchId: "1",
+    destinationBranchId: "1",
+    sortBy: "kilo",
+    sortDirection: "asc",
+  });
+  expect(url.searchParams.has("page")).toBe(false);
+  expect(url.searchParams.has("pageSize")).toBe(false);
+  expect(anchor?.getAttribute("data-prefetch")).toBeNull();
+  host.innerHTML = render(ready);
+  expect(host.querySelector("a[download]")).toBeNull();
+  host.innerHTML = render({
+    ...ready,
+    canExport: true,
+    state: "invalid",
+    parsed: { status: "invalid", issues: [] },
+  });
+  expect(host.querySelector("a[download]")).toBeNull();
 });

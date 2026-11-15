@@ -8,13 +8,16 @@ import {
 } from "../../src/features/identity/permissions";
 
 describe("report-specific navigation grant", () => {
-  it("registers only view after delivery without an administrator-only restriction", () => {
+  it("registers view and export after delivery without an administrator-only restriction", () => {
     expect(
       validPermission({ resource: "transaction_report", action: "view" }),
     ).toBe(true);
     expect(
       validPermission({ resource: "transaction_report", action: "create" }),
     ).toBe(false);
+    expect(
+      validPermission({ resource: "transaction_report", action: "export" }),
+    ).toBe(true);
     expect(permissionRestriction("transaction_report")).toBeUndefined();
     const resources = permissionResources.map(
       (entry) => entry.resource as string,

@@ -539,3 +539,103 @@ it("sorts all nine stored fields numerically or by relation name with nulls and 
     }
   }
 });
+
+it("reconciles scoped sorted source rows to CSV, ignores paging, makes no writes and denies revoked grants/scope", async () => {
+  await expect(service(users[1]).export(period)).rejects.toHaveProperty(
+    "status",
+    403,
+  );
+  await expect(service(users[2]).export(period)).rejects.toHaveProperty(
+    "status",
+    403,
+  );
+  const grant = await db.permission.create({
+    data: {
+      groupId: groups[1],
+      resource: "transaction_report",
+      action: "export",
+    },
+  });
+  try {
+    const first = await record({
+      awbNo: `${tag}-export-A`,
+      transactionDate: new Date("2026-11-04T00:00:00Z"),
+      originBranchId: branches[0],
+      destinationBranchId: branches[1],
+      senderName: "=1+1",
+      receiverName: 'FAKE, "受信"',
+      koli: 10,
+      kilo: "10.25",
+      status: "Cancelled",
+    });
+    await record({
+      awbNo: `${tag}-export-B`,
+      transactionDate: new Date("2026-11-04T00:00:00Z"),
+      originBranchId: branches[0],
+      destinationBranchId: branches[1],
+      senderName: "FAKE",
+      receiverName: null,
+      koli: 2,
+      kilo: "2.5",
+      status: "Open",
+    });
+    await record({
+      awbNo: `${tag}-export-hidden`,
+      transactionDate: new Date("2026-11-04T00:00:00Z"),
+      originBranchId: branches[2],
+      kilo: "1",
+    });
+    const query = {
+      ...period,
+      search: `${tag}-export-`,
+      originBranchId: String(branches[0]),
+      destinationBranchId: String(branches[1]),
+      sortBy: "kilo",
+      sortDirection: "asc",
+      pageSize: "1",
+      page: "2",
+    };
+    const page = await service(users[1]).read(query);
+    expect(page.canExport).toBe(true);
+    expect(page.items.map((row) => row.id)).toEqual([first]);
+    const before = await db.transaction.count({
+      where: { id: { in: transactionIds } },
+    });
+    const csv = await service(users[1]).export(query);
+    expect(csv).toBe(
+      '"AWB No.","tanggal (UTC)","Asal","Tujuan","Pengirim","Penerima Barang","Koli","Kilo","Status Pengiriman"\r\n' +
+        `"${tag}-export-B","2026-11-04T00:00:00.000Z","FAKE report branch 0","FAKE report branch 1","FAKE","","2","2.5","Open"\r\n` +
+        `"${tag}-export-A","2026-11-04T00:00:00.000Z","FAKE report branch 0","FAKE report branch 1","'=1+1","FAKE, ""受信""","10","10.25","Cancelled"\r\n`,
+    );
+    expect(await service(users[1]).export(query)).toBe(csv);
+    expect(
+      await db.transaction.count({ where: { id: { in: transactionIds } } }),
+    ).toBe(before);
+    await expect(
+      service(users[1]).export({
+        ...query,
+        originBranchId: String(branches[2]),
+      }),
+    ).rejects.toHaveProperty("status", 403);
+    await db.userAllowedBranch.deleteMany({
+      where: { userId: users[1], branchId: branches[0] },
+    });
+    try {
+      await expect(service(users[1]).export(query)).rejects.toHaveProperty(
+        "status",
+        403,
+      );
+    } finally {
+      await db.userAllowedBranch.create({
+        data: { userId: users[1], branchId: branches[0] },
+      });
+    }
+  } finally {
+    await db.permission.delete({ where: { id: grant.id } });
+  }
+  expect((await service(users[1]).read(period)).canExport).toBe(false);
+  await expect(service(users[1]).export(period)).rejects.toHaveProperty(
+    "status",
+    403,
+  );
+});
