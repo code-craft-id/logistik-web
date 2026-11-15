@@ -1,61 +1,52 @@
-# RPT-01A progress and verification
+# RPT-01A verification —2026-11-15
 
-2026-11-15. Full RPT-01: **PARTIAL**. Connected RPT-01A report: **NOT IMPLEMENTED**.
-Business OptionA approved; actual human Dev1/Dev2 reviews pending in the linked
-[contract](../../RPT-01-contract.md). No new PR or deployment.
+IMPLEMENTED + LOCAL VERIFIED for the bounded nine-column non-financial report. Full RPT-01 remains PARTIAL for deferred parity. Code SHA723dce61309cc6157d2a374a2fba4220b9181ce1, basea26e8487bbe8d1b332c585e9fce0f66a7f61e169. Final documentation commits do not change this tested source. No new PR, merge or deployment.
 
-## Independently executable preparation
+## Scope and authority
 
-Code commit `64d9ea24e38a96338c8ba45ca64724f2e2399e74`, parent
-`caefd2c67cdb6da5006737ae99c48b97f92d66ec`. Only new code/test files:
-`src/features/reports/transaction-details/filters.ts` and
-`tests/unit/transaction-detail-report-filters.test.ts`.
+Owner selected OptionA for scoped D15/D19/D22:9real-source fields, explicit UTC transaction dates,31day period, allstoredstatuses includingCancelled, no money/aggregates/export/billing filters. Formal named-approver record remains PARTIAL; explicit task-local selection persists without another approval question. Actual [Dev1 documentation review](https://github.com/code-craft-id/logistik-web/pull/10#pullrequestreview-5908964791) corrections implemented. Owner explicitly deferred Dev1/Dev2 code approvals to finalcombinedDev3PR for this and allfuturetasks; [standing workflow](../../../agent-policies/DEV3-REVIEW-WORKFLOW.md).
 
-Pure initial/valid/invalid query parsing implements the approved period and technical
-bounds. It reads no identity, source records or DB, changes no permission inventory,
-and is not connected to a route. Branch ID syntax validation is not authorization.
+## Actual checks
 
-Implementation-worker actual commands using pinned Node24.15.0:
+Pinned Node24.15.0; Prisma7.10.1; Next16.4.2. No schema/migration/dependency changes.
 
-| Check | Result / limit |
+| Command/check | Actual result at723dce6 |
 | --- | --- |
-| TDD RED, `npm test -- tests/unit/transaction-detail-report-filters.test.ts` with typed nonfunctional stub | 55 expected assertion failures /2 initial-state passes; earlier missing-module failure not sole RED evidence |
-| Same focused test after implementation | 57/57 PASS,853ms |
-| Installed Biome `check` on the two owned files | PASS,2files after formatting; formatting after GREEN changed no code semantics |
-| `npm run typecheck` | PASS, `tsc --noEmit`,4.64s |
-| `git diff --check` | PASS |
+| Worker service/filter RED | 8expectedfailures, typednonfunctionalservice +AWB51reviewcorrection |
+| Worker UI/navigation RED | 4expectedfailures beforeimplementation |
+| Focused npmtest RPT filters/service/navigation/page/UI files | 5files/70PASS6.70s |
+| Targeted guarded test:integration report file | 7PASS3.35s |
+| Worker installedBiome19ownedfiles | PASS |
+| Lead rtk bypass npm run lint | PASS356files |
+| Lead npm run typecheck | PASS |
+| Lead npm test | 55files/544PASS70.26s |
+| Lead npm run test:integration | 13files/111PASS38.47s |
+| Lead temporary guardedhelper build (delegates next build) | PASS68routes; testURL validated before childenv, no dev/production DB mutation |
+| Independent qa_reviewer a26e848..723dce6 | PASS noP0/P1/P2; readonly code/spec/test review, no testsrerun |
+| Impeccable detector6changed reportTSX | [] PASS |
+| git diff --check | PASS |
 
-Initial `npx biome check` executable resolution failed; using the existing pinned
-Node executable with `node_modules/@biomejs/biome/bin/biome` resolved invocation.
-No install/configuration change or repeated blind verification loop.
+Full suite is RPT regression coverage for shared permission/navigation changes, not a repeated SUP acceptance task. No previous SUP result transfers to this codeSHA.
 
-Cases include real-calendar UTC/leap dates and half-open cutoffs; inclusive31-day
-bound; invalid/reversed ranges; canonical integer page1..1000, size1..100/default20;
-AWB max100; branch positive-integer syntax; unknown keys/duplicate arrays; malformed
-optional parameters before initial-state return; fixed errors without raw-input echo.
+## Meaningful test evidence
 
-Independent focused code QA: **PASS**, noP0/P1/P2, `caefd2c..64d9ea2` on2026-11-15.
-Read-only qa_reviewer verified both changed files and spec/security bounds; no tests
-rerun or DB/browser access. Earlier independent packet QA PASS is separate design
-review; neither supplies human domain approval or report authorization proof.
+- Fresh actor/report grant; transaction:view alone denied; emptyscope, allowedorigin/destination, permission/membership revocation, ACTIVEhierarchy, mixedinactive/active endpoints, adminhistorical/nullnull and validatedbranchoptions.
+- Exact synthetic row/count reconciliation, UTC half-open boundaries, duplicate-date stablepaging, nullversuszero, Decimalstring DTO without financial/private fields.
+- Real external writer commits after rows read/beforecount inside RepeatableRead: same response retains consistentoldrows/count, nextrequest seesnewrow. Test-onlyProxy coordinates realDBcalls, no productionhook.
+- Literal AWB percent/underscore/backslash regression: actualunderscoreRED matched2rows instead1; escapingfix passesall3 without rawSQL. LibraryfirstContext7 [official versioned Prisma filtering docs](https://github.com/prisma/web/blob/v6/content/200-orm/200-prisma-client/100-queries/050-filtering-and-sorting.mdx) used with installed7 compatibility; latestv8 API deliberately not substituted.
 
-## Deliberately unresolved checks
+## Actual local browser proof
 
-- Source query, DTO, grants, branch-scope enforcement, rows/count reconciliation,
-  concurrency integration, operational page, responsive/keyboard browser checks:
-  **NOT RUN / not implemented**, awaiting actual Dev1/Dev2 contract reviews.
-- Full unit suite, DB integration, lint across repository and production build:
-  **NOT RUN for this unconnected parser preparation**. They remain required at the
-  connected report code SHA; no earlier SUP result is transferred.
-- No staging/production/provider data used; no DB mutation, migration, fixture,
-  browser page or local server created in this RPT work.
-- SUP-01A remains IMPLEMENTED + LOCAL VERIFIED at its own prior code SHA. Full
-  SUP-01 remains PARTIAL, with its deferred lifecycle untouched.
+ChromeDevToolsLab against local productionbuild127.0.0.1:3021, guarded logistik_web_test only, isolatedcontexts/fakecredentials/ownedfixtures. Legacy page1 untouched; no legacy content or images inspected/archived.
 
-## Next executable work
+- Anonymous report redirectslogin. Fake report-onlyreader signsin and realGETform Nov1..15 returns exactly3of6ownedfixtures: UTCboundary, nullableAWB/quantities, Cancelled/zero. Otherbranch/nextday/nullnull excluded. Ninecolumns, no financialdata/detail links.
+- Native images manually viewed1440/768/375touch CSSpixels: no page-level clipping observed; intentional internal table scroll preservesall9columns. Regionfocus+ArrowRight reachesrightmoststatus/quantities on375. TabfocusesNext andEnter loadsdistinctsecondrow/count3.
+- Actual no-match AWBquery ->empty0. Invalid32day period ->fixedalert andbothdates preserved aftersettlednavigation. Immediatepre-navigation snapshot notusedasacceptance; no productbug inferredfromracinginputs.
+- Separate fakeuser withtransaction:view/no reportgrant gets generic Aksesditolak/no reportdata. Mobile nav correctreportlink; EscapeclosesSheet/restoresfocus.
+- Nativeimagesviewed only; no PNGexportattempt/archiveclaim. Ownedpages5/6closed, ownedserverstopped/no3021listenerverified. CapturedIDfixtures deleted (6transactions/2users/groups/branches/office/company), ownedusersabsenceverified. Temporaryhelper/metadataremoved. No pending jobs.
 
-Dev1 review of `transaction_report:view`, fresh actor, branch scope/options and route
-mapping; Dev2 review of nine source fields/date/current status/raw Kilo/branch mapping.
-Requests and exact reviewed proposal SHA are in the contract. Once accepted, continue
-the same vertical slice with source service + real report UI/tests and independent QA;
-commit/push feature branch, no new PR until all agreed Dev3 work finishes.
+## Diagnostics and remaining limits
+
+Initial RTK npm-lint wrapper expectedESLintJSON andfailed parsingBiomeoutput; documentedRTKbypass exposedactualcleanlint. No repository/configfix. Worker fixture corrections: shortenedtoo-longfakeAWB, selectedexactzero-fixture assertion, correctedmodelnameagainstsource. Ownedimportsorting/nullmarkup lint fixed, thenrelevantchecks passed. Repeats followedactualfailures/fixes, not blindloops.
+
+Staging, physicaldevice/browsermatrix, finalhuman codeapproval/release NOTRUN/DEFERRED. Finalreview is not a developmentapprovalgate. Migrationdiff not rerun for schema-freeRPT; previouslyrecorded Dev2 timestampdrift anddependencyadvisories remainseparatefollowups. Missing-source columns/filters, exports andfinance deferred in [contract](../../RPT-01-contract.md). SUP01A unchanged/fullSUP PARTIAL. See [final review queue](../../DEV3-FINAL-REVIEW.md).

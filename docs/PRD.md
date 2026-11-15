@@ -110,6 +110,8 @@ Every step needs explicit decisions on cancellation, returns, retries, partial d
 - Before UI sign-off, each report must define: filters, date basis, units, totals, included statuses, permissions, and source query.
 - Dashboard quick actions mirror allowed pages and never grant privileges.
 
+RPT-01A implementation checkpoint2026-11-15: the selected nine-column non-financial Transaction Detail Report is implemented and locally verified with explicit UTC31-day dates, separate report permission/currentACTIVEbranch scope and snapshot-consistent paging/count. Full report parity remains PARTIAL. Owner consolidates Dev1/Dev2 code reviews in finalDev3PR; no development approval gate. Formal named-owner approval record remains PARTIAL; explicit task-local OptionA persists. See [contract](decisions/RPT-01-contract.md) and [verification](decisions/evidence/rpt-01/verification.md).
+
 ### FR-07. Ticketing
 - Create tickets with category, description, linked AWB/customer where applicable, priority, assignee, status, and a chronological event/comment history.
 - Visibility by branch and user, plus resolved/reopened rules, must be defined (D-16).
@@ -165,7 +167,7 @@ D-30 records the user's technical SCH-01 approval on 2026-10-18 separately from 
 | D-12 | Financial | Invoice lifecycle and payment handling? | FR-05 | DISC-04 | FIN-01 | TBD |
 | D-13 | Financial | Chart of accounts and posting rules? | FR-05 | DISC-04 | FIN-02 | TBD |
 | D-14 | Financial | Profit calculation and recognition date? | FR-05, FR-06 | DISC-04 | FIN-02 | TBD |
-| D-15 | Reports | Exact columns, formulas, export formats, date/time basis, access scope, and sample outputs per report? | FR-06 | DISC-04 | RPT-01, RPT-02 (per report) | PARTIAL: RPT-01A nine-column non-financial Option A approved by project owner on 2026-11-15; Dev1/Dev2 contract reviews pending. Other reports/rules remain TBD; see RPT-01-contract.md |
+| D-15 | Reports | Exact columns, formulas, export formats, date/time basis, access scope, and sample outputs per report? | FR-06 | DISC-04 | RPT-01, RPT-02 (per report) | PARTIAL: RPT-01A nine-column non-financial Option A approved by project owner on 2026-11-15; Formal approver identity record PARTIAL; explicit owner Option A direction persists. Owner defers Dev1/Dev2 code/merge reviews to final combined Dev3 PR; actual Dev1 documentation corrections adopted. Other reports/rules remain TBD; see RPT-01-contract.md |
 | D-16 | Ticketing | Visibility, assignment, and resolved/reopened rules? | FR-07 | DISC-04 | SUP-01 | PARTIAL: Option A create/read direction selected 2026-11-15; named formal approval record incomplete; later lifecycle rules TBD; Dev1 bounded contract accepted 2026-11-15; implementation code review remains required |
 | D-17 | Delivery | Launch scope and date? | All | DISC-01 | Phase 1 start | TBD |
 | D-18 | Delivery | Required integrations? Baileys in a separate stakeholder-supplied project is selected for branch WhatsApp; preparatory setup is approved under D-34. Transport and sending rules, plus other integrations, remain TBD. | TBD per integration | DISC-01, WA-01 | Before each live integration | PARTIAL |
