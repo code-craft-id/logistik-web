@@ -175,3 +175,6 @@ Regression proposals NOT RUN: date query preserves selected period; test billing
 LD044–046 amendments: LP-R08 successfully queried2026-11-01..15 via calendar, still empty6-label output; LP-R17 Lunas now inspected, same7-header empty structure as initial tab; LP-R06 all3 current variants now queried and empty with same11 labels, plus one November2025 Vendor comparison empty. No row-level profit formula/reconciliation oracle became available. Prior initial-only/unqueried limits remain historical at their original evidence IDs.
 
 No user-known nonempty financial period/branch is available. Do not reuse operational shipment rows as financial reconciliation cases; do not infer formulas from empty GP/AR/AP. Existing rules or permitted sanitized source/output examples remain required.
+
+## RPT-02 consuming v1 target —2026-11-15
+Featurebranch operational v1 is DONE/localverified at9b76457: realmanifest/perDRS+items/rawdashboard source-backed targets, not an assertion that every legacy header/aggregate is implemented. Existing observed inventory stays unchanged; source/definition/test limits in docs/decisions/RPT-02-contract.md and verification.md. Vendor LP-R09 attribution remains RPT-05; targetedcurrentview didnotestablishmapping, not globalabsence. No discovery reopening or financialformula confirmation.
