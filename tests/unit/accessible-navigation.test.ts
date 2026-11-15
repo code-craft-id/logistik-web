@@ -39,6 +39,12 @@ describe("available navigation", () => {
     expect(paths).toContain("/logistics/services");
     for (const path of [
       "/dashboard",
+      "/branch-reports/manifest-outbound",
+      "/branch-reports/delivery",
+    ])
+      expect(paths).toContain(path);
+    for (const path of [
+      "/branch-reports/manifest-vendor",
       "/perkiraan",
       "/akunting",
       "/transactions",
