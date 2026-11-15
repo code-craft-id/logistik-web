@@ -4,7 +4,7 @@
 
 ## Current source facts (verified on this base)
 
-- `src/features/bookings/billing-contract.ts` is the only src/tests reference to ShipmentBillingEvent/SHIPMENT_BILLABLE. It defines a proposed shape; no producer, validator, persistence, dedupe or consumer exists. The old OPS-04 note's billing-events.ts path is stale; actual owning file is billing-contract.ts.
+- `src/features/bookings/billing-contract.ts` is the only src/tests reference to ShipmentBillingEvent/SHIPMENT_BILLABLE. It defines a proposed shape; no producer, validator, persistence, dedupe or consumer exists. The historical OPS-04 note named billing-events.ts; that documentation path is now corrected to actual billing-contract.ts without changing the proposed contract or runtime.
 - Transaction provides operational identifiers, date, branches, stored current shipment status and nullable biaya Decimal(15,2). A numeric field does not prove customer receivable, final charge, currency, tax treatment or billability. Do not reinterpret shipment status as invoice/payment status.
 - No Invoice or Payment model declaration exists in the current domain schema files. `src/features/accounting/preview/screens.ts` is presentation; accounting.prisma Ledger/Account/categories remain DRAFT under D-13/D-14, not runtime authorization.
 - PRD D-11 (rates/discount/tax/COD/vendor costing), D-12 (invoice/payment lifecycle) and D-21 (approvals/approvers) remain TBD. FIN-01 explicitly depends on OPS-01/OPS-04/accepted DISC-04. DISC-04 closure is satisfied and is not reopened; actual finance/source gates remain.
@@ -34,3 +34,27 @@ Request the real existing rule/example or prepare an explicitly proposed target 
 ## Status and handoff
 
 FIN-01 source/decision preparation started; runtime **BLOCKED: decision required D-11/D-12/D-21**, plus a real approved billing-source contract. This is not a new Dev1/Dev2 gate or a generic DISC-04 blocker. FIN-02 remains deferred. No runtime/test/schema/package modifications in this worktree; no tests rerun for this documentation-only note. Canonical lead state stays C:/Development/logistik-web/docs/agent-state/dev3; resume from those disk records and real Git, not chat memory.
+
+## Owner-directed legacy follow-up in progress
+
+Owner answered the initial finance-rule request: **“cek pada web legacy terlebih dahulu”**. Lead revalidated authenticated approved Chrome Lab page1 and assigned one bounded observer under canonical DIRECT_NON_MUTATING_DISCOVERY. Reuse accepted LD004/021/040/041/045; inspect only new safe invoice detail/items/payment/history paths, no business-form/workflow submit, export/download, credentials or arbitrary JS/API. No financial policy is adopted by this instruction. The user-rule request is superseded by this evidence check; do not repeat it before the result.
+
+Additional repo fact on this exact source base: bookings/server/service.ts persists supplied nullable biaya (`data.biaya`/`rest.biaya`); scoped contracts/service/form searches found no currency/tax/discount derivation. It is a stored operational input, not proof of customer final charge. No code is changed by this source check.
+
+Initial bounded live result reported by observer: current sales invoice list has0entries, hence no populated ordinary invoice/item/payment detail link in that inspected list. This is not global absence; distinct safe finance navigation/history candidates still being checked. Final sanitized evidence and any genuine remaining decision follow after that check.
+
+## FIN-01 targeted legacy result —2026-11-15 07:29:02–07:30:38 UTC
+
+One legacy_observer completed the owner-directed bounded gap check through current authenticated Chrome Lab page1 at the approved origin, applicable DIRECT_NON_MUTATING_DISCOVERY. Protected-technical NOT_VERIFIED unchanged; role/non-admin/branch parity outside this session unverified.
+
+OBSERVED:
+- /index.php/sales default invoice list explicitly0entries.
+- Actual Dashboard Invoice Paid link opens /sales with status=paid and invoice_status=Closed in current dashboard November date context; list0entries.
+- Actual Dashboard Invoice Outstanding/Unpaid link opens /sales with status=unpaid and invoice_status=Open in the same context; list0entries.
+- Modul > Keuangan > Piutang Dagang exposes Invoice(New)->sales in that navigation branch. Search selector offers InvoiceNo/PeriodeDate; no query submitted without a specific record/period hypothesis.
+
+Parameter strings prove visible link mapping only, not backend filtering, status semantics or completeness. No populated row/detail/item/payment/history link was available in those three inspected lists; no global data absence claimed. Accepted LD004/021/040/041/045 reused, no repeated AR/AP or random period scans. No businessform/workflow/status/payment/approval/generate/print/export/download/credentials/JS/API action, no files/private data archived.
+
+UNVERIFIED: authoritative customer amount/currency/components, source grouping, invoice number/date rules, payment allocation/correction history, approval authority/posting rules. No rule has been confirmed by this observation and no dependent runtime becomes READY.
+
+Next consolidated choice: (A) establish an explicit target FIN01 billing/payment contract with the project/finance owner and reconciled synthetic examples, then implement one approved slice; or (B) defer runtime until actual business definitions/example become available. Recommend A to advance without fabricating parity. Choosing that direction alone would NOT approve an amount/formula/state machine/permission; the concrete contract still needs actual adoption. No repeated request for the user to locate pages or a populated legacy period.
