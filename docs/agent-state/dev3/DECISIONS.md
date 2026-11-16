@@ -33,3 +33,9 @@ Owner authorized shared-component polish. Existing tokens/primitives retained; n
 
 ### 2026-11-16 01:49:40 UTC - accounting navigation boundary
 Technical fix only: page-local Suspense contains session-dependent AccountingHomePage during sibling navigation. No new business policy, caching of authority, schema or financial change. Existing business/release decisions unchanged.
+
+## 2026-11-16 — comprehensive RPT migration continuation
+
+D15/D19/D22: PARTIAL. Owner explicitly requests all22report identities plus actual export inspection; previous ROADMAP/NOT NEEDED acceptance retained historically. LP-R09 is now part of the comprehensive reporting objective without another inclusion-approval question; vendor capture/attribution remains BLOCKED_SOURCE. No business rule auto-confirmed. Source-ready quantity/branch-reference contracts implemented under this instruction; source/reconciliation limits and17actual inspected export identities are recorded in DEV3-LEGACY-PARITY-AUDIT.md section11. No VERIFIED_EQUIVALENT or exact migration established.
+
+D11–14/D21: existing FIN A+B adoption unchanged. Legacy GP vendor allocations/trucking, cash/credit categories, invoice receipt/aging and supplier settlement are OBSERVED structures or unresolved rules, not newly approved postings. SUP omission decisions unchanged. Cross-domain code review timing remains final combined review; remaining source/business semantics, not developer availability, block19full report migrations.

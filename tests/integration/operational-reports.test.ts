@@ -174,8 +174,19 @@ beforeAll(async () => {
       ).id,
     );
   }
-  txA = await transaction("A", { status: "Cancelled", koli: 0, kilo: "0.00" });
-  txB = await transaction("B", { originBranchId: c, destinationBranchId: b });
+  txA = await transaction("A", {
+    status: "Cancelled",
+    koli: 0,
+    kilo: "0.10",
+    volume: "0.001",
+  });
+  txB = await transaction("B", {
+    originBranchId: c,
+    destinationBranchId: b,
+    koli: 3,
+    kilo: "0.20",
+    volume: null,
+  });
   txHidden = await transaction("H", {
     originBranchId: c,
     destinationBranchId: c,
@@ -193,7 +204,7 @@ beforeAll(async () => {
     originBranchId: d,
     destinationBranchId: null,
   });
-  main = await manifest("main");
+  main = await manifest("main", { originBranchId: a, destinationBranchId: c });
   other = await manifest("other", { branchId: b });
   hidden = await manifest("hidden", {
     branchId: c,
@@ -299,7 +310,15 @@ describe("guarded operational report real sources", () => {
     if (result.kind !== "manifest") throw new Error("kind");
     expect(result.items.find((row) => row.id === main)).toMatchObject({
       type: "Transit",
+      originBranch: (await db.branch.findUniqueOrThrow({ where: { id: a } }))
+        .name,
+      destinationBranch: (
+        await db.branch.findUniqueOrThrow({ where: { id: c } })
+      ).name,
       assignedTransactions: 1,
+      totalKoli: 0,
+      totalKilo: "0.1",
+      totalVolume: "0.001",
       vehicle: null,
       courier: null,
     });
@@ -310,6 +329,7 @@ describe("guarded operational report real sources", () => {
       expect.arrayContaining([a, b]),
     );
     expect(result.branches.map((branch) => branch.id)).not.toContain(d);
+    expect(result.branches.map((branch) => branch.id)).not.toContain(c);
     const admin = await read(userIds[0]).read("manifest", period);
     expect(admin.items.map((row) => row.id)).toEqual(
       expect.arrayContaining([hidden, unowned, inactive]),
@@ -344,6 +364,9 @@ describe("guarded operational report real sources", () => {
     expect(sheets.items[0]).toMatchObject({
       id: sheetMain,
       visibleTransactions: 2,
+      totalKoli: 3,
+      totalKilo: "0.3",
+      totalVolume: null,
     });
     expect(sheets.items[0]).not.toHaveProperty("status");
     const items = await read(userIds[1]).read("delivery", {

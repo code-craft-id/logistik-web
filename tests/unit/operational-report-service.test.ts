@@ -9,6 +9,7 @@ const db = {
   user: { findUnique: vi.fn() },
   branch: { findMany: vi.fn() },
   manifest: { findMany: vi.fn(), count: vi.fn() },
+  manifestItem: { findMany: vi.fn() },
   transaction: { count: vi.fn() },
   deliverySheet: { findMany: vi.fn(), count: vi.fn() },
   deliverySheetItem: { findMany: vi.fn(), count: vi.fn() },
@@ -46,12 +47,15 @@ beforeEach(() => {
   );
   db.branch.findMany.mockResolvedValue([{ id: 10, name: "FAKE Branch" }]);
   db.$transaction.mockImplementation(async (work) => work(db));
+  db.manifestItem.findMany.mockResolvedValue([]);
   db.manifest.findMany.mockResolvedValue([
     {
       id: 5,
       manifestNo: "FAKE-M",
       manifestDate: new Date("2026-11-02T00:00:00Z"),
       branch: { name: "FAKE" },
+      originBranchId: null,
+      destinationBranchId: null,
       type: "Transit",
       vehicle: null,
       courier: null,
@@ -105,11 +109,16 @@ describe("operational report boundaries", () => {
         manifestNo: "FAKE-M",
         date: "2026-11-02T00:00:00.000Z",
         branch: "FAKE",
+        originBranch: null,
+        destinationBranch: null,
         type: "Transit",
         vehicle: null,
         courier: null,
         status: "Draft",
         assignedTransactions: 0,
+        totalKoli: 0,
+        totalKilo: "0",
+        totalVolume: "0",
       },
     ]);
     expect(args.select._count.select.items.where).toMatchObject({
@@ -117,6 +126,39 @@ describe("operational report boundaries", () => {
       releasedAt: null,
       transaction: { is: { deletedAt: null } },
     });
+  });
+  it("resolves only stored page references without adding them to branch options or guessing missing labels", async () => {
+    const source = (await db.manifest.findMany())[0];
+    db.manifest.findMany.mockResolvedValue([
+      { ...source, originBranchId: 10, destinationBranchId: 999 },
+    ]);
+    const result = await read().read("manifest", period);
+    expect(result.items[0]).toMatchObject({
+      originBranch: "FAKE Branch",
+      destinationBranch: null,
+    });
+    expect(result.branches).toEqual([{ id: 10, name: "FAKE Branch" }]);
+    expect(db.branch.findMany).toHaveBeenCalledWith({
+      where: { id: { in: [10, 999] } },
+      select: { id: true, name: true },
+    });
+  });
+  it("bounds quantities to the displayed manifests and the same scoped active items as the count", async () => {
+    await read().read("manifest", period);
+    const args = db.manifestItem.findMany.mock.calls[0][0];
+    expect(args.where).toEqual({
+      ...db.manifest.findMany.mock.calls[0][0].select._count.select.items.where,
+      manifestId: { in: [5] },
+    });
+    expect(args.take).toBe(10001);
+    expect(args.select).toEqual({
+      manifestId: true,
+      transaction: { select: { koli: true, kilo: true, volume: true } },
+    });
+    db.manifest.findMany.mockResolvedValue([]);
+    db.manifestItem.findMany.mockClear();
+    expect((await read().read("manifest", period)).items).toEqual([]);
+    expect(db.manifestItem.findMany).not.toHaveBeenCalled();
   });
   it("validates branch options even for admins and does not run initial source queries", async () => {
     expect((await read().read("manifest", {})).state).toBe("initial");

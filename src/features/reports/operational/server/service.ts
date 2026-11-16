@@ -12,6 +12,7 @@ import {
 import type { Prisma, PrismaClient } from "@/lib/db/generated/client";
 import type { OperationalReportResult } from "../contracts";
 import { type OperationalKind, parseOperationalFilters } from "../filters";
+import { quantitySelect, quantityTotals } from "./quantities";
 
 const resources = {
   manifest: "manifest_report",
@@ -144,6 +145,8 @@ export function createOperationalReportService(
                 manifestNo: true,
                 manifestDate: true,
                 branch: { select: { name: true } },
+                originBranchId: true,
+                destinationBranchId: true,
                 type: true,
                 vehicle: { select: { licensePlate: true } },
                 courier: { select: { name: true } },
@@ -164,23 +167,78 @@ export function createOperationalReportService(
               skip: f.skip,
               take: f.take,
             });
+            const referenceIds = [
+              ...new Set(
+                rows
+                  .flatMap((row) => [
+                    row.originBranchId,
+                    row.destinationBranchId,
+                  ])
+                  .filter((id): id is number => id !== null),
+              ),
+            ];
+            const references = new Map(
+              (referenceIds.length
+                ? await tx.branch.findMany({
+                    where: { id: { in: referenceIds } },
+                    select: { id: true, name: true },
+                  })
+                : []
+              ).map((branch) => [branch.id, branch.name]),
+            );
+            const quantities = quantityTotals(
+              rows.map((row) => row.id),
+              (rows.length
+                ? await tx.manifestItem.findMany({
+                    where: {
+                      manifestId: { in: rows.map((row) => row.id) },
+                      deletedAt: null,
+                      releasedAt: null,
+                      transaction: { is: txVisible },
+                    },
+                    select: {
+                      manifestId: true,
+                      transaction: { select: quantitySelect },
+                    },
+                    orderBy: { id: "asc" },
+                    take: 10_001,
+                  })
+                : []
+              ).map((item) => ({
+                groupId: item.manifestId,
+                transaction: item.transaction,
+              })),
+            );
             const total = await tx.manifest.count({ where });
             return {
               ...base,
               kind: "manifest",
               state: "ready",
               total,
-              items: rows.map((row) => ({
-                id: row.id,
-                manifestNo: row.manifestNo,
-                date: row.manifestDate.toISOString(),
-                branch: row.branch?.name ?? null,
-                type: row.type,
-                vehicle: row.vehicle?.licensePlate ?? null,
-                courier: row.courier?.name ?? null,
-                status: row.status,
-                assignedTransactions: row._count.items,
-              })),
+              items: rows.map((row) => {
+                const quantity = quantities.get(row.id);
+                if (!quantity) throw new Error("Missing manifest quantities");
+                return {
+                  id: row.id,
+                  manifestNo: row.manifestNo,
+                  date: row.manifestDate.toISOString(),
+                  branch: row.branch?.name ?? null,
+                  originBranch:
+                    row.originBranchId === null
+                      ? null
+                      : (references.get(row.originBranchId) ?? null),
+                  destinationBranch:
+                    row.destinationBranchId === null
+                      ? null
+                      : (references.get(row.destinationBranchId) ?? null),
+                  type: row.type,
+                  vehicle: row.vehicle?.licensePlate ?? null,
+                  courier: row.courier?.name ?? null,
+                  status: row.status,
+                  assignedTransactions: row._count.items,
+                  ...quantity,
+                };
+              }),
             };
           }
           if (kind === "dashboard") {
@@ -241,21 +299,47 @@ export function createOperationalReportService(
               skip: f.skip,
               take: f.take,
             });
+            const quantities = quantityTotals(
+              rows.map((row) => row.id),
+              (rows.length
+                ? await tx.deliverySheetItem.findMany({
+                    where: {
+                      ...eligibleItems,
+                      deliverySheetId: { in: rows.map((row) => row.id) },
+                    },
+                    select: {
+                      deliverySheetId: true,
+                      transaction: { select: quantitySelect },
+                    },
+                    orderBy: { id: "asc" },
+                    take: 10_001,
+                  })
+                : []
+              ).map((item) => ({
+                groupId: item.deliverySheetId,
+                transaction: item.transaction,
+              })),
+            );
             const total = await tx.deliverySheet.count({ where });
             return {
               ...base,
               kind: "sheets",
               state: "ready",
               total,
-              items: rows.map((row) => ({
-                id: row.id,
-                sheetNo: row.sheetNo,
-                date: row.deliveryDate.toISOString(),
-                manifestNo: row.manifest.manifestNo,
-                branch: row.manifest.branch?.name ?? null,
-                courier: row.manifest.courier?.name ?? null,
-                visibleTransactions: row._count.items,
-              })),
+              items: rows.map((row) => {
+                const quantity = quantities.get(row.id);
+                if (!quantity) throw new Error("Missing delivery quantities");
+                return {
+                  id: row.id,
+                  sheetNo: row.sheetNo,
+                  date: row.deliveryDate.toISOString(),
+                  manifestNo: row.manifest.manifestNo,
+                  branch: row.manifest.branch?.name ?? null,
+                  courier: row.manifest.courier?.name ?? null,
+                  visibleTransactions: row._count.items,
+                  ...quantity,
+                };
+              }),
             };
           }
           const where: Prisma.DeliverySheetItemWhereInput = {

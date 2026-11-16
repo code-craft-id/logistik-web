@@ -5,18 +5,25 @@ export const operationalRoutes = {
   dashboard: "/dashboard",
   vendor: "/branch-reports/manifest-vendor",
 } as const;
-export type ManifestReportRow = {
+export type VisibleQuantities = {
+  totalKoli: number | null;
+  totalKilo: string | null;
+  totalVolume: string | null;
+};
+export type ManifestReportRow = VisibleQuantities & {
   id: number;
   manifestNo: string;
   date: string;
   branch: string | null;
+  originBranch: string | null;
+  destinationBranch: string | null;
   type: string | null;
   vehicle: string | null;
   courier: string | null;
   status: string;
   assignedTransactions: number;
 };
-export type SheetReportRow = {
+export type SheetReportRow = VisibleQuantities & {
   id: number;
   sheetNo: string;
   date: string;

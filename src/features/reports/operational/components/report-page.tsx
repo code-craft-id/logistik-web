@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ErrorState } from "@/components/patterns/content-state";
 import { IdentityError } from "@/features/identity/server/access";
+import { operationalRoutes } from "../contracts";
 import type { OperationalKind } from "../filters";
 import { operationalReportService } from "../server/context";
 import { OperationalReportView } from "./report-view";
@@ -23,6 +24,25 @@ export async function OperationalReportPage({
   } catch (error) {
     if (error instanceof IdentityError) {
       if (error.status === 401) redirect("/login");
+      if (error.code === "REPORT_LIMIT")
+        return (
+          <ErrorState
+            title="Rincian laporan terlalu banyak"
+            description={error.message}
+            action={
+              <Link
+                href={
+                  kind === "manifest"
+                    ? operationalRoutes.manifest
+                    : operationalRoutes.delivery
+                }
+                className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
+              >
+                Ubah filter laporan
+              </Link>
+            }
+          />
+        );
       if (error.status === 403)
         return (
           <ErrorState

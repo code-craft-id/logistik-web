@@ -68,11 +68,16 @@ function reportTable(result: OperationalReportResult) {
       "Manifes No.",
       "Tanggal (UTC)",
       "Cabang pemilik",
+      "Asal (cabang tersimpan)",
+      "Tujuan (cabang tersimpan)",
       "Jenis",
       "Kendaraan",
       "Kurir manifest",
       "Status",
       "Penugasan aktif terlihat",
+      "Koli terlihat",
+      "Berat terlihat (kg)",
+      "Volume terlihat",
     ];
     rows = result.items.map((row) => ({
       id: row.id,
@@ -80,11 +85,16 @@ function reportTable(result: OperationalReportResult) {
         row.manifestNo,
         row.date,
         row.branch,
+        row.originBranch,
+        row.destinationBranch,
         row.type,
         row.vehicle,
         row.courier,
         row.status,
         row.assignedTransactions,
+        row.totalKoli,
+        row.totalKilo,
+        row.totalVolume,
       ],
     }));
   } else if (result.kind === "sheets") {
@@ -95,6 +105,9 @@ function reportTable(result: OperationalReportResult) {
       "Cabang pemilik",
       "Kurir manifest",
       "Transaksi terlihat",
+      "Koli terlihat",
+      "Berat terlihat (kg)",
+      "Volume terlihat",
     ];
     rows = result.items.map((row) => ({
       id: row.id,
@@ -105,6 +118,9 @@ function reportTable(result: OperationalReportResult) {
         row.branch,
         row.courier,
         row.visibleTransactions,
+        row.totalKoli,
+        row.totalKilo,
+        row.totalVolume,
       ],
     }));
   } else {
@@ -146,7 +162,10 @@ function reportTable(result: OperationalReportResult) {
               scope="col"
               className={
                 header === "Penugasan aktif terlihat" ||
-                header === "Transaksi terlihat"
+                header === "Transaksi terlihat" ||
+                header === "Koli terlihat" ||
+                header === "Berat terlihat (kg)" ||
+                header === "Volume terlihat"
                   ? "text-right"
                   : undefined
               }
@@ -163,7 +182,12 @@ function reportTable(result: OperationalReportResult) {
               <TableCell
                 key={headers[index]}
                 className={
-                  typeof value === "number"
+                  typeof value === "number" ||
+                  [
+                    "Koli terlihat",
+                    "Berat terlihat (kg)",
+                    "Volume terlihat",
+                  ].includes(headers[index])
                     ? "text-right tabular-nums"
                     : "min-w-32 max-w-64 whitespace-normal [overflow-wrap:anywhere]"
                 }
@@ -257,8 +281,8 @@ export function OperationalReportView({
           {dashboard
             ? "Jumlah dokumen operasional dalam cakupan cabang Anda. Setiap angka memakai tanggal sumber yang tertulis; tidak ada perhitungan finansial atau indikator keberhasilan."
             : result.kind === "manifest"
-              ? "Satu baris per manifest sesuai jenis dan status tersimpan. Penugasan aktif menghitung transaksi yang masih ditugaskan dan terlihat dalam cakupan Anda."
-              : "Laporan atas lembar pengantaran yang sudah tercatat. Periode mengikuti tanggal lembar pengantaran, bukan waktu diterima; hasil ditampilkan sesuai catatan tersimpan."}
+              ? "Satu baris per manifest sesuai jenis dan status tersimpan. Penugasan aktif dan kuantitas hanya mencakup transaksi yang masih ditugaskan dan terlihat dalam cakupan Anda. Kuantitas tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."
+              : "Laporan atas lembar pengantaran yang sudah tercatat. Periode mengikuti tanggal lembar pengantaran, bukan waktu diterima; hasil ditampilkan sesuai catatan tersimpan. Kuantitas hanya menjumlahkan transaksi terlihat dan tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."}
         </p>
         {dashboard && (
           <p className="max-w-prose text-sm text-muted-foreground">

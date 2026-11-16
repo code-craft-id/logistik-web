@@ -13,6 +13,14 @@ vi.mock("../../src/features/reports/operational/server/context", () => ({
 }));
 vi.mock("next/navigation", () => ({ redirect }));
 beforeEach(() => vi.resetAllMocks());
+it("explains quantity overflow and offers a report-filter recovery link", async () => {
+  read.mockRejectedValue(
+    new IdentityError("REPORT_LIMIT", 422, "Persempit periode."),
+  );
+  const result = await OperationalReportPage({ kind: "delivery", query: {} });
+  expect(result.props.description).toBe("Persempit periode.");
+  expect(result.props.action.props.href).toBe("/branch-reports/delivery");
+});
 it("redirects anonymous requests and gives denied dashboard users a safe profile escape", async () => {
   read.mockRejectedValueOnce(new IdentityError("UNAUTHENTICATED", 401));
   await expect(
