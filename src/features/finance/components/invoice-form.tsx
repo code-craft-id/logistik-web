@@ -113,7 +113,9 @@ export function InvoiceForm({
                     hint="Maksimal 50 pilihan per pencarian."
                   >
                     <Input
+                      className="min-h-11"
                       id="lookup"
+                      aria-describedby="lookup-hint"
                       maxLength={100}
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
@@ -151,7 +153,9 @@ export function InvoiceForm({
                     ))}
                   </select>
                 </FormField>
-                <output>{error}</output>
+                <p role="alert" className="self-end text-sm text-destructive">
+                  {error}
+                </p>
               </div>
             ),
           },
@@ -162,6 +166,7 @@ export function InvoiceForm({
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField id="invoiceDate" label="Tanggal invoice">
                   <Input
+                    className="min-h-11"
                     required
                     id="invoiceDate"
                     name="invoiceDate"
@@ -171,6 +176,7 @@ export function InvoiceForm({
                 </FormField>
                 <FormField id="dueDate" label="Jatuh tempo">
                   <Input
+                    className="min-h-11"
                     required
                     id="dueDate"
                     name="dueDate"
@@ -235,6 +241,7 @@ export function InvoiceForm({
                     </FormField>
                     <FormField id={`amount-${index}`} label="Tagihan IDR">
                       <Input
+                        className="min-h-11"
                         required
                         id={`amount-${index}`}
                         inputMode="decimal"
@@ -253,7 +260,7 @@ export function InvoiceForm({
                     <Button
                       type="button"
                       variant="outline"
-                      className="min-h-11 self-end"
+                      className="min-h-11 h-auto self-end whitespace-normal"
                       disabled={items.length === 1}
                       onClick={() =>
                         setItems(items.filter((_, n) => n !== index))

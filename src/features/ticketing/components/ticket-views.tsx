@@ -31,10 +31,12 @@ export function TicketList({
   const pageLink = (next: number) =>
     `/ticketting?${new URLSearchParams({ search, page: String(next), pageSize: String(pageSize) })}`;
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Ticketing</h1>
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Ticketing
+          </h1>
           <p className="mt-2 max-w-prose text-sm text-muted-foreground">
             Tiket yang tersedia dalam cakupan akses Anda.
           </p>
@@ -52,7 +54,7 @@ export function TicketList({
         <form
           action="/ticketting"
           method="get"
-          className="flex flex-wrap items-end gap-3 border-b bg-muted/40 p-4"
+          className="grid gap-3 border-b bg-muted/40 p-4 sm:flex sm:flex-wrap sm:items-end"
         >
           <div className="min-w-0 flex-1 space-y-2">
             <Label htmlFor="ticket-search">Cari judul atau menu</Label>
@@ -95,7 +97,7 @@ export function TicketList({
             }
           />
         ) : (
-          <Table>
+          <Table className="min-w-5xl [&_td]:align-top">
             <caption className="sr-only">
               Tiket, terbaru terlebih dahulu. Waktu pembuatan dalam UTC.
             </caption>
@@ -131,15 +133,15 @@ export function TicketList({
                       {ticket.createdAt}
                     </time>
                   </TableCell>
-                  <TableCell className="max-w-xs whitespace-normal break-words font-medium">
+                  <TableCell className="min-w-48 max-w-xs whitespace-normal font-medium [overflow-wrap:anywhere]">
                     {ticket.subject}
                   </TableCell>
-                  <TableCell className="max-w-xs whitespace-normal break-words">
+                  <TableCell className="min-w-40 max-w-xs whitespace-normal [overflow-wrap:anywhere]">
                     {ticket.menuName}
                   </TableCell>
                   <TableCell>{ticket.branchId}</TableCell>
                   <TableCell>{ticket.priority}</TableCell>
-                  <TableCell className="max-w-xs whitespace-normal break-all">
+                  <TableCell className="min-w-48 max-w-xs whitespace-normal [overflow-wrap:anywhere]">
                     {ticket.relatedPageUrl}
                   </TableCell>
                   <TableCell>
@@ -191,9 +193,9 @@ export function TicketDetail({ ticket }: { ticket: TicketDTO }) {
     ["Keterangan", ticket.remarks ?? "Tidak ada keterangan."],
   ];
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <div>
-        <h1 className="break-words text-2xl font-semibold tracking-tight">
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           {ticket.subject}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -202,11 +204,18 @@ export function TicketDetail({ ticket }: { ticket: TicketDTO }) {
       </div>
       <dl className="grid min-w-0 gap-6 rounded-lg border bg-background p-4 sm:grid-cols-2 sm:p-6">
         {fields.map(([label, value]) => (
-          <div key={label} className="min-w-0 space-y-2">
+          <div
+            key={label}
+            className={
+              label === "Keterangan" || label === "Link URL terkait"
+                ? "min-w-0 space-y-2 sm:col-span-2"
+                : "min-w-0 space-y-2"
+            }
+          >
             <dt className="text-sm font-medium text-muted-foreground">
               {label}
             </dt>
-            <dd className="whitespace-pre-wrap break-all text-sm">
+            <dd className="whitespace-pre-wrap text-sm [overflow-wrap:anywhere]">
               {label === "Dibuat (UTC)" ? (
                 <time dateTime={value}>{value}</time>
               ) : (

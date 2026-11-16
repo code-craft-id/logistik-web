@@ -53,9 +53,11 @@ export async function TicketCreatePage() {
   if (!actor) return denied;
   const branches = await ticketService.branches();
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Buat tiket</h1>
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+          Buat tiket
+        </h1>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
           Pilih cabang dan prioritas, lalu jelaskan kendala Anda. Judul, menu,
           URL, cabang dan prioritas wajib diisi.

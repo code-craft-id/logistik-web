@@ -58,8 +58,8 @@ export function TicketForm({
     }
   }
   return (
-    <form onSubmit={submit} className="space-y-6" aria-busy={pending}>
-      <div className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={submit} className="min-w-0 space-y-5" aria-busy={pending}>
+      <div className="grid items-start gap-4 sm:grid-cols-2 [&>div]:min-w-0">
         <div className="space-y-2">
           <Label htmlFor="ticket-branch">Cabang pemilik</Label>
           <select
@@ -67,7 +67,7 @@ export function TicketForm({
             name="branchId"
             required
             defaultValue=""
-            className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+            className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
           >
             <option value="" disabled>
               Pilih cabang
@@ -86,7 +86,7 @@ export function TicketForm({
             name="priority"
             required
             defaultValue=""
-            className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+            className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
           >
             <option value="" disabled>
               Pilih prioritas
@@ -142,12 +142,15 @@ export function TicketForm({
         </div>
       </div>
       {error && (
-        <p role="alert" className="break-words text-sm text-destructive">
+        <p
+          role="alert"
+          className="rounded-md border border-destructive p-3 text-sm text-destructive [overflow-wrap:anywhere]"
+        >
           {error}
         </p>
       )}
       {savedId !== null && (
-        <output className="block text-sm">
+        <output className="block rounded-md border bg-muted p-3 text-sm">
           Tiket tersimpan. ID internal: {savedId}.
         </output>
       )}

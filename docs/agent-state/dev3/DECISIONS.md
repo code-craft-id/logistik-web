@@ -21,3 +21,15 @@ mappings and group rights must be explicitly configured before financial use.
 Existing Dev2 updated_at default drift requires coordinator disposition. No
 applied migration/model was changed to hide it. REL-01 is not release-approved;
 no D-17 or broader business/security decision is promoted by local test results.
+
+## 2026-11-15 13:45 UTC - Finance UI scope
+Owner requested FIN-01/FIN-02 presentation polish. No D-ID status, adopted rule, source contract or release gate changed. No backend correctness defect identified in this scoped pass. Browser evidence is synthetic local UI only.
+
+## 2026-11-15 13:58 UTC - Remaining Dev3 presentation scope
+Owner requested same polish for remaining Dev3 tasks. Applied to implemented SUP-01/RPT-01/RPT-02 UI, including operational dashboard. No deferred behavior implemented, D-ID/status changed or business/source contract adopted. Existing release restrictions retained.
+
+## 2026-11-16 01:29 UTC - Shared micro presentation
+Owner authorized shared-component polish. Existing tokens/primitives retained; no D-ID, business/source contract or release status changed. Shared human review pending before merge.
+
+### 2026-11-16 01:49:40 UTC - accounting navigation boundary
+Technical fix only: page-local Suspense contains session-dependent AccountingHomePage during sibling navigation. No new business policy, caching of authority, schema or financial change. Existing business/release decisions unchanged.

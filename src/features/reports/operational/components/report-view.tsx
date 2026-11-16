@@ -133,7 +133,7 @@ function reportTable(result: OperationalReportResult) {
     }));
   }
   return (
-    <Table>
+    <Table className="min-w-5xl [&_td]:align-top">
       <caption className="sr-only">
         {titles[result.kind]}. Seluruh waktu menggunakan UTC. Gulir untuk
         membaca semua kolom.
@@ -141,7 +141,16 @@ function reportTable(result: OperationalReportResult) {
       <TableHeader>
         <TableRow>
           {headers.map((header) => (
-            <TableHead key={header} scope="col">
+            <TableHead
+              key={header}
+              scope="col"
+              className={
+                header === "Penugasan aktif terlihat" ||
+                header === "Transaksi terlihat"
+                  ? "text-right"
+                  : undefined
+              }
+            >
               {header}
             </TableHead>
           ))}
@@ -153,7 +162,11 @@ function reportTable(result: OperationalReportResult) {
             {row.values.map((value, index) => (
               <TableCell
                 key={headers[index]}
-                className="max-w-64 break-words whitespace-normal tabular-nums"
+                className={
+                  typeof value === "number"
+                    ? "text-right tabular-nums"
+                    : "min-w-32 max-w-64 whitespace-normal [overflow-wrap:anywhere]"
+                }
               >
                 {cell(value)}
               </TableCell>
@@ -217,7 +230,7 @@ export function OperationalReportView({
   if (result.kind === "vendor")
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Manifest Vendor
         </h1>
         <EmptyState
@@ -235,9 +248,9 @@ export function OperationalReportView({
       </div>
     );
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           {titles[result.kind]}
         </h1>
         <p className="max-w-prose text-sm text-muted-foreground">
@@ -287,7 +300,7 @@ export function OperationalReportView({
           >
             Pilih tanggal UTC, maksimal 31 hari termasuk kedua tanggal.
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-2">
               <Label htmlFor="op-start">Tanggal mulai (UTC)</Label>
               <Input
@@ -320,7 +333,7 @@ export function OperationalReportView({
                 id="op-branch"
                 name="branchId"
                 defaultValue={display.branchId ?? ""}
-                className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
               >
                 <option value="">Semua cabang yang diizinkan</option>
                 {result.branches.map((branch) => (
@@ -366,7 +379,10 @@ export function OperationalReportView({
             )}
           </div>
           {issues.length > 0 && (
-            <div role="alert" className="space-y-1 text-sm text-destructive">
+            <div
+              role="alert"
+              className="space-y-1 rounded-md border border-destructive p-3 text-sm text-destructive"
+            >
               <p className="font-medium">
                 Filter belum valid. Perbaiki pilihan lalu cari kembali.
               </p>
@@ -396,7 +412,7 @@ export function OperationalReportView({
             <h2 className="font-semibold">
               Periode {f.startDate} sampai {f.endDate}, UTC
             </h2>
-            <dl className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 {
                   key: "transactions",
@@ -453,8 +469,13 @@ export function OperationalReportView({
                     : null,
                 },
               ].map((metric) => (
-                <div key={metric.key} className="space-y-2">
-                  <dt className="text-sm font-medium">{metric.label}</dt>
+                <div
+                  key={metric.key}
+                  className="flex min-w-0 flex-col items-start gap-2"
+                >
+                  <dt className="text-sm font-medium xl:min-h-10">
+                    {metric.label}
+                  </dt>
                   <dd className="text-2xl font-semibold tabular-nums">
                     {metric.value}
                   </dd>
@@ -462,7 +483,7 @@ export function OperationalReportView({
                     {metric.basis} · UTC
                   </dd>
                   {metric.href && (
-                    <dd>
+                    <dd className="mt-auto">
                       <Link
                         prefetch={false}
                         className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"

@@ -21,6 +21,14 @@ export function CommandForm({
   const busy = useRef(false);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
+  const [failed, setFailed] = useState(false);
+  const destructive = [
+    "invoice.void",
+    "payment.reverse",
+    "journal.reverse",
+    "finance_cost.reverse",
+    "finance_period.close",
+  ].includes(String(values.action));
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (busy.current) return;
@@ -36,9 +44,11 @@ export function CommandForm({
     busy.current = true;
     setPending(true);
     setMessage("");
+    setFailed(false);
     try {
       const result = await financeCommand(data);
       if (!result.ok) {
+        setFailed(true);
         setMessage(result.message);
         return;
       }
@@ -47,6 +57,7 @@ export function CommandForm({
       if (href) router.push(href.replace(":id", String(result.id)));
       router.refresh();
     } catch {
+      setFailed(true);
       setMessage(
         "Hasil belum dapat dikonfirmasi. Coba kembali dengan isi yang sama.",
       );
@@ -59,18 +70,36 @@ export function CommandForm({
     <form
       noValidate
       onSubmit={submit}
-      className="space-y-4"
+      className="min-w-0 space-y-4"
+      aria-busy={pending}
       onChange={() => {
         if (!busy.current) token.current = null;
       }}
     >
-      <fieldset disabled={pending} className="space-y-4">
+      <fieldset
+        disabled={pending}
+        className="min-w-0 space-y-4 disabled:opacity-70"
+      >
         {children}
-        <Button className="min-h-11" type="submit">
+        <Button
+          className="min-h-11 h-auto max-w-full whitespace-normal text-left"
+          variant={destructive ? "destructive" : "default"}
+          type="submit"
+        >
           {pending ? "Menyimpan…" : label}
         </Button>
       </fieldset>
-      <output className="block text-sm">{message}</output>
+      <div
+        role={failed ? "alert" : "status"}
+        aria-atomic="true"
+        className={
+          message
+            ? `rounded-md border p-3 text-sm break-words ${failed ? "border-destructive text-destructive" : "border-border bg-muted"}`
+            : "sr-only"
+        }
+      >
+        {message}
+      </div>
     </form>
   );
 }

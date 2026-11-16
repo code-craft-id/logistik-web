@@ -226,7 +226,7 @@ The intended surface system has no decorative shadows. Border lines, tonal layer
 
 **The Flat Surface Rule.** Use borders, spacing and tonal surfaces to establish structure. Do not add decorative shadows or gradients.
 
-Implementation detail, not a reusable elevation policy: the generated Input and Textarea primitives currently retain Tailwind's extra-small shadow (`0 1px 2px 0 rgb(0 0 0 / 0.05)`). This inherited detail is recorded rather than promoted to a surface token. Focus rings remain interaction feedback.
+Input, Textarea and dropdown menus use flat bordered surfaces without resting shadows. Focus rings remain interaction feedback.
 
 Motion is functional: ordinary control transitions use the installed 150ms standard easing; dialog and Sheet entry/exit use 200ms. Reduced-motion preference shortens animations and transitions to 0.01ms. Do not add decorative motion.
 

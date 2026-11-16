@@ -2,6 +2,7 @@ import "server-only";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ErrorState } from "@/components/patterns/content-state";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -56,9 +57,12 @@ function Workspace({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <nav className="flex flex-wrap gap-x-5 gap-y-3" aria-label="Keuangan">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
+      <h1 className="text-xl font-semibold sm:text-2xl">{title}</h1>
+      <nav
+        className="flex flex-wrap gap-x-5 gap-y-1 border-b pb-2"
+        aria-label="Keuangan"
+      >
         <Link className={financeLink} href="/finance/invoices">
           Invoice
         </Link>
@@ -78,7 +82,7 @@ function Workspace({
 }
 function Filter({ query, dates = false }: { query: Query; dates?: boolean }) {
   return (
-    <form className="flex flex-wrap items-end gap-4">
+    <form className="grid gap-3 rounded-lg border bg-background p-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
       <FinanceField
         prefix="filter"
         name="branchId"
@@ -105,9 +109,9 @@ function Filter({ query, dates = false }: { query: Query; dates?: boolean }) {
           />
         </>
       )}
-      <button className="min-h-11 rounded-md border px-4" type="submit">
+      <Button className="min-h-11" variant="outline" type="submit">
         Tampilkan
-      </button>
+      </Button>
     </form>
   );
 }
@@ -125,7 +129,10 @@ function Pages({
       ? `&branchId=${encodeURIComponent(query.branchId)}`
       : "";
   return (
-    <nav className="flex gap-4" aria-label="Halaman">
+    <nav
+      className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm"
+      aria-label="Halaman"
+    >
       <span>
         Halaman {page} · {total} catatan
       </span>
@@ -320,7 +327,7 @@ export async function AccountsPage({ query }: { query: Query }) {
                     ...(c.flowClass ? { flowClass: c.flowClass } : {}),
                   }}
                 >
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <FinanceField
                       prefix={`cat-${c.id}`}
                       name="code"
@@ -434,14 +441,16 @@ export async function JournalsPage({ query }: { query: Query }) {
       <Filter query={query} />
       {permits(actor, "create", "journal") && (
         <details className="border-y py-3">
-          <summary className="cursor-pointer py-2">Buat jurnal manual</summary>
+          <summary className="mb-4 cursor-pointer py-2">
+            Buat jurnal manual
+          </summary>
           <JournalForm />
         </details>
       )}
       {permits(actor, "post", "journal") &&
         permits(actor, "create", "journal") && (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <section className="space-y-4">
+          <div className="grid items-start gap-6 lg:grid-cols-2">
+            <section className="min-w-0 space-y-4">
               <h2 className="text-lg font-semibold">Beban kas / bank</h2>
               <CommandForm
                 label="Posting beban kas"
@@ -468,7 +477,7 @@ export async function JournalsPage({ query }: { query: Query }) {
                 />
               </CommandForm>
             </section>
-            <section className="space-y-4">
+            <section className="min-w-0 space-y-4">
               <h2 className="text-lg font-semibold">Transfer kas internal</h2>
               <CommandForm
                 label="Posting transfer internal"
@@ -517,8 +526,8 @@ export async function JournalsPage({ query }: { query: Query }) {
             <TableHeader>
               <TableRow>
                 <TableHead>ID akun</TableHead>
-                <TableHead>Debit IDR</TableHead>
-                <TableHead>Kredit IDR</TableHead>
+                <TableHead className="text-right">Debit IDR</TableHead>
+                <TableHead className="text-right">Kredit IDR</TableHead>
                 <TableHead>Transaksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -526,8 +535,12 @@ export async function JournalsPage({ query }: { query: Query }) {
               {j.lines.map((l) => (
                 <TableRow key={l.id}>
                   <TableCell>{l.accountId}</TableCell>
-                  <TableCell className="tabular-nums">{l.debit}</TableCell>
-                  <TableCell className="tabular-nums">{l.credit}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {l.debit}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {l.credit}
+                  </TableCell>
                   <TableCell>{l.transactionId ?? "—"}</TableCell>
                 </TableRow>
               ))}
@@ -619,9 +632,9 @@ export async function CostsPage({ query }: { query: Query }) {
         Pembatalan invoice tidak membatalkan kewajiban pemasok.
       </p>
       <Filter query={query} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         {permits(actor, "create", "finance_cost") && (
-          <section className="space-y-4">
+          <section className="min-w-0 space-y-4">
             <h2 className="text-lg font-semibold">Catat biaya</h2>
             <CommandForm
               label="Posting biaya aktual"
@@ -648,7 +661,7 @@ export async function CostsPage({ query }: { query: Query }) {
           </section>
         )}
         {permits(actor, "finalize", "finance_cost") && (
-          <section className="space-y-4">
+          <section className="min-w-0 space-y-4">
             <h2 className="text-lg font-semibold">
               Konfirmasi kelengkapan biaya
             </h2>
@@ -752,7 +765,7 @@ export async function PeriodsPage({ query }: { query: Query }) {
           label="Tutup periode cabang"
           values={{ action: "finance_period.close" }}
         >
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FinanceField
               prefix="close"
               name="branchId"
@@ -801,7 +814,7 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
           : "BELUM LENGKAP — angka laba belum final"}
       </p>
       {!r.complete && (
-        <p className="break-words text-destructive">
+        <p className="rounded-md border border-destructive p-3 text-sm break-words text-destructive">
           Biaya belum lengkap untuk transaksi: {r.incomplete.join(", ")}
           {r.incompleteOverflow ? " dan lainnya" : ""}. Lengkapi bukti biaya
           sebelum finalisasi.
@@ -809,7 +822,7 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
       )}
       <section className="space-y-3 border-t pt-5">
         <h2 className="text-lg font-semibold">Profit & Loss</h2>
-        <dl className="grid gap-4 sm:grid-cols-3">
+        <dl className="grid gap-4 rounded-lg border bg-background p-4 sm:grid-cols-3 [&_dt]:text-sm [&_dt]:text-muted-foreground [&_dd]:mt-1 [&_dd]:font-semibold">
           <div>
             <dt>Pendapatan bersih</dt>
             <dd className="tabular-nums">{r.revenue}</dd>
@@ -844,7 +857,8 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
         {r.cashflow.length ? (
           r.cashflow.map((c) => (
             <p key={c.category}>
-              {c.category} · <span className="tabular-nums">{c.amount}</span>
+              {c.category} ·{" "}
+              <span className="text-right tabular-nums">{c.amount}</span>
             </p>
           ))
         ) : (
@@ -863,8 +877,8 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
           <TableHeader>
             <TableRow>
               <TableHead>Akun</TableHead>
-              <TableHead>Debit IDR</TableHead>
-              <TableHead>Kredit IDR</TableHead>
+              <TableHead className="text-right">Debit IDR</TableHead>
+              <TableHead className="text-right">Kredit IDR</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -873,8 +887,12 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
                 <TableCell>
                   {l.code} · {l.name}
                 </TableCell>
-                <TableCell>{l.debit}</TableCell>
-                <TableCell>{l.credit}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {l.debit}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {l.credit}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -897,7 +915,14 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
                 "Debit",
                 "Kredit",
               ].map((h) => (
-                <TableHead key={h}>{h}</TableHead>
+                <TableHead
+                  key={h}
+                  className={
+                    h === "Debit" || h === "Kredit" ? "text-right" : undefined
+                  }
+                >
+                  {h}
+                </TableHead>
               ))}
             </TableRow>
           </TableHeader>
@@ -912,8 +937,12 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
                 <TableCell className="break-words">{l.reference}</TableCell>
                 <TableCell>{l.transactionId ?? "—"}</TableCell>
                 <TableCell>{l.accountId}</TableCell>
-                <TableCell>{l.debit}</TableCell>
-                <TableCell>{l.credit}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {l.debit}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {l.credit}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -937,18 +966,22 @@ function MarginTable({
       <TableHeader>
         <TableRow>
           <TableHead>Sumber / bulan</TableHead>
-          <TableHead>Pendapatan IDR</TableHead>
-          <TableHead>Biaya IDR</TableHead>
-          <TableHead>Gross Profit IDR</TableHead>
+          <TableHead className="text-right">Pendapatan IDR</TableHead>
+          <TableHead className="text-right">Biaya IDR</TableHead>
+          <TableHead className="text-right">Gross Profit IDR</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {rows.map((r) => (
           <TableRow key={r.key}>
             <TableCell>{r.key}</TableCell>
-            <TableCell>{r.revenue}</TableCell>
-            <TableCell>{r.cost}</TableCell>
-            <TableCell>{r.profit ?? "BELUM LENGKAP"}</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {r.revenue}
+            </TableCell>
+            <TableCell className="text-right tabular-nums">{r.cost}</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {r.profit ?? "BELUM LENGKAP"}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

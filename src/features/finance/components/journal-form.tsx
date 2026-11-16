@@ -25,8 +25,8 @@ export function JournalForm() {
         ].map(([name, label, type]) => (
           <FormField key={name} id={`journal-new-${name}`} label={label}>
             <Input
-              required
               className="min-h-11"
+              required
               id={`journal-new-${name}`}
               name={name}
               type={type}
@@ -40,12 +40,16 @@ export function JournalForm() {
         melalui dokumen sumber, beban kas atau transfer.
       </p>
       {lines.map((line, index) => (
-        <div key={line.row} className="grid gap-3 border-b pb-4 sm:grid-cols-4">
+        <div
+          key={line.row}
+          className="grid gap-3 border-b pb-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
           <FormField
             id={`journal-account-${line.row}`}
             label={`ID akun baris ${index + 1}`}
           >
             <Input
+              className="min-h-11"
               required
               id={`journal-account-${line.row}`}
               type="number"
@@ -81,6 +85,7 @@ export function JournalForm() {
           </FormField>
           <FormField id={`journal-amount-${line.row}`} label="Jumlah IDR">
             <Input
+              className="min-h-11"
               required
               id={`journal-amount-${line.row}`}
               inputMode="decimal"
@@ -95,7 +100,7 @@ export function JournalForm() {
             />
           </FormField>
           <Button
-            className="min-h-11 self-end"
+            className="min-h-11 h-auto self-end whitespace-normal"
             type="button"
             variant="outline"
             disabled={lines.length <= 2}

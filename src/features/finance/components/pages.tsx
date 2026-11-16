@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ErrorState } from "@/components/patterns/content-state";
 import { FormField } from "@/components/patterns/form-field";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -20,7 +21,8 @@ import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
 import { InvoiceForm } from "./invoice-form";
 
-export const financeLink = "text-primary underline underline-offset-4";
+export const financeLink =
+  "inline-flex min-h-11 items-center rounded-md text-primary underline underline-offset-4";
 export async function financeEntry(
   resource: string | readonly string[] = "invoice",
   action = "view",
@@ -56,9 +58,9 @@ export async function InvoiceListPage({
     );
   const result = await financeService.list(input.data);
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Invoice</h1>
-      <nav className="flex flex-wrap gap-4" aria-label="Keuangan">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
+      <h1 className="text-xl font-semibold sm:text-2xl">Invoice</h1>
+      <nav className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Keuangan">
         {permits(actor, "create", "invoice") && (
           <Link className={financeLink} href="/finance/invoices/new">
             Buat invoice
@@ -68,9 +70,10 @@ export async function InvoiceListPage({
           Akuntansi & laporan
         </Link>
       </nav>
-      <form className="flex flex-wrap items-end gap-3">
+      <form className="grid gap-3 rounded-lg border bg-background p-4 sm:flex sm:flex-wrap sm:items-end">
         <FormField id="filterBranch" label="ID cabang (opsional)">
           <Input
+            className="min-h-11"
             id="filterBranch"
             name="branchId"
             type="number"
@@ -78,15 +81,15 @@ export async function InvoiceListPage({
             defaultValue={input.data.branchId}
           />
         </FormField>
-        <button className="min-h-11 rounded-md border px-4" type="submit">
+        <Button className="min-h-11" variant="outline" type="submit">
           Terapkan
-        </button>
+        </Button>
       </form>
       <p>
         {result.total} invoice. Halaman {result.page}.
       </p>
       {result.items.length ? (
-        <Table>
+        <Table className="[&_th:last-child]:text-right">
           <TableHeader>
             <TableRow>
               {[
@@ -97,7 +100,12 @@ export async function InvoiceListPage({
                 "Tagihan IDR",
                 "Sisa IDR",
               ].map((v) => (
-                <TableHead key={v}>{v}</TableHead>
+                <TableHead
+                  key={v}
+                  className={v.endsWith("IDR") ? "text-right" : undefined}
+                >
+                  {v}
+                </TableHead>
               ))}
             </TableRow>
           </TableHeader>
@@ -115,8 +123,12 @@ export async function InvoiceListPage({
                 <TableCell>{r.branchId}</TableCell>
                 <TableCell>{r.invoiceDate}</TableCell>
                 <TableCell>{r.paymentStatus}</TableCell>
-                <TableCell className="tabular-nums">{r.total}</TableCell>
-                <TableCell className="tabular-nums">{r.balance}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {r.total}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {r.balance}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -124,7 +136,10 @@ export async function InvoiceListPage({
       ) : (
         <p>Belum ada invoice untuk filter ini.</p>
       )}
-      <nav className="flex gap-4" aria-label="Halaman invoice">
+      <nav
+        className="flex flex-wrap items-center gap-x-4 gap-y-1"
+        aria-label="Halaman invoice"
+      >
         {result.page > 1 && (
           <Link
             className={financeLink}
@@ -149,8 +164,8 @@ export async function InvoiceNewPage() {
   if (!(await financeEntry("invoice", "create"))) return denied;
   const branches = await financeService.choices();
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Buat invoice</h1>
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
+      <h1 className="text-xl font-semibold sm:text-2xl">Buat invoice</h1>
       <Link className={financeLink} href="/finance/invoices">
         Daftar invoice
       </Link>
@@ -173,18 +188,18 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
       ? await accountingQueries.paymentChoices()
       : null;
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <Link className={financeLink} href="/finance/invoices">
         Daftar invoice
       </Link>
-      <h1 className="text-2xl font-semibold">
+      <h1 className="text-xl font-semibold sm:text-2xl">
         {row.number ?? `Draft #${row.id}`}
       </h1>
       <p>
         Cabang {row.issuedBranchName ?? row.branchId} · Pelanggan{" "}
         {row.issuedCustomerName ?? row.customerId} · {row.paymentStatus}
       </p>
-      <dl className="grid gap-4 sm:grid-cols-3">
+      <dl className="grid gap-4 rounded-lg border bg-background p-4 sm:grid-cols-3 [&_dt]:text-sm [&_dt]:text-muted-foreground [&_dd]:mt-1 [&_dd]:font-semibold">
         <div>
           <dt>Tanggal / jatuh tempo</dt>
           <dd>
@@ -200,7 +215,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
           <dd className="tabular-nums">{row.balance}</dd>
         </div>
       </dl>
-      <Table>
+      <Table className="[&_th:last-child]:text-right">
         <TableHeader>
           <TableRow>
             <TableHead>Sumber transaksi</TableHead>
@@ -215,7 +230,9 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
                   (s) => s.transactionId === i.transactionId,
                 )?.awbNo ?? `Transaksi #${i.transactionId}`}
               </TableCell>
-              <TableCell className="tabular-nums">{i.amount}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {i.amount}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -251,10 +268,22 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
           }}
         >
           <FormField id="voidReason" label="Alasan pembatalan">
-            <Input required name="reason" id="voidReason" maxLength={500} />
+            <Input
+              className="min-h-11"
+              required
+              name="reason"
+              id="voidReason"
+              maxLength={500}
+            />
           </FormField>
           <FormField id="voidDate" label="Tanggal akuntansi pembatalan">
-            <Input required type="date" name="accountingDate" id="voidDate" />
+            <Input
+              className="min-h-11"
+              required
+              type="date"
+              name="accountingDate"
+              id="voidDate"
+            />
           </FormField>
         </CommandForm>
       )}
@@ -274,6 +303,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
               ].map(([name, label, type]) => (
                 <FormField key={name} id={`receipt-${name}`} label={label}>
                   <Input
+                    className="min-h-11"
                     required={name !== "reference"}
                     id={`receipt-${name}`}
                     name={name}
@@ -309,7 +339,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
           {!row.receipts.length && <p>Belum ada pembayaran.</p>}
           {row.receipts.map((r) => (
             <div key={r.id} className="space-y-3 border-b pb-4">
-              <p>
+              <p className="break-words">
                 #{r.id} · {r.receivedDate} · {r.amount} IDR ·{" "}
                 {r.reversalOfId ? `Pembalikan #${r.reversalOfId}` : r.method} ·{" "}
                 {r.reference}
@@ -324,6 +354,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
                   >
                     <FormField id={`reason-${r.id}`} label="Alasan koreksi">
                       <Input
+                        className="min-h-11"
                         required
                         id={`reason-${r.id}`}
                         name="reason"
@@ -335,6 +366,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
                       label="Tanggal akuntansi pembalikan"
                     >
                       <Input
+                        className="min-h-11"
                         required
                         id={`reverse-date-${r.id}`}
                         name="accountingDate"

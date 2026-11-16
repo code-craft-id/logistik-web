@@ -79,9 +79,9 @@ export function TransactionReportView({
     );
   const issues = result.parsed.status === "invalid" ? result.parsed.issues : [];
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Detail Transaksi
         </h1>
         <p className="max-w-prose text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export function TransactionReportView({
             Pilih tanggal mulai dan akhir, maksimal 31 hari termasuk kedua
             tanggal. Batas hari dan waktu hasil menggunakan UTC.
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-2">
               <Label htmlFor="report-start">Tanggal mulai (UTC)</Label>
               <Input
@@ -146,7 +146,7 @@ export function TransactionReportView({
                         | "destinationBranchId"
                     ] ?? ""
                   }
-                  className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                  className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
                 >
                   <option value="">Semua cabang yang diizinkan</option>
                   {result.branches.map((branch) => (
@@ -163,7 +163,7 @@ export function TransactionReportView({
                 id="report-sort"
                 name="sortBy"
                 defaultValue={display.sortBy}
-                className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
               >
                 {transactionReportSortFields.map((field, index) => (
                   <option key={field} value={field}>
@@ -178,7 +178,7 @@ export function TransactionReportView({
                 id="report-direction"
                 name="sortDirection"
                 defaultValue={display.sortDirection}
-                className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
+                className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
               >
                 <option value="asc">Menaik</option>
                 <option value="desc">Menurun</option>
@@ -211,7 +211,10 @@ export function TransactionReportView({
             </div>
           </div>
           {issues.length > 0 && (
-            <div role="alert" className="space-y-1 text-sm text-destructive">
+            <div
+              role="alert"
+              className="space-y-1 rounded-md border border-destructive p-3 text-sm text-destructive"
+            >
               <p className="font-medium">
                 Filter belum valid. Perbaiki pilihan lalu cari kembali.
               </p>
@@ -225,7 +228,7 @@ export function TransactionReportView({
           <ReportSubmitButton />
         </Form>
         {result.state === "ready" && filters && result.canExport && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t pt-3">
             <a
               href={reportUrl(filters)}
               download
@@ -285,7 +288,7 @@ export function TransactionReportView({
               }
             />
           ) : (
-            <Table>
+            <Table className="min-w-5xl [&_td]:align-top">
               <caption className="sr-only">
                 Detail transaksi non-finansial; seluruh waktu dalam UTC. Gulir
                 tabel untuk membaca semua kolom.
@@ -293,7 +296,15 @@ export function TransactionReportView({
               <TableHeader>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHead key={header} scope="col">
+                    <TableHead
+                      key={header}
+                      scope="col"
+                      className={
+                        header === "Koli" || header === "Kilo"
+                          ? "text-right"
+                          : undefined
+                      }
+                    >
                       {header}
                     </TableHead>
                   ))}
@@ -318,15 +329,15 @@ export function TransactionReportView({
                     ].map((item, index) => (
                       <TableCell
                         key={headers[index + 2]}
-                        className="max-w-64 break-words whitespace-normal"
+                        className="min-w-40 max-w-64 whitespace-normal [overflow-wrap:anywhere]"
                       >
                         {value(item)}
                       </TableCell>
                     ))}
-                    <TableCell className="tabular-nums">
+                    <TableCell className="text-right tabular-nums">
                       {value(row.koli)}
                     </TableCell>
-                    <TableCell className="tabular-nums">
+                    <TableCell className="text-right tabular-nums">
                       {value(row.kilo)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
