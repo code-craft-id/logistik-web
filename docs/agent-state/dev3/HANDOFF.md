@@ -1,3 +1,15 @@
+## Latest checkpoint: PR #11 review fixes and REL-01 readiness (2026-11-17, end of day)
+
+Pushed `dee2dc9` to `dev3/ready-for-review` (PR #11, draft). Review fixes: `/dashboard` falls back to the general overview without `dashboard_report.view`; finance permission notes match FIN-02 (rights-based, per user direction "akses sesuai hak akses"); finance P2002/P2025 messages; independent cost source/event pagination; global finance lock documented. AWB report self-review fixes in `98ab774`.
+
+Open, needs owner: VOID-invoice cost completeness at period close (FIN-02 "issued-source" rule, finance owner); DELETE triggers for posted journals (new migration, migration coordinator); PR split and removal of agent notes (user asked to keep Dev 3 files).
+
+REL-01 local gates on `dee2dc9` (Node 24.15.0): lint 435 PASS, typecheck PASS, unit 70/683 PASS, integration 16/145 PASS, build PASS (first attempt stops on the Next.js advisory notice, retry passes), `prisma validate` PASS, migrate diff only the known Dev 2 `updated_at` default drift. `npm audit --omit=dev`: better-auth 1.6.23 critical/high (OAuth state/magic link, OAuth proxy, device login; app only enables the `username` plugin) -> fix 1.7.25; next 16.4.2 moderate -> 16.4.6; fast-uri moderate; happy-dom high (test-only, listed under dependencies). Same versions on `main`. Release NOT READY: human review, dependency security upgrade (Dev 1 auth contract), staging/UAT/backup-restore.
+
+Next: upgrade better-auth and Next.js on a separate branch with full test run (awaiting user go-ahead), then REL-01 report.
+
+---
+
 ## Latest checkpoint: LP-R10 / LP-R11 / LP-R21 implemented (2026-11-17)
 
 User directed continuing past the review stop point and decided the three missing definitions (PRD D-22, 2026-11-17). New feature `src/features/reports/awb-status/` with routes `/branch-reports/awb` (views pending/manifested), `/customer-reports/all-status`, and CSV exports; shell footer and breadcrumb updated. No schema, migration or `permissions.ts` change; uses `transaction_report` view/export. Read-only legacy observation confirmed opening states; deviations in audit §12.
