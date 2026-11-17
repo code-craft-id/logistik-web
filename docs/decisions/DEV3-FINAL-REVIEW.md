@@ -69,6 +69,6 @@ Original required findings above are now locally addressed, not erased. Shared l
 
 ## 2026-11-17 PR packaging cleanup (draft PR #11)
 
-- "Exclude agent execution-plan instructions from final PR packaging": `docs/agent-prompts/` and `docs/superpowers/plans/` removed from the branch tip; they remain in Git history. Durable checkpoints (`docs/agent-state/dev3/`), policies and decisions are kept. Historical references to those paths in RUN_LOG/DISC-04 are left as history.
+- "Exclude agent execution-plan instructions from final PR packaging": NOT applied. The user directed that Dev 3 files stay on the branch, so `docs/agent-prompts/` and `docs/superpowers/plans/` are retained; reviewers may still request exclusion before merge.
 - Legacy origin hostname replaced by `<legacy-origin>` in `DEV3-LEGACY-PARITY-AUDIT.md`, `DEV3-LEGACY-NAVIGATION-INVENTORY.md` and `LEGACY-ACCESS-GATE.md`; page paths kept as report identities. Pre-existing screenshot names in `FND-03-iteration-2.md` (already on `main`) are outside this branch's scope.
 - Em-dash mojibake (`â€”`) restored to `—` in `AGENTS.md` and the navigation inventory.
