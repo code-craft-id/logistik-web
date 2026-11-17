@@ -72,6 +72,10 @@ export const listInput = z.object({
   page: z.coerce.number().int().min(1).max(100000).default(1),
   branchId: z.preprocess((v) => (v === "" ? undefined : v), id.optional()),
 });
+/** Costs page lists sources and events independently, so each has its own page. */
+export const costListInput = listInput.extend({
+  eventPage: z.coerce.number().int().min(1).max(100000).default(1),
+});
 export function sum(values: (string | Prisma.Decimal)[]) {
   const total = values.reduce<Prisma.Decimal>(
     (a, b) => a.plus(b),

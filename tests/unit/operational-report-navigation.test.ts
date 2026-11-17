@@ -47,3 +47,22 @@ it("registers read-only rights and exposes exactly their implemented routes", ()
     '"href":"/branch-reports/manifest-outbound"',
   );
 });
+
+it("does not promise administrator-only finance writes the server never enforces", async () => {
+  const { permissionRestriction } = await import(
+    "../../src/features/identity/permissions"
+  );
+  for (const resource of [
+    "invoice",
+    "payment",
+    "journal",
+    "finance_cost",
+    "finance_period",
+    "financial_report",
+  ])
+    expect(permissionRestriction(resource)).toBeUndefined();
+  expect(permissionRestriction("finance_account")).toMatch(/semua cabang/);
+  expect(permissionRestriction("finance_account")).not.toMatch(
+    /khusus administrator/,
+  );
+});

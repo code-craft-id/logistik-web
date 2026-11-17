@@ -10,7 +10,7 @@ import {
 } from "@/features/identity/server/access";
 import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
 import { reportInput } from "../accounting-contracts";
-import { asDate, day, listInput } from "../contracts";
+import { asDate, costListInput, day, listInput } from "../contracts";
 import { scoped } from "./accounting";
 
 export function createAccountingQueries(
@@ -121,7 +121,7 @@ export function createAccountingQueries(
       );
     },
     async costs(input: unknown) {
-      const d = listInput.parse(input);
+      const d = costListInput.parse(input);
       return db.$transaction(
         async (tx) => {
           const current = await actor(tx, "finance_cost");
@@ -141,7 +141,7 @@ export function createAccountingQueries(
           const costs = await tx.finCost.findMany({
             where: { source: where },
             orderBy: { id: "desc" },
-            skip: (d.page - 1) * 30,
+            skip: (d.eventPage - 1) * 30,
             take: 30,
             include: {
               reversal: { select: { id: true } },
@@ -150,6 +150,7 @@ export function createAccountingQueries(
           });
           return {
             page: d.page,
+            eventPage: d.eventPage,
             total: await tx.finCostState.count({ where }),
             eventTotal: await tx.finCost.count({ where: { source: where } }),
             items: rows.map((r) => ({

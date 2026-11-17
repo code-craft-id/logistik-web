@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { reportInput } from "../accounting-contracts";
-import { listInput } from "../contracts";
+import { costListInput, listInput } from "../contracts";
 import { accountingQueries } from "../server/context";
 import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
@@ -119,30 +119,38 @@ function Pages({
   page,
   total,
   query,
+  param = "page",
 }: {
   page: number;
   total: number;
   query: Query;
+  /** Query key this pager drives; other list keys on the page are preserved. */
+  param?: "page" | "eventPage";
 }) {
-  const b =
-    typeof query.branchId === "string" && query.branchId
-      ? `&branchId=${encodeURIComponent(query.branchId)}`
-      : "";
+  const href = (target: number) => {
+    const next = new URLSearchParams();
+    for (const key of ["branchId", "page", "eventPage"]) {
+      const value = query[key];
+      if (typeof value === "string" && value) next.set(key, value);
+    }
+    next.set(param, String(target));
+    return `?${next}`;
+  };
   return (
     <nav
       className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm"
-      aria-label="Halaman"
+      aria-label={param === "eventPage" ? "Halaman peristiwa biaya" : "Halaman"}
     >
       <span>
         Halaman {page} · {total} catatan
       </span>
       {page > 1 && (
-        <Link className={financeLink} href={`?page=${page - 1}${b}`}>
+        <Link className={financeLink} href={href(page - 1)}>
           Sebelumnya
         </Link>
       )}
       {page * 30 < total && (
-        <Link className={financeLink} href={`?page=${page + 1}${b}`}>
+        <Link className={financeLink} href={href(page + 1)}>
           Berikutnya
         </Link>
       )}
@@ -616,7 +624,7 @@ function CommonFields({
 export async function CostsPage({ query }: { query: Query }) {
   const actor = await financeEntry("finance_cost");
   if (!actor) return denied;
-  const parsed = listInput.safeParse(query);
+  const parsed = costListInput.safeParse(query);
   if (!parsed.success)
     return (
       <Workspace title="Biaya aktual">
@@ -693,6 +701,7 @@ export async function CostsPage({ query }: { query: Query }) {
             {s.finalized ? "Lengkap" : "Belum lengkap"} · {s.evidence}
           </p>
         ))}
+        <Pages page={result.page} total={result.total} query={query} />
       </section>
       <section className="space-y-4 border-t pt-5">
         <h2 className="text-lg font-semibold">Peristiwa biaya</h2>
@@ -728,9 +737,10 @@ export async function CostsPage({ query }: { query: Query }) {
         ))}
       </section>
       <Pages
-        page={result.page}
-        total={Math.max(result.total, result.eventTotal)}
+        page={result.eventPage}
+        total={result.eventTotal}
         query={query}
+        param="eventPage"
       />
     </Workspace>
   );

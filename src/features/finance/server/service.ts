@@ -171,6 +171,13 @@ export function createFinanceService(
       const initial = await actor(db, resource, permission);
       return db.$transaction(
         async (tx) => {
+          // Deliberate v1 trade-off (FIN-02 "short finance writes serialized globally"):
+          // the shared 71642 lock lets identity/policy writers exclude finance commands,
+          // and the exclusive 71643 lock serializes every finance write across branches
+          // so reservations, balances, period close and journals never interleave.
+          // Under sustained load writers queue; lock_timeout fails a waiter after 5s
+          // with a retryable error instead of hanging. Revisit with per-branch keys
+          // only after the posting rules are proven safe to partition.
           await tx.$executeRaw`SET LOCAL lock_timeout = '5s'`;
           await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock_shared(71642, 1)`;
           await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(71643, 1)`;

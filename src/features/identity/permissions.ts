@@ -261,6 +261,10 @@ export const fullAccessPermission = {
 export function permissionRestriction(resource: string): string | undefined {
   if (resource === "vendor_tax")
     return "Lihat dan kelola NPWP vendor khusus administrator.";
+  // FIN-02 contract: account/category management is a separately granted right,
+  // not administrator-only; the data is shared by every branch.
+  if (resource === "finance_account")
+    return "Akun dan kategori berlaku untuk semua cabang. Berikan hak kelola hanya kepada staf finance yang berwenang.";
   if (
     [
       "booking",
@@ -272,6 +276,12 @@ export function permissionRestriction(resource: string): string | undefined {
       "manifest_report",
       "delivery_report",
       "dashboard_report",
+      "invoice",
+      "payment",
+      "journal",
+      "finance_cost",
+      "finance_period",
+      "financial_report",
     ].includes(resource)
   )
     return undefined;

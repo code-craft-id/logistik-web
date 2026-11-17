@@ -4,9 +4,33 @@ import { IdentityError } from "@/features/identity/server/access";
 import { identityAction } from "@/features/identity/server/action";
 import { financeService } from "./server/context";
 
+/** Finance-specific wording for database conflicts; identityAction sanitizes the rest. */
+async function financeErrors<T>(work: () => Promise<T>): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    const code =
+      error && typeof error === "object" && "code" in error ? error.code : null;
+    if (code === "P2002")
+      throw new IdentityError(
+        "DUPLICATE",
+        409,
+        "Kode atau nomor sudah dipakai. Gunakan kode lain.",
+      );
+    if (code === "P2025")
+      throw new IdentityError(
+        "NOT_FOUND",
+        404,
+        "Data tidak ditemukan atau sudah berubah. Muat ulang halaman.",
+      );
+    throw error;
+  }
+}
 export async function financeCommand(input: unknown) {
   try {
-    const result = await identityAction(() => financeService.execute(input));
+    const result = await identityAction(() =>
+      financeErrors(() => financeService.execute(input)),
+    );
     revalidatePath("/finance", "layout");
     return { ok: true as const, id: result.id };
   } catch (error) {
