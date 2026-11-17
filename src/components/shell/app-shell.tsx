@@ -433,6 +433,8 @@ export function AppShell({
           "/branch-reports/manifest-outbound",
           "/branch-reports/manifest-vendor",
           "/branch-reports/delivery",
+          "/branch-reports/awb",
+          "/customer-reports/all-status",
           "/dashboard",
         ].some(
           (route) => pathname === route || pathname.startsWith(`${route}/`),

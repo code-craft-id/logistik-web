@@ -1,10 +1,10 @@
 import type { TransactionReportRow } from "./contracts";
 
-const quote = (value: string) => `"${value.replaceAll('"', '""')}"`;
-function text(value: string | null) {
+export const csvQuote = (value: string) => `"${value.replaceAll('"', '""')}"`;
+export function csvText(value: string | null) {
   const cell = value ?? "";
   // Protect formula and control prefixes, even after whitespace or invisible characters.
-  return quote(
+  return csvQuote(
     /^[\s\p{Cc}\p{Cf}]*[=+\-@＝＋－＠\p{Cc}\p{Cf}]/u.test(cell)
       ? `'${cell}`
       : cell,
@@ -22,19 +22,19 @@ export function transactionReportCsv(rows: TransactionReportRow[]): string {
     "Kilo",
     "Status Pengiriman",
   ]
-    .map(quote)
+    .map(csvQuote)
     .join(",");
   const lines = rows.map((row) =>
     [
-      text(row.awbNo),
-      quote(row.transactionDate),
-      text(row.originBranch),
-      text(row.destinationBranch),
-      text(row.senderName),
-      text(row.receiverName),
-      quote(row.koli === null ? "" : String(row.koli)),
-      quote(row.kilo ?? ""),
-      text(row.status),
+      csvText(row.awbNo),
+      csvQuote(row.transactionDate),
+      csvText(row.originBranch),
+      csvText(row.destinationBranch),
+      csvText(row.senderName),
+      csvText(row.receiverName),
+      csvQuote(row.koli === null ? "" : String(row.koli)),
+      csvQuote(row.kilo ?? ""),
+      csvText(row.status),
     ].join(","),
   );
   return `${[header, ...lines].join("\r\n")}\r\n`;

@@ -1,3 +1,13 @@
+## Latest checkpoint: LP-R10 / LP-R11 / LP-R21 implemented (2026-11-17)
+
+User directed continuing past the review stop point and decided the three missing definitions (PRD D-22, 2026-11-17). New feature `src/features/reports/awb-status/` with routes `/branch-reports/awb` (views pending/manifested), `/customer-reports/all-status`, and CSV exports; shell footer and breadcrumb updated. No schema, migration or `permissions.ts` change; uses `transaction_report` view/export. Read-only legacy observation confirmed opening states; deviations in audit §12.
+
+Verification (Node 24.15.0 now nvm default): lint 432 files PASS, typecheck PASS, unit 67 files / 672 PASS before new unit file, new unit 4 PASS, new integration 7 PASS. Dev server checked in Chrome on synthetic local data (40 AWB, 3 manifests) for all three reports; 375px viewport not verified (window resize had no effect). Local `logistik_web` was reset with user consent and seeded (fake fixtures + synthetic operational rows from a scratch script, not committed).
+
+Remaining for these reports: Moda/Service/Description/customer/billing sources (Dev 2 / finance), per-piece rows, Total Biaya money rule (D-11), same-data parity reconciliation.
+
+---
+
 ## Latest checkpoint: review stop point, decisions required, mobile notes (2026-11-17)
 
 Branch `dev3/ready-for-review` (remote `origin/dev3/ready-for-review`), base `8247686`. Older entries below mention `C:/Development/...` and `codex/dev3-ready-for-review`; those are the previous machine's path and local branch name, kept as history only.

@@ -408,8 +408,8 @@ export function navigationPath(
   const financeRoot = !navigationDestinations(groups).some(
     ({ item }) => item.href === pathname,
   )
-    ? ["/finance/invoices", "/finance/accounting"].find((root) =>
-        pathname.startsWith(`${root}/`),
+    ? ["/finance/invoices", "/finance/accounting", "/customer-reports"].find(
+        (root) => pathname.startsWith(`${root}/`),
       )
     : undefined;
   const financeLabels: Record<string, string> = {
@@ -419,6 +419,7 @@ export function navigationPath(
     periods: "Periode",
     reports: "Laporan keuangan",
     new: "Buat invoice",
+    "all-status": "Semua Status",
   };
   const suffix = financeRoot
     ? [
