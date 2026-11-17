@@ -66,3 +66,9 @@ Branch FK index is additive migration/performance suggestion without measured re
 Relevant required shared-lock/inventory corrections7245649 and actual ticket-list rows/count race8d25df1 implemented/local verified;7page regressions and admin-other-detail proof added. RPT03 sourced filters/sorting and RPT04 boundedCSV implemented; owner packet A closes SUP02/SUP03/RPT05 NOT NEEDED and unsupported5headers CLOSED WITH NOTES. Independent QA all slices PASS. Full659unit/127DB/lint382/typecheck/build69 at8d; final two-paragraph-copybe1 has5UI/Biome/QA/detector/build69 and native375/768/1440 proof, unchanged service/tests identity documented. [Exact evidence](evidence/dev3-sup-rpt-followups/verification.md).
 
 Original required findings above are now locally addressed, not erased. Shared lock still conflicts with exclusive policy writers. Optional FK index/names, retained defensive permission checks, existing plan packaging and dependency/drift diagnostics are triaged in the durable follow-up scope. Staging, final Dev1/Dev2 combined review and human merge/release remain open. No new PR/merge/deploy.
+
+## 2026-11-17 PR packaging cleanup (draft PR #11)
+
+- "Exclude agent execution-plan instructions from final PR packaging": `docs/agent-prompts/` and `docs/superpowers/plans/` removed from the branch tip; they remain in Git history. Durable checkpoints (`docs/agent-state/dev3/`), policies and decisions are kept. Historical references to those paths in RUN_LOG/DISC-04 are left as history.
+- Legacy origin hostname replaced by `<legacy-origin>` in `DEV3-LEGACY-PARITY-AUDIT.md`, `DEV3-LEGACY-NAVIGATION-INVENTORY.md` and `LEGACY-ACCESS-GATE.md`; page paths kept as report identities. Pre-existing screenshot names in `FND-03-iteration-2.md` (already on `main`) are outside this branch's scope.
+- Em-dash mojibake (`â€”`) restored to `—` in `AGENTS.md` and the navigation inventory.

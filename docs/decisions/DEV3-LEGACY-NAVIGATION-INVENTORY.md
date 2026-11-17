@@ -2,7 +2,7 @@
 
 ## 1. Observation metadata
 
-Observed 2026-11-16 (Asia/Bangkok), origin https://redlogistik.tracks-app.com/index.php/. Chrome DevTools Lab list_pages failed (connection refused at port 9333); connected Chrome browser via cua_repl successfully inspected existing authenticated tab. IVAN displayed; Administrator role supplied by user, effective role/permission matrix not independently established. DIRECT_NON_MUTATING_DISCOVERY is procedural, not enforced zero-write protection. No credentials inspected, business mutations or private records retained. Existing worktree changes preserved on codex/dev3-ready-for-review.
+Observed 2026-11-16 (Asia/Bangkok), origin <legacy-origin>/index.php/. Chrome DevTools Lab list_pages failed (connection refused at port 9333); connected Chrome browser via cua_repl successfully inspected existing authenticated tab. IVAN displayed; Administrator role supplied by user, effective role/permission matrix not independently established. DIRECT_NON_MUTATING_DISCOVERY is procedural, not enforced zero-write protection. No credentials inspected, business mutations or private records retained. Existing worktree changes preserved on codex/dev3-ready-for-review.
 
 Evidence: live observations in this document are OBSERVED, not approved business rules. Historical LD evidence is explicitly attributed to docs/agent-state/dev3/REPORT_CATALOGUE.md and DISC-04.md. Current application mappings are source inspection, not a runtime or staging test. Report names do not prove calculations or equivalence.
 
@@ -120,109 +120,109 @@ Tutorial System
 
 | Menu path | Legacy URL | Entry type | Inspected | Notes |
 |---|---|---|---|---|
-| Dashboard | https://redlogistik.tracks-app.com/index.php/ | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Dashboard | <legacy-origin>/index.php/ | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Sistem Seting | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Sistem Seting > Grup User | https://redlogistik.tracks-app.com/index.php/group-user | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Sistem Seting > Manajemen User | https://redlogistik.tracks-app.com/index.php/user-management | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Sistem Seting > Hak Akses Menu | https://redlogistik.tracks-app.com/index.php/hak-akses-menu | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Sistem Seting > Grup User | <legacy-origin>/index.php/group-user | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Sistem Seting > Manajemen User | <legacy-origin>/index.php/user-management | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Sistem Seting > Hak Akses Menu | <legacy-origin>/index.php/hak-akses-menu | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Kantor | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Kantor > Perusahaan | https://redlogistik.tracks-app.com/index.php/company | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Kantor > Kantor Cabang | https://redlogistik.tracks-app.com/index.php/branch-offices | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Kantor > Perusahaan | <legacy-origin>/index.php/company | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Kantor > Kantor Cabang | <legacy-origin>/index.php/branch-offices | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Master Data | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Master Data > M. Logistik | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Master Data > M. Logistik > Area Logistik | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Area Logistik > Provinsi | https://redlogistik.tracks-app.com/index.php/area | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Area Logistik > Kabupaten | https://redlogistik.tracks-app.com/index.php/kabupaten | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Area Logistik > Kecamatan | https://redlogistik.tracks-app.com/index.php/kecamatan | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Area Logistik > Kelurahan | https://redlogistik.tracks-app.com/index.php/destination-branch | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Area Logistik > Kode Pos | https://redlogistik.tracks-app.com/index.php/kode-pos | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Area Logistik > Provinsi | <legacy-origin>/index.php/area | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Area Logistik > Kabupaten | <legacy-origin>/index.php/kabupaten | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Area Logistik > Kecamatan | <legacy-origin>/index.php/kecamatan | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Area Logistik > Kelurahan | <legacy-origin>/index.php/destination-branch | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Area Logistik > Kode Pos | <legacy-origin>/index.php/kode-pos | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Master Data > M. Logistik > Divisi Logistik | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Divisi Logistik > Pemasaran | https://redlogistik.tracks-app.com/index.php/marketing | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Divisi Logistik > Driver | https://redlogistik.tracks-app.com/index.php/driver | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Divisi Logistik > Kurir | https://redlogistik.tracks-app.com/index.php/courier | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Divisi Logistik > Pemasaran | <legacy-origin>/index.php/marketing | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Divisi Logistik > Driver | <legacy-origin>/index.php/driver | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Divisi Logistik > Kurir | <legacy-origin>/index.php/courier | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Master Data > M. Logistik > Layanan Logistik | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Layanan Logistik > Moda | https://redlogistik.tracks-app.com/index.php/moda | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Layanan Logistik > Kategori Layanan | https://redlogistik.tracks-app.com/index.php/service-category | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Layanan Logistik > Layanan Pengantaran | https://redlogistik.tracks-app.com/index.php/services-delivery | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Layanan Logistik > Jenis Barang | https://redlogistik.tracks-app.com/index.php/content-delivery | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Layanan Logistik > Jenis Biaya | https://redlogistik.tracks-app.com/index.php/billing-type | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Layanan Logistik > Termin | https://redlogistik.tracks-app.com/index.php/termin | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Layanan Logistik > Moda | <legacy-origin>/index.php/moda | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Layanan Logistik > Kategori Layanan | <legacy-origin>/index.php/service-category | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Layanan Logistik > Layanan Pengantaran | <legacy-origin>/index.php/services-delivery | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Layanan Logistik > Jenis Barang | <legacy-origin>/index.php/content-delivery | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Layanan Logistik > Jenis Biaya | <legacy-origin>/index.php/billing-type | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Layanan Logistik > Termin | <legacy-origin>/index.php/termin | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Master Data > M. Logistik > Kendaraan Logistik | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Kendaraan Logistik > Jenis Kendaraan | https://redlogistik.tracks-app.com/index.php/vehicle-type | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Kendaraan Logistik > Kendaraan | https://redlogistik.tracks-app.com/index.php/log-vehicles | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Logistik > Kendaraan Logistik > Jenis Trucking | https://redlogistik.tracks-app.com/index.php/jenis-trucking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Kendaraan Logistik > Jenis Kendaraan | <legacy-origin>/index.php/vehicle-type | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Kendaraan Logistik > Kendaraan | <legacy-origin>/index.php/log-vehicles | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Logistik > Kendaraan Logistik > Jenis Trucking | <legacy-origin>/index.php/jenis-trucking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Master Data > M. Vendor | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Master Data > M. Vendor > Vendor | https://redlogistik.tracks-app.com/index.php/vendors | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M. Vendor > Layanan Vendor | https://redlogistik.tracks-app.com/index.php/services-vendor | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Master Data > M.Shipment Status | https://redlogistik.tracks-app.com/index.php/mshipment-status | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Vendor > Vendor | <legacy-origin>/index.php/vendors | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M. Vendor > Layanan Vendor | <legacy-origin>/index.php/services-vendor | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Master Data > M.Shipment Status | <legacy-origin>/index.php/mshipment-status | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Modul | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Modul > Pemasaran/Penjualan | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Modul > Pemasaran/Penjualan > Customer | https://redlogistik.tracks-app.com/index.php/customer | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Pemasaran/Penjualan > Penerima | https://redlogistik.tracks-app.com/index.php/consignee | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Pemasaran/Penjualan > Pendapatan Pelanggan | https://redlogistik.tracks-app.com/index.php/revenue-customer | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Modul > Pemasaran/Penjualan > Customer | <legacy-origin>/index.php/customer | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Pemasaran/Penjualan > Penerima | <legacy-origin>/index.php/consignee | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Pemasaran/Penjualan > Pendapatan Pelanggan | <legacy-origin>/index.php/revenue-customer | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Modul > Layanan Pelanggan | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Modul > Layanan Pelanggan > Transaksi | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Transaksi > On Site Outbound | https://redlogistik.tracks-app.com/index.php/on-site-add | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Transaksi > On Site Inbound | https://redlogistik.tracks-app.com/index.php/on-site-inbound | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Transaksi > Print AWB | https://redlogistik.tracks-app.com/index.php/print-awb | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Transaksi > Persetujuan Edit/delete AWB | https://redlogistik.tracks-app.com/index.php/approve-modified-awb | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Transaksi > Void Awb | https://redlogistik.tracks-app.com/index.php/void-awb | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Status Pengantaran | https://redlogistik.tracks-app.com/index.php/shipment-status | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Cek Ongkir | https://redlogistik.tracks-app.com/index.php/cek-ongkir | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Cek Resi | https://redlogistik.tracks-app.com/index.php/tracking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Histori Edit Resi | https://redlogistik.tracks-app.com/index.php/history-edit-resi | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Booking | https://redlogistik.tracks-app.com/index.php/booking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > Inbound Booking | https://redlogistik.tracks-app.com/index.php/inbound-booking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Layanan Pelanggan > History Delete Resi | https://redlogistik.tracks-app.com/index.php/history-delete-shipment-status | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Transaksi > On Site Outbound | <legacy-origin>/index.php/on-site-add | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Transaksi > On Site Inbound | <legacy-origin>/index.php/on-site-inbound | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Transaksi > Print AWB | <legacy-origin>/index.php/print-awb | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Transaksi > Persetujuan Edit/delete AWB | <legacy-origin>/index.php/approve-modified-awb | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Transaksi > Void Awb | <legacy-origin>/index.php/void-awb | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Status Pengantaran | <legacy-origin>/index.php/shipment-status | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Cek Ongkir | <legacy-origin>/index.php/cek-ongkir | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Cek Resi | <legacy-origin>/index.php/tracking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Histori Edit Resi | <legacy-origin>/index.php/history-edit-resi | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Booking | <legacy-origin>/index.php/booking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > Inbound Booking | <legacy-origin>/index.php/inbound-booking | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Layanan Pelanggan > History Delete Resi | <legacy-origin>/index.php/history-delete-shipment-status | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Modul > Operasional | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Modul > Operasional > Manifest | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Manifest > Cek Transit | https://redlogistik.tracks-app.com/index.php/chek-transit | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Manifest > Cek Inbound | https://redlogistik.tracks-app.com/index.php/cek-inbound | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Manifest > Cek Inbound Agen | https://redlogistik.tracks-app.com/index.php/cek-inbound-agen | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Manifest > Print Manifest | https://redlogistik.tracks-app.com/index.php/print-manifest | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Manifest > Cek Transit | <legacy-origin>/index.php/chek-transit | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Manifest > Cek Inbound | <legacy-origin>/index.php/cek-inbound | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Manifest > Cek Inbound Agen | <legacy-origin>/index.php/cek-inbound-agen | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Manifest > Print Manifest | <legacy-origin>/index.php/print-manifest | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Modul > Operasional > Lembar Pengantaran | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Lembar Pengantaran > Kurir Kota | https://redlogistik.tracks-app.com/index.php/delivery-sheet | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Lembar Pengantaran > Print DRS | https://redlogistik.tracks-app.com/index.php/print-city-courier | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > POD Kembali | https://redlogistik.tracks-app.com/index.php/stt-kembali-operational | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Proses Vendor | https://redlogistik.tracks-app.com/index.php/proses-vendor | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
-| Modul > Operasional > Approval Pod Kembali | https://redlogistik.tracks-app.com/index.php/approval-pod-kembali | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Lembar Pengantaran > Kurir Kota | <legacy-origin>/index.php/delivery-sheet | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Lembar Pengantaran > Print DRS | <legacy-origin>/index.php/print-city-courier | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > POD Kembali | <legacy-origin>/index.php/stt-kembali-operational | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Proses Vendor | <legacy-origin>/index.php/proses-vendor | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Modul > Operasional > Approval Pod Kembali | <legacy-origin>/index.php/approval-pod-kembali | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 | Modul > Keuangan | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Modul > Keuangan > Piutang Dagang | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Modul > Keuangan > Piutang Dagang > Invoice (New) | https://redlogistik.tracks-app.com/index.php/sales | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Modul > Keuangan > Piutang Dagang > Invoice (New) | <legacy-origin>/index.php/sales | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Modul > Keuangan > Hutang Dagang | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Modul > Keuangan > Hutang Dagang > Pembayaran Hutang | https://redlogistik.tracks-app.com/index.php/debt-payments | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Modul > Keuangan > Hutang Dagang > Pembayaran Hutang | <legacy-origin>/index.php/debt-payments | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Laporan-laporan | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
 | Laporan-laporan > Laporan Cabang | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Detail Transaksi | https://redlogistik.tracks-app.com/index.php/detail-transaction | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Rekap Transaksi | https://redlogistik.tracks-app.com/index.php/recaps-transactions | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Manifest Outbound | https://redlogistik.tracks-app.com/index.php/branch-manifest | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Rekap Manifest | https://redlogistik.tracks-app.com/index.php/branch-manifest-recaps | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Pengantaran | https://redlogistik.tracks-app.com/index.php/city-courier | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Gross Profit / Manifest | https://redlogistik.tracks-app.com/index.php/gross-profit-manifest | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Rekap Gross Profit | https://redlogistik.tracks-app.com/index.php/rekap-gross-profit | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Rekap Transaksi Harian | https://redlogistik.tracks-app.com/index.php/rekap-omzet-harian | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Manifest Vendor | https://redlogistik.tracks-app.com/index.php/manifest-vendor | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Awb Tertunda | https://redlogistik.tracks-app.com/index.php/awb-pending | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Awb Termanifest | https://redlogistik.tracks-app.com/index.php/awb-termanifest | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Rekap Customer Bulanan | https://redlogistik.tracks-app.com/index.php/rekap-customer-bl | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Rekap Omset Harian | https://redlogistik.tracks-app.com/index.php/rekap-omset-harian | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Cabang > Detail Transaction Inbound | https://redlogistik.tracks-app.com/index.php/detail-transaksi-inbound | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Detail Transaksi | <legacy-origin>/index.php/detail-transaction | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Rekap Transaksi | <legacy-origin>/index.php/recaps-transactions | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Manifest Outbound | <legacy-origin>/index.php/branch-manifest | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Rekap Manifest | <legacy-origin>/index.php/branch-manifest-recaps | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Pengantaran | <legacy-origin>/index.php/city-courier | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Gross Profit / Manifest | <legacy-origin>/index.php/gross-profit-manifest | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Rekap Gross Profit | <legacy-origin>/index.php/rekap-gross-profit | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Rekap Transaksi Harian | <legacy-origin>/index.php/rekap-omzet-harian | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Manifest Vendor | <legacy-origin>/index.php/manifest-vendor | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Awb Tertunda | <legacy-origin>/index.php/awb-pending | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Awb Termanifest | <legacy-origin>/index.php/awb-termanifest | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Rekap Customer Bulanan | <legacy-origin>/index.php/rekap-customer-bl | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Rekap Omset Harian | <legacy-origin>/index.php/rekap-omset-harian | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Cabang > Detail Transaction Inbound | <legacy-origin>/index.php/detail-transaksi-inbound | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Laporan-laporan > Laporan Keuangan | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Keuangan > Laporan AR | https://redlogistik.tracks-app.com/index.php/sales-aging | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Keuangan > Laporan AP | https://redlogistik.tracks-app.com/index.php/ap-report | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Keuangan > Laporan AR | <legacy-origin>/index.php/sales-aging | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Keuangan > Laporan AP | <legacy-origin>/index.php/ap-report | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Laporan-laporan > Laporan Kurir | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Kurir > Harian Kurir | https://redlogistik.tracks-app.com/index.php/daily-report-courier | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Laporan Kurir > Laporan Detail Kurir | https://redlogistik.tracks-app.com/index.php/laporan-detail-kurir | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Kurir > Harian Kurir | <legacy-origin>/index.php/daily-report-courier | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Laporan Kurir > Laporan Detail Kurir | <legacy-origin>/index.php/laporan-detail-kurir | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Laporan-laporan > Reports Customer | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Reports Customer > Pengiriman | https://redlogistik.tracks-app.com/index.php/pengiriman | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Reports Customer > POD Kembali | https://redlogistik.tracks-app.com/index.php/pod-return | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Reports Customer > Semua Status | https://redlogistik.tracks-app.com/index.php/all-status | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Laporan-laporan > Report Customer | https://redlogistik.tracks-app.com/index.php/report-customer | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Reports Customer > Pengiriman | <legacy-origin>/index.php/pengiriman | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Reports Customer > POD Kembali | <legacy-origin>/index.php/pod-return | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Reports Customer > Semua Status | <legacy-origin>/index.php/all-status | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Laporan-laporan > Report Customer | <legacy-origin>/index.php/report-customer | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Ticketing | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Ticketing > Tiket Support | https://redlogistik.tracks-app.com/index.php/ticketing-support | Navigation link | Opened | Session visibility only; role dependence unverified. |
-| Ticketing > Persetujuan Tiketing | https://redlogistik.tracks-app.com/index.php/approval-ticketing | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Ticketing > Tiket Support | <legacy-origin>/index.php/ticketing-support | Navigation link | Opened | Session visibility only; role dependence unverified. |
+| Ticketing > Persetujuan Tiketing | <legacy-origin>/index.php/approval-ticketing | Navigation link | Opened | Session visibility only; role dependence unverified. |
 | Tutorial System | javascript:void(0) | Disclosure | Expanded | Session visibility only; role dependence unverified. |
-| Tutorial System > List Tutorial | https://redlogistik.tracks-app.com/index.php/list-tutorial | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
+| Tutorial System > List Tutorial | <legacy-origin>/index.php/list-tutorial | Navigation link | Link verified only | Session visibility only; role dependence unverified. |
 
 
 ## 4. Dev3 detailed page inventory
@@ -233,7 +233,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R01: Laporan-laporan > Laporan Cabang > Detail Transaksi — `detail-transaction`
 
-- **Title / URL:** Kelola Detail Transaksi; https://redlogistik.tracks-app.com/index.php/detail-transaction. Entry: sidebar path above.
+- **Title / URL:** Kelola Detail Transaksi; <legacy-origin>/index.php/detail-transaction. Entry: sidebar path above.
 - **Purpose:** Detail Transaksi report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode pair; Asal=Semua Asal; Tujuan=Semua Tujuan; Pelanggan=Semua Pelanggan; Jenis Biaya=Semua Pembayaran; Moda=Semua Moda; Status=Semua Status; Cari; Ekspor; Refresh.
 - **Columns, in order:** AWB No.; tanggal; Moda; Servis; Asal; Tujuan; Pengirim; Penerima Barang; Koli; Kilo; Deskripsi; Status Pengiriman; Komentar; Diterima Oleh
@@ -242,7 +242,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R02: Laporan-laporan > Laporan Cabang > Rekap Transaksi — `recaps-transactions`
 
-- **Title / URL:** Rekap Transaksi; https://redlogistik.tracks-app.com/index.php/recaps-transactions. Entry: sidebar path above.
+- **Title / URL:** Rekap Transaksi; <legacy-origin>/index.php/recaps-transactions. Entry: sidebar path above.
 - **Purpose:** Rekap Transaksi report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Bulan=November; year=2026; Cabang=JAKARTA; Jenis Lembar=-- Multiple Sheet --; Ekspor Excel.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -251,7 +251,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R03: Laporan-laporan > Laporan Cabang > Manifest Outbound — `branch-manifest`
 
-- **Title / URL:** Manifes Cabang; https://redlogistik.tracks-app.com/index.php/branch-manifest. Entry: sidebar path above.
+- **Title / URL:** Manifes Cabang; <legacy-origin>/index.php/branch-manifest. Entry: sidebar path above.
 - **Purpose:** Manifest Outbound report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Tanggal=2026-11-16; Cabang=JAKARTA; Daftar Manifes.
 - **Columns, in order:** Manifes No.; Tanggal; Asal; Tujuan; Penjual; Tot. AWB; Tot. Koli; Tot. Berat; Tot. Volume; Tot. Biaya (Rp.); Kendaraan; Sopir; Status; Aksi
@@ -260,7 +260,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R04: Laporan-laporan > Laporan Cabang > Rekap Manifest — `branch-manifest-recaps`
 
-- **Title / URL:** Recaps Manifest; https://redlogistik.tracks-app.com/index.php/branch-manifest-recaps. Entry: sidebar path above.
+- **Title / URL:** Recaps Manifest; <legacy-origin>/index.php/branch-manifest-recaps. Entry: sidebar path above.
 - **Purpose:** Rekap Manifest report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Bulan=November; year=2026; Cabang=JAKARTA; Ekspor Excel.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -269,7 +269,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R05: Laporan-laporan > Laporan Cabang > Pengantaran — `city-courier`
 
-- **Title / URL:** Cari Kurir Kota / Daftar Kurir Kota; https://redlogistik.tracks-app.com/index.php/city-courier. Entry: sidebar path above.
+- **Title / URL:** Cari Kurir Kota / Daftar Kurir Kota; <legacy-origin>/index.php/city-courier. Entry: sidebar path above.
 - **Purpose:** Pengantaran report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Select Searching; Search; Refresh; local Search; size 10/25/50/100; Previous/Next.
 - **Columns, in order:** Tanggal; DRS No.; Cabang; Kurir; Tot. AWB; Tot. Progress; Tot. Sukses; Tot. Gagal; Tot. Koli; Tot. Berat; Tot. Volume; Tot. Biaya (Rp.); Status; Aksi
@@ -278,7 +278,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R06: Laporan-laporan > Laporan Cabang > Gross Profit / Manifest — `gross-profit-manifest`
 
-- **Title / URL:** Gross Profit / Manifests; https://redlogistik.tracks-app.com/index.php/gross-profit-manifest. Entry: sidebar path above.
+- **Title / URL:** Gross Profit / Manifests; <legacy-origin>/index.php/gross-profit-manifest. Entry: sidebar path above.
 - **Purpose:** Gross Profit / Manifest report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** November; 2026; Status initially Select Status ...; expanded Destination/Transit/Vendor; Show; Refresh; result Search; size 10/25/50/100; Previous/Next.
 - **Columns, in order:** Manifest No.; Tanggal; Tujuan; Tot. AWB; Tot. Koli; Tot. Kg; Tot. Volume; Tot. Biaya (Rp.); kendaraan; Driver; Aksi
@@ -287,7 +287,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R07: Laporan-laporan > Laporan Cabang > Rekap Transaksi Harian — `rekap-omzet-harian`
 
-- **Title / URL:** Rekap Transaksi Harian; https://redlogistik.tracks-app.com/index.php/rekap-omzet-harian. Entry: sidebar path above.
+- **Title / URL:** Rekap Transaksi Harian; <legacy-origin>/index.php/rekap-omzet-harian. Entry: sidebar path above.
 - **Purpose:** Rekap Transaksi Harian report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Tanggal=2026-11-16; Cabang=JAKARTA; Cetak.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -296,7 +296,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R08: Laporan-laporan > Laporan Cabang > Rekap Gross Profit — `rekap-gross-profit`
 
-- **Title / URL:** Rekap Gross Profit; https://redlogistik.tracks-app.com/index.php/rekap-gross-profit. Entry: sidebar path above.
+- **Title / URL:** Rekap Gross Profit; <legacy-origin>/index.php/rekap-gross-profit. Entry: sidebar path above.
 - **Purpose:** Rekap Gross Profit report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode Date Start/End=2026-11-16; Branch Origin displays -- All Destination --; Nopol=-- All Nopol --; Show; Export Excel; Refresh; result Search; size 10/25/50/100; Previous/Next.
 - **Columns, in order:** No. Polisi; No. Manifests; Tujuan; Driver; Tgl. Manifests; Dibuat Oleh
@@ -305,7 +305,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R09: Laporan-laporan > Laporan Cabang > Manifest Vendor — `manifest-vendor`
 
-- **Title / URL:** Penjual Manifes; https://redlogistik.tracks-app.com/index.php/manifest-vendor. Entry: sidebar path above.
+- **Title / URL:** Penjual Manifes; <legacy-origin>/index.php/manifest-vendor. Entry: sidebar path above.
 - **Purpose:** Manifest Vendor report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** November; 2026; Penjual=Pilih Penjual...; Pengguna=Pilih Pengguna...; Daftar Manifes.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -314,7 +314,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R10: Laporan-laporan > Laporan Cabang > Awb Tertunda — `awb-pending`
 
-- **Title / URL:** AWB Pending Manifest; https://redlogistik.tracks-app.com/index.php/awb-pending. Entry: sidebar path above.
+- **Title / URL:** AWB Pending Manifest; <legacy-origin>/index.php/awb-pending. Entry: sidebar path above.
 - **Purpose:** Awb Tertunda report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Semua Tujuan; Cari; Ekspor Excel; Refresh; local Search.
 - **Columns, in order:** AWB Koli No.; AWB No.; DO No.; Tanggal; Tujuan; Moda; Koli; Berat; Volume; Total Biaya
@@ -323,7 +323,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R11: Laporan-laporan > Laporan Cabang > Awb Termanifest — `awb-termanifest`
 
-- **Title / URL:** AWB TerManifes; https://redlogistik.tracks-app.com/index.php/awb-termanifest. Entry: sidebar path above.
+- **Title / URL:** AWB TerManifes; <legacy-origin>/index.php/awb-termanifest. Entry: sidebar path above.
 - **Purpose:** Awb Termanifest report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** November; 2026; Semua Pengguna; Semua Tujuan; Cari; Ekspor Excel; Refresh; local Search.
 - **Columns, in order:** AWB No.; DO No.; Manifes No.; Tanggal; Tujuan; Moda; Koli; Berat; Volume; Total Biaya
@@ -332,7 +332,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R12: Laporan-laporan > Laporan Cabang > Rekap Customer Bulanan — `rekap-customer-bl`
 
-- **Title / URL:** Rekap Pelanggan Bl; https://redlogistik.tracks-app.com/index.php/rekap-customer-bl. Entry: sidebar path above.
+- **Title / URL:** Rekap Pelanggan Bl; <legacy-origin>/index.php/rekap-customer-bl. Entry: sidebar path above.
 - **Purpose:** Rekap Customer Bulanan report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** November; 2026; Cabang=JAKARTA; Ekspor Excel.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -341,7 +341,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R13: Laporan-laporan > Laporan Cabang > Rekap Omset Harian — `rekap-omset-harian`
 
-- **Title / URL:** Rekap Omset Harian; https://redlogistik.tracks-app.com/index.php/rekap-omset-harian. Entry: sidebar path above.
+- **Title / URL:** Rekap Omset Harian; <legacy-origin>/index.php/rekap-omset-harian. Entry: sidebar path above.
 - **Purpose:** Rekap Omset Harian report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** November; 2026; Cabang=JAKARTA; Ekspor Excel.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -350,7 +350,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R14: Laporan-laporan > Laporan Cabang > Detail Transaction Inbound — `detail-transaksi-inbound`
 
-- **Title / URL:** Kelola Detail Transaksi; https://redlogistik.tracks-app.com/index.php/detail-transaksi-inbound. Entry: sidebar path above.
+- **Title / URL:** Kelola Detail Transaksi; <legacy-origin>/index.php/detail-transaksi-inbound. Entry: sidebar path above.
 - **Purpose:** Detail Transaction Inbound report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** November; 2026; Asal/Tujuan/Pelanggan/Pembayaran/Moda/Status all defaults; Jenis Lembar=-- One Sheet --; Cari; Ekspor; Refresh.
 - **Columns, in order:** AWB No.; tanggal; Moda; Servis; Asal; Tujuan; Pengirim; Penerima Barang; Koli; Kilo; Deskripsi; Status Pengiriman; Komentar; Diterima Oleh
@@ -359,7 +359,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R15: Laporan-laporan > Laporan Kurir > Harian Kurir — `daily-report-courier`
 
-- **Title / URL:** List Daily Report Courier; https://redlogistik.tracks-app.com/index.php/daily-report-courier. Entry: sidebar path above.
+- **Title / URL:** List Daily Report Courier; <legacy-origin>/index.php/daily-report-courier. Entry: sidebar path above.
 - **Purpose:** Harian Kurir report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Date Start/End=2026-11-16; Export; Search; Refresh; local Search.
 - **Columns, in order:** Nama Kurir; Jumlah Terambil; Jumlah Miss Pickup
@@ -368,7 +368,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R16: Laporan-laporan > Laporan Kurir > Laporan Detail Kurir — `laporan-detail-kurir`
 
-- **Title / URL:** Laporan Detail Kurir; https://redlogistik.tracks-app.com/index.php/laporan-detail-kurir. Entry: sidebar path above.
+- **Title / URL:** Laporan Detail Kurir; <legacy-origin>/index.php/laporan-detail-kurir. Entry: sidebar path above.
 - **Purpose:** Laporan Detail Kurir report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode pair; Branch=Semua Asal; Kurir=-- Semua Kurir --; Status=-- All Status --; Cari; Ekspor; Refresh.
 - **Columns, in order:** DRS No.; AWB No; Kurir; Tanggal; Asal; Tujuan; Pengirim; Layanan; Status; Penerima; Diterima Oleh; Tgl. Diterima; Acc. in; L.Time; SLA
@@ -377,7 +377,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R17: Laporan-laporan > Laporan Keuangan > Laporan AR — `sales-aging`
 
-- **Title / URL:** Daftar Rekap Penjualan Aging; https://redlogistik.tracks-app.com/index.php/sales-aging. Entry: sidebar path above.
+- **Title / URL:** Daftar Rekap Penjualan Aging; <legacy-origin>/index.php/sales-aging. Entry: sidebar path above.
 - **Purpose:** Laporan AR report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Cari textbox; November; 2026; Pelanggan=Semua; Ekspor Excel; Menunjukan; Refresh; Belum Lunas/Lunas tabs.
 - **Columns, in order:** Tanggal Invoice; No. KWT/INV; Pelanggan; Ketentuan; Status; [blank]; Penerima
@@ -386,7 +386,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R18: Laporan-laporan > Laporan Keuangan > Laporan AP — `ap-report`
 
-- **Title / URL:** Daftar Rekap Laporan AP; https://redlogistik.tracks-app.com/index.php/ap-report. Entry: sidebar path above.
+- **Title / URL:** Daftar Rekap Laporan AP; <legacy-origin>/index.php/ap-report. Entry: sidebar path above.
 - **Purpose:** Laporan AP report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Cari textbox; November; 2026; Penjual=Semua; Ekspor Excel; Menunjukan; Belum Lunas/Lunas tabs.
 - **Columns, in order:** Penjual; No. Faktur; Tanggal; Status; Tot. Biaya
@@ -395,7 +395,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R19: Laporan-laporan > Reports Customer > Pengiriman — `pengiriman`
 
-- **Title / URL:** Report Pengiriman; https://redlogistik.tracks-app.com/index.php/pengiriman. Entry: sidebar path above.
+- **Title / URL:** Report Pengiriman; <legacy-origin>/index.php/pengiriman. Entry: sidebar path above.
 - **Purpose:** Pengiriman report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode pair; Customer=Semua Customer; Destination=ALL DESTINATION; Search; Export; Refresh; local Search.
 - **Columns, in order:** AWB No .; Date; DO No. / Reff; Moda; Service; Origin; Destination; Shipper; Consignee; Koli; Kilo; Description; Shipment Status; Received by; Received Date
@@ -404,7 +404,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R20: Laporan-laporan > Reports Customer > POD Kembali — `pod-return`
 
-- **Title / URL:** Report POD Return; https://redlogistik.tracks-app.com/index.php/pod-return. Entry: sidebar path above.
+- **Title / URL:** Report POD Return; <legacy-origin>/index.php/pod-return. Entry: sidebar path above.
 - **Purpose:** POD Kembali report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode pair; Semua Asal/Tujuan/Customer; Search; Export; Refresh; local Search.
 - **Columns, in order:** AWB; AWB Date; Destination; Consignee; Reff No; Received By; Received Date; Status AWB; Remarks
@@ -413,7 +413,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R21: Laporan-laporan > Reports Customer > Semua Status — `all-status`
 
-- **Title / URL:** Report All Status; https://redlogistik.tracks-app.com/index.php/all-status. Entry: sidebar path above.
+- **Title / URL:** Report All Status; <legacy-origin>/index.php/all-status. Entry: sidebar path above.
 - **Purpose:** Semua Status report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode pair; Asal/Tujuan/Customer/Pembayaran/Status all defaults; Search; Export; Refresh; size 10/25/50/100; local Search; Previous/Next.
 - **Columns, in order:** AWB; Date; Moda; Service; Origin; Destination; Shipper; Consignee; Koli; Kilo; Description; Shipment Status; Received by; No Manifest
@@ -422,7 +422,7 @@ Coverage: 8 top-level entries, 95 nested entries (disclosures included); 77 dest
 
 ### LP-R22: Laporan-laporan > Report Customer — `report-customer`
 
-- **Title / URL:** Report Customer; https://redlogistik.tracks-app.com/index.php/report-customer. Entry: sidebar path above.
+- **Title / URL:** Report Customer; <legacy-origin>/index.php/report-customer. Entry: sidebar path above.
 - **Purpose:** Report Customer report (label interpretation; business semantics unconfirmed).
 - **Controls / sections:** Periode Date Start/End; Origin=-- All Origin --; Destination=-- All Destination --; Customer=-- All Customer --; Billing Type=-- All Billing Type --; Export Excel.
 - **Columns, in order:** Not exposed in parameter-only initial view; output unverified.
@@ -439,7 +439,7 @@ Executed bounded GP query: `gross-profit-manifest?bulan=11&tahun=2026&status=1&s
 
 ### Dashboard — Dashboard — `/index.php/`
 
-URL https://redlogistik.tracks-app.com/index.php/. Date range 2026-11-01–2026-11-16; November/2026; Semua Cabang. Dashboard year options 2020–2026 differ from the calendar widget. Refresh and per-section refresh controls. Quick Action exposes Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi, Rekap Transaksi, Report AR, and Atur Menu (settings action skipped).
+URL <legacy-origin>/index.php/. Date range 2026-11-01–2026-11-16; November/2026; Semua Cabang. Dashboard year options 2020–2026 differ from the calendar widget. Refresh and per-section refresh controls. Quick Action exposes Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi, Rekap Transaksi, Report AR, and Atur Menu (settings action skipped).
 
 Sections: Quick Action; AI Executive Insight; AI Executive Summary; Rekomendasi AI; Notifikasi Penting; KPI Summary; Analytics & Operational Status; Grafik Penjualan; Top 5 Customer (Revenue Bulan Ini); Shipment Status; Aktivitas Terbaru; POD Outstanding Manifest; Pengumuman. Initial Memuat... states settled to content. KPI labels: Total Transaksi, Total Shipment Success, Delivery, AWB Pending, Invoice Outstanding, Piutang. Shipment groups: Delivered / Success, On Delivery, Failed / Return, Pending. No totals/formulas reconciled. Recent activity record identifiers intentionally omitted. No AI/settings action invoked.
 
@@ -484,27 +484,27 @@ KPI links additionally contain `month=11&bulan=11&year=2026&tahun=2026&date=2026
 | Lihat Detail | shipment-status | dashboard=shipment-status | Analytics |
 | Lihat Semua POD | shipment-status | dashboard=pod-outstanding | Analytics |
 
-Lihat Semua Aktivitas links to `https://redlogistik.tracks-app.com/modul/home/dashboard_activity.php?` plus shared context and `&dashboard=activity` (link verified, outside approved index.php navigation scope, not opened). Lihat Semua Pengumuman links to `https://redlogistik.tracks-app.com/` (not opened). Recent activity links use `tracking/view/[private-id]#tracking`; identifiers redacted. No page behavior inferred from these links. Current `/dashboard` renders the RPT-02 operational target, not the live AI/finance dashboard above.
+Lihat Semua Aktivitas links to `<legacy-origin>/modul/home/dashboard_activity.php?` plus shared context and `&dashboard=activity` (link verified, outside approved index.php navigation scope, not opened). Lihat Semua Pengumuman links to `<legacy-origin>/` (not opened). Recent activity links use `tracking/view/[private-id]#tracking`; identifiers redacted. No page behavior inferred from these links. Current `/dashboard` renders the RPT-02 operational target, not the live AI/finance dashboard above.
 
 ### Modul > Pemasaran/Penjualan > Pendapatan Pelanggan — `revenue-customer`
 
-URL https://redlogistik.tracks-app.com/index.php/revenue-customer. Title/section List Pelanggan, home breadcrumb. November/2026 selectors and Search. Columns: No.; List Pelanggan; Total Pendapatan; Growth. Initial Processing; settled rows and growth/revenue formulas unverified. Dashboard Top 5 Customer links here. No dedicated implemented revenue equivalent established.
+URL <legacy-origin>/index.php/revenue-customer. Title/section List Pelanggan, home breadcrumb. November/2026 selectors and Search. Columns: No.; List Pelanggan; Total Pendapatan; Growth. Initial Processing; settled rows and growth/revenue formulas unverified. Dashboard Top 5 Customer links here. No dedicated implemented revenue equivalent established.
 
 ### Modul > Keuangan > Piutang Dagang > Invoice (New) — `sales`
 
-URL https://redlogistik.tracks-app.com/index.php/sales. Sections Tambah Invoice, Daftar Invoice. Form: Customers (Pilih Customers); Invoice No (Auto Generate When Submit); Manual; Tgl. Dibuat (2026-11-16); Termin; Deskripsi (Description); Submit. Form/Manual skipped. List: Search textbox; Select Searching; Search button; Refresh; Export. Ordered columns Customer; Invoice No; Tgl. Dibuat; Tgl. Diterima; Termin; Tgl. Pengingat; Status; Tgl. Tutup; Tot. AWB; Action. Empty result; populated invoice detail/payment/history unverified. Dashboard paid/outstanding links do not prove payment workflow. Current `/finance/invoices`, `/finance/invoices/new`, `/finance/invoices/[id]` implement adopted manual IDR billing/issue/void/receipt/reversal policy; PARTIAL parity.
+URL <legacy-origin>/index.php/sales. Sections Tambah Invoice, Daftar Invoice. Form: Customers (Pilih Customers); Invoice No (Auto Generate When Submit); Manual; Tgl. Dibuat (2026-11-16); Termin; Deskripsi (Description); Submit. Form/Manual skipped. List: Search textbox; Select Searching; Search button; Refresh; Export. Ordered columns Customer; Invoice No; Tgl. Dibuat; Tgl. Diterima; Termin; Tgl. Pengingat; Status; Tgl. Tutup; Tot. AWB; Action. Empty result; populated invoice detail/payment/history unverified. Dashboard paid/outstanding links do not prove payment workflow. Current `/finance/invoices`, `/finance/invoices/new`, `/finance/invoices/[id]` implement adopted manual IDR billing/issue/void/receipt/reversal policy; PARTIAL parity.
 
 ### Modul > Keuangan > Hutang Dagang > Pembayaran Hutang — `debt-payments`
 
-URL https://redlogistik.tracks-app.com/index.php/debt-payments. Sections Tambah Pembayaran Hutang, Daftar Invoice. Form: Kategori (--Please Select--); Tanggal Buat (2026-11-16); Invoice No. (Auto Generate When Submit); Manual; Submit. Form actions skipped. Search textbox; Select Searching; Search; Refresh. Columns Kategori; Vendor; Invoice No; Tanggal Dibuat; Tanggal Diterima; Term; Tgl. Pengingat; Status; Tanggal Tutup; Tot. AWB; Action. Empty result; payment/detail/history not established. FIN-02 accrued supplier liability does not implement settlement.
+URL <legacy-origin>/index.php/debt-payments. Sections Tambah Pembayaran Hutang, Daftar Invoice. Form: Kategori (--Please Select--); Tanggal Buat (2026-11-16); Invoice No. (Auto Generate When Submit); Manual; Submit. Form actions skipped. Search textbox; Select Searching; Search; Refresh. Columns Kategori; Vendor; Invoice No; Tanggal Dibuat; Tanggal Diterima; Term; Tgl. Pengingat; Status; Tanggal Tutup; Tot. AWB; Action. Empty result; payment/detail/history not established. FIN-02 accrued supplier liability does not implement settlement.
 
 ### Ticketing > Tiket Support — `ticketing-support`
 
-URL https://redlogistik.tracks-app.com/index.php/ticketing-support. Title Add Ticketing despite list content. Select Searching; Search button; Refresh; Add link to `ticketing-support/tambah`; local Search textbox. Columns Date; No. Ticket; Judul; Link URL; Status; Approval; Approve By; Action. One existing row, content omitted. Eye detail opened; no status/approval action executed. Current `/ticketting` and `/ticketting/[id]` implement accepted SUP-01 creator/current-branch subset with explicit administrator scope; no approval/lifecycle/attachment parity claim.
+URL <legacy-origin>/index.php/ticketing-support. Title Add Ticketing despite list content. Select Searching; Search button; Refresh; Add link to `ticketing-support/tambah`; local Search textbox. Columns Date; No. Ticket; Judul; Link URL; Status; Approval; Approve By; Action. One existing row, content omitted. Eye detail opened; no status/approval action executed. Current `/ticketting` and `/ticketting/[id]` implement accepted SUP-01 creator/current-branch subset with explicit administrator scope; no approval/lifecycle/attachment parity claim.
 
 ### Ticketing > Tiket Support > Add — `ticketing-support/tambah`
 
-URL https://redlogistik.tracks-app.com/index.php/ticketing-support/tambah. Title Add Ticketing. Fields in order Date (2026-11-16); Priority (Pilih Priority....); Subject; Upload File / Choose File; Nama Menu; Picture (ex: 1) + Detail button; URL; Remarks; submit; Back to list. No input/upload/Detail/submit. Historical LD036 observed Low/Normal/High, not re-expanded here. Current `/ticketting/new` implements accepted basic fields/priority; attachments/Picture/lifecycle intentionally deferred.
+URL <legacy-origin>/index.php/ticketing-support/tambah. Title Add Ticketing. Fields in order Date (2026-11-16); Priority (Pilih Priority....); Subject; Upload File / Choose File; Nama Menu; Picture (ex: 1) + Detail button; URL; Remarks; submit; Back to list. No input/upload/Detail/submit. Historical LD036 observed Low/Normal/High, not re-expanded here. Current `/ticketting/new` implements accepted basic fields/priority; attachments/Picture/lifecycle intentionally deferred.
 
 ### Ticketing > Tiket Support > eye detail — `ticketing-support/chat/[id]`
 
@@ -512,7 +512,7 @@ Existing ordinary detail link opened; private ID deliberately redacted. Title Ed
 
 ### Ticketing > Persetujuan Tiketing — `approval-ticketing`
 
-URL https://redlogistik.tracks-app.com/index.php/approval-ticketing. Title Approval Ticketing; Search textbox. Columns Judul; Nama Menu; Link URL; Action. Empty table, no populated approval/history detail available. No standalone current approval route; intentionally deferred by SUP-01 scope. Empty list does not prove absence of approval workflows.
+URL <legacy-origin>/index.php/approval-ticketing. Title Approval Ticketing; Search textbox. Columns Judul; Nama Menu; Link URL; Action. Empty table, no populated approval/history detail available. No standalone current approval route; intentionally deferred by SUP-01 scope. Empty list does not prove absence of approval workflows.
 
 ### Accounting / ledger / category / cashflow / P&L legacy discovery
 
@@ -555,37 +555,37 @@ Classifications describe behavior, not matching labels. EXACT requires demonstra
 
 | Legacy menu path | Legacy URL | Current route | Classification | Explanation |
 |---|---|---|---|---|
-| Laporan-laporan > Laporan Cabang > Detail Transaksi (LP-R01) | https://redlogistik.tracks-app.com/index.php/detail-transaction | /branch-reports/transaction-details | PARTIAL | RPT-01 source-backed bounded report; missing transport/service and legacy billing meanings not guessed. |
-| Laporan-laporan > Laporan Cabang > Rekap Transaksi (LP-R02) | https://redlogistik.tracks-app.com/index.php/recaps-transactions | â€” | MISSING_OR_BLOCKED | No dedicated implemented recap route established; daily turnover is distinct. |
-| Laporan-laporan > Laporan Cabang > Manifest Outbound (LP-R03) | https://redlogistik.tracks-app.com/index.php/branch-manifest | /branch-reports/manifest-outbound | PARTIAL | RPT-02 operational inventory; vendor/cost/driver semantics not equivalent. |
-| Laporan-laporan > Laporan Cabang > Rekap Manifest (LP-R04) | https://redlogistik.tracks-app.com/index.php/branch-manifest-recaps | â€” | MISSING_OR_BLOCKED | No dedicated source-backed manifest recap found. |
-| Laporan-laporan > Laporan Cabang > Pengantaran (LP-R05) | https://redlogistik.tracks-app.com/index.php/city-courier | /branch-reports/delivery?view=sheets; /branch-reports/delivery?view=items | PARTIAL | RPT-02 stored sheets/items; legacy report is per DRS; item view separate. Generation remains OPS-03. |
-| Laporan-laporan > Laporan Cabang > Gross Profit / Manifest (LP-R06) | https://redlogistik.tracks-app.com/index.php/gross-profit-manifest | /branch-reports/gross-profit; /finance/accounting/reports | PARTIAL | Old route is preview; FIN transaction GP uses adopted accounting policy, not manifest GP parity. |
-| Laporan-laporan > Laporan Cabang > Rekap Transaksi Harian (LP-R07) | https://redlogistik.tracks-app.com/index.php/rekap-omzet-harian | â€” | MISSING_OR_BLOCKED | Distinct route from rekap-omset-harian; no proven counterpart. |
-| Laporan-laporan > Laporan Cabang > Rekap Gross Profit (LP-R08) | https://redlogistik.tracks-app.com/index.php/rekap-gross-profit | /branch-reports/rekap-gross-profit; /finance/accounting/reports | PARTIAL | Preview survives; FIN monthly transaction GP recap has different grouping/source. |
-| Laporan-laporan > Laporan Cabang > Manifest Vendor (LP-R09) | https://redlogistik.tracks-app.com/index.php/manifest-vendor | /branch-reports/manifest-vendor | INTENTIONALLY_DEFERRED | RPT-02/RPT-05 document missing trustworthy vendor association; unavailable state deliberate. |
-| Laporan-laporan > Laporan Cabang > Awb Tertunda (LP-R10) | https://redlogistik.tracks-app.com/index.php/awb-pending | /branch-reports/awb | PARTIAL | Shared AWB preview is not real pending membership. |
-| Laporan-laporan > Laporan Cabang > Awb Termanifest (LP-R11) | https://redlogistik.tracks-app.com/index.php/awb-termanifest | /branch-reports/awb | PARTIAL | Shared AWB preview does not prove manifested membership/history. |
-| Laporan-laporan > Laporan Cabang > Rekap Customer Bulanan (LP-R12) | https://redlogistik.tracks-app.com/index.php/rekap-customer-bl | /branch-reports/customer-monthly-summary | PARTIAL | Preview only; totals unimplemented by matching labels. |
-| Laporan-laporan > Laporan Cabang > Rekap Omset Harian (LP-R13) | https://redlogistik.tracks-app.com/index.php/rekap-omset-harian | /branch-reports/daily-turnover-summary | PARTIAL | Preview only; distinct from daily transaction print recap. |
-| Laporan-laporan > Laporan Cabang > Detail Transaction Inbound (LP-R14) | https://redlogistik.tracks-app.com/index.php/detail-transaksi-inbound | /branch-reports/inbound-transaction-details | PARTIAL | Preview only; same headers do not establish inbound semantics. |
-| Laporan-laporan > Laporan Kurir > Harian Kurir (LP-R15) | https://redlogistik.tracks-app.com/index.php/daily-report-courier | /courier-reports | PARTIAL | Combined courier preview; pickup/miss event source unestablished. |
-| Laporan-laporan > Laporan Kurir > Laporan Detail Kurir (LP-R16) | https://redlogistik.tracks-app.com/index.php/laporan-detail-kurir | /courier-reports | PARTIAL | Preview only; SLA/lead-time semantics unverified. |
-| Laporan-laporan > Laporan Keuangan > Laporan AR (LP-R17) | https://redlogistik.tracks-app.com/index.php/sales-aging | /financial-reports; /finance/invoices | PARTIAL | AR preview remains; FIN invoice/receipt policy is not proven legacy aging parity. |
-| Laporan-laporan > Laporan Keuangan > Laporan AP (LP-R18) | https://redlogistik.tracks-app.com/index.php/ap-report | /financial-reports | INTENTIONALLY_DEFERRED | AP preview; supplier settlement excluded from FIN. Accrued liability is not a payment workflow. |
-| Laporan-laporan > Reports Customer > Pengiriman (LP-R19) | https://redlogistik.tracks-app.com/index.php/pengiriman | /customer-reports | PARTIAL | Combined customer preview, not source-backed shipment report. |
-| Laporan-laporan > Reports Customer > POD Kembali (LP-R20) | https://redlogistik.tracks-app.com/index.php/pod-return | /customer-reports | PARTIAL | Preview; delivery outcome cannot prove POD-return event. |
-| Laporan-laporan > Reports Customer > Semua Status (LP-R21) | https://redlogistik.tracks-app.com/index.php/all-status | /customer-reports | PARTIAL | Preview, not source-backed all-status scope/totals. |
-| Laporan-laporan > Report Customer (LP-R22) | https://redlogistik.tracks-app.com/index.php/report-customer | /customer-reports | PARTIAL | Shared preview is not a verified standalone export equivalent. |
-| Dashboard | https://redlogistik.tracks-app.com/index.php/ | /dashboard | PARTIAL | Operational target, not AI/financial KPI parity. |
-| Pendapatan Pelanggan | https://redlogistik.tracks-app.com/index.php/revenue-customer | /marketing (module entry only) | MISSING_OR_BLOCKED | Dedicated revenue/Growth query counterpart not established. |
-| Invoice (New) | https://redlogistik.tracks-app.com/index.php/sales | /finance/invoices; /finance/invoices/new; /finance/invoices/[id] | PARTIAL | Adopted FIN-01 target; legacy numbering/financial lifecycle not equivalent by evidence. |
-| Pembayaran Hutang | https://redlogistik.tracks-app.com/index.php/debt-payments | — | INTENTIONALLY_DEFERRED | Supplier payment workflow excluded from FIN adoption. |
-| Tiket Support, Add, eye detail | https://redlogistik.tracks-app.com/index.php/ticketing-support; ticketing-support/tambah; ticketing-support/chat/[id] | /ticketting; /ticketting/new; /ticketting/[id] | PARTIAL | Creator/branch subset; approval, attachment and history parity not established. |
-| Persetujuan Tiketing | https://redlogistik.tracks-app.com/index.php/approval-ticketing | — | INTENTIONALLY_DEFERRED | Approval lifecycle excluded from accepted v1. |
+| Laporan-laporan > Laporan Cabang > Detail Transaksi (LP-R01) | <legacy-origin>/index.php/detail-transaction | /branch-reports/transaction-details | PARTIAL | RPT-01 source-backed bounded report; missing transport/service and legacy billing meanings not guessed. |
+| Laporan-laporan > Laporan Cabang > Rekap Transaksi (LP-R02) | <legacy-origin>/index.php/recaps-transactions | — | MISSING_OR_BLOCKED | No dedicated implemented recap route established; daily turnover is distinct. |
+| Laporan-laporan > Laporan Cabang > Manifest Outbound (LP-R03) | <legacy-origin>/index.php/branch-manifest | /branch-reports/manifest-outbound | PARTIAL | RPT-02 operational inventory; vendor/cost/driver semantics not equivalent. |
+| Laporan-laporan > Laporan Cabang > Rekap Manifest (LP-R04) | <legacy-origin>/index.php/branch-manifest-recaps | — | MISSING_OR_BLOCKED | No dedicated source-backed manifest recap found. |
+| Laporan-laporan > Laporan Cabang > Pengantaran (LP-R05) | <legacy-origin>/index.php/city-courier | /branch-reports/delivery?view=sheets; /branch-reports/delivery?view=items | PARTIAL | RPT-02 stored sheets/items; legacy report is per DRS; item view separate. Generation remains OPS-03. |
+| Laporan-laporan > Laporan Cabang > Gross Profit / Manifest (LP-R06) | <legacy-origin>/index.php/gross-profit-manifest | /branch-reports/gross-profit; /finance/accounting/reports | PARTIAL | Old route is preview; FIN transaction GP uses adopted accounting policy, not manifest GP parity. |
+| Laporan-laporan > Laporan Cabang > Rekap Transaksi Harian (LP-R07) | <legacy-origin>/index.php/rekap-omzet-harian | — | MISSING_OR_BLOCKED | Distinct route from rekap-omset-harian; no proven counterpart. |
+| Laporan-laporan > Laporan Cabang > Rekap Gross Profit (LP-R08) | <legacy-origin>/index.php/rekap-gross-profit | /branch-reports/rekap-gross-profit; /finance/accounting/reports | PARTIAL | Preview survives; FIN monthly transaction GP recap has different grouping/source. |
+| Laporan-laporan > Laporan Cabang > Manifest Vendor (LP-R09) | <legacy-origin>/index.php/manifest-vendor | /branch-reports/manifest-vendor | INTENTIONALLY_DEFERRED | RPT-02/RPT-05 document missing trustworthy vendor association; unavailable state deliberate. |
+| Laporan-laporan > Laporan Cabang > Awb Tertunda (LP-R10) | <legacy-origin>/index.php/awb-pending | /branch-reports/awb | PARTIAL | Shared AWB preview is not real pending membership. |
+| Laporan-laporan > Laporan Cabang > Awb Termanifest (LP-R11) | <legacy-origin>/index.php/awb-termanifest | /branch-reports/awb | PARTIAL | Shared AWB preview does not prove manifested membership/history. |
+| Laporan-laporan > Laporan Cabang > Rekap Customer Bulanan (LP-R12) | <legacy-origin>/index.php/rekap-customer-bl | /branch-reports/customer-monthly-summary | PARTIAL | Preview only; totals unimplemented by matching labels. |
+| Laporan-laporan > Laporan Cabang > Rekap Omset Harian (LP-R13) | <legacy-origin>/index.php/rekap-omset-harian | /branch-reports/daily-turnover-summary | PARTIAL | Preview only; distinct from daily transaction print recap. |
+| Laporan-laporan > Laporan Cabang > Detail Transaction Inbound (LP-R14) | <legacy-origin>/index.php/detail-transaksi-inbound | /branch-reports/inbound-transaction-details | PARTIAL | Preview only; same headers do not establish inbound semantics. |
+| Laporan-laporan > Laporan Kurir > Harian Kurir (LP-R15) | <legacy-origin>/index.php/daily-report-courier | /courier-reports | PARTIAL | Combined courier preview; pickup/miss event source unestablished. |
+| Laporan-laporan > Laporan Kurir > Laporan Detail Kurir (LP-R16) | <legacy-origin>/index.php/laporan-detail-kurir | /courier-reports | PARTIAL | Preview only; SLA/lead-time semantics unverified. |
+| Laporan-laporan > Laporan Keuangan > Laporan AR (LP-R17) | <legacy-origin>/index.php/sales-aging | /financial-reports; /finance/invoices | PARTIAL | AR preview remains; FIN invoice/receipt policy is not proven legacy aging parity. |
+| Laporan-laporan > Laporan Keuangan > Laporan AP (LP-R18) | <legacy-origin>/index.php/ap-report | /financial-reports | INTENTIONALLY_DEFERRED | AP preview; supplier settlement excluded from FIN. Accrued liability is not a payment workflow. |
+| Laporan-laporan > Reports Customer > Pengiriman (LP-R19) | <legacy-origin>/index.php/pengiriman | /customer-reports | PARTIAL | Combined customer preview, not source-backed shipment report. |
+| Laporan-laporan > Reports Customer > POD Kembali (LP-R20) | <legacy-origin>/index.php/pod-return | /customer-reports | PARTIAL | Preview; delivery outcome cannot prove POD-return event. |
+| Laporan-laporan > Reports Customer > Semua Status (LP-R21) | <legacy-origin>/index.php/all-status | /customer-reports | PARTIAL | Preview, not source-backed all-status scope/totals. |
+| Laporan-laporan > Report Customer (LP-R22) | <legacy-origin>/index.php/report-customer | /customer-reports | PARTIAL | Shared preview is not a verified standalone export equivalent. |
+| Dashboard | <legacy-origin>/index.php/ | /dashboard | PARTIAL | Operational target, not AI/financial KPI parity. |
+| Pendapatan Pelanggan | <legacy-origin>/index.php/revenue-customer | /marketing (module entry only) | MISSING_OR_BLOCKED | Dedicated revenue/Growth query counterpart not established. |
+| Invoice (New) | <legacy-origin>/index.php/sales | /finance/invoices; /finance/invoices/new; /finance/invoices/[id] | PARTIAL | Adopted FIN-01 target; legacy numbering/financial lifecycle not equivalent by evidence. |
+| Pembayaran Hutang | <legacy-origin>/index.php/debt-payments | — | INTENTIONALLY_DEFERRED | Supplier payment workflow excluded from FIN adoption. |
+| Tiket Support, Add, eye detail | <legacy-origin>/index.php/ticketing-support; ticketing-support/tambah; ticketing-support/chat/[id] | /ticketting; /ticketting/new; /ticketting/[id] | PARTIAL | Creator/branch subset; approval, attachment and history parity not established. |
+| Persetujuan Tiketing | <legacy-origin>/index.php/approval-ticketing | — | INTENTIONALLY_DEFERRED | Approval lifecycle excluded from accepted v1. |
 | Legacy accounting paths not exposed | UNVERIFIED | /finance/accounting; /finance/accounting/accounts; /finance/accounting/journals; /finance/accounting/costs; /finance/accounting/periods; /finance/accounting/reports | UNVERIFIED | Current implementation exists; legacy navigation provenance not established. |
 | Older local accounting previews (not observed legacy menu) | UNVERIFIED | /perkiraan; /akunting; /akunting/ledger; /akunting/kategori-akun; /akunting/rugi-laba; /akunting/kategori-cashflow → /finance/accounting/* | RELOCATED | Modern functions under finance/accounting; old preview routes remain. Current-app relocation only. |
-| Provider inventory metadata for implemented Detail Transaksi | https://redlogistik.tracks-app.com/index.php/detail-transaction | /branch-reports/transaction-details | STALE_NAVIGATION | Unlinked metadata can imply unavailable although a separate canonical runtime link exists. |
+| Provider inventory metadata for implemented Detail Transaksi | <legacy-origin>/index.php/detail-transaction | /branch-reports/transaction-details | STALE_NAVIGATION | Unlinked metadata can imply unavailable although a separate canonical runtime link exists. |
 
 Source evidence: `src/components/shell/navigation.ts`, `legacy-menu.ts`, `implemented-preview-routes.ts`; corresponding `src/app/(dashboard)/` pages; `src/features/finance/components/accounting-pages.tsx`; `docs/decisions/{SUP-01-contract,RPT-01-contract,RPT-02-contract,FIN-01-contract,FIN-02-contract,FIN-implementation}.md`. HEAD `af28516eac27d6dd6a2930372baab6f83e21e8f0` plus pre-existing uncommitted UI edits. Conclusions describe inspected disk source, not a clean committed snapshot. FIN adoption dated 2026-11-15 is target policy, not provider parity/release approval.
 

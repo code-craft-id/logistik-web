@@ -6,7 +6,7 @@
 
 Evidence keys (repository-relative links):
 
-- **I:** [navigation/page inventory](DEV3-LEGACY-NAVIGATION-INVENTORY.md), observed earlier on 2026-11-16; exact legacy URLs, hierarchy, controls/column order and bounded outputs. Retained as evidence, not recreated. Origin `https://redlogistik.tracks-app.com/index.php/`; displayed IVAN, Administrator role user-provided, effective permissions unverified.
+- **I:** [navigation/page inventory](DEV3-LEGACY-NAVIGATION-INVENTORY.md), observed earlier on 2026-11-16; exact legacy URLs, hierarchy, controls/column order and bounded outputs. Retained as evidence, not recreated. Origin `<legacy-origin>/index.php/`; displayed IVAN, Administrator role user-provided, effective permissions unverified.
 - **L:** [DISC-04 catalogue](../agent-state/dev3/REPORT_CATALOGUE.md), stable LP identities and LD observations. Historical observations do not prove current behavior or source formulas.
 - **S:** [SUP-01 contract](SUP-01-contract.md).
 - **A:** [owner-adopted minimum scope and RPT-03/04 extension](DEV3-SUP-RPT-FOLLOWUPS.md), 2026-11-15. Explicit NOT NEEDED dispositions remain valid.
@@ -117,7 +117,7 @@ M sources for this batch: `src/app/(dashboard)/branch-reports/**/page.tsx`, `/co
 
 ### LP-R01 — Laporan-laporan > Laporan Cabang > Detail Transaksi
 
-Legacy `https://redlogistik.tracks-app.com/index.php/detail-transaction`; modern `/branch-reports/transaction-details`. **Implementation DONE; parity PARTIAL_PARITY; disposition KEEP.**
+Legacy `<legacy-origin>/index.php/detail-transaction`; modern `/branch-reports/transaction-details`. **Implementation DONE; parity PARTIAL_PARITY; disposition KEEP.**
 
 | Dimension | Assessment |
 |---|---|
@@ -133,7 +133,7 @@ Cause/correction: adopted R1/R2/A subset; keep existing functionality and separa
 
 ### LP-R02 — Laporan-laporan > Laporan Cabang > Rekap Transaksi
 
-Legacy `https://redlogistik.tracks-app.com/index.php/recaps-transactions`; modern `—`. **Implementation MISSING; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/recaps-transactions`; modern `—`. **Implementation MISSING; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -149,7 +149,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R03 — Laporan-laporan > Laporan Cabang > Manifest Outbound
 
-Legacy `https://redlogistik.tracks-app.com/index.php/branch-manifest`; modern `/branch-reports/manifest-outbound`. **Implementation DONE; parity PARTIAL_PARITY; disposition KEEP.**
+Legacy `<legacy-origin>/index.php/branch-manifest`; modern `/branch-reports/manifest-outbound`. **Implementation DONE; parity PARTIAL_PARITY; disposition KEEP.**
 
 | Dimension | Assessment |
 |---|---|
@@ -165,7 +165,7 @@ Cause/correction: adopted R1/R2/A subset; keep existing functionality and separa
 
 ### LP-R04 — Laporan-laporan > Laporan Cabang > Rekap Manifest
 
-Legacy `https://redlogistik.tracks-app.com/index.php/branch-manifest-recaps`; modern `—`. **Implementation MISSING; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/branch-manifest-recaps`; modern `—`. **Implementation MISSING; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -181,7 +181,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R05 — Laporan-laporan > Laporan Cabang > Pengantaran
 
-Legacy `https://redlogistik.tracks-app.com/index.php/city-courier`; modern `/branch-reports/delivery?view=sheets and ?view=items`. **Implementation DONE; parity PARTIAL_PARITY; disposition KEEP.**
+Legacy `<legacy-origin>/index.php/city-courier`; modern `/branch-reports/delivery?view=sheets and ?view=items`. **Implementation DONE; parity PARTIAL_PARITY; disposition KEEP.**
 
 | Dimension | Assessment |
 |---|---|
@@ -197,7 +197,7 @@ Cause/correction: adopted R1/R2/A subset; keep existing functionality and separa
 
 ### LP-R06 — Laporan-laporan > Laporan Cabang > Gross Profit / Manifest
 
-Legacy `https://redlogistik.tracks-app.com/index.php/gross-profit-manifest`; modern `/branch-reports/gross-profit; separate /finance/accounting/reports`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/gross-profit-manifest`; modern `/branch-reports/gross-profit; separate /finance/accounting/reports`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -213,7 +213,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R07 — Laporan-laporan > Laporan Cabang > Rekap Transaksi Harian
 
-Legacy `https://redlogistik.tracks-app.com/index.php/rekap-omzet-harian`; modern `—`. **Implementation MISSING; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/rekap-omzet-harian`; modern `—`. **Implementation MISSING; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -229,7 +229,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R08 — Laporan-laporan > Laporan Cabang > Rekap Gross Profit
 
-Legacy `https://redlogistik.tracks-app.com/index.php/rekap-gross-profit`; modern `/branch-reports/rekap-gross-profit; separate /finance/accounting/reports`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/rekap-gross-profit`; modern `/branch-reports/rekap-gross-profit; separate /finance/accounting/reports`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -245,7 +245,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R09 — Laporan-laporan > Laporan Cabang > Manifest Vendor
 
-Legacy `https://redlogistik.tracks-app.com/index.php/manifest-vendor`; modern `/branch-reports/manifest-vendor`. **Implementation MISSING; parity APPROVED_DEVIATION; disposition INTENTIONALLY_DEFERRED.**
+Legacy `<legacy-origin>/index.php/manifest-vendor`; modern `/branch-reports/manifest-vendor`. **Implementation MISSING; parity APPROVED_DEVIATION; disposition INTENTIONALLY_DEFERRED.**
 
 | Dimension | Assessment |
 |---|---|
@@ -261,7 +261,7 @@ Cause/correction: A explicitly omits vendor attribution (RPT-05); no implicit re
 
 ### LP-R10 — Laporan-laporan > Laporan Cabang > Awb Tertunda
 
-Legacy `https://redlogistik.tracks-app.com/index.php/awb-pending`; modern `/branch-reports/awb (pending view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/awb-pending`; modern `/branch-reports/awb (pending view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -277,7 +277,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R11 — Laporan-laporan > Laporan Cabang > Awb Termanifest
 
-Legacy `https://redlogistik.tracks-app.com/index.php/awb-termanifest`; modern `/branch-reports/awb (manifested view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/awb-termanifest`; modern `/branch-reports/awb (manifested view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -293,7 +293,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R12 — Laporan-laporan > Laporan Cabang > Rekap Customer Bulanan
 
-Legacy `https://redlogistik.tracks-app.com/index.php/rekap-customer-bl`; modern `/branch-reports/customer-monthly-summary`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/rekap-customer-bl`; modern `/branch-reports/customer-monthly-summary`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -309,7 +309,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R13 — Laporan-laporan > Laporan Cabang > Rekap Omset Harian
 
-Legacy `https://redlogistik.tracks-app.com/index.php/rekap-omset-harian`; modern `/branch-reports/daily-turnover-summary`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/rekap-omset-harian`; modern `/branch-reports/daily-turnover-summary`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -325,7 +325,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R14 — Laporan-laporan > Laporan Cabang > Detail Transaction Inbound
 
-Legacy `https://redlogistik.tracks-app.com/index.php/detail-transaksi-inbound`; modern `/branch-reports/inbound-transaction-details`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/detail-transaksi-inbound`; modern `/branch-reports/inbound-transaction-details`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -343,7 +343,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R15 — Laporan-laporan > Laporan Kurir > Harian Kurir
 
-Legacy `https://redlogistik.tracks-app.com/index.php/daily-report-courier`; modern `/courier-reports (daily view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/daily-report-courier`; modern `/courier-reports (daily view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -359,7 +359,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R16 — Laporan-laporan > Laporan Kurir > Laporan Detail Kurir
 
-Legacy `https://redlogistik.tracks-app.com/index.php/laporan-detail-kurir`; modern `/courier-reports (detail view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/laporan-detail-kurir`; modern `/courier-reports (detail view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -377,7 +377,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R17 — Laporan-laporan > Laporan Keuangan > Laporan AR
 
-Legacy `https://redlogistik.tracks-app.com/index.php/sales-aging`; modern `/financial-reports (AR); separate /finance/invoices`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/sales-aging`; modern `/financial-reports (AR); separate /finance/invoices`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -393,7 +393,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R18 — Laporan-laporan > Laporan Keuangan > Laporan AP
 
-Legacy `https://redlogistik.tracks-app.com/index.php/ap-report`; modern `/financial-reports (AP)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/ap-report`; modern `/financial-reports (AP)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -411,7 +411,7 @@ Cause/correction: F2 excludes supplier settlement, but does not prove AP-aging p
 
 ### LP-R19 — Laporan-laporan > Reports Customer > Pengiriman
 
-Legacy `https://redlogistik.tracks-app.com/index.php/pengiriman`; modern `/customer-reports (shipment view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/pengiriman`; modern `/customer-reports (shipment view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -427,7 +427,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R20 — Laporan-laporan > Reports Customer > POD Kembali
 
-Legacy `https://redlogistik.tracks-app.com/index.php/pod-return`; modern `/customer-reports (POD view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/pod-return`; modern `/customer-reports (POD view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -443,7 +443,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R21 — Laporan-laporan > Reports Customer > Semua Status
 
-Legacy `https://redlogistik.tracks-app.com/index.php/all-status`; modern `/customer-reports (status view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/all-status`; modern `/customer-reports (status view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
@@ -461,7 +461,7 @@ Cause/correction: missing functional report query/output, not a verified duplica
 
 ### LP-R22 — Laporan-laporan > Report Customer
 
-Legacy `https://redlogistik.tracks-app.com/index.php/report-customer`; modern `/customer-reports (standalone customer view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
+Legacy `<legacy-origin>/index.php/report-customer`; modern `/customer-reports (standalone customer view)`. **Implementation PREVIEW_ONLY; parity NOT_MIGRATED; disposition INVESTIGATE.**
 
 | Dimension | Assessment |
 |---|---|
