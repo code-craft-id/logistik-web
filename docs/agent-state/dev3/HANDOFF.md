@@ -1,3 +1,37 @@
+## Latest checkpoint: review stop point, decisions required, mobile notes (2026-11-17)
+
+Branch `dev3/ready-for-review` (remote `origin/dev3/ready-for-review`), base `8247686`. Older entries below mention `C:/Development/...` and `codex/dev3-ready-for-review`; those are the previous machine's path and local branch name, kept as history only.
+
+**Stop point.** Per `docs/handoffs/continue/prompt-continue.md` §0, no further implementation until this branch (175 files / ~28k lines vs `origin/main`, 3 migrations, `finance.prisma`, `permissions.ts` +74) is reviewed by Dev 1 and Dev 2 through PR(s), preferably split SUP-01 / RPT / FIN. No PR existed at this checkpoint; pushing and opening PRs await the user.
+
+**Verification on this commit (Linux, Node 20.20.2; `.nvmrc` pins 24.15.0, so engine conformance is not established).** `npx prisma generate`; `npm run lint` PASS (419 files); `npm run typecheck` PASS after regenerating stale `.next` route types left by another branch (`next typegen`); `npm test` PASS 67 files / 672 tests, including the SCH-01 migration checksum (LF checkout). Integration not run: `logistik_web_test` holds another branch's migration history (WEB-01 applied, seven of this branch's migrations missing) and needs a reset the user has not yet approved.
+
+**Slice readiness.** Re-checked against audit §11 and ROADMAP: every Dev 3 ROADMAP ticket is DONE, NOT NEEDED, or PARTIAL only for human/migration/staging gates. Of LP-R01..LP-R22, none is source-ready without a change that §4 of the prompt reserves for domain owners. Stopping per §5.
+
+### Decisions required (grouped by owner; evidence in audit §11)
+
+| Owner | Decision / source needed | Unblocks | D-xx | Alternatives |
+|---|---|---|---|---|
+| Dev 2 (shipment/AWB) | Capture mode, service, description, comment/receivedBy at Transaction grain | LP-R01 full columns, LP-R19, LP-R21, LP-R22 | D-15, D-22 | (a) nullable capture for new records, historical shown as unavailable; (b) approved historical import with field/grain reconciliation |
+| Dev 2 | Manifest/DRS driver and vendor attribution; trucking cost source | LP-R04, LP-R06, LP-R08, LP-R09, LP-R03/R05 remaining columns | D-11, D-22 | (a) explicit manifest-level vendor/driver relation; (b) keep reports without those columns as documented deviation |
+| Dev 2 | Piece-level identity and "pending manifest" definition | LP-R10, LP-R11 | D-22 | (a) piece/koli model; (b) transaction-grain report labelled as deviation |
+| Dev 2 | Pickup, inbound arrival, POD-return events; SLA/lead-time rule | LP-R14, LP-R15, LP-R16, LP-R20 | D-15, D-19, D-22 | (a) status-history events with defined types; (b) defer reports |
+| Finance owner | Billing categories (CASH/KREDIT/COD/TRF/BB/BL), recognition date, turnover definition | LP-R02, LP-R07, LP-R12, LP-R13 | D-11..D-14, D-21 | (a) derive from FIN-01 invoices/receipts (new LMS data only); (b) separate approved category capture |
+| Finance owner | AR aging basis/buckets (invoice receipt vs payment), AP supplier invoice/settlement | LP-R17, LP-R18 | D-12, D-14, D-21 | (a) AR aging from FIN-01 due dates; AP deferred until settlement scope; (b) defer both |
+| Project owner | CONSOLIDATE/CORRECT proposals (e.g. LP-R19 legacy SQL failure not copied; similar transaction exports) | parity scope | D-22 | record per identity in PRD §7 before any implementation |
+| Migration coordinator | Dev 2 `updated_at` default drift on `manifest_items` / `delivery_sheet_items` | clean schema diff | — | forward migration vs accept drift |
+
+### Mobile readiness (evaluation only; no APIs or refactors added)
+
+- **Good:** Dev 3 services (`createTicketService`, `createTransactionReportService`, `createOperationalReportService`, `createFinanceService`, `createAccountingQueries`) are factories taking `PrismaClient` plus an actor resolver. Validation, RBAC (`loadAccessActor` reload per call) and branch scope run inside the service, not the UI. A non-web adapter only needs a different actor resolver.
+- **Good:** money is serialized as fixed 2-decimal strings, dates as ISO/day strings, IDs as `Int`.
+- **Gap (Dev 1):** identity comes from the Better Auth cookie session (`currentIdentity`). A mobile client needs a token-based session path; that is an auth-contract decision, not Dev 3 work.
+- **Gap:** server actions collapse errors into Indonesian UI strings and drop `IdentityError.code`. A future API adapter should return the stable `code` and status, as the CSV route already does for status.
+- **Gap:** `invoiceDTO` spreads the Prisma row (`...row`), so its shape follows the schema. A mobile contract would want an explicit field list.
+- **Gap:** only the transaction CSV export is a Route Handler; all other reads and writes are server actions or RSC pages, so no HTTP contract exists yet for them.
+
+---
+
 ## Accounting navigation warning fix (2026-11-16 01:49:40 UTC)
 
 Base af28516eac27d6dd6a2930372baab6f83e21e8f0, branch codex/dev3-ready-for-review; existing uncommitted UI work preserved. User-requested FIN bug fix adds page-local Suspense with existing LoadingState in src/app/(dashboard)/finance/accounting/page.tsx. Auth/session/RBAC and financial behavior unchanged. Signed-in localhost:3000 Chrome showed the uncached-navigation insight before the patch; reload and accounts-to-accounting history navigation show normal content without the insight afterward. Scoped direct Biome check PASS; direct Vitest tests/unit/finance-pages.test.ts PASS (2); npm run typecheck PASS. Initial npx biome invocation failed to resolve executable; direct installed binary passed. No build, DB/integration, staging or viewport matrix repeated. No business decisions changed; release gates remain pending. Existing dev server left running. Next: review scoped diff with existing combined owner review.
