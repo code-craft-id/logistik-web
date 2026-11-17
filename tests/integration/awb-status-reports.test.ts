@@ -199,6 +199,15 @@ beforeAll(async () => {
     },
   });
   ids.sheet.push(sheet3.id);
+  const m4 = await manifest("M4", "2026-11-07T08:00:00Z");
+  const sheet4 = await db.deliverySheet.create({
+    data: {
+      manifestId: m4,
+      sheetNo: `${tag}-DRS4`,
+      deliveryDate: new Date("2026-11-07T00:00:00Z"),
+    },
+  });
+  ids.sheet.push(sheet4.id);
   await db.deliverySheetItem.createMany({
     data: [
       // ACTIVE: first attempt has a recipient, later attempts do not.
@@ -215,7 +224,7 @@ beforeAll(async () => {
         outcome: "Failed",
         deliveredAt: new Date("2026-11-06T10:00:00Z"),
       },
-      // NEVER: undated recipient must lose to a dated one (nulls last).
+      // NEVER: older DRS loses to the newer DRS, regardless of delivery time.
       {
         deliverySheetId: sheet.id,
         transactionId: never,
@@ -226,6 +235,18 @@ beforeAll(async () => {
         transactionId: never,
         receivedBy: "FAKE R-dated",
         deliveredAt: new Date("2026-11-06T09:00:00Z"),
+      },
+      // OLDMAN: a newer attempt without delivery time still wins (review #2).
+      {
+        deliverySheetId: sheet3.id,
+        transactionId: oldManifest,
+        receivedBy: "FAKE Old",
+        deliveredAt: new Date("2026-11-06T12:00:00Z"),
+      },
+      {
+        deliverySheetId: sheet4.id,
+        transactionId: oldManifest,
+        receivedBy: "FAKE Newer",
       },
     ],
   });
@@ -324,6 +345,13 @@ describe("LP-R10/R11/R21 guarded real sources", () => {
     });
     expect(awbs(result.items)).toEqual([awb("ACTIVE")]);
     expect(result.statuses).toContain(`${tag.slice(0, 8)}X`);
+    // An applied status outside the scoped options stays selectable (review #1).
+    const unknown = await service(scoped).read("all-status", {
+      ...period,
+      status: "ZZ-NOT-STORED",
+    });
+    expect(unknown.items).toEqual([]);
+    expect(unknown.statuses).toContain("ZZ-NOT-STORED");
     expect(
       (await service(scoped).read("pending", { ...period, status: "Open" }))
         .state,
@@ -372,7 +400,11 @@ describe("LP-R10/R11/R21 guarded real sources", () => {
     });
     expect(byAwb.get(awb("RELEASED"))?.manifestNo).toBeNull();
     expect(byAwb.get(awb("DELMAN"))?.manifestNo).toBeNull();
-    expect(byAwb.get(awb("OLDMAN"))?.manifestNo).toBe(`${tag}-M3`);
+    expect(byAwb.get(awb("OLDMAN"))).toMatchObject({
+      manifestNo: `${tag}-M3`,
+      receivedBy: "FAKE Newer",
+      deliveredAt: null,
+    });
   });
 
   it("exports the same rows with export permission and formula protection", async () => {

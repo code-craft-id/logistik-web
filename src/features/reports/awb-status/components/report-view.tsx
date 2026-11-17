@@ -13,7 +13,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { OperationalSubmitButton } from "../../operational/components/submit-button";
-import type { TransactionReportFilters } from "../../transaction-details/filters";
+import {
+  type TransactionReportFilters,
+  transactionReportFormValues,
+} from "../../transaction-details/filters";
 import { awbStatusTable } from "../columns";
 import {
   type AwbStatusKind,
@@ -33,7 +36,7 @@ const descriptions: Record<AwbStatusKind, string> = {
   manifested:
     "Satu baris per AWB yang masih ditugaskan aktif pada manifest. AWB yang sudah dilepas tidak ditampilkan. Periode mengikuti tanggal manifest.",
   "all-status":
-    "Satu baris per AWB dengan status pengiriman tersimpan. Diterima oleh dan waktu diterima diambil dari percobaan pengantaran terakhir yang mencatat penerima. Manifes No. hanya untuk penugasan aktif. Moda, layanan dan deskripsi belum memiliki sumber data.",
+    "Satu baris per AWB dengan status pengiriman tersimpan. Diterima oleh dan waktu diterima diambil dari percobaan pengantaran terakhir (tanggal DRS terbaru, lalu waktu pengantaran) yang mencatat penerima. Manifes No. hanya untuk penugasan aktif. Moda, layanan dan deskripsi belum memiliki sumber data.",
 };
 
 type UrlContext = { allDates: boolean; status: string | null };
@@ -87,27 +90,16 @@ function displayValues(
   query: DisplayQuery | undefined,
   branches: AwbStatusResult["branches"],
 ) {
-  const scalar = (value: unknown, maximum: number) =>
-    typeof value === "string" && value.length <= maximum ? value : "";
-  const calendar = (value: unknown) => {
-    const text = scalar(value, 10);
-    return /^\d{4}-\d{2}-\d{2}$/.test(text) && !text.startsWith("0000")
-      ? text
-      : "";
-  };
-  const branch = (value: unknown) => {
-    const text = scalar(value, 10);
-    return branches.some((option) => String(option.id) === text) ? text : "";
-  };
-  const size = scalar(query?.pageSize, 3);
+  const values = transactionReportFormValues(query, branches);
+  const status = query?.status;
   return {
-    startDate: calendar(query?.startDate),
-    endDate: calendar(query?.endDate),
-    search: scalar(query?.search, 50),
-    pageSize: /^[1-9]\d{0,2}$/.test(size) && Number(size) <= 100 ? size : "20",
-    originBranchId: branch(query?.originBranchId),
-    destinationBranchId: branch(query?.destinationBranchId),
-    status: scalar(query?.status, 30),
+    startDate: values.startDate,
+    endDate: values.endDate,
+    search: values.search,
+    pageSize: String(values.pageSize),
+    originBranchId: values.originBranchId,
+    destinationBranchId: values.destinationBranchId,
+    status: typeof status === "string" && status.length <= 30 ? status : "",
   };
 }
 

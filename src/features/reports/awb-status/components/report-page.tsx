@@ -21,21 +21,32 @@ export async function AwbStatusReportPage({
   const { view, ...rest } = query;
   const kind: AwbStatusKind | null =
     report === "all-status" ? "all-status" : awbView(view);
-  if (!kind || (report === "all-status" && view !== undefined))
+  if (!kind || (report === "all-status" && view !== undefined)) {
+    const home =
+      report === "all-status"
+        ? "/customer-reports/all-status"
+        : "/branch-reports/awb";
     return (
       <ErrorState
         title="Tampilan tidak dikenal"
-        description="Pilih AWB Tertunda atau AWB Termanifest."
+        description={
+          report === "all-status"
+            ? "Laporan Semua Status tidak memiliki pilihan tampilan."
+            : "Pilih AWB Tertunda atau AWB Termanifest."
+        }
         action={
           <Link
-            href="/branch-reports/awb"
+            href={home}
             className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
           >
-            Buka AWB Tertunda
+            {report === "all-status"
+              ? "Buka Semua Status"
+              : "Buka AWB Tertunda"}
           </Link>
         }
       />
     );
+  }
   // Legacy opens with data: current month (LP-R11), today (LP-R21), all dates (LP-R10).
   await connection();
   const fallback =

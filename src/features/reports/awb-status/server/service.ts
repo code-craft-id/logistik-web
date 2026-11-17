@@ -99,7 +99,6 @@ export function createAwbStatusReportService(
       async (tx) => {
         const actor = await loadAccessActor(tx, identity.id);
         assertPermission(actor, "view", "transaction_report");
-        if (!actor) throw new IdentityError("UNAUTHENTICATED", 401);
         if (mode === "export")
           assertPermission(actor, "export", "transaction_report");
         const admin = isAdministrator(actor);
@@ -112,10 +111,12 @@ export function createAwbStatusReportService(
           orderBy: [{ name: "asc" }, { id: "asc" }],
         });
         const { parsed, status, allDates } = parseAwbStatusFilters(kind, input);
+        // DB-side grouping (Prisma distinct runs in memory); page mode only.
         const statuses =
-          kind === "all-status"
+          kind === "all-status" && mode === "page"
             ? (
-                await tx.transaction.findMany({
+                await tx.transaction.groupBy({
+                  by: ["status"],
                   where: {
                     deletedAt: null,
                     ...(!admin
@@ -127,13 +128,13 @@ export function createAwbStatusReportService(
                         }
                       : {}),
                   },
-                  distinct: ["status"],
-                  select: { status: true },
                   orderBy: { status: "asc" },
-                  take: 50,
                 })
               ).map((row) => row.status)
             : [];
+        // An applied filter must stay selectable, or the form would silently drop it.
+        if (status && mode === "page" && !statuses.includes(status))
+          statuses.push(status);
         const base = {
           parsed,
           branches,
@@ -144,14 +145,8 @@ export function createAwbStatusReportService(
           total: 0,
           totals: null,
         };
-        const empty = (
-          state: "initial" | "invalid" | "ready",
-        ): AwbStatusResult =>
-          kind === "pending"
-            ? { ...base, kind, state, items: [] }
-            : kind === "manifested"
-              ? { ...base, kind, state, items: [] }
-              : { ...base, kind, state, items: [] };
+        const empty = (state: "initial" | "invalid" | "ready") =>
+          ({ ...base, kind, state, items: [] }) as AwbStatusResult;
         if (parsed.status !== "valid") {
           if (mode === "export")
             throw new IdentityError(
@@ -176,6 +171,9 @@ export function createAwbStatusReportService(
         };
         const skip = mode === "export" ? 0 : f.skip;
         const take = mode === "export" ? EXPORT_LIMIT + 1 : f.take;
+        // CSV output never shows totals; skip the aggregate on export.
+        const summary = (where: Prisma.TransactionWhereInput) =>
+          mode === "export" ? Promise.resolve(null) : totals(tx, where);
         const limit = (count: number) => {
           if (mode === "export" && count > EXPORT_LIMIT)
             throw new IdentityError(
@@ -211,7 +209,7 @@ export function createAwbStatusReportService(
             take,
           });
           limit(rows.length);
-          const sum = await totals(tx, {
+          const sum = await summary({
             ...scoped,
             manifestItems: { some: inPeriod },
           });
@@ -219,7 +217,7 @@ export function createAwbStatusReportService(
             ...base,
             kind,
             state: "ready",
-            total: sum.totalAwb,
+            total: sum?.totalAwb ?? rows.length,
             totals: sum,
             items: rows.map((row) => ({
               id: row.id,
@@ -260,12 +258,12 @@ export function createAwbStatusReportService(
             take,
           });
           limit(rows.length);
-          const sum = await totals(tx, where);
+          const sum = await summary(where);
           return {
             ...base,
             kind,
             state: "ready",
-            total: sum.totalAwb,
+            total: sum?.totalAwb ?? rows.length,
             totals: sum,
             items: rows.map((row) => ({
               id: row.id,
@@ -304,7 +302,7 @@ export function createAwbStatusReportService(
               orderBy: { id: "desc" },
               take: 1,
             },
-            // Latest delivery attempt with a recorded recipient (D-22, 2026-11-17).
+            // Latest attempt with a recorded recipient: newest DRS date, then delivery time (D-22).
             deliverySheetItems: {
               where: {
                 deletedAt: null,
@@ -312,6 +310,7 @@ export function createAwbStatusReportService(
               },
               select: { receivedBy: true, deliveredAt: true },
               orderBy: [
+                { deliverySheet: { deliveryDate: "desc" } },
                 { deliveredAt: { sort: "desc", nulls: "last" } },
                 { id: "desc" },
               ],
@@ -323,12 +322,12 @@ export function createAwbStatusReportService(
           take,
         });
         limit(rows.length);
-        const sum = await totals(tx, where);
+        const sum = await summary(where);
         return {
           ...base,
           kind: "all-status",
           state: "ready",
-          total: sum.totalAwb,
+          total: sum?.totalAwb ?? rows.length,
           totals: sum,
           items: rows.map((row) => {
             const receipt = row.deliverySheetItems[0];
