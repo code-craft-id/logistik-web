@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { LoadingState } from "@/components/patterns/content-state";
-import { OperationalReportPage } from "@/features/reports/operational/components/report-page";
+import { SimpleReportPage } from "@/features/reports/simple/report-page";
+
 export const metadata: Metadata = { title: "Manifest Vendor" };
+
+// Session- and query-dependent report; blocking render.
+export const instant = false;
+
 export default function Page({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return (
-    <Suspense fallback={<LoadingState label="Memuat laporan…" />}>
-      <Content searchParams={searchParams} />
-    </Suspense>
+    <SimpleReportPage
+      id="manifest-vendor"
+      route="/branch-reports/manifest-vendor"
+      searchParams={searchParams}
+    />
   );
-}
-async function Content({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  return <OperationalReportPage kind="vendor" query={await searchParams} />;
 }

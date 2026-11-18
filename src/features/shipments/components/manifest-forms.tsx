@@ -29,11 +29,13 @@ export function ManifestCreateForm({
   branches,
   vehicles,
   couriers,
+  vendors,
   today,
 }: {
   branches: Option[];
   vehicles: Option[];
   couriers: Option[];
+  vendors: Option[];
   today: string;
 }) {
   const router = useRouter();
@@ -117,6 +119,7 @@ export function ManifestCreateForm({
         {choice("destinationBranchId", "Tujuan", branches)}
         {choice("vehicleId", "Kendaraan", vehicles)}
         {choice("courierId", "Kurir", couriers)}
+        {choice("vendorId", "Vendor", vendors)}
         <div className="min-w-0 space-y-2">
           <Label htmlFor="mf-transit1">Transit</Label>
           <Input

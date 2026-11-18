@@ -120,6 +120,14 @@ export async function createManifest(
       }
     }
 
+    if (data.vendorId) {
+      const vendor = await tx.vendor.findFirst({
+        where: { id: data.vendorId, deletedAt: null, status: "ACTIVE" },
+        select: { id: true },
+      });
+      if (!vendor) throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+
     return tx.manifest.create({
       data: {
         manifestNo: data.manifestNo,
@@ -128,6 +136,7 @@ export async function createManifest(
         branchId: data.branchId,
         vehicleId: data.vehicleId ?? null,
         courierId: data.courierId ?? null,
+        vendorId: data.vendorId ?? null,
         originBranchId: data.originBranchId ?? null,
         destinationBranchId: data.destinationBranchId ?? null,
         status: "Draft",

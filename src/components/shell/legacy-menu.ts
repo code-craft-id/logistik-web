@@ -55,7 +55,7 @@ export const legacyMenu = [
       },
       {
         label: "Perkiraan",
-        href: "/perkiraan",
+        href: "/finance/accounting/accounts",
       },
       {
         label: "Shipment Status",
@@ -157,8 +157,8 @@ export const legacyMenu = [
       {
         label: "Customer Reports",
         children: [
-          { label: "Pengiriman" },
-          { label: "POD Kembali" },
+          { label: "Pengiriman", href: "/customer-reports/shipments" },
+          { label: "POD Kembali", href: "/customer-reports/pod" },
           {
             label: "Semua Status",
             href: "/customer-reports/all-status",

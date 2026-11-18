@@ -32,9 +32,12 @@ describe("available navigation", () => {
     const destinations = navigationDestinations(groups);
     const paths = destinations.map(({ item }) => item.href);
     expect(destinations.length).toBeGreaterThan(30);
+    // Only legacy items without any live page remain unlinked.
     expect(
-      destinations.filter(({ item }) => !item.href).length,
-    ).toBeGreaterThan(10);
+      destinations
+        .filter(({ item }) => !item.href)
+        .map(({ item }) => item.providerLabel),
+    ).toEqual([]);
     expect(paths).toContain("/office/company");
     expect(paths).toContain("/logistics/services");
     for (const path of [
@@ -45,15 +48,19 @@ describe("available navigation", () => {
       "/bookings",
       "/manifest",
       "/marketing",
+      "/branch-reports/manifest-vendor",
+      "/courier-reports",
+      "/financial-reports",
+      "/branch-reports/gross-profit",
+      "/customer-reports/pod",
       "/branch-reports/awb",
       "/customer-reports/all-status",
     ])
       expect(paths).toContain(path);
     for (const path of [
-      "/branch-reports/manifest-vendor",
       "/perkiraan",
       "/akunting",
-      "/courier-reports",
+      "/manifest/new",
       "/ui-examples",
     ])
       expect(paths).not.toContain(path);
@@ -68,6 +75,11 @@ describe("available navigation", () => {
     expect(hrefs(["transaction_report"])).toEqual([
       "/branch-reports/transaction-details",
       "/branch-reports/awb",
+      "/branch-reports/customer-monthly-summary",
+      "/branch-reports/daily-turnover-summary",
+      "/branch-reports/inbound-transaction-details",
+      "/customer-reports/shipments",
+      "/customer-reports/pod",
       "/customer-reports/all-status",
     ]);
   });

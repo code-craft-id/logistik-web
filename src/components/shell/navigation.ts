@@ -233,7 +233,13 @@ type LegacyItem = {
   children?: readonly LegacyItem[];
 };
 // Live workflows added after the frozen preview inventory (outside its 43 screens).
-export const liveRoutes = ["/customer-reports/all-status"];
+export const liveRoutes = [
+  "/customer-reports/all-status",
+  "/customer-reports/shipments",
+  "/customer-reports/pod",
+  // Perkiraan (chart of accounts) is served by the FIN-02 accounts page.
+  "/finance/accounting/accounts",
+];
 const implemented = new Set<string>([
   ...implementedPreviewRoutes.map((item) => item.href),
   ...liveRoutes,

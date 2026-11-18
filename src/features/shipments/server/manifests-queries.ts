@@ -163,6 +163,7 @@ export async function getManifest(actor: AccessActor, id: number) {
       branch: { select: { name: true } },
       vehicle: { select: { name: true, licensePlate: true } },
       courier: { select: { name: true } },
+      vendor: { select: { name: true } },
       createdBy: { select: { name: true } },
       items: {
         where: { deletedAt: null, releasedAt: null },
@@ -210,6 +211,7 @@ export async function getManifest(actor: AccessActor, id: number) {
       ? `${row.vehicle.licensePlate} · ${row.vehicle.name}`
       : null,
     courier: row.courier?.name ?? null,
+    vendor: row.vendor?.name ?? null,
     createdBy: row.createdBy?.name ?? null,
     transit: [
       row.transit1,
@@ -240,7 +242,7 @@ export async function getManifest(actor: AccessActor, id: number) {
 export async function manifestFormOptions(actor: AccessActor) {
   const admin = isAdministrator(actor);
   const scoped = admin ? {} : { id: { in: actor.branchIds } };
-  const [branches, vehicles, couriers] = await Promise.all([
+  const [branches, vehicles, couriers, vendors] = await Promise.all([
     prisma.branch.findMany({
       where: { deletedAt: null, status: "ACTIVE", ...scoped },
       select: { id: true, name: true },
@@ -270,8 +272,15 @@ export async function manifestFormOptions(actor: AccessActor) {
       orderBy: { name: "asc" },
       take: 500,
     }),
+    prisma.vendor.findMany({
+      where: { deletedAt: null, status: "ACTIVE" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+      take: 500,
+    }),
   ]);
   return {
+    vendors,
     branches: branches.filter((b) => admin || permitsBranch(actor, b.id)),
     vehicles: vehicles.map((v) => ({
       id: v.id,

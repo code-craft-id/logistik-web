@@ -30,7 +30,8 @@ it("registers read-only rights and exposes exactly their implemented routes", ()
   };
   const nav = JSON.stringify(accessibleNavigation(actor));
   expect(nav).toContain('"href":"/branch-reports/manifest-outbound"');
-  expect(nav).not.toContain('"href":"/branch-reports/manifest-vendor"');
+  // Manifest Vendor is now a live report under the same permission.
+  expect(nav).toContain('"href":"/branch-reports/manifest-vendor"');
   expect(nav).not.toContain('"href":"/branch-reports/delivery"');
   expect(nav).not.toContain('"href":"/dashboard"');
   if (!actor.group) throw new Error("Missing fixture group");

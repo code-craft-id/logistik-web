@@ -41,7 +41,8 @@ describe("legacy inventory coverage and presentation routing", () => {
     const finance = navigationDestinations().filter(({ item }) =>
       item.href?.startsWith("/finance/"),
     );
-    expect(finance).toHaveLength(7);
+    // Seven Akunting entries plus Master Data > Perkiraan (chart of accounts).
+    expect(finance).toHaveLength(8);
     for (const { item } of finance) {
       expect(existsSync(`src/app/(dashboard)${item.href}/page.tsx`)).toBe(true);
       if (item.href) available.add(item.href);

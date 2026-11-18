@@ -51,6 +51,7 @@ export default async function Page({
     ["Transit", manifest.transit.join(", ") || null],
     ["Kendaraan", manifest.vehicle],
     ["Kurir", manifest.courier],
+    ["Vendor", manifest.vendor],
     ["Dibuat oleh", manifest.createdBy],
     ["Tot. AWB", manifest.awb],
     ["Tot. Koli", manifest.koli],
