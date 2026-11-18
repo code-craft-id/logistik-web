@@ -7,6 +7,7 @@ export type DeliveryView = "sheets" | "items";
 export function parseOperationalFilters(
   kind: OperationalKind,
   input: unknown,
+  now?: Date,
 ): { view: DeliveryView; parsed: TransactionReportFilterResult } {
   let view: DeliveryView = "sheets";
   const invalid = (message: string) => ({
@@ -45,6 +46,16 @@ export function parseOperationalFilters(
     ["search", "page", "pageSize"].some((key) => query[key] !== undefined)
   )
     return invalid("Ringkasan menggunakan filter periode dan cabang saja.");
+  // Legacy dashboard opens on the current month to date; UTC per D-19 bounded use.
+  if (
+    kind === "dashboard" &&
+    query.startDate === undefined &&
+    query.endDate === undefined
+  ) {
+    const today = (now ?? new Date()).toISOString().slice(0, 10);
+    query.startDate = `${today.slice(0, 8)}01`;
+    query.endDate = today;
+  }
   const parsed = parseTransactionReportFilters(query);
   if (parsed.status === "invalid")
     return {

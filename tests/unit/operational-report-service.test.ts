@@ -10,7 +10,7 @@ const db = {
   branch: { findMany: vi.fn() },
   manifest: { findMany: vi.fn(), count: vi.fn() },
   manifestItem: { findMany: vi.fn() },
-  transaction: { count: vi.fn() },
+  transaction: { count: vi.fn(), groupBy: vi.fn(), findMany: vi.fn() },
   deliverySheet: { findMany: vi.fn(), count: vi.fn() },
   deliverySheetItem: { findMany: vi.fn(), count: vi.fn() },
   $transaction: vi.fn(),
@@ -180,6 +180,9 @@ describe("operational report boundaries", () => {
     db.manifest.count.mockResolvedValue(3);
     db.deliverySheet.count.mockResolvedValue(2);
     db.deliverySheetItem.count.mockResolvedValue(1);
+    db.transaction.groupBy.mockResolvedValue([
+      { status: "Open", _count: { _all: 4 } },
+    ]);
     const result = await read().read("dashboard", period);
     expect(result.kind).toBe("dashboard");
     if (result.kind !== "dashboard") throw new Error("wrong kind");
@@ -194,6 +197,14 @@ describe("operational report boundaries", () => {
       delivery: false,
       transaction: false,
     });
+    // Without transaction or invoice rights, no detail rows or balances are read.
+    expect(result.insights).toMatchObject({
+      actions: [],
+      statuses: [{ status: "Open", count: 4 }],
+      recent: null,
+      invoices: null,
+    });
+    expect(db.transaction.findMany).not.toHaveBeenCalled();
   });
   it("exposes vendor readiness only, without any inferred data query", async () => {
     const result = await read().read("vendor", {});

@@ -40,6 +40,22 @@ describe("operational report query boundaries", () => {
         "invalid",
       );
   });
+  it("opens the dashboard on the current UTC month to date, like legacy", () => {
+    const parsed = parseOperationalFilters(
+      "dashboard",
+      {},
+      new Date("2026-11-18T22:30:00Z"),
+    ).parsed;
+    expect(parsed.status).toBe("valid");
+    if (parsed.status !== "valid") return;
+    expect(parsed.filters).toMatchObject({
+      startDate: "2026-11-01",
+      endDate: "2026-11-18",
+    });
+    expect(parseOperationalFilters("manifest", {}).parsed.status).toBe(
+      "initial",
+    );
+  });
   it("does not silently ignore dashboard search or pagination", () => {
     expect(parseOperationalFilters("dashboard", period).parsed.status).toBe(
       "valid",

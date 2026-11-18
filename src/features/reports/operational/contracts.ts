@@ -49,6 +49,31 @@ export type DashboardReportCounts = {
   sheets: number;
   items: number;
 };
+/** Legacy dashboard widgets with an approved source (D-12, D-22 2026-11-17). */
+export type DashboardInsights = {
+  /** Legacy Quick Action entries that have an implemented, permitted route. */
+  actions: { label: string; href: string }[];
+  /** In period, no active manifest assignment (LP-R10 definition). */
+  awbPending: number;
+  /** Stored transaction status counts in period; no bucket mapping. */
+  statuses: { status: string; count: number }[];
+  /** Latest created AWBs in scope; null without transaction read rights. */
+  recent:
+    | {
+        id: number;
+        awbNo: string | null;
+        createdBy: string | null;
+        createdAt: string;
+      }[]
+    | null;
+  /** Current ISSUED invoice balances (FIN-01 derivation); null without invoice:view. */
+  invoices: {
+    unpaid: number;
+    partial: number;
+    paid: number;
+    outstanding: string;
+  } | null;
+};
 type Common = {
   state: "initial" | "invalid" | "ready" | "unavailable";
   parsed: TransactionReportFilterResult;
@@ -65,6 +90,7 @@ export type OperationalReportResult = Common &
         kind: "dashboard";
         items: never[];
         counts: DashboardReportCounts | null;
+        insights?: DashboardInsights | null;
       }
     | { kind: "vendor"; items: never[] }
   );

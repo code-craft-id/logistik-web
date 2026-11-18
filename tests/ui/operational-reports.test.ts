@@ -131,13 +131,49 @@ it("shows raw date-labelled dashboard counts without unauthorized links or synth
     items: [],
     counts: { transactions: 4, manifests: 3, sheets: 2, items: 1 },
   });
-  expect(html).toContain("Ringkasan Operasional");
+  expect(html).toContain("Dashboard");
   expect(html).toContain("Tanggal transaksi");
   expect(html).toContain("Tanggal manifest");
   expect(html).toContain("Tanggal lembar pengantaran");
   expect(html).not.toMatch(
     /Invoice|Piutang|Penjualan|<svg|href="\/branch-reports\/delivery/,
   );
+});
+it("renders legacy dashboard widgets from sources and hides gated detail", () => {
+  const counts = { transactions: 4, manifests: 3, sheets: 2, items: 1 };
+  const html = render({
+    ...base,
+    kind: "dashboard",
+    items: [],
+    counts,
+    insights: {
+      actions: [{ label: "Entry AWB", href: "/transactions/new" }],
+      awbPending: 3,
+      statuses: [
+        { status: "Delivered", count: 1 },
+        { status: "Open", count: 3 },
+      ],
+      recent: [
+        {
+          id: 1,
+          awbNo: "<b>FAKE</b>",
+          createdBy: "FAKE User",
+          createdAt: "2026-11-02T03:04:00.000Z",
+        },
+      ],
+      invoices: null,
+    },
+  });
+  expect(html.indexOf("Quick Action")).toBeLessThan(
+    html.indexOf("Lembar pengantaran terlihat"),
+  );
+  expect(html).toContain('href="/transactions/new"');
+  expect(html).toContain("AWB Pending");
+  expect(html).toContain("1 (25.00%)");
+  expect(html).toContain("&lt;b&gt;FAKE&lt;/b&gt;");
+  expect(html).toContain("hanya tampil bagi pengguna dengan hak lihat invoice");
+  expect(html).not.toContain("IDR");
+  expect(html).toContain("Belum tersedia");
 });
 it("distinguishes unavailable vendor, initial, empty and invalid states", () => {
   const vendor = render({

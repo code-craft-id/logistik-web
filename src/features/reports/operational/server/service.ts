@@ -9,7 +9,7 @@ import {
   IdentityError,
   loadAccessActor,
 } from "@/features/identity/server/access";
-import type { Prisma, PrismaClient } from "@/lib/db/generated/client";
+import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
 import type { OperationalReportResult } from "../contracts";
 import { type OperationalKind, parseOperationalFilters } from "../filters";
 import { quantitySelect, quantityTotals } from "./quantities";
@@ -46,6 +46,87 @@ function manifests(
   if (branchId !== null) AND.push({ branchId });
   return { deletedAt: null, AND };
 }
+/** Legacy dashboard Quick Action order; only implemented, permitted routes are links. */
+const QUICK_ACTIONS = [
+  { label: "Booking", href: "/bookings", action: "view", resource: "booking" },
+  {
+    label: "Entry AWB",
+    href: "/transactions/new",
+    action: "create",
+    resource: "transaction",
+  },
+  {
+    label: "Manifest",
+    href: "/branch-reports/manifest-outbound",
+    action: "view",
+    resource: "manifest_report",
+  },
+  {
+    label: "Delivery Sheet",
+    href: "/branch-reports/delivery",
+    action: "view",
+    resource: "delivery_report",
+  },
+  {
+    label: "Invoice",
+    href: "/finance/invoices",
+    action: "view",
+    resource: "invoice",
+  },
+  {
+    label: "Tracking AWB",
+    href: "/transactions/lookup",
+    action: "view",
+    resource: "transaction",
+  },
+  {
+    label: "Report Detail Transaksi",
+    href: "/branch-reports/transaction-details",
+    action: "view",
+    resource: "transaction_report",
+  },
+] as const;
+function quickActions(actor: AccessActor) {
+  return QUICK_ACTIONS.filter((item) =>
+    permits(actor, item.action, item.resource),
+  ).map(({ label, href }) => ({ label, href }));
+}
+
+/** FIN-01 derived payment state of current ISSUED invoices (balance as of now). */
+async function invoiceBalances(
+  tx: Prisma.TransactionClient,
+  actor: AccessActor,
+  branchId: number | null,
+) {
+  const scope: Prisma.Sql[] = [];
+  if (!isAdministrator(actor))
+    scope.push(
+      actor.branchIds.length
+        ? Prisma.sql`i."branchId" IN (${Prisma.join(actor.branchIds)})`
+        : Prisma.sql`FALSE`,
+    );
+  if (branchId !== null) scope.push(Prisma.sql`i."branchId" = ${branchId}`);
+  const where = scope.length
+    ? Prisma.sql`AND ${Prisma.join(scope, " AND ")}`
+    : Prisma.empty;
+  const [row] = await tx.$queryRaw<
+    { unpaid: number; partial: number; paid: number; outstanding: string }[]
+  >`
+    SELECT count(*) FILTER (WHERE net = 0)::int AS unpaid,
+           count(*) FILTER (WHERE net > 0 AND net < total)::int AS partial,
+           count(*) FILTER (WHERE net = total)::int AS paid,
+           COALESCE(sum(total - net), 0)::numeric(15,2)::text AS outstanding
+    FROM (
+      SELECT i.total,
+             COALESCE(sum(CASE WHEN r."reversalOfId" IS NULL THEN r.amount ELSE -r.amount END), 0) AS net
+      FROM fin_invoices i
+      LEFT JOIN fin_receipts r ON r."invoiceId" = i.id
+      WHERE i.status = 'ISSUED' ${where}
+      GROUP BY i.id, i.total
+    ) balances`;
+  return row ?? { unpaid: 0, partial: 0, paid: 0, outstanding: "0.00" };
+}
+
 export function createOperationalReportService(
   db: PrismaClient,
   resolve: () => Promise<AccessActor | null>,
@@ -262,6 +343,57 @@ export function createOperationalReportService(
             const itemCount = await tx.deliverySheetItem.count({
               where: itemsWhere,
             });
+            const inPeriod: Prisma.TransactionWhereInput = {
+              ...txVisible,
+              transactionDate: range,
+              AND,
+            };
+            const awbPending = await tx.transaction.count({
+              where: {
+                ...inPeriod,
+                manifestItems: {
+                  none: {
+                    deletedAt: null,
+                    releasedAt: null,
+                    manifest: { is: { deletedAt: null } },
+                  },
+                },
+              },
+            });
+            const statuses = (
+              await tx.transaction.groupBy({
+                by: ["status"],
+                where: inPeriod,
+                _count: { _all: true },
+                orderBy: { status: "asc" },
+              })
+            ).map((row) => ({ status: row.status, count: row._count._all }));
+            const readsTransactions =
+              permits(actor, "view", "transaction_report") ||
+              permits(actor, "view", "transaction");
+            const recent = readsTransactions
+              ? (
+                  await tx.transaction.findMany({
+                    where: { ...txVisible, AND },
+                    select: {
+                      id: true,
+                      awbNo: true,
+                      createdAt: true,
+                      createdBy: { select: { name: true } },
+                    },
+                    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+                    take: 5,
+                  })
+                ).map((row) => ({
+                  id: row.id,
+                  awbNo: row.awbNo,
+                  createdBy: row.createdBy?.name ?? null,
+                  createdAt: row.createdAt.toISOString(),
+                }))
+              : null;
+            const invoices = permits(actor, "view", "invoice")
+              ? await invoiceBalances(tx, actor, f.branchId)
+              : null;
             return {
               ...base,
               kind: "dashboard",
@@ -272,6 +404,13 @@ export function createOperationalReportService(
                 manifests: manifestCount,
                 sheets: sheetCount,
                 items: itemCount,
+              },
+              insights: {
+                actions: quickActions(actor),
+                awbPending,
+                statuses,
+                recent,
+                invoices,
               },
             };
           }

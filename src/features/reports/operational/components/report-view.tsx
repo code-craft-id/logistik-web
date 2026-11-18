@@ -14,13 +14,17 @@ import {
 } from "@/components/ui/table";
 import type { TransactionReportFilters } from "../../transaction-details/filters";
 import { type OperationalReportResult, operationalRoutes } from "../contracts";
+import {
+  DashboardInsightsView,
+  DashboardQuickActions,
+} from "./dashboard-insights";
 import { OperationalSubmitButton } from "./submit-button";
 
 const titles = {
   manifest: "Manifes Cabang",
   sheets: "Laporan Pengantaran",
   items: "Hasil Pengantaran per Transaksi",
-  dashboard: "Ringkasan Operasional",
+  dashboard: "Dashboard",
   vendor: "Manifest Vendor",
 };
 const routes = {
@@ -279,7 +283,7 @@ export function OperationalReportView({
         </h1>
         <p className="max-w-prose text-sm text-muted-foreground">
           {dashboard
-            ? "Jumlah dokumen operasional dalam cakupan cabang Anda. Setiap angka memakai tanggal sumber yang tertulis; tidak ada perhitungan finansial atau indikator keberhasilan."
+            ? "Ringkasan operasional dalam cakupan cabang Anda. Setiap angka memakai tanggal sumber yang tertulis; status ditampilkan sesuai catatan tersimpan tanpa penggolongan keberhasilan."
             : result.kind === "manifest"
               ? "Satu baris per manifest sesuai jenis dan status tersimpan. Penugasan aktif dan kuantitas hanya mencakup transaksi yang masih ditugaskan dan terlihat dalam cakupan Anda. Kuantitas tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."
               : "Laporan atas lembar pengantaran yang sudah tercatat. Periode mengikuti tanggal lembar pengantaran, bukan waktu diterima; hasil ditampilkan sesuai catatan tersimpan. Kuantitas hanya menjumlahkan transaksi terlihat dan tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."}
@@ -429,98 +433,118 @@ export function OperationalReportView({
       {result.state === "ready" &&
         f &&
         (dashboard ? (
-          <section
-            aria-label="Ringkasan hasil"
-            className="rounded-lg border bg-background p-4 sm:p-6"
-          >
-            <h2 className="font-semibold">
-              Periode {f.startDate} sampai {f.endDate}, UTC
-            </h2>
-            <dl className="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                {
-                  key: "transactions",
-                  label: "Transaksi",
-                  basis: "Tanggal transaksi",
-                  value: result.counts?.transactions ?? 0,
-                  href: result.links.transaction
-                    ? queryUrl(
-                        "/branch-reports/transaction-details",
-                        f,
-                        1,
-                        undefined,
-                        false,
-                      )
-                    : null,
-                },
-                {
-                  key: "manifests",
-                  label: "Manifest",
-                  basis: "Tanggal manifest",
-                  value: result.counts?.manifests ?? 0,
-                  href: result.links.manifest
-                    ? queryUrl(
-                        operationalRoutes.manifest,
-                        f,
-                        1,
-                        undefined,
-                        false,
-                      )
-                    : null,
-                },
-                {
-                  key: "sheets",
-                  label: "Lembar pengantaran terlihat",
-                  basis: "Tanggal lembar pengantaran",
-                  value: result.counts?.sheets ?? 0,
-                  href: result.links.delivery
-                    ? queryUrl(
-                        operationalRoutes.delivery,
-                        f,
-                        1,
-                        "sheets",
-                        false,
-                      )
-                    : null,
-                },
-                {
-                  key: "items",
-                  label: "Transaksi pengantaran terlihat",
-                  basis: "Tanggal lembar pengantaran",
-                  value: result.counts?.items ?? 0,
-                  href: result.links.delivery
-                    ? queryUrl(operationalRoutes.delivery, f, 1, "items", false)
-                    : null,
-                },
-              ].map((metric) => (
-                <div
-                  key={metric.key}
-                  className="flex min-w-0 flex-col items-start gap-2"
-                >
-                  <dt className="text-sm font-medium xl:min-h-10">
-                    {metric.label}
-                  </dt>
-                  <dd className="text-2xl font-semibold tabular-nums">
-                    {metric.value}
-                  </dd>
-                  <dd className="text-sm text-muted-foreground">
-                    {metric.basis} · UTC
-                  </dd>
-                  {metric.href && (
-                    <dd className="mt-auto">
-                      <Link
-                        prefetch={false}
-                        className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
-                        href={metric.href}
-                      >
-                        Lihat {metric.label.toLowerCase()}
-                      </Link>
+          <>
+            {result.kind === "dashboard" && result.insights && (
+              <DashboardQuickActions actions={result.insights.actions} />
+            )}
+            <section
+              aria-label="Ringkasan hasil"
+              className="rounded-lg border bg-background p-4 sm:p-6"
+            >
+              <h2 className="font-semibold">
+                Periode {f.startDate} sampai {f.endDate}, UTC
+              </h2>
+              <dl className="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                {[
+                  {
+                    key: "transactions",
+                    label: "Transaksi",
+                    basis: "Tanggal transaksi",
+                    value: result.counts?.transactions ?? 0,
+                    href: result.links.transaction
+                      ? queryUrl(
+                          "/branch-reports/transaction-details",
+                          f,
+                          1,
+                          undefined,
+                          false,
+                        )
+                      : null,
+                  },
+                  {
+                    key: "manifests",
+                    label: "Manifest",
+                    basis: "Tanggal manifest",
+                    value: result.counts?.manifests ?? 0,
+                    href: result.links.manifest
+                      ? queryUrl(
+                          operationalRoutes.manifest,
+                          f,
+                          1,
+                          undefined,
+                          false,
+                        )
+                      : null,
+                  },
+                  {
+                    key: "sheets",
+                    label: "Lembar pengantaran terlihat",
+                    basis: "Tanggal lembar pengantaran",
+                    value: result.counts?.sheets ?? 0,
+                    href: result.links.delivery
+                      ? queryUrl(
+                          operationalRoutes.delivery,
+                          f,
+                          1,
+                          "sheets",
+                          false,
+                        )
+                      : null,
+                  },
+                  {
+                    key: "items",
+                    label: "Transaksi pengantaran terlihat",
+                    basis: "Tanggal lembar pengantaran",
+                    value: result.counts?.items ?? 0,
+                    href: result.links.delivery
+                      ? queryUrl(
+                          operationalRoutes.delivery,
+                          f,
+                          1,
+                          "items",
+                          false,
+                        )
+                      : null,
+                  },
+                ].map((metric) => (
+                  <div
+                    key={metric.key}
+                    className="flex min-w-0 flex-col items-start gap-2"
+                  >
+                    <dt className="text-sm font-medium xl:min-h-10">
+                      {metric.label}
+                    </dt>
+                    <dd className="text-2xl font-semibold tabular-nums">
+                      {metric.value}
                     </dd>
-                  )}
+                    <dd className="text-sm text-muted-foreground">
+                      {metric.basis} · UTC
+                    </dd>
+                    {metric.href && (
+                      <dd className="mt-auto">
+                        <Link
+                          prefetch={false}
+                          className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+                          href={metric.href}
+                        >
+                          Lihat {metric.label.toLowerCase()}
+                        </Link>
+                      </dd>
+                    )}
+                  </div>
+                ))}
+              </dl>
+              {result.kind === "dashboard" && result.insights && (
+                <div className="mt-6">
+                  <DashboardInsightsView
+                    insights={result.insights}
+                    filters={f}
+                    canOpenAwbReport={result.links.transaction}
+                  />
                 </div>
-              ))}
-            </dl>
-          </section>
+              )}
+            </section>
+          </>
         ) : (
           <section
             aria-label="Hasil laporan"

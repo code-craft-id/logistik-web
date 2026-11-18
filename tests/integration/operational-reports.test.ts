@@ -414,6 +414,29 @@ describe("guarded operational report real sources", () => {
       delivery: false,
       transaction: false,
     });
+    // Legacy widgets: pending/status from sources, detail gated by rights.
+    if (result.kind !== "dashboard" || dashOnly.kind !== "dashboard") return;
+    const insights = result.insights;
+    expect(insights?.statuses.reduce((n, row) => n + row.count, 0)).toBe(2);
+    expect(insights?.awbPending).toBeGreaterThanOrEqual(0);
+    expect(insights?.awbPending).toBeLessThanOrEqual(2);
+    expect(insights?.recent).toBeNull();
+    expect(insights?.invoices).toBeNull();
+    expect(insights?.actions.map((x) => x.label)).toEqual([
+      "Manifest",
+      "Delivery Sheet",
+    ]);
+    expect(dashOnly.insights?.actions).toEqual([]);
+    const admin = await read(userIds[0]).read("dashboard", {
+      startDate: period.startDate,
+      endDate: period.endDate,
+      branchId: String(a),
+    });
+    if (admin.kind !== "dashboard") throw new Error("kind");
+    expect(admin.insights?.recent?.length).toBeGreaterThan(0);
+    expect(admin.insights?.invoices).toMatchObject({
+      outstanding: expect.stringMatching(/^\d+\.\d{2}$/),
+    });
   });
   it("reloads grants, memberships and ACTIVE hierarchy on every request", async () => {
     await db.permission.deleteMany({
