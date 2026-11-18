@@ -93,16 +93,23 @@ export async function InvoiceListPage({
           <TableHeader>
             <TableRow>
               {[
-                "Invoice",
-                "Cabang",
-                "Tanggal",
+                "Customer",
+                "Invoice No",
+                "Tgl. Dibuat",
+                "Termin",
                 "Status",
+                "Tot. AWB",
+                "Cabang",
                 "Tagihan IDR",
                 "Sisa IDR",
               ].map((v) => (
                 <TableHead
                   key={v}
-                  className={v.endsWith("IDR") ? "text-right" : undefined}
+                  className={
+                    v.endsWith("IDR") || v === "Tot. AWB" || v === "Termin"
+                      ? "text-right"
+                      : undefined
+                  }
                 >
                   {v}
                 </TableHead>
@@ -112,6 +119,7 @@ export async function InvoiceListPage({
           <TableBody>
             {result.items.map((r) => (
               <TableRow key={r.id}>
+                <TableCell>{r.customerName ?? r.customerId}</TableCell>
                 <TableCell>
                   <Link
                     className={financeLink}
@@ -120,9 +128,15 @@ export async function InvoiceListPage({
                     {r.number ?? `Draft #${r.id}`}
                   </Link>
                 </TableCell>
-                <TableCell>{r.branchId}</TableCell>
                 <TableCell>{r.invoiceDate}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {r.termDays} hari
+                </TableCell>
                 <TableCell>{r.paymentStatus}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {r.awbCount}
+                </TableCell>
+                <TableCell>{r.branchName ?? r.branchId}</TableCell>
                 <TableCell className="text-right tabular-nums">
                   {r.total}
                 </TableCell>

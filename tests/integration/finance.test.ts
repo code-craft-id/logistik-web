@@ -386,6 +386,16 @@ describe("FIN-01 guarded persistence", () => {
     const row = await service().detail(id);
     expect(row.balance).toBe("20000.00");
     expect(row.paymentStatus).toBe("PARTIAL");
+    // Legacy list columns: snapshot customer/branch, term in days, AWB count.
+    const listed = (await service().list({ branchId: branch })).items.find(
+      (x) => x.id === id,
+    );
+    expect(listed).toMatchObject({
+      customerName: row.issuedCustomerName,
+      branchName: row.issuedBranchName,
+      awbCount: row.items.length,
+    });
+    expect(listed?.termDays).toBeGreaterThanOrEqual(0);
     await expect(
       service().execute({
         action: "invoice.void",

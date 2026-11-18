@@ -447,8 +447,39 @@ export function createFinanceService(
             skip: (data.page - 1) * 30,
             take: 30,
           });
+          // Legacy list columns (Customer, Termin, Tot. AWB): issued rows keep
+          // their immutable snapshot names; drafts show current master names.
+          const [customers, branches] = await Promise.all([
+            tx.customer.findMany({
+              where: {
+                id: { in: [...new Set(rows.map((r) => r.customerId))] },
+              },
+              select: { id: true, name: true },
+            }),
+            tx.branch.findMany({
+              where: { id: { in: [...new Set(rows.map((r) => r.branchId))] } },
+              select: { id: true, name: true },
+            }),
+          ]);
+          const customerName = new Map(customers.map((c) => [c.id, c.name]));
+          const branchName = new Map(branches.map((b) => [b.id, b.name]));
           return {
-            items: rows.map((r) => invoiceDTO(r, false)),
+            items: rows.map((r) => {
+              const dto = invoiceDTO(r, false);
+              return {
+                ...dto,
+                customerName:
+                  dto.issuedCustomerName ??
+                  customerName.get(r.customerId) ??
+                  null,
+                branchName:
+                  dto.issuedBranchName ?? branchName.get(r.branchId) ?? null,
+                termDays: Math.round(
+                  (r.dueDate.getTime() - r.invoiceDate.getTime()) / 86_400_000,
+                ),
+                awbCount: r.items.length,
+              };
+            }),
             total: await tx.finInvoice.count({ where }),
             page: data.page,
           };
