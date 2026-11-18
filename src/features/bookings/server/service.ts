@@ -192,6 +192,13 @@ function payloadMatchesExisting(
     "originBranchId",
     "destinationBranchId",
     "courierId",
+    "customerId",
+    "transportModeId",
+    "deliveryServiceId",
+    "goodsTypeId",
+    "costTypeId",
+    "description",
+    "remarks",
   ];
   for (const f of fields) {
     const a = existing[f];
@@ -348,6 +355,44 @@ export async function createTransaction(
         }
       }
 
+      // Legacy Entry AWB capture: referenced masters must exist and be usable.
+      if (data.customerId) {
+        const customer = await tx.customer.findFirst({
+          where: {
+            id: data.customerId,
+            deletedAt: null,
+            ...(isAdministrator(actor)
+              ? {}
+              : {
+                  OR: [
+                    { branchId: { in: actor.branchIds } },
+                    { branchId: null },
+                  ],
+                }),
+          },
+          select: { id: true },
+        });
+        if (!customer) throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
+      const masters = [
+        [data.transportModeId, tx.transportMode],
+        [data.deliveryServiceId, tx.deliveryService],
+        [data.goodsTypeId, tx.goodsType],
+        [data.costTypeId, tx.costType],
+      ] as const;
+      for (const [id, model] of masters) {
+        if (!id) continue;
+        const found = await (
+          model as unknown as {
+            findFirst: (a: unknown) => Promise<{ id: number } | null>;
+          }
+        ).findFirst({
+          where: { id, deletedAt: null, status: "ACTIVE" },
+          select: { id: true },
+        });
+        if (!found) throw new Error("VALIDATION_MASTER_NOT_FOUND");
+      }
+
       if (data.idempotencyKey) {
         const existingByKey = await tx.transaction.findUnique({
           where: { idempotencyKey: data.idempotencyKey },
@@ -427,6 +472,13 @@ export async function createTransaction(
           volume: rest.volume ?? null,
           biaya: rest.biaya ?? null,
           courierId: rest.courierId ?? null,
+          customerId: rest.customerId ?? null,
+          transportModeId: rest.transportModeId ?? null,
+          deliveryServiceId: rest.deliveryServiceId ?? null,
+          goodsTypeId: rest.goodsTypeId ?? null,
+          costTypeId: rest.costTypeId ?? null,
+          description: rest.description ?? null,
+          remarks: rest.remarks ?? null,
           status: "Open",
           createdById: actor.id,
         },

@@ -143,6 +143,9 @@ export async function createTransactionAction(
       ) {
         return { ok: false, error: "IDEMPOTENCY_CONFLICT" };
       }
+      if (e.message === "VALIDATION_MASTER_NOT_FOUND") {
+        return { ok: false, error: "VALIDATION" };
+      }
       if (e.message.includes("AWB_ALREADY_USED")) {
         return { ok: false, error: "CONFLICT" };
       }

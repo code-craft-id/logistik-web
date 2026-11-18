@@ -47,6 +47,7 @@ model Customer {
   accounting                  CustomerAccounting?
   whatsappNotifications       CustomerWhatsAppNotification[]
   bookings                    Booking[]
+  transactions                Transaction[]
   createdAt                   DateTime                       @default(now()) @map("created_at")
   updatedAt                   DateTime                       @updatedAt @map("updated_at")
   deletedAt                   DateTime?                      @map("deleted_at")
@@ -164,6 +165,19 @@ model Transaction {
   status                String                     @default("Open") @db.VarChar(30)
   courierId             Int?                       @map("courier_id")
   courier               Courier?                   @relation(fields: [courierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Legacy Entry AWB capture (OBSERVED 2026-11-18): Customer, Via Moda, Layanan, DOC/PAC, Pembayaran, Isi Barang, Keterangan. Nullable: historical rows unknown.
+  customerId            Int?                       @map("customer_id")
+  customer              Customer?                  @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId       Int?                       @map("transport_mode_id")
+  transportMode         TransportMode?             @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deliveryServiceId     Int?                       @map("delivery_service_id")
+  deliveryService       DeliveryService?           @relation(fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  goodsTypeId           Int?                       @map("goods_type_id")
+  goodsType             GoodsType?                 @relation(fields: [goodsTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  costTypeId            Int?                       @map("cost_type_id")
+  costType              CostType?                  @relation(fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  description           String?                    @db.VarChar(500)
+  remarks               String?                    @db.VarChar(500)
   createdById           Int?                       @map("created_by_id")
   createdBy             User?                      @relation("TransactionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt             DateTime                   @default(now()) @map("created_at")
@@ -179,6 +193,11 @@ model Transaction {
   @@index([bookingId])
   @@index([status])
   @@index([transactionDate])
+  @@index([customerId])
+  @@index([transportModeId])
+  @@index([deliveryServiceId])
+  @@index([goodsTypeId])
+  @@index([costTypeId])
   @@map("transactions")
 }
 
@@ -221,6 +240,9 @@ model Manifest {
   transit3          String?            @db.VarChar(100)
   transit4          String?            @db.VarChar(100)
   transit5          String?            @db.VarChar(100)
+  /// Legacy Manifest Vendor attribution (OBSERVED); nullable for historical rows.
+  vendorId          Int?               @map("vendor_id")
+  vendor            Vendor?            @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdById       Int?               @map("created_by_id")
   createdBy         User?              @relation("ManifestCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt         DateTime           @default(now()) @map("created_at")
@@ -233,6 +255,7 @@ model Manifest {
   @@index([originBranchId])
   @@index([status])
   @@index([manifestDate])
+  @@index([vendorId])
   @@map("manifests")
 }
 

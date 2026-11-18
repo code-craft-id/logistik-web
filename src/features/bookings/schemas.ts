@@ -119,6 +119,19 @@ export const createTransactionSchema = z
     volume: decimalField(7, 3),
     biaya: decimalField(13, 2),
     courierId: optionalPositiveInt,
+    customerId: optionalPositiveInt,
+    transportModeId: optionalPositiveInt,
+    deliveryServiceId: optionalPositiveInt,
+    goodsTypeId: optionalPositiveInt,
+    costTypeId: optionalPositiveInt,
+    description: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    remarks: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
     status: z.never().optional(),
   })
   .strict();

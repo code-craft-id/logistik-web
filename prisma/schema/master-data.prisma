@@ -119,6 +119,7 @@ model TransportMode {
   divider          String            @db.VarChar(100)
   status           RecordStatus      @default(ACTIVE)
   deliveryServices DeliveryService[]
+  transactions     Transaction[]
 
   @@index([status])
   @@map("transport_modes")
@@ -149,6 +150,7 @@ model DeliveryService {
   transportModeId   Int?             @map("transport_mode_id")
   transportMode     TransportMode?   @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   status            RecordStatus     @default(ACTIVE)
+  transactions      Transaction[]
 
   @@index([serviceCategoryId])
   @@index([transportModeId])
@@ -162,14 +164,16 @@ model GoodsType {
   createdAt DateTime     @default(now()) @map("created_at")
   id        Int          @id @default(autoincrement())
   name      String       @db.VarChar(100)
-  status    RecordStatus @default(ACTIVE)
+  status       RecordStatus  @default(ACTIVE)
+  transactions Transaction[]
 
   @@index([status])
   @@map("goods_types")
 }
 
 model CostType {
-  customers Customer[]
+  customers    Customer[]
+  transactions Transaction[]
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
   createdAt DateTime     @default(now()) @map("created_at")
@@ -268,6 +272,7 @@ model ShipmentStatus {
 }
 
 model Vendor {
+  manifests   Manifest[]
   deletedAt   DateTime?         @map("deleted_at")
   id          Int               @id @default(autoincrement())
   name        String

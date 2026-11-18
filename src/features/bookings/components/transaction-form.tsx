@@ -6,7 +6,57 @@ import {
   createTransactionAction,
 } from "../actions";
 
-export function TransactionForm() {
+type Option = { id: number; name: string };
+export type TransactionFormOptions = {
+  branches: Option[];
+  customers: Option[];
+  transportModes: Option[];
+  deliveryServices: Option[];
+  goodsTypes: Option[];
+  costTypes: Option[];
+};
+const selectClass = "w-full border rounded px-2 py-1 min-h-11 bg-background";
+
+function Choice({
+  name,
+  label,
+  options,
+  required = false,
+}: {
+  name: string;
+  label: string;
+  options: Option[];
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label htmlFor={name} className="text-sm font-medium">
+        {label}
+        {required ? " *" : ""}
+      </label>
+      <select
+        id={name}
+        name={name}
+        required={required}
+        defaultValue=""
+        className={selectClass}
+      >
+        <option value="">{required ? "Pilih…" : "Tidak dipilih"}</option>
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+export function TransactionForm({
+  options,
+}: {
+  options?: TransactionFormOptions;
+} = {}) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -106,29 +156,50 @@ export function TransactionForm() {
             className="w-full border rounded px-2 py-1"
           />
         </div>
-        <div>
-          <label htmlFor="originBranchId" className="text-sm font-medium">
-            Cabang Asal (originBranchId) *
-          </label>
-          <input
-            id="originBranchId"
-            name="originBranchId"
-            type="number"
-            required
-            className="w-full border rounded px-2 py-1"
-          />
-        </div>
-        <div>
-          <label htmlFor="destinationBranchId" className="text-sm font-medium">
-            Cabang Tujuan (destinationBranchId)
-          </label>
-          <input
-            id="destinationBranchId"
-            name="destinationBranchId"
-            type="number"
-            className="w-full border rounded px-2 py-1"
-          />
-        </div>
+        {options ? (
+          <>
+            <Choice
+              name="originBranchId"
+              label="Asal"
+              options={options.branches}
+              required
+            />
+            <Choice
+              name="destinationBranchId"
+              label="Tujuan"
+              options={options.branches}
+            />
+          </>
+        ) : (
+          <>
+            <div>
+              <label htmlFor="originBranchId" className="text-sm font-medium">
+                Cabang Asal (originBranchId) *
+              </label>
+              <input
+                id="originBranchId"
+                name="originBranchId"
+                type="number"
+                required
+                className="w-full border rounded px-2 py-1"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="destinationBranchId"
+                className="text-sm font-medium"
+              >
+                Cabang Tujuan (destinationBranchId)
+              </label>
+              <input
+                id="destinationBranchId"
+                name="destinationBranchId"
+                type="number"
+                className="w-full border rounded px-2 py-1"
+              />
+            </div>
+          </>
+        )}
         <div>
           <label htmlFor="bookingId" className="text-sm font-medium">
             Booking ID (opsional)
@@ -205,6 +276,57 @@ export function TransactionForm() {
             name="biaya"
             type="number"
             step="0.01"
+            className="w-full border rounded px-2 py-1"
+          />
+        </div>
+        {options && (
+          <>
+            <Choice
+              name="customerId"
+              label="Customer"
+              options={options.customers}
+            />
+            <Choice
+              name="deliveryServiceId"
+              label="Layanan"
+              options={options.deliveryServices}
+            />
+            <Choice
+              name="goodsTypeId"
+              label="DOC / PAC"
+              options={options.goodsTypes}
+            />
+            <Choice
+              name="transportModeId"
+              label="Via Moda"
+              options={options.transportModes}
+            />
+            <Choice
+              name="costTypeId"
+              label="Pembayaran"
+              options={options.costTypes}
+            />
+          </>
+        )}
+        <div>
+          <label htmlFor="description" className="text-sm font-medium">
+            Isi Barang
+          </label>
+          <input
+            id="description"
+            name="description"
+            maxLength={500}
+            className="w-full border rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label htmlFor="remarks" className="text-sm font-medium">
+            Keterangan
+          </label>
+          <input
+            id="remarks"
+            name="remarks"
+            maxLength={500}
             className="w-full border rounded px-2 py-1"
           />
         </div>

@@ -226,3 +226,58 @@ export async function lookupTransactionByAwb(
   // Multiple matches without origin disambiguation: return all (scoped) for UI selection.
   return matches;
 }
+
+/** Select options for the Entry AWB form; the service re-validates every value. */
+export async function transactionFormOptions(actor: AccessActor) {
+  const admin = isAdministrator(actor);
+  const active = { deletedAt: null, status: "ACTIVE" as const };
+  const byName = { name: "asc" as const };
+  const pick = { id: true, name: true } as const;
+  const [
+    branches,
+    customers,
+    transportModes,
+    deliveryServices,
+    goodsTypes,
+    costTypes,
+  ] = await Promise.all([
+    prisma.branch.findMany({
+      where: { ...active, ...(admin ? {} : { id: { in: actor.branchIds } }) },
+      select: pick,
+      orderBy: byName,
+    }),
+    prisma.customer.findMany({
+      where: {
+        deletedAt: null,
+        ...(admin
+          ? {}
+          : {
+              OR: [{ branchId: { in: actor.branchIds } }, { branchId: null }],
+            }),
+      },
+      select: pick,
+      orderBy: byName,
+      take: 1000,
+    }),
+    prisma.transportMode.findMany({
+      where: active,
+      select: pick,
+      orderBy: byName,
+    }),
+    prisma.deliveryService.findMany({
+      where: active,
+      select: pick,
+      orderBy: byName,
+    }),
+    prisma.goodsType.findMany({ where: active, select: pick, orderBy: byName }),
+    prisma.costType.findMany({ where: active, select: pick, orderBy: byName }),
+  ]);
+  return {
+    branches,
+    customers,
+    transportModes,
+    deliveryServices,
+    goodsTypes,
+    costTypes,
+  };
+}
