@@ -680,3 +680,6 @@ Migration 20261118000100_fin_delete_guards (test DB only) + teardown guard toggl
 
 ## 2026-11-18 — Modules, simplified reports, review pass
 Manifest/DRS UI, capture fields migration, Customer/Penerima, barcode, ten reports, nav fully linked. Review fixes: id grouping, incomplete-data counts, ambiguous AWB refusal, deliveredBy misuse. Reconciliation tests. Gates lint458/typecheck/unit689/integration161/build PASS. Pushed to PR #11.
+
+## 2026-11-19 — Modul parity, printing, UX pass
+Pendapatan Pelanggan, Modul menu mirror, print tab with QR and bulk print, ComboSelect, finance pickers, row numbers, info tips, message review, import branch ID. Gates lint479/typecheck/unit699/integration163/build PASS. Pushed to PR #11.

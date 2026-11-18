@@ -905,3 +905,26 @@ Schema: migration 20261118000200_transaction_capture_fields (nullable FKs, no ba
 - Relations: every new column has a RESTRICT foreign key to the intended master (customers, transport_modes, delivery_services, goods_types, cost_types, vendors). Dev DB consistency checks all zero: DRS items outside their manifest, AWB in two active manifests, customer/consignee/invoice branch mismatches. Known gap: legacy `manifests.origin_branch_id`/`destination_branch_id` have no foreign key (Dev 2 schema).
 - Report numbers: grouping by id (not name); missing koli/berat/biaya counted in an explicit column instead of silently treated as complete; reconciliation tests tie Rekap Customer and Omset totals to direct counts, GP/Rekap GP/Manifest Vendor AWB totals to active manifest items, and courier outcome buckets to their total.
 - Delivery sheets: create one DRS per manifest and record outcomes from the manifest page (Dev 2 outcome service), so Laporan Kurir and POD Kembali have a live source. Outcome DELIVERED still requires AWB status In Transit (Dev 2 transition rule).
+
+### 15. Modul menu parity, printing and UX pass — 2026-11-19
+
+Legacy observed read-only: Pendapatan Pelanggan (`revenue-customer`: No., List Pelanggan, Total Pendapatan, Growth "dari" previous month, month/year filter, all customers incl. zero).
+
+| Modul item (reference) | LMS | Note |
+|---|---|---|
+| Customer, Penerima | `/marketing` tabs | — |
+| Pendapatan Pelanggan | `/marketing/revenue` | Revenue = AWB biaya per month; growth vs previous month |
+| Onsite Outbound / Inbound | Entry AWB / Detail Transaksi Inbound | Inbound = destination branch list |
+| Print AWB | AWB list → select → print tab (barcode + QR) | — |
+| Void AWB, History Delete Resi | `/transactions/void` | Cancelled or deleted AWB; no separate void approval |
+| Histori Edit Resi | `/transactions/history` | Status change history only; field edits are not tracked |
+| Status Pengantaran, Cek Resi, Booking | delivery items report, lookup, bookings | — |
+| Manifest, Cek Transit, Cek Inbound, Print Manifest | `/manifest` (+type filter), print tab | — |
+| Kurir Kota, Print DRS | courier report, delivery report / DRS print | — |
+| POD Kembali, Proses Vendor, Invoice (new) | POD report, manifest vendor, invoices | — |
+| Persetujuan Edit/Delete AWB, Approval POD Kembali | not built | Need approval workflow and approver rules (D-21) |
+| Cek Ongkir | not built | No tariff master (D-11) |
+| Inbound Booking, Cek Inbound Agen | not built | No booking-destination or agent-manifest source |
+| Pembayaran Hutang | not built | Supplier settlement out of scope (owner NOT NEEDED) |
+
+Also: searchable dropdowns (ComboSelect over a native select), branch pickers instead of raw IDs in finance, popover token fix, print route group without shell (auto print dialog, `?preview=1`), QR backup (qrcode 1.5.4), bulk print, row numbers, info tips for long explanations, clearer messages, personnel import accepts branch ID. Gates (Node 24.15.0): lint 479, typecheck, unit 699, integration 163, build PASS.

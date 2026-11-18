@@ -1,3 +1,9 @@
+## Latest checkpoint: Modul parity, printing, UX (2026-11-19)
+
+At user direction (pushed to PR #11): Modul menu mirrors the reference (audit §15) with Pendapatan Pelanggan, Void AWB, Histori Resi, manifest type filters; print tab without shell (AWB barcode + QR via pinned qrcode 1.5.4, bulk select print for AWB/manifest/DRS); searchable dropdowns; finance branch/account pickers; popover token fix; row numbers; info tips; clearer messages; branch ID in personnel import; help chat 10-minute history. Six reference items remain unbuilt (approvals, Cek Ongkir, Inbound Booking, Cek Inbound Agen, Pembayaran Hutang) pending decisions. Gates: lint 479, typecheck, unit 699, integration 163, build PASS. Release NOT READY (same blockers).
+
+---
+
 ## Latest checkpoint: modules, reports and review pass (2026-11-18, night)
 
 Pushed to PR #11 (`dev3/ready-for-review`). Added at user direction: Manifest pages with DRS and delivery outcomes, Entry AWB/Booking dropdowns and capture fields (migration `20261118000200_transaction_capture_fields`), Customer/Penerima maintenance (`customer`/`consignee` permissions), AWB barcode, ten simplified reports, all legacy menu items linked. Simplifications are listed in `docs/decisions/DEV3-LEGACY-PARITY-AUDIT.md` §14/§14.1 and need owner confirmation. Gates (Node 24.15.0): lint 458, typecheck, unit 689, integration 161, build PASS. Dev and test DBs migrated locally. Dev server restarted from the agent session (log in scratchpad). Release NOT READY: Dev 1 re-review, Dev 2 and migration coordinator review of two new migrations, better-auth/Next.js security upgrade, staging/UAT, P3 decision.
