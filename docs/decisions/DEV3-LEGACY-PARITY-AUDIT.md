@@ -877,3 +877,25 @@ Fresh read-only legacy observation (Dashboard, Invoice (New) list 2016-01-01..20
 | LP-R03 | (unchanged) | Asal/Tujuan stored branches and visible quantities already present; earlier presentation row in §LP-R03 is outdated | PARTIAL_PARITY | Penjual, Tot. Biaya, Sopir (Dev 2 driver/vendor, D-11) |
 
 Commits up to 398d11d on dev3/ready-for-review. Verification recorded in agent-state RUN_LOG 2026-11-18.
+
+### 14. Modules and simplified reports — 2026-11-18 (branch feat/modules-parity)
+
+User direction: make every unavailable menu work from database data, simplified where needed and reported. Legacy Entry AWB form observed read-only (fields only, no submit).
+
+| Area | Modern implementation | Simplification vs legacy (needs owner confirmation) |
+|---|---|---|
+| Manifest | List, create (Draft, vendor), detail, assign AWB by number | No status change, print, driver/cost columns |
+| Entry AWB / Booking | Branch, customer, layanan, DOC/PAC, moda, pembayaran dropdowns; isi barang, keterangan | No pricing engine (harga/kg, diskon, PPN); biaya entered manually |
+| Pemasaran/Penjualan | Customer and Penerima CRUD, soft delete, new `customer`/`consignee` permissions | Customer revenue page not separate (see Rekap Customer Bulanan) |
+| AWB detail | Code 128 barcode, names instead of IDs | No print layout |
+| Rekap Customer Bulanan | Per customer: AWB, koli, berat, total biaya input | Biaya = Entry AWB amount, not recognized revenue (D-11/D-14) |
+| Rekap Omset Harian | Per day × payment type | Omset = sum of Entry AWB biaya |
+| Detail Transaksi Inbound | AWB whose destination is the branch | Inbound = destination branch, no arrival event |
+| Laporan Kurir | Per manifest courier from DRS: total, berhasil, gagal, retur, belum ada hasil | No pickup/SLA columns |
+| Laporan Keuangan | AR aging per customer from FIN-01 issued invoices (as of today) | AP not included (no supplier settlement) |
+| Gross Profit / Manifest, Rekap GP | Pendapatan = AWB biaya; Biaya = FIN-02 net actual cost; GP = difference; per manifest / per vehicle | Missing costs count as 0 and are flagged |
+| Manifest Vendor | Per vendor chosen on manifest | Historical manifests have no vendor |
+| Pengiriman | AWB list per customer with layanan/moda | — |
+| POD Kembali | DELIVERED delivery items with receiver and time | No physical POD-return event |
+
+Schema: migration 20261118000200_transaction_capture_fields (nullable FKs, no backfill). Needs Dev 2 and migration coordinator review. Verification: lint, typecheck, unit 689, integration 157 PASS (Node 24.15.0); desktop browser spot checks on local synthetic data.
