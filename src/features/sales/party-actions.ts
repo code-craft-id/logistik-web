@@ -24,7 +24,11 @@ function failure(e: unknown): PartyResult {
     };
   if (e instanceof ZodError)
     return { ok: false, message: "Isian belum valid. Periksa nama dan email." };
-  return { ok: false, message: "Belum tersimpan. Silakan coba lagi." };
+  return {
+    ok: false,
+    message:
+      "Belum tersimpan karena kesalahan sistem. Coba lagi; jika berulang, hubungi admin.",
+  };
 }
 
 export async function savePartyAction(

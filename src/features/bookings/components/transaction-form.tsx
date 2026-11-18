@@ -106,27 +106,39 @@ export function TransactionForm({
         if (res.ok) {
           setSuccess(
             res.idempotent
-              ? "AWB/Transaksi sudah ada (idempotent)."
-              : "AWB/Transaksi berhasil disimpan.",
+              ? "AWB ini sudah tersimpan sebelumnya; tidak dibuat ganda."
+              : "AWB berhasil disimpan.",
           );
           setIdempotencyKey(generateKey());
         } else {
           if (res.error === "VALIDATION") {
-            setError("Data tidak valid. Periksa kolom wajib dan format angka.");
+            setError(
+              "Data belum lengkap atau tidak valid. Periksa Asal (wajib), angka koli/berat/volume/biaya, dan pilihan master yang aktif.",
+            );
           } else if (res.error === "UNAUTHENTICATED") {
-            setError("Sesi tidak valid. Silakan login kembali.");
+            setError("Sesi Anda berakhir. Silakan masuk kembali.");
           } else if (res.error === "FORBIDDEN_BRANCH") {
-            setError("Tidak memiliki akses cabang untuk operasi ini.");
+            setError(
+              "Anda tidak punya akses ke cabang atau customer yang dipilih. Pilih cabang/customer milik Anda.",
+            );
           } else if (res.error === "IDEMPOTENCY_CONFLICT") {
-            setError("AWB/IDempotency bertabrakan dengan payload berbeda.");
+            setError(
+              "Nomor AWB ini sudah dipakai dengan data yang berbeda. Gunakan nomor AWB lain atau kosongkan agar dibuat otomatis.",
+            );
           } else if (res.error === "CONFLICT") {
-            setError("Data bertabrakan atau sudah digunakan.");
+            setError(
+              "Nomor AWB sudah dipakai di cabang asal ini. Gunakan nomor AWB lain.",
+            );
           } else {
-            setError("Gagal menyimpan AWB/Transaksi.");
+            setError(
+              "AWB belum tersimpan karena kesalahan sistem. Coba lagi; jika berulang, hubungi admin.",
+            );
           }
         }
       } catch {
-        setError("Terjadi kesalahan saat menyimpan.");
+        setError(
+          "Koneksi ke server terputus. Periksa jaringan lalu coba simpan lagi.",
+        );
       }
     });
   }
@@ -134,8 +146,19 @@ export function TransactionForm({
   return (
     <form action={onSubmit} className="space-y-4 max-w-3xl">
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
-      {error ? <div className="text-sm text-red-600">{error}</div> : null}
-      {success ? <div className="text-sm text-green-700">{success}</div> : null}
+      {error ? (
+        <p
+          role="alert"
+          className="rounded-md border border-destructive p-3 text-sm text-destructive"
+        >
+          {error}
+        </p>
+      ) : null}
+      {success ? (
+        <output className="block rounded-md border border-primary p-3 text-sm text-primary">
+          {success}
+        </output>
+      ) : null}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="awbNo" className="text-sm font-medium">

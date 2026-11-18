@@ -60,7 +60,11 @@ function failure(e: unknown): ManifestFormResult {
     if (e.message === "MANIFEST_NOT_ASSIGNABLE")
       return { ok: false, message: "Manifest sudah ditutup." };
   }
-  return { ok: false, message: "Belum tersimpan. Silakan coba lagi." };
+  return {
+    ok: false,
+    message:
+      "Belum tersimpan karena kesalahan sistem. Coba lagi; jika berulang, hubungi admin.",
+  };
 }
 
 export async function createManifestFormAction(

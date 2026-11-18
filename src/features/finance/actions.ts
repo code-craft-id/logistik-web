@@ -39,7 +39,7 @@ export async function financeCommand(input: unknown) {
       message:
         error instanceof IdentityError
           ? error.message
-          : "Belum tersimpan. Coba kembali dengan isi yang sama.",
+          : "Belum tersimpan karena gangguan sistem. Kirim ulang tanpa mengubah isi; data tidak akan tercatat ganda.",
     };
   }
 }

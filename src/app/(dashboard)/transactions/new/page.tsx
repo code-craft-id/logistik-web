@@ -22,8 +22,8 @@ export default async function Page() {
           Tambah AWB / On Site Outbound
         </h1>
         <p className="text-sm text-muted-foreground">
-          Input transaksi/AWB. Idempotensi diterapkan via kunci permintaan;
-          relasi booking bersifat opsional (D-05 belum terkonfirmasi).
+          Isi data AWB lalu Simpan. Nomor AWB boleh dikosongkan; kirim ulang
+          form yang sama tidak membuat AWB ganda.
         </p>
       </div>
       <TransactionForm options={options} />

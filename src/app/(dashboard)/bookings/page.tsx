@@ -17,8 +17,8 @@ export default async function Page() {
             Kelola Booking
           </h1>
           <p className="text-sm text-muted-foreground">
-            Daftar booking. Relasi booking-AWB bersifat opsional (D-05 belum
-            terkonfirmasi).
+            Daftar booking. Booking boleh dihubungkan ke AWB, tetapi tidak
+            wajib.
           </p>
         </div>
         <Link href="/bookings/new" className="px-3 py-2 border rounded">

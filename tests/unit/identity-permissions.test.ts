@@ -125,7 +125,8 @@ describe("identity server input contracts", () => {
     ).rejects.toMatchObject({
       code: "INTERNAL_ERROR",
       status: 500,
-      message: "Permintaan tidak dapat diproses.",
+      message:
+        "Permintaan tidak dapat diproses. Coba lagi; jika berulang, hubungi admin.",
     });
   });
   const input = {

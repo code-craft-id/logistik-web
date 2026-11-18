@@ -16,13 +16,13 @@ function getErrorMessage(error: BookingActionError) {
     case "UNAUTHENTICATED":
       return "Sesi Anda berakhir. Silakan masuk kembali.";
     case "FORBIDDEN_BRANCH":
-      return "Anda tidak memiliki akses ke cabang yang dipilih.";
+      return "Anda tidak punya akses ke cabang atau customer yang dipilih. Pilih cabang/customer milik Anda.";
     case "VALIDATION":
-      return "Data booking tidak valid. Periksa kembali isian Anda.";
+      return "Data booking belum lengkap atau tidak valid. Periksa Cabang (wajib) dan angka koli/berat/volume/biaya.";
     case "CONFLICT":
-      return "Booking tidak dapat disimpan karena terjadi konflik data.";
+      return "Nomor booking sudah dipakai. Gunakan nomor lain atau kosongkan.";
     default:
-      return "Gagal menyimpan booking. Silakan coba lagi.";
+      return "Booking belum tersimpan karena kesalahan sistem. Coba lagi; jika berulang, hubungi admin.";
   }
 }
 

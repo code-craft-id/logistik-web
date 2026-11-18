@@ -112,7 +112,10 @@ export function parseTransactionReportFilters(
     ["destinationBranchId", destinationBranchId],
   ] as const) {
     if (query[field] && value === null)
-      issues.push({ field, message: "ID cabang tidak valid." });
+      issues.push({
+        field,
+        message: "Pilihan cabang tidak valid. Pilih cabang dari daftar.",
+      });
   }
   const sortBy =
     query.sortBy === undefined
@@ -137,7 +140,10 @@ export function parseTransactionReportFilters(
     issues.push({ field: "pageSize", message: "Ukuran halaman harus 1–100." });
   }
   if (query.branchId && branchId === null) {
-    issues.push({ field: "branchId", message: "ID cabang tidak valid." });
+    issues.push({
+      field: "branchId",
+      message: "Pilihan cabang tidak valid. Pilih cabang dari daftar.",
+    });
   }
   if ((query.search ?? "").length > 50) {
     issues.push({

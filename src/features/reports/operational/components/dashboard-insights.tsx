@@ -209,8 +209,8 @@ export function DashboardInsightsView({
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
           Nominal transaksi, CASH/KREDIT/COD/TRANSFER, grafik penjualan per
           nominal, top customer, POD outstanding, failed/return, rekomendasi
-          otomatis dan pengumuman menunggu aturan sumber yang disetujui (D-11,
-          D-15, D-22). Dashboard tidak menebak angka tersebut.
+          otomatis dan pengumuman belum tersedia karena aturan dan sumber
+          datanya belum disetujui. Dashboard tidak menebak angka tersebut.
         </p>
       </section>
     </div>
