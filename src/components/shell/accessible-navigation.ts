@@ -31,6 +31,7 @@ const routeResources: Record<string, readonly string[]> = {
   "/dashboard": ["dashboard_report"],
   "/transactions": ["transaction"],
   "/bookings": ["booking"],
+  "/manifest": ["manifest"],
   "/branch-reports/awb": ["transaction_report"],
   "/customer-reports/all-status": ["transaction_report"],
   "/branch-reports/manifest-outbound": ["manifest_report"],
