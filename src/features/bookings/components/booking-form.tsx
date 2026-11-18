@@ -25,7 +25,14 @@ function getErrorMessage(error: BookingActionError) {
   }
 }
 
-export function BookingForm() {
+type Option = { id: number; name: string };
+const selectClass = "w-full border rounded px-2 py-1 min-h-11 bg-background";
+
+export function BookingForm({
+  options,
+}: {
+  options?: { branches: Option[]; customers: Option[] };
+} = {}) {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -69,18 +76,60 @@ export function BookingForm() {
             className="w-full border rounded px-2 py-1"
           />
         </div>
-        <div>
-          <label htmlFor="branchId" className="text-sm font-medium">
-            Cabang (branchId)
-          </label>
-          <input
-            id="branchId"
-            name="branchId"
-            type="number"
-            className="w-full border rounded px-2 py-1"
-            required
-          />
-        </div>
+        {options ? (
+          <>
+            <div>
+              <label htmlFor="branchId" className="text-sm font-medium">
+                Cabang *
+              </label>
+              <select
+                id="branchId"
+                name="branchId"
+                required
+                defaultValue=""
+                className={selectClass}
+              >
+                <option value="">Pilih…</option>
+                {options.branches.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="customerId" className="text-sm font-medium">
+                Customer
+              </label>
+              <select
+                id="customerId"
+                name="customerId"
+                defaultValue=""
+                className={selectClass}
+              >
+                <option value="">Tidak dipilih</option>
+                {options.customers.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        ) : (
+          <div>
+            <label htmlFor="branchId" className="text-sm font-medium">
+              Cabang (branchId)
+            </label>
+            <input
+              id="branchId"
+              name="branchId"
+              type="number"
+              className="w-full border rounded px-2 py-1"
+              required
+            />
+          </div>
+        )}
         <div>
           <label htmlFor="senderName" className="text-sm font-medium">
             Pengirim

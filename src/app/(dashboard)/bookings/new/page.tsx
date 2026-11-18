@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { BookingForm } from "@/features/bookings/components/booking-form";
+import { transactionFormOptions } from "@/features/bookings/server/queries";
+import { currentIdentity } from "@/features/identity/server/context";
 import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Tambah Booking" };
 
+// Session-dependent form options; blocking render.
+export const instant = false;
+
 export default async function Page() {
   await requirePermission("create", "booking");
+  const current = await currentIdentity();
+  if (!current) redirect("/login");
+  const { branches, customers } = await transactionFormOptions(current.actor);
   return (
     <div className="space-y-6">
       <div>
@@ -17,7 +26,7 @@ export default async function Page() {
           (opsional).
         </p>
       </div>
-      <BookingForm />
+      <BookingForm options={{ branches, customers }} />
     </div>
   );
 }
