@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 
+// Request-dependent redirect; never prerendered.
+export const instant = false;
+
 /** Single-manifest print links share the multi-document print tab. */
 export default async function Page({
   params,
