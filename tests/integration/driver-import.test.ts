@@ -157,6 +157,17 @@ describe("transactional Driver Excel import", () => {
     });
     expect(await count()).toBe(before + 2);
   });
+  it("accepts the numeric branch ID in the CABANG column", async () => {
+    const bytes = file([data("BYID", String(branches[0]))]);
+    const before = await count();
+    expect(await service(users[1]).preview(bytes)).toMatchObject({
+      count: 1,
+      valid: true,
+      issues: [],
+    });
+    expect(await service(users[1]).import(bytes)).toEqual({ count: 1 });
+    expect(await count()).toBe(before + 1);
+  });
   it("rejects repeated rows and aborts the complete batch for an unauthorized or inactive branch", async () => {
     const before = await count();
     expect(

@@ -15,8 +15,9 @@ const parseDriverSpreadsheet = (bytes: Uint8Array) =>
   parsePersonnelSpreadsheet("driver", bytes);
 const parseDriverWorksheet = (sheet: XLSX.WorkSheet) =>
   parsePersonnelWorksheet("driver", sheet);
-const buildDriverTemplate = (branches: { code: string; name: string }[]) =>
-  buildPersonnelTemplate("driver", branches);
+const buildDriverTemplate = (
+  branches: { id: number; code: string; name: string }[],
+) => buildPersonnelTemplate("driver", branches);
 
 const data = [
   "",
@@ -112,7 +113,7 @@ describe("driver Excel compatibility", () => {
   }, 15_000);
   it("generates a clean compatible download with instructions, scoped references and no formulas or example imports", () => {
     const bytes = buildDriverTemplate([
-      { code: "FAKE-01", name: "FAKE Branch" },
+      { id: 901, code: "FAKE-01", name: "FAKE Branch" },
     ]);
     expect(bytes.byteLength).toBeLessThanOrEqual(DRIVER_IMPORT_MAX_BYTES);
     const book = XLSX.read(bytes, { type: "array", cellFormula: true });
@@ -126,6 +127,10 @@ describe("driver Excel compatibility", () => {
     expect(
       XLSX.utils.sheet_to_json(book.Sheets.Keterangan, { header: 1 }).flat(),
     ).toContain("FAKE-01");
+    // The branch reference lists the ID usable in the CABANG column.
+    expect(
+      XLSX.utils.sheet_to_json(book.Sheets.Keterangan, { header: 1 }).flat(),
+    ).toContain("901");
   }, 15_000);
   it.each([
     "courier",

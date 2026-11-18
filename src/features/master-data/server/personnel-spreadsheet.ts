@@ -134,7 +134,7 @@ export function parsePersonnelWorksheet(
 
 export function buildPersonnelTemplate(
   kind: PersonnelImportKind,
-  branches: { code: string; name: string }[],
+  branches: { id: number; code: string; name: string }[],
 ) {
   const definition = personnelImportDefinitions[kind];
   const headers = definition.headers;
@@ -192,15 +192,15 @@ export function buildPersonnelTemplate(
       "",
       "KTP-CONTOH",
       "080000000000",
-      branches[0]?.code ?? "KODE-CABANG-LOKAL",
+      branches[0] ? String(branches[0].id) : "ID-CABANG",
       "",
       ...(kind === "driver" ? ["SIM-CONTOH"] : []),
       "Y",
     ],
     [],
     ["Referensi cabang aktif yang dapat Anda gunakan (maksimal 1000):"],
-    ["Kode", "Nama"],
-    ...branches.map((branch) => [branch.code, branch.name]),
+    ["ID", "Kode", "Nama"],
+    ...branches.map((branch) => [String(branch.id), branch.code, branch.name]),
   ]);
   guide["!cols"] = [{ wch: 105 }, { wch: 40 }];
   XLSX.utils.book_append_sheet(book, guide, "Keterangan");
