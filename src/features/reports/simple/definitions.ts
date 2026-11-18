@@ -28,30 +28,36 @@ export const simpleReports: Record<string, ReportDef> = {
     title: "Rekap Customer Bulanan",
     resource: "transaction_report",
     definition:
-      "Satu baris per customer: jumlah AWB, koli, berat dan total biaya input AWB menurut tanggal transaksi dalam periode. AWB tanpa customer dikelompokkan sebagai 'Tanpa customer'.",
+      "Satu baris per customer: jumlah AWB, koli, berat dan total biaya input AWB menurut tanggal transaksi dalam periode. AWB tanpa customer dikelompokkan sebagai 'Tanpa customer'. Nilai yang kosong tidak dijumlahkan; jumlah AWB yang datanya belum lengkap ditampilkan.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
         SELECT COALESCE(c.name, 'Tanpa customer') AS customer,
                count(*)::int AS awb,
+               count(*) FILTER (WHERE t.koli IS NULL OR t.kilo IS NULL OR t.biaya IS NULL)::int AS tidak_lengkap,
                COALESCE(sum(t.koli), 0)::int AS koli,
                COALESCE(sum(t.kilo), 0)::text AS kilo,
                COALESCE(sum(t.biaya), 0)::text AS biaya
         FROM transactions t LEFT JOIN customers c ON c.id = t.customer_id
         WHERE ${transactionScope(actor, f)}
           AND t.transaction_date >= ${f.from} AND t.transaction_date < ${f.toExclusive}
-        GROUP BY 1 ORDER BY sum(t.biaya) DESC NULLS LAST, 1`;
+        GROUP BY t.customer_id, c.name ORDER BY sum(t.biaya) DESC NULLS LAST, 1`;
       return {
         columns: [
           { key: "customer", label: "Customer" },
           count("Total AWB", "awb"),
+          count("AWB data belum lengkap", "tidak_lengkap"),
           count("Koli", "koli"),
           count("Berat (kg)", "kilo"),
           money("Total Biaya (Rp)", "biaya"),
         ],
         rows,
-        totals: sumColumns(rows, ["awb", "koli", "kilo", "biaya"], {
-          customer: "Total",
-        }),
+        totals: sumColumns(
+          rows,
+          ["awb", "tidak_lengkap", "koli", "kilo", "biaya"],
+          {
+            customer: "Total",
+          },
+        ),
       };
     },
   },
@@ -59,32 +65,38 @@ export const simpleReports: Record<string, ReportDef> = {
     title: "Rekap Omset Harian",
     resource: "transaction_report",
     definition:
-      "Satu baris per tanggal transaksi dan jenis pembayaran: jumlah AWB, koli, berat dan total biaya input AWB. Omset = jumlah biaya yang diisi saat Entry AWB (belum termasuk diskon/pajak).",
+      "Satu baris per tanggal transaksi dan jenis pembayaran: jumlah AWB, koli, berat dan total biaya input AWB. Omset = jumlah biaya yang diisi saat Entry AWB (belum termasuk diskon/pajak). AWB tanpa biaya/koli/berat dihitung di kolom 'AWB data belum lengkap'.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
         SELECT to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
                COALESCE(ct.name, 'Tidak diisi') AS pembayaran,
                count(*)::int AS awb,
+               count(*) FILTER (WHERE t.koli IS NULL OR t.kilo IS NULL OR t.biaya IS NULL)::int AS tidak_lengkap,
                COALESCE(sum(t.koli), 0)::int AS koli,
                COALESCE(sum(t.kilo), 0)::text AS kilo,
                COALESCE(sum(t.biaya), 0)::text AS biaya
         FROM transactions t LEFT JOIN cost_types ct ON ct.id = t.cost_type_id
         WHERE ${transactionScope(actor, f)}
           AND t.transaction_date >= ${f.from} AND t.transaction_date < ${f.toExclusive}
-        GROUP BY 1, 2 ORDER BY 1, 2`;
+        GROUP BY 1, t.cost_type_id, ct.name ORDER BY 1, 2`;
       return {
         columns: [
           { key: "tanggal", label: "Tanggal (UTC)" },
           { key: "pembayaran", label: "Pembayaran" },
           count("AWB", "awb"),
+          count("AWB data belum lengkap", "tidak_lengkap"),
           count("Koli", "koli"),
           count("Berat (kg)", "kilo"),
           money("Omset (Rp)", "biaya"),
         ],
         rows,
-        totals: sumColumns(rows, ["awb", "koli", "kilo", "biaya"], {
-          tanggal: "Total",
-        }),
+        totals: sumColumns(
+          rows,
+          ["awb", "tidak_lengkap", "koli", "kilo", "biaya"],
+          {
+            tanggal: "Total",
+          },
+        ),
       };
     },
   },
@@ -143,7 +155,7 @@ export const simpleReports: Record<string, ReportDef> = {
         LEFT JOIN couriers co ON co.id = m.courier_id
         WHERE i.deleted_at IS NULL AND ${branchScope(actor, f, Prisma.sql`m.branch_id`)}
           AND ds.delivery_date >= ${f.from} AND ds.delivery_date < ${f.toExclusive}
-        GROUP BY 1 ORDER BY 3 DESC, 1`;
+        GROUP BY m.courier_id, co.name ORDER BY 3 DESC, 1`;
       return {
         columns: [
           { key: "kurir", label: "Kurir" },
@@ -185,7 +197,7 @@ export const simpleReports: Record<string, ReportDef> = {
                sum(sisa) FILTER (WHERE current_date - b."dueDate" > 90)::text AS lebih,
                sum(sisa)::text AS total
         FROM b JOIN customers c ON c.id = b."customerId"
-        WHERE b.sisa > 0 GROUP BY c.name ORDER BY sum(sisa) DESC`;
+        WHERE b.sisa > 0 GROUP BY c.id, c.name ORDER BY sum(sisa) DESC`;
       const zero = (r: Row) => {
         for (const k of ["belum", "d30", "d60", "d90", "lebih"]) r[k] ??= "0";
         return r;
@@ -215,12 +227,13 @@ export const simpleReports: Record<string, ReportDef> = {
     title: "Gross Profit / Manifest",
     resource: "financial_report",
     definition:
-      "Satu baris per manifest dalam periode tanggal manifest. Pendapatan = total biaya input AWB aktif di manifest; Biaya = biaya aktual bersih yang dicatat di Akunting (FIN-02) untuk AWB tersebut; GP = Pendapatan − Biaya. AWB tanpa biaya aktual dihitung 0 dan ditandai.",
+      "Satu baris per manifest dalam periode tanggal manifest. Pendapatan = total biaya input AWB aktif di manifest; Biaya = biaya aktual bersih yang dicatat di Akunting (FIN-02) untuk AWB tersebut; GP = Pendapatan − Biaya. AWB tanpa biaya input atau tanpa biaya aktual dihitung 0 dan jumlahnya ditampilkan di kolom tersendiri.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
         SELECT m.manifest_no AS manifest, to_char(m.manifest_date, 'YYYY-MM-DD') AS tanggal,
                v.license_plate AS kendaraan, co.name AS kurir,
                count(mi.id)::int AS awb,
+               count(mi.id) FILTER (WHERE t.biaya IS NULL)::int AS tanpa_tarif,
                COALESCE(sum(t.biaya), 0)::text AS pendapatan,
                COALESCE(sum(nc.cost), 0)::text AS biaya,
                (COALESCE(sum(t.biaya), 0) - COALESCE(sum(nc.cost), 0))::text AS gp,
@@ -243,6 +256,7 @@ export const simpleReports: Record<string, ReportDef> = {
           { key: "kendaraan", label: "Kendaraan" },
           { key: "kurir", label: "Kurir" },
           count("AWB", "awb"),
+          count("AWB tanpa biaya input", "tanpa_tarif"),
           money("Pendapatan (Rp)", "pendapatan"),
           money("Biaya (Rp)", "biaya"),
           money("GP (Rp)", "gp"),
@@ -252,7 +266,7 @@ export const simpleReports: Record<string, ReportDef> = {
         truncated,
         totals: sumColumns(
           page,
-          ["awb", "pendapatan", "biaya", "gp", "tanpa_biaya"],
+          ["awb", "tanpa_tarif", "pendapatan", "biaya", "gp", "tanpa_biaya"],
           { manifest: "Total" },
         ),
       };
@@ -268,6 +282,7 @@ export const simpleReports: Record<string, ReportDef> = {
         SELECT COALESCE(v.license_plate, 'Tanpa kendaraan') AS kendaraan,
                count(DISTINCT m.id)::int AS manifest,
                count(mi.id)::int AS awb,
+               count(mi.id) FILTER (WHERE t.biaya IS NULL)::int AS tanpa_tarif,
                COALESCE(sum(t.biaya), 0)::text AS pendapatan,
                COALESCE(sum(nc.cost), 0)::text AS biaya,
                (COALESCE(sum(t.biaya), 0) - COALESCE(sum(nc.cost), 0))::text AS gp
@@ -284,6 +299,7 @@ export const simpleReports: Record<string, ReportDef> = {
           { key: "kendaraan", label: "No. Polisi" },
           count("Manifest", "manifest"),
           count("AWB", "awb"),
+          count("AWB tanpa biaya input", "tanpa_tarif"),
           money("Pendapatan (Rp)", "pendapatan"),
           money("Biaya (Rp)", "biaya"),
           money("GP (Rp)", "gp"),
@@ -291,7 +307,7 @@ export const simpleReports: Record<string, ReportDef> = {
         rows,
         totals: sumColumns(
           rows,
-          ["manifest", "awb", "pendapatan", "biaya", "gp"],
+          ["manifest", "awb", "tanpa_tarif", "pendapatan", "biaya", "gp"],
           { kendaraan: "Total" },
         ),
       };
@@ -307,6 +323,7 @@ export const simpleReports: Record<string, ReportDef> = {
         SELECT COALESCE(vd.name, 'Tanpa vendor') AS vendor,
                count(DISTINCT m.id)::int AS manifest,
                count(mi.id)::int AS awb,
+               count(mi.id) FILTER (WHERE t.koli IS NULL OR t.kilo IS NULL OR t.biaya IS NULL)::int AS tidak_lengkap,
                COALESCE(sum(t.koli), 0)::int AS koli,
                COALESCE(sum(t.kilo), 0)::text AS kilo
         FROM manifests m
@@ -315,19 +332,24 @@ export const simpleReports: Record<string, ReportDef> = {
         LEFT JOIN transactions t ON t.id = mi.transaction_id
         WHERE m.deleted_at IS NULL AND ${branchScope(actor, f, Prisma.sql`m.branch_id`)}
           AND m.manifest_date >= ${f.from} AND m.manifest_date < ${f.toExclusive}
-        GROUP BY 1 ORDER BY 2 DESC, 1`;
+        GROUP BY m.vendor_id, vd.name ORDER BY 2 DESC, 1`;
       return {
         columns: [
           { key: "vendor", label: "Vendor" },
           count("Manifest", "manifest"),
           count("AWB", "awb"),
+          count("AWB data belum lengkap", "tidak_lengkap"),
           count("Koli", "koli"),
           count("Berat (kg)", "kilo"),
         ],
         rows,
-        totals: sumColumns(rows, ["manifest", "awb", "koli", "kilo"], {
-          vendor: "Total",
-        }),
+        totals: sumColumns(
+          rows,
+          ["manifest", "awb", "tidak_lengkap", "koli", "kilo"],
+          {
+            vendor: "Total",
+          },
+        ),
       };
     },
   },

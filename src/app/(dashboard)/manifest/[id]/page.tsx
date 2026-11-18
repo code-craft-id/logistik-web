@@ -13,7 +13,11 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
-import { AssignAwbForm } from "@/features/shipments/components/manifest-forms";
+import {
+  AssignAwbForm,
+  DeliverySheetForm,
+  OutcomeForm,
+} from "@/features/shipments/components/manifest-forms";
 import { getManifest } from "@/features/shipments/server/manifests-queries";
 import { requirePermission } from "@/lib/auth/session";
 
@@ -60,6 +64,17 @@ export default async function Page({
   ];
   const canAssign =
     manifest.assignable && permits(current.actor, "update", "manifest");
+  const canCreateDrs =
+    !manifest.deliverySheet &&
+    manifest.assignable &&
+    permits(current.actor, "create", "delivery");
+  const sheet = manifest.deliverySheet;
+  const canRecord = !!sheet && permits(current.actor, "update", "delivery");
+  const outcomeLabel: Record<string, string> = {
+    DELIVERED: "Terkirim",
+    FAILED_DELIVERY: "Gagal",
+    RETURNED: "Retur",
+  };
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-1">
@@ -94,6 +109,28 @@ export default async function Page({
         </section>
       )}
       <section
+        aria-label="Lembar pengantaran"
+        className="rounded-lg border bg-background p-4 sm:p-6"
+      >
+        <h2 className="mb-3 font-semibold">Lembar Pengantaran (DRS)</h2>
+        {sheet ? (
+          <p className="text-sm">
+            DRS <strong>{sheet.sheetNo}</strong> · tanggal antar {sheet.date}.
+            Catat hasil antar per AWB di tabel di bawah.
+          </p>
+        ) : canCreateDrs ? (
+          <DeliverySheetForm
+            manifestId={manifest.id}
+            suggestedNo={`DRS-${manifest.manifestNo}`}
+            today={new Date().toISOString().slice(0, 10)}
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Belum ada DRS untuk manifest ini.
+          </p>
+        )}
+      </section>
+      <section
         aria-label="AWB dalam manifest"
         className="min-w-0 rounded-lg border bg-background"
       >
@@ -112,6 +149,7 @@ export default async function Page({
                     "Berat (kg)",
                     "Volume",
                     "Status",
+                    ...(sheet ? ["Hasil antar"] : []),
                   ].map((h) => (
                     <TableHead key={h}>{h}</TableHead>
                   ))}
@@ -145,6 +183,25 @@ export default async function Page({
                       {item.volume ?? "—"}
                     </TableCell>
                     <TableCell>{item.status}</TableCell>
+                    {sheet && (
+                      <TableCell>
+                        {item.outcome ? (
+                          <span>
+                            {outcomeLabel[item.outcome] ?? item.outcome}
+                            {item.receivedBy ? ` · ${item.receivedBy}` : ""}
+                          </span>
+                        ) : null}
+                        {canRecord &&
+                          item.outcome !== "DELIVERED" &&
+                          item.outcome !== "RETURNED" && (
+                            <OutcomeForm
+                              manifestId={manifest.id}
+                              deliverySheetId={sheet.id}
+                              transactionId={item.transactionId}
+                            />
+                          )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

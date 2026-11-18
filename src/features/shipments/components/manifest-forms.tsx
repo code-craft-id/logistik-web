@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   assignAwbFormAction,
+  createDeliverySheetFormAction,
   createManifestFormAction,
+  recordOutcomeFormAction,
 } from "../manifest-form-actions";
 
 type Option = { id: number; name: string };
@@ -187,6 +189,125 @@ export function AssignAwbForm({ manifestId }: { manifestId: number }) {
         <output className="block text-sm text-muted-foreground">
           AWB {added} ditambahkan.
         </output>
+      )}
+    </form>
+  );
+}
+
+export function DeliverySheetForm({
+  manifestId,
+  suggestedNo,
+  today,
+}: {
+  manifestId: number;
+  suggestedNo: string;
+  today: string;
+}) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <form
+      className="space-y-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setError(null);
+        start(async () => {
+          const result = await createDeliverySheetFormAction(data);
+          if (result.ok) router.refresh();
+          else setError(result.message);
+        });
+      }}
+    >
+      <input type="hidden" name="manifestId" value={manifestId} />
+      <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <div className="min-w-0 space-y-2">
+          <Label htmlFor="drs-no">DRS No.</Label>
+          <Input
+            id="drs-no"
+            name="sheetNo"
+            required
+            maxLength={50}
+            defaultValue={suggestedNo}
+            className="min-h-11"
+          />
+        </div>
+        <div className="min-w-0 space-y-2">
+          <Label htmlFor="drs-date">Tanggal antar</Label>
+          <Input
+            id="drs-date"
+            name="deliveryDate"
+            type="date"
+            required
+            defaultValue={today}
+            className="min-h-11"
+          />
+        </div>
+        <Button type="submit" disabled={pending} className="min-h-11">
+          {pending ? "Membuat…" : "Buat DRS"}
+        </Button>
+      </div>
+      <Feedback error={error} />
+    </form>
+  );
+}
+
+export function OutcomeForm({
+  manifestId,
+  deliverySheetId,
+  transactionId,
+}: {
+  manifestId: number;
+  deliverySheetId: number;
+  transactionId: number;
+}) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <form
+      className="flex min-w-64 flex-wrap items-center gap-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setError(null);
+        start(async () => {
+          const result = await recordOutcomeFormAction(data);
+          if (result.ok) router.refresh();
+          else setError(result.message);
+        });
+      }}
+    >
+      <input type="hidden" name="manifestId" value={manifestId} />
+      <input type="hidden" name="deliverySheetId" value={deliverySheetId} />
+      <input type="hidden" name="transactionId" value={transactionId} />
+      <select
+        name="outcome"
+        aria-label="Hasil antar"
+        required
+        defaultValue=""
+        className={`${select} w-auto`}
+      >
+        <option value="">Hasil…</option>
+        <option value="DELIVERED">Terkirim</option>
+        <option value="FAILED_DELIVERY">Gagal</option>
+        <option value="RETURNED">Retur</option>
+      </select>
+      <Input
+        name="receivedBy"
+        aria-label="Diterima oleh"
+        placeholder="Diterima oleh"
+        maxLength={150}
+        className="min-h-11 w-40"
+      />
+      <Button type="submit" size="sm" disabled={pending} className="min-h-11">
+        {pending ? "…" : "Simpan"}
+      </Button>
+      {error && (
+        <span role="alert" className="w-full text-xs text-destructive">
+          {error}
+        </span>
       )}
     </form>
   );

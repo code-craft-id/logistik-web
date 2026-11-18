@@ -224,6 +224,77 @@ describe("simple reports", () => {
     expect(outside.rows).toEqual([]);
   });
 
+  it("keeps different customers with the same name on separate rows", async () => {
+    const twin = await db.customer.create({
+      data: { name: `${tag} Customer`, branchId: ids.a },
+    });
+    const extra = await db.transaction.create({
+      data: {
+        awbNo: `${tag}-T`,
+        transactionDate: new Date("2026-11-03T10:00:00Z"),
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+        customerId: twin.id,
+        biaya: "1.00",
+      },
+    });
+    try {
+      const result = await run("customer-monthly", actor([ids.a]), ids.a);
+      expect(
+        result.rows.filter((r) => r.customer === `${tag} Customer`),
+      ).toHaveLength(2);
+    } finally {
+      await db.transaction.delete({ where: { id: extra.id } });
+      await db.customer.delete({ where: { id: twin.id } });
+    }
+  });
+
+  it("reconciles totals across reports and with direct database counts", async () => {
+    const who = actor([ids.a]);
+    const scope = {
+      deletedAt: null,
+      transactionDate: {
+        gte: new Date("2026-11-01T00:00:00Z"),
+        lt: new Date("2026-11-16T00:00:00Z"),
+      },
+      OR: [{ originBranchId: ids.a }, { destinationBranchId: ids.a }],
+    };
+    const direct = await db.transaction.aggregate({
+      where: scope,
+      _count: { _all: true },
+      _sum: { biaya: true, koli: true },
+    });
+    const customer = await run("customer-monthly", who, ids.a);
+    const turnover = await run("daily-turnover", who, ids.a);
+    for (const r of [customer, turnover]) {
+      expect(r.totals?.awb).toBe(direct._count._all);
+      expect(r.totals?.koli).toBe(direct._sum.koli);
+      expect(r.totals?.biaya).toBe(direct._sum.biaya?.toFixed(2));
+      // AWB 3 has no biaya: reported as incomplete, not silently complete.
+      expect(r.totals?.tidak_lengkap).toBe(1);
+    }
+    const activeItems = await db.manifestItem.count({
+      where: {
+        manifest: { branchId: ids.a, deletedAt: null },
+        deletedAt: null,
+        releasedAt: null,
+      },
+    });
+    const gp = await run("gross-profit", who, ids.a);
+    const recap = await run("gross-profit-recap", who, ids.a);
+    const vendor = await run("manifest-vendor", who, ids.a);
+    expect(gp.totals?.awb).toBe(activeItems);
+    expect(recap.totals?.awb).toBe(activeItems);
+    expect(vendor.totals?.awb).toBe(activeItems);
+    expect(recap.totals?.pendapatan).toBe(gp.totals?.pendapatan);
+    expect(recap.totals?.gp).toBe(gp.totals?.gp);
+    const courier = await run("courier", who, ids.a);
+    const t = courier.totals ?? {};
+    expect(
+      Number(t.berhasil) + Number(t.gagal) + Number(t.retur) + Number(t.proses),
+    ).toBe(t.awb);
+  });
+
   it("validates the period and branch filters", () => {
     expect(
       framework.parseFilters(

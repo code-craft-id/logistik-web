@@ -5,7 +5,6 @@ import {
   isAdministrator,
   permitsBranch,
 } from "@/features/identity/permissions";
-import { IdentityError } from "@/features/identity/server/access";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
 
@@ -14,7 +13,7 @@ export const MANIFEST_PAGE_SIZE = 25;
 /** Manifest visibility follows its owning branch, as in createManifest. */
 function visible(actor: AccessActor): Prisma.ManifestWhereInput {
   if (isAdministrator(actor)) return { deletedAt: null };
-  if (!actor.branchIds.length) throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  // No branch membership: an empty list rather than an error page.
   return { deletedAt: null, branchId: { in: actor.branchIds } };
 }
 
@@ -165,6 +164,22 @@ export async function getManifest(actor: AccessActor, id: number) {
       courier: { select: { name: true } },
       vendor: { select: { name: true } },
       createdBy: { select: { name: true } },
+      deliverySheet: {
+        select: {
+          id: true,
+          sheetNo: true,
+          deliveryDate: true,
+          items: {
+            where: { deletedAt: null },
+            select: {
+              transactionId: true,
+              outcome: true,
+              receivedBy: true,
+              deliveredAt: true,
+            },
+          },
+        },
+      },
       items: {
         where: { deletedAt: null, releasedAt: null },
         orderBy: { id: "asc" },
@@ -212,6 +227,13 @@ export async function getManifest(actor: AccessActor, id: number) {
       : null,
     courier: row.courier?.name ?? null,
     vendor: row.vendor?.name ?? null,
+    deliverySheet: row.deliverySheet
+      ? {
+          id: row.deliverySheet.id,
+          sheetNo: row.deliverySheet.sheetNo,
+          date: row.deliverySheet.deliveryDate.toISOString().slice(0, 10),
+        }
+      : null,
     createdBy: row.createdBy?.name ?? null,
     transit: [
       row.transit1,
@@ -222,19 +244,27 @@ export async function getManifest(actor: AccessActor, id: number) {
     ].filter((v): v is string => !!v),
     assignable: row.status !== "Closed",
     ...totals(row.items),
-    items: row.items.map((item) => ({
-      id: item.id,
-      assignedAt: item.assignedAt.toISOString(),
-      transactionId: item.transaction.id,
-      awbNo: item.transaction.awbNo,
-      doNo: item.transaction.doNo,
-      receiver: item.transaction.receiverName,
-      destination: item.transaction.destinationBranch?.name ?? null,
-      koli: item.transaction.koli,
-      kilo: item.transaction.kilo?.toString() ?? null,
-      volume: item.transaction.volume?.toString() ?? null,
-      status: item.transaction.status,
-    })),
+    items: row.items.map((item) => {
+      const outcome = row.deliverySheet?.items.find(
+        (d) => d.transactionId === item.transaction.id,
+      );
+      return {
+        outcome: outcome?.outcome ?? null,
+        receivedBy: outcome?.receivedBy ?? null,
+        deliveredAt: outcome?.deliveredAt?.toISOString() ?? null,
+        id: item.id,
+        assignedAt: item.assignedAt.toISOString(),
+        transactionId: item.transaction.id,
+        awbNo: item.transaction.awbNo,
+        doNo: item.transaction.doNo,
+        receiver: item.transaction.receiverName,
+        destination: item.transaction.destinationBranch?.name ?? null,
+        koli: item.transaction.koli,
+        kilo: item.transaction.kilo?.toString() ?? null,
+        volume: item.transaction.volume?.toString() ?? null,
+        status: item.transaction.status,
+      };
+    }),
   };
 }
 
@@ -296,7 +326,8 @@ export async function findAssignableTransaction(
   awbNo: string,
 ) {
   const admin = isAdministrator(actor);
-  return prisma.transaction.findFirst({
+  // AWB numbers are unique per origin branch only; refuse to guess between two.
+  const matches = await prisma.transaction.findMany({
     where: {
       awbNo: { equals: awbNo.trim(), mode: "insensitive" },
       deletedAt: null,
@@ -311,5 +342,8 @@ export async function findAssignableTransaction(
     },
     select: { id: true },
     orderBy: { id: "desc" },
+    take: 2,
   });
+  if (matches.length > 1) return "AMBIGUOUS" as const;
+  return matches[0] ?? null;
 }

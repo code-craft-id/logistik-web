@@ -23,6 +23,7 @@ const ids = {
   transactions: [] as number[],
 };
 let queries: typeof import("../../src/features/shipments/server/manifests-queries");
+let sheets: typeof import("../../src/features/shipments/server/delivery-sheets");
 const actor = (branchIds: number[], admin = false): AccessActor => ({
   id: 1,
   status: "ACTIVE",
@@ -42,6 +43,7 @@ beforeAll(async () => {
   queries = await import(
     "../../src/features/shipments/server/manifests-queries"
   );
+  sheets = await import("../../src/features/shipments/server/delivery-sheets");
   ids.company = (
     await db.company.create({
       data: { name: tag, isDepositAgent: false, showPriceOnPrint: false },
@@ -115,6 +117,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await db.deliverySheet.deleteMany({
+    where: { manifestId: { in: ids.manifests } },
+  });
   await db.manifestItem.deleteMany({
     where: { manifestId: { in: ids.manifests } },
   });
@@ -127,15 +132,32 @@ afterAll(async () => {
 });
 
 describe("manifest list/detail queries", () => {
+  it("refuses an AWB number shared by two origin branches", async () => {
+    const [a, b] = ids.branches;
+    const twin = await db.transaction.create({
+      data: { awbNo: `${tag}-1`, originBranchId: b, destinationBranchId: a },
+    });
+    ids.transactions.push(twin.id);
+    try {
+      expect(
+        await queries.findAssignableTransaction(actor([a, b]), `${tag}-1`),
+      ).toBe("AMBIGUOUS");
+      expect(
+        await queries.findAssignableTransaction(actor([a]), `${tag}-2`),
+      ).toMatchObject({ id: ids.transactions[1] });
+    } finally {
+      await db.transaction.delete({ where: { id: twin.id } });
+      ids.transactions.pop();
+    }
+  });
+
   it("scopes manifests to the actor's branches", async () => {
     const [a] = ids.branches;
     const scoped = await queries.listManifests(actor([a]), { search: tag });
     expect(scoped.items.map((m) => m.manifestNo)).toEqual([`${tag}-A`]);
     const admin = await queries.listManifests(actor([], true), { search: tag });
     expect(admin.total).toBe(2);
-    await expect(queries.listManifests(actor([]))).rejects.toMatchObject({
-      status: 403,
-    });
+    expect((await queries.listManifests(actor([]))).total).toBe(0);
     expect(await queries.getManifest(actor([a]), ids.manifests[1])).toBeNull();
   });
 
@@ -167,5 +189,44 @@ describe("manifest list/detail queries", () => {
         `${tag}-3`,
       ),
     ).toBeNull();
+  });
+
+  it("creates one delivery sheet per visible manifest", async () => {
+    const [a, b] = ids.branches;
+    const writer = (branchIds: number[]): AccessActor => ({
+      ...actor(branchIds),
+      group: {
+        id: 1,
+        name: "FAKE",
+        status: "ACTIVE",
+        deletedAt: null,
+        permissions: [{ resource: "delivery", action: "create" }],
+      },
+    });
+    const input = {
+      manifestId: ids.manifests[0],
+      sheetNo: `${tag}-DRS`,
+      deliveryDate: "2026-11-05",
+    };
+    await expect(
+      sheets.createDeliverySheet(writer([b]), input),
+    ).rejects.toMatchObject({ status: 403 });
+    await expect(
+      sheets.createDeliverySheet(actor([a]), input),
+    ).rejects.toMatchObject({ status: 403 });
+    const sheet = await sheets.createDeliverySheet(writer([a]), input);
+    expect(sheet.manifestId).toBe(ids.manifests[0]);
+    await expect(
+      sheets.createDeliverySheet(writer([a]), {
+        ...input,
+        sheetNo: `${tag}-DRS2`,
+      }),
+    ).rejects.toMatchObject({ code: "P2002" });
+    expect(
+      (await queries.getManifest(actor([a]), ids.manifests[0]))?.deliverySheet,
+    ).toMatchObject({
+      sheetNo: `${tag}-DRS`,
+      date: "2026-11-05",
+    });
   });
 });
