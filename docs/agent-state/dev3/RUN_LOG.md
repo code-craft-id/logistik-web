@@ -674,3 +674,6 @@ P2 confirmed and fixed (LP-R21 ignores DRS under soft-deleted manifest), regress
 
 ## 2026-11-18 — Legacy observation for PR #11 P3 (invoice VOID completeness)
 DIRECT_NON_MUTATING_DISCOVERY, existing authenticated session, display-only queries. /sales Invoice (New) Periode Date 2016-01-01..2026-11-18 Search: 0 invoices, so no invoice void lifecycle observable. Legacy finance menu has Piutang/Hutang Dagang, Pembayaran Hutang, Laporan AR/AP, Gross Profit / Manifest and Rekap Gross Profit; no P&L, journal, period close or cost-completeness screen seen. Legacy "Void AWB" (/void-awb) is AWB deletion (columns incl. Biaya, Delete User, Delete Date), empty list; not invoice void. Conclusion: legacy offers no oracle for P3; remains finance-owner decision on FIN-02. No forms submitted, no export.
+
+## 2026-11-18 — Delete guards, dashboard parity, invoice list
+Migration 20261118000100_fin_delete_guards (test DB only) + teardown guard toggle; dashboard legacy widgets from approved sources, month-to-date default, daily AWB count chart; invoice list legacy columns. Legacy dashboard observed read-only. Gates Node 24.15.0: lint437/typecheck/unit685/integration147/build PASS. Desktop browser check only. No staging.

@@ -865,3 +865,15 @@ Decisions recorded in `docs/PRD.md` D-22 (2026-11-17). Fresh read-only legacy ob
 
 Common: `transaction_report` view (and export for CSV) rights, RPT-01 branch scope (origin or destination in allowed branches), RepeatableRead snapshot, max 5000 export rows, formula-safe CSV. No schema, migration or permission changes. Tests: `tests/integration/awb-status-reports.test.ts` (7), `tests/unit/awb-status-report.test.ts` (4). Parity remains unverified until a same-data reconciliation is possible.
 
+
+### 13. Dashboard, invoice list and per-feature recheck — 2026-11-18
+
+Fresh read-only legacy observation (Dashboard, Invoice (New) list 2016-01-01..2026-11-18 = 0 invoices, Void AWB list empty; no forms, no exports, no customer values persisted).
+
+| ID | Legacy (observed 2026-11-18) | Modern after this pass | Status | Remaining deviations (owner) |
+|---|---|---|---|---|
+| Dashboard | Opens on current month to date; month/year/branch filters; Quick Action (13 shortcuts); AI summary/recommendations; alerts (AWB pending, shipment pending, invoice outstanding, failed/return, DRS, piutang); KPI cards; Analytics (total Rp, CASH/KREDIT/COD/TRANSFER, AWB count, avg/AWB, active customers); sales chart by nominal per billing type; top 5 customer; shipment status buckets; recent AWB activity; POD outstanding by destination; announcements | Opens on current UTC month to date; Quick Action limited to implemented permitted routes; raw counts; AWB Pending (LP-R10 definition); invoice outstanding + piutang (FIN-01 derivation, invoice:view); daily AWB count chart with table view; stored status distribution; latest 5 AWB activity (transaction read rights) | PARTIAL_PARITY | Money totals, billing categories, avg/AWB, active/top customer (D-11, D-15, customer attribution — finance/Dev 2); success/failed/on-delivery buckets (status mapping, D-15/D-22); POD outstanding (POD event source, Dev 2); AI recommendations and announcements (no source, not invented); sales chart shows counts not nominal |
+| FIN-INVOICE-LIST | Customer, Invoice No, Tgl. Dibuat, Tgl. Diterima, Termin, Tgl. Pengingat, Status, Tgl. Tutup, Tot. AWB, Action | Customer, Invoice No, Tgl. Dibuat, Termin (days), Status, Tot. AWB, Cabang, Tagihan IDR, Sisa IDR | PARTIAL_PARITY | Received/reminder/closing dates have no FIN-01 source (finance owner) |
+| LP-R03 | (unchanged) | Asal/Tujuan stored branches and visible quantities already present; earlier presentation row in §LP-R03 is outdated | PARTIAL_PARITY | Penjual, Tot. Biaya, Sopir (Dev 2 driver/vendor, D-11) |
+
+Commits up to 398d11d on dev3/ready-for-review. Verification recorded in agent-state RUN_LOG 2026-11-18.

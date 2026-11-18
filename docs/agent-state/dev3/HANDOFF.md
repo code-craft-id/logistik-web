@@ -1,3 +1,14 @@
+## Latest checkpoint: delete guards, dashboard parity, invoice list (2026-11-18, later)
+
+- **DELETE guards** (Dev 1 review 🟡): new forward-only migration `20261118000100_fin_delete_guards` rejects DELETE of POSTED journals and their lines, receipts, and non-draft invoices and their items. Applied to `logistik_web_test` only. Needs migration coordinator review; dev DB not migrated.
+- **Dashboard**: opens on current UTC month to date like legacy; Quick Action (implemented, permitted routes), AWB Pending, invoice outstanding/piutang, daily AWB count chart, stored status distribution, latest AWB activity. Money/billing/top customer/POD/AI widgets listed as unavailable (decisions in audit §13).
+- **Invoice list**: legacy columns Customer, Termin, Tot. AWB (+ branch name).
+- **P3 (VOID completeness)**: Dev 1 raised it twice (first review item 2, second review P3). Kept per FIN-02; legacy has no invoice void/period close. Decision belongs to the finance contract owner (Dev 3).
+- Verification (Node 24.15.0): lint 437 PASS, typecheck PASS, unit 70/685 PASS, integration 16/147 PASS, build PASS (before the chart/invoice commits; unit/finance/operational suites re-run after). Desktop browser check on local synthetic data; 375px not verified.
+- Open: re-review by Dev 1; staging/UAT; dependency security upgrade (better-auth, Next.js); blocked reports listed in audit §11/§13.
+
+---
+
 ## Latest checkpoint: PR #11 second review (REQUEST CHANGES) addressed (2026-11-18)
 
 - **P2 delivery soft-delete: CONFIRMED, fixed.** LP-R21 recipient lookup now ignores DRS items whose manifest is soft-deleted (`delivery_sheets` has no `deleted_at`; RPT-02 already uses the manifest). Regression fixture: newer DRS under deleted manifest M2; the test fails on `24d3618` and passes after the fix.
