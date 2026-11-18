@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -51,7 +52,7 @@ export function ManifestCreateForm({
   ) => (
     <div className="min-w-0 space-y-2">
       <Label htmlFor={`mf-${name}`}>{label}</Label>
-      <select
+      <ComboSelect
         id={`mf-${name}`}
         name={name}
         required={required}
@@ -64,7 +65,7 @@ export function ManifestCreateForm({
             {o.name}
           </option>
         ))}
-      </select>
+      </ComboSelect>
     </div>
   );
   return (
@@ -105,7 +106,7 @@ export function ManifestCreateForm({
         </div>
         <div className="min-w-0 space-y-2">
           <Label htmlFor="mf-type">Jenis</Label>
-          <select
+          <ComboSelect
             id="mf-type"
             name="type"
             defaultValue="Outbound"
@@ -114,7 +115,7 @@ export function ManifestCreateForm({
             <option value="Outbound">Outbound</option>
             <option value="Transit">Transit</option>
             <option value="Inbound">Inbound</option>
-          </select>
+          </ComboSelect>
         </div>
         {choice("branchId", "Cabang pemilik", branches, true)}
         {choice("originBranchId", "Asal", branches)}
@@ -282,7 +283,7 @@ export function OutcomeForm({
       <input type="hidden" name="manifestId" value={manifestId} />
       <input type="hidden" name="deliverySheetId" value={deliverySheetId} />
       <input type="hidden" name="transactionId" value={transactionId} />
-      <select
+      <ComboSelect
         name="outcome"
         aria-label="Hasil antar"
         required
@@ -293,7 +294,7 @@ export function OutcomeForm({
         <option value="DELIVERED">Terkirim</option>
         <option value="FAILED_DELIVERY">Gagal</option>
         <option value="RETURNED">Retur</option>
-      </select>
+      </ComboSelect>
       <Input
         name="receivedBy"
         aria-label="Diterima oleh"

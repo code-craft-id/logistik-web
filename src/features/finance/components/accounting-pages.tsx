@@ -15,6 +15,7 @@ import { permits } from "@/features/identity/permissions";
 import { reportInput } from "../accounting-contracts";
 import { costListInput, listInput } from "../contracts";
 import { accountingQueries } from "../server/context";
+import { FinanceBranchField, journalFormChoices } from "./branch-field";
 import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
 import { JournalForm } from "./journal-form";
@@ -83,11 +84,8 @@ function Workspace({
 function Filter({ query, dates = false }: { query: Query; dates?: boolean }) {
   return (
     <form className="grid gap-3 rounded-lg border bg-background p-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
-      <FinanceField
+      <FinanceBranchField
         prefix="filter"
-        name="branchId"
-        label="ID cabang"
-        type="number"
         optional={!dates}
         value={typeof query.branchId === "string" ? query.branchId : undefined}
       />
@@ -403,12 +401,7 @@ export async function AccountsPage({ query }: { query: Query }) {
             values={{ action: "finance_account.manage", entity: "mapping" }}
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              <FinanceField
-                prefix="map"
-                name="branchId"
-                label="ID cabang"
-                type="number"
-              />
+              <FinanceBranchField prefix="map" />
               {[
                 ["receivableId", "Piutang", "ASSET"],
                 ["revenueId", "Pendapatan pengiriman", "REVENUE"],
@@ -452,7 +445,7 @@ export async function JournalsPage({ query }: { query: Query }) {
           <summary className="mb-4 cursor-pointer py-2">
             Buat jurnal manual
           </summary>
-          <JournalForm />
+          <JournalForm {...(await journalFormChoices())} />
         </details>
       )}
       {permits(actor, "post", "journal") &&
@@ -597,12 +590,7 @@ function CommonFields({
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <FinanceField
-        prefix={prefix}
-        name="branchId"
-        label="ID cabang"
-        type="number"
-      />
+      <FinanceBranchField prefix={prefix} />
       <FinanceField
         prefix={prefix}
         name="accountingDate"
@@ -776,12 +764,7 @@ export async function PeriodsPage({ query }: { query: Query }) {
           values={{ action: "finance_period.close" }}
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <FinanceField
-              prefix="close"
-              name="branchId"
-              label="ID cabang"
-              type="number"
-            />
+            <FinanceBranchField prefix="close" />
             <FinanceField
               prefix="close"
               name="month"

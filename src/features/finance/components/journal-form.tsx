@@ -2,10 +2,19 @@
 import { useRef, useState } from "react";
 import { FormField } from "@/components/patterns/form-field";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { CommandForm } from "./command-form";
 
-export function JournalForm() {
+type Choice = { id: number; name: string };
+
+export function JournalForm({
+  branches = [],
+  accounts = [],
+}: {
+  branches?: Choice[];
+  accounts?: Choice[];
+}) {
   const next = useRef(2);
   const [lines, setLines] = useState([
     { row: 0, accountId: "", side: "DEBIT", amount: "" },
@@ -17,8 +26,22 @@ export function JournalForm() {
       values={{ action: "journal.create", lines }}
     >
       <div className="grid gap-4 sm:grid-cols-2">
+        <FormField id="journal-new-branchId" label="Cabang">
+          <ComboSelect
+            id="journal-new-branchId"
+            name="branchId"
+            required
+            defaultValue=""
+          >
+            <option value="">Pilih…</option>
+            {branches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </ComboSelect>
+        </FormField>
         {[
-          ["branchId", "ID cabang", "number"],
           ["accountingDate", "Tanggal akuntansi", "date"],
           ["reference", "Referensi dokumen", "text"],
           ["reason", "Keterangan", "text"],
@@ -36,8 +59,8 @@ export function JournalForm() {
         ))}
       </div>
       <p className="text-sm text-muted-foreground">
-        Gunakan ID akun pada daftar akun. Akun kontrol dan kas/bank hanya
-        melalui dokumen sumber, beban kas atau transfer.
+        Akun kontrol dan kas/bank hanya bisa dipakai melalui dokumen sumber,
+        beban kas atau transfer.
       </p>
       {lines.map((line, index) => (
         <div
@@ -46,14 +69,11 @@ export function JournalForm() {
         >
           <FormField
             id={`journal-account-${line.row}`}
-            label={`ID akun baris ${index + 1}`}
+            label={`Akun baris ${index + 1}`}
           >
-            <Input
-              className="min-h-11"
+            <ComboSelect
               required
               id={`journal-account-${line.row}`}
-              type="number"
-              min="1"
               value={line.accountId}
               onChange={(e) =>
                 setLines(
@@ -64,10 +84,17 @@ export function JournalForm() {
                   ),
                 )
               }
-            />
+            >
+              <option value="">Pilih akun…</option>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </ComboSelect>
           </FormField>
           <FormField id={`journal-side-${line.row}`} label="Sisi">
-            <select
+            <ComboSelect
               className="min-h-11 w-full rounded-md border border-input bg-background px-3"
               id={`journal-side-${line.row}`}
               value={line.side}
@@ -81,7 +108,7 @@ export function JournalForm() {
             >
               <option value="DEBIT">Debit</option>
               <option value="CREDIT">Kredit</option>
-            </select>
+            </ComboSelect>
           </FormField>
           <FormField id={`journal-amount-${line.row}`} label="Jumlah IDR">
             <Input

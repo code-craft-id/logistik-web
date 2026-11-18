@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { ComboSelect } from "@/components/ui/combo-select";
 import {
   type CreateTransactionActionResult,
   createTransactionAction,
@@ -34,7 +35,7 @@ function Choice({
         {label}
         {required ? " *" : ""}
       </label>
-      <select
+      <ComboSelect
         id={name}
         name={name}
         required={required}
@@ -47,7 +48,7 @@ function Choice({
             {o.name}
           </option>
         ))}
-      </select>
+      </ComboSelect>
     </div>
   );
 }

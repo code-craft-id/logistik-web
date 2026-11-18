@@ -6,6 +6,7 @@ import type {
   ReferenceRow,
 } from "@/components/patterns/reference-workspace";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import {
   Dialog,
   DialogContent,
@@ -176,7 +177,7 @@ export function CompanySettingEditor({
         <div className="flex flex-wrap items-end gap-3">
           <div className="space-y-2">
             <Label htmlFor="setting-record">Konfigurasi</Label>
-            <select
+            <ComboSelect
               id="setting-record"
               className="min-h-11 rounded-md border border-input bg-background px-3"
               value={selected ?? ""}
@@ -188,7 +189,7 @@ export function CompanySettingEditor({
                   {definition.label} {(page - 1) * 50 + index + 1}
                 </option>
               ))}
-            </select>
+            </ComboSelect>
           </div>
           <Button
             variant="outline"

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,7 +63,7 @@ export function TicketForm({
       <div className="grid items-start gap-4 sm:grid-cols-2 [&>div]:min-w-0">
         <div className="space-y-2">
           <Label htmlFor="ticket-branch">Cabang pemilik</Label>
-          <select
+          <ComboSelect
             id="ticket-branch"
             name="branchId"
             required
@@ -77,11 +78,11 @@ export function TicketForm({
                 {branch.name} (ID {branch.id})
               </option>
             ))}
-          </select>
+          </ComboSelect>
         </div>
         <div className="space-y-2">
           <Label htmlFor="ticket-priority">Prioritas</Label>
-          <select
+          <ComboSelect
             id="ticket-priority"
             name="priority"
             required
@@ -94,7 +95,7 @@ export function TicketForm({
             {["Low", "Normal", "High"].map((priority) => (
               <option key={priority}>{priority}</option>
             ))}
-          </select>
+          </ComboSelect>
         </div>
         <div className="space-y-2 sm:col-span-2">
           <Label htmlFor="ticket-subject">Judul</Label>

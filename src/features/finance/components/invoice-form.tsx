@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { FormField } from "@/components/patterns/form-field";
 import { FormLayout } from "@/components/patterns/form-layout";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { financeOptions } from "../actions";
 import { CommandForm } from "./command-form";
@@ -81,7 +82,7 @@ export function InvoiceForm({
             content: (
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField id="branch" label="Cabang">
-                  <select
+                  <ComboSelect
                     id="branch"
                     className={selectClass}
                     value={branchId}
@@ -104,7 +105,7 @@ export function InvoiceForm({
                         {b.name}
                       </option>
                     ))}
-                  </select>
+                  </ComboSelect>
                 </FormField>
                 <div className="space-y-2">
                   <FormField
@@ -132,7 +133,7 @@ export function InvoiceForm({
                   </Button>
                 </div>
                 <FormField id="customer" label="Pelanggan">
-                  <select
+                  <ComboSelect
                     required
                     id="customer"
                     className={selectClass}
@@ -151,7 +152,7 @@ export function InvoiceForm({
                         {c.name}
                       </option>
                     ))}
-                  </select>
+                  </ComboSelect>
                 </FormField>
                 <p role="alert" className="self-end text-sm text-destructive">
                   {error}
@@ -205,7 +206,7 @@ export function InvoiceForm({
                       id={`source-${index}`}
                       label={`AWB ${index + 1}`}
                     >
-                      <select
+                      <ComboSelect
                         required
                         id={`source-${index}`}
                         className={selectClass}
@@ -237,7 +238,7 @@ export function InvoiceForm({
                             {s.awbNo || `#${s.id}`}
                           </option>
                         ))}
-                      </select>
+                      </ComboSelect>
                     </FormField>
                     <FormField id={`amount-${index}`} label="Tagihan IDR">
                       <Input

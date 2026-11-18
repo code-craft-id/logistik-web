@@ -136,7 +136,7 @@ it("shows raw date-labelled dashboard counts without unauthorized links or synth
   expect(html).toContain("Tanggal manifest");
   expect(html).toContain("Tanggal lembar pengantaran");
   expect(html).not.toMatch(
-    /Invoice|Piutang|Penjualan|<svg|href="\/branch-reports\/delivery/,
+    /Invoice|Piutang|Penjualan|Grafik|href="\/branch-reports\/delivery/,
   );
 });
 it("renders legacy dashboard widgets from sources and hides gated detail", () => {

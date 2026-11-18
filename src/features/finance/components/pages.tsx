@@ -17,6 +17,7 @@ import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { id, listInput } from "../contracts";
 import { accountingQueries, financeService } from "../server/context";
+import { FinanceBranchField } from "./branch-field";
 import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
 import { InvoiceForm } from "./invoice-form";
@@ -71,16 +72,11 @@ export async function InvoiceListPage({
         </Link>
       </nav>
       <form className="grid gap-3 rounded-lg border bg-background p-4 sm:flex sm:flex-wrap sm:items-end">
-        <FormField id="filterBranch" label="ID cabang (opsional)">
-          <Input
-            className="min-h-11"
-            id="filterBranch"
-            name="branchId"
-            type="number"
-            min="1"
-            defaultValue={input.data.branchId}
-          />
-        </FormField>
+        <FinanceBranchField
+          prefix="invoice-filter"
+          optional
+          value={input.data.branchId ? String(input.data.branchId) : undefined}
+        />
         <Button className="min-h-11" variant="outline" type="submit">
           Terapkan
         </Button>

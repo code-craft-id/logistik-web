@@ -2,6 +2,7 @@ import Form from "next/form";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -112,7 +113,7 @@ export async function SimpleReportPage({
         )}
         <div className="min-w-0 space-y-2">
           <Label htmlFor="sr-branch">Cabang</Label>
-          <select
+          <ComboSelect
             id="sr-branch"
             name="branchId"
             defaultValue={values.branchId}
@@ -124,7 +125,7 @@ export async function SimpleReportPage({
                 {b.name}
               </option>
             ))}
-          </select>
+          </ComboSelect>
         </div>
         <Button type="submit" className="min-h-11">
           Tampilkan

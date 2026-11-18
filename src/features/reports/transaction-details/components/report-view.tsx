@@ -1,6 +1,7 @@
 import Form from "next/form";
 import Link from "next/link";
 import { EmptyState } from "@/components/patterns/content-state";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -135,7 +136,7 @@ export function TransactionReportView({
             ].map(([name, label]) => (
               <div key={name} className="space-y-2">
                 <Label htmlFor={`report-${name}`}>{label}</Label>
-                <select
+                <ComboSelect
                   id={`report-${name}`}
                   name={name}
                   defaultValue={
@@ -154,12 +155,12 @@ export function TransactionReportView({
                       {branch.name}
                     </option>
                   ))}
-                </select>
+                </ComboSelect>
               </div>
             ))}
             <div className="space-y-2">
               <Label htmlFor="report-sort">Urutkan menurut</Label>
-              <select
+              <ComboSelect
                 id="report-sort"
                 name="sortBy"
                 defaultValue={display.sortBy}
@@ -170,11 +171,11 @@ export function TransactionReportView({
                     {headers[index]}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
             <div className="space-y-2">
               <Label htmlFor="report-direction">Arah urutan</Label>
-              <select
+              <ComboSelect
                 id="report-direction"
                 name="sortDirection"
                 defaultValue={display.sortDirection}
@@ -182,7 +183,7 @@ export function TransactionReportView({
               >
                 <option value="asc">Menaik</option>
                 <option value="desc">Menurun</option>
-              </select>
+              </ComboSelect>
             </div>
             <div className="space-y-2">
               <Label htmlFor="report-search">Cari AWB</Label>

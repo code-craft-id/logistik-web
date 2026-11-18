@@ -124,9 +124,8 @@ function setInputValue(el: HTMLInputElement, value: string) {
 }
 
 function originSelect(): HTMLSelectElement {
-  const el = host.querySelector<HTMLSelectElement>(
-    '[data-testid="origin-branch-select"]',
-  );
+  // ComboSelect keeps a native <select> as the form control.
+  const el = host.querySelector<HTMLSelectElement>("select#originBranchId");
   if (!el) throw new Error("Missing origin branch select");
   return el;
 }

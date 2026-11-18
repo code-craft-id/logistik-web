@@ -1,4 +1,5 @@
 import { FormField } from "@/components/patterns/form-field";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 
 export type Choice = { id: number | string; name: string };
@@ -23,20 +24,20 @@ export function FinanceField({
   return (
     <FormField id={id} label={label}>
       {options ? (
-        <select
+        <ComboSelect
           id={id}
           name={name}
           required={!optional}
           defaultValue={value ?? ""}
           className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base md:text-sm"
         >
-          <option value="">Pilih…</option>
+          <option value="">{optional ? "Semua" : "Pilih…"}</option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>
               {o.name}
             </option>
           ))}
-        </select>
+        </ComboSelect>
       ) : (
         <Input
           className="min-h-11"

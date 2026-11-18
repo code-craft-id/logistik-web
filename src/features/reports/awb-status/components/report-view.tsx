@@ -2,6 +2,7 @@ import Form from "next/form";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { EmptyState } from "@/components/patterns/content-state";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -224,7 +225,7 @@ export function AwbStatusReportView({
             {kind === "all-status" && (
               <div className="space-y-2">
                 <Label htmlFor="awb-origin">Asal</Label>
-                <select
+                <ComboSelect
                   id="awb-origin"
                   name="originBranchId"
                   defaultValue={display.originBranchId}
@@ -236,12 +237,12 @@ export function AwbStatusReportView({
                       {branch.name}
                     </option>
                   ))}
-                </select>
+                </ComboSelect>
               </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="awb-destination">Tujuan</Label>
-              <select
+              <ComboSelect
                 id="awb-destination"
                 name="destinationBranchId"
                 defaultValue={display.destinationBranchId}
@@ -253,12 +254,12 @@ export function AwbStatusReportView({
                     {branch.name}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
             {kind === "all-status" && (
               <div className="space-y-2">
                 <Label htmlFor="awb-status">Status kiriman</Label>
-                <select
+                <ComboSelect
                   id="awb-status"
                   name="status"
                   defaultValue={display.status}
@@ -270,7 +271,7 @@ export function AwbStatusReportView({
                       {status}
                     </option>
                   ))}
-                </select>
+                </ComboSelect>
               </div>
             )}
             <div className="space-y-2">

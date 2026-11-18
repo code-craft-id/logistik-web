@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { createBookingAction } from "../actions";
 
 type BookingActionError =
@@ -82,7 +83,7 @@ export function BookingForm({
               <label htmlFor="branchId" className="text-sm font-medium">
                 Cabang *
               </label>
-              <select
+              <ComboSelect
                 id="branchId"
                 name="branchId"
                 required
@@ -95,13 +96,13 @@ export function BookingForm({
                     {o.name}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
             <div>
               <label htmlFor="customerId" className="text-sm font-medium">
                 Customer
               </label>
-              <select
+              <ComboSelect
                 id="customerId"
                 name="customerId"
                 defaultValue=""
@@ -113,7 +114,7 @@ export function BookingForm({
                     {o.name}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
           </>
         ) : (

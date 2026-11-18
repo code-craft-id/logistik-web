@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deletePartyAction, savePartyAction } from "../party-actions";
@@ -74,7 +75,7 @@ export function PartyForm({
                 {"required" in field && field.required ? " *" : ""}
               </Label>
               {field.type === "choice" ? (
-                <select
+                <ComboSelect
                   id={fieldId}
                   name={field.key}
                   defaultValue={value ?? ""}
@@ -86,7 +87,7 @@ export function PartyForm({
                       {o.name}
                     </option>
                   ))}
-                </select>
+                </ComboSelect>
               ) : (
                 <Input
                   id={fieldId}

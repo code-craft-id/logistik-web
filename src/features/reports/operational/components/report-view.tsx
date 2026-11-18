@@ -2,6 +2,7 @@ import Form from "next/form";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { EmptyState } from "@/components/patterns/content-state";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -357,7 +358,7 @@ export function OperationalReportView({
               <Label htmlFor="op-branch">
                 {dashboard ? "Cabang" : "Cabang pemilik manifest"}
               </Label>
-              <select
+              <ComboSelect
                 id="op-branch"
                 name="branchId"
                 defaultValue={display.branchId ?? ""}
@@ -369,7 +370,7 @@ export function OperationalReportView({
                     {branch.name}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
             {!dashboard && (
               <>

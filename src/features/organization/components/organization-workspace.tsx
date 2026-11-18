@@ -4,6 +4,7 @@ import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SearchSelect } from "@/components/patterns/search-select";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import {
   Dialog,
   DialogContent,
@@ -540,7 +541,7 @@ function OrganizationList({
                   />
                 </div>
               ) : field.type === "status" ? (
-                <select
+                <ComboSelect
                   id={`org-${field.key}`}
                   name={field.key}
                   defaultValue={String(editing?.[field.key] ?? "ACTIVE")}
@@ -550,7 +551,7 @@ function OrganizationList({
                 >
                   <option value="ACTIVE">Aktif</option>
                   <option value="INACTIVE">Tidak aktif</option>
-                </select>
+                </ComboSelect>
               ) : (
                 <Input
                   className="min-h-11 sm:col-span-2"
@@ -604,7 +605,7 @@ function OrganizationList({
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-0 flex-1 space-y-2">
               <Label htmlFor="company-record">Perusahaan</Label>
-              <select
+              <ComboSelect
                 id="company-record"
                 className="min-h-11 w-full rounded-md border border-input bg-background px-3"
                 value={editing?.id ?? ""}
@@ -626,7 +627,7 @@ function OrganizationList({
                     {item.name}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
             {writable && (
               <Button
@@ -734,7 +735,7 @@ function OrganizationList({
         {kind !== "company" && (
           <div className="space-y-2">
             <Label htmlFor={`status-${kind}`}>Status</Label>
-            <select
+            <ComboSelect
               id={`status-${kind}`}
               className="min-h-11 rounded-md border border-input bg-background px-3"
               value={status}
@@ -746,12 +747,12 @@ function OrganizationList({
               <option value="">Semua</option>
               <option value="ACTIVE">Aktif</option>
               <option value="INACTIVE">Tidak aktif</option>
-            </select>
+            </ComboSelect>
           </div>
         )}
         <div className="space-y-2">
           <Label htmlFor={`page-size-${kind}`}>Jumlah per halaman</Label>
-          <select
+          <ComboSelect
             id={`page-size-${kind}`}
             value={pageSize}
             className="min-h-11 rounded-md border border-input bg-background px-3"
@@ -765,11 +766,11 @@ function OrganizationList({
                 {size}
               </option>
             ))}
-          </select>
+          </ComboSelect>
         </div>
         <div className="space-y-2">
           <Label htmlFor={`sort-${kind}`}>Urutan</Label>
-          <select
+          <ComboSelect
             id={`sort-${kind}`}
             value={sortDirection}
             className="min-h-11 rounded-md border border-input bg-background px-3"
@@ -780,7 +781,7 @@ function OrganizationList({
           >
             <option value="asc">A–Z</option>
             <option value="desc">Z–A</option>
-          </select>
+          </ComboSelect>
         </div>
         <Button className="min-h-11" type="submit">
           Cari
