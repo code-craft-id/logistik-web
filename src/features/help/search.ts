@@ -45,7 +45,7 @@ export function searchHelp(question: string, limit = 3): HelpEntry[] {
     .map((s) => s.entry);
 }
 
-export const HISTORY_TTL_MS = 60 * 60 * 1000;
+export const HISTORY_TTL_MS = 10 * 60 * 1000;
 
 export type ChatMessage = {
   id: string;
@@ -55,7 +55,7 @@ export type ChatMessage = {
   at: number;
 };
 
-/** Drop messages older than one hour. */
+/** Drop messages older than ten minutes. */
 export function freshMessages(messages: ChatMessage[], now = Date.now()) {
   return messages.filter((m) => now - m.at < HISTORY_TTL_MS);
 }

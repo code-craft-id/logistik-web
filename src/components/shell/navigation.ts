@@ -238,7 +238,25 @@ export const liveRoutes = [
   "/customer-reports/shipments",
   "/customer-reports/pod",
   // Perkiraan (chart of accounts) is served by the FIN-02 accounts page.
-  "/finance/accounting/accounts",
+  "/finance/accounting/accounts", // Modul menu entries mirroring the reference; query variants keep each
+  // legacy item distinct while landing on the live page that serves it.
+  "/marketing?tab=customer",
+  "/marketing?tab=consignee",
+  "/marketing/revenue",
+  "/transactions/new",
+  "/branch-reports/inbound-transaction-details?view=onsite",
+  "/transactions/void",
+  "/branch-reports/delivery?view=items",
+  "/transactions/lookup",
+  "/transactions/history",
+  "/transactions/void?view=deleted",
+  "/manifest?type=Transit",
+  "/manifest?type=Inbound",
+  "/manifest?type=Outbound",
+  "/courier-reports?view=city",
+  "/customer-reports/pod?view=ops",
+  "/branch-reports/manifest-vendor?view=process",
+  "/finance/invoices?from=modul",
 ];
 const implemented = new Set<string>([
   ...implementedPreviewRoutes.map((item) => item.href),

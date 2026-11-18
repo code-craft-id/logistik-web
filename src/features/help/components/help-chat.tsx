@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, Send, X } from "lucide-react";
+import { Headset, Send, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -49,7 +49,7 @@ export function HelpChat() {
 
   useEffect(() => {
     setMessages(load());
-    // Expire history older than one hour while the page stays open.
+    // Expire history older than ten minutes while the page stays open.
     const timer = window.setInterval(
       () => setMessages((current) => freshMessages(current)),
       60_000,
@@ -115,8 +115,8 @@ export function HelpChat() {
             <div>
               <h2 className="text-sm font-semibold">Bantuan fitur</h2>
               <p className="text-xs text-muted-foreground">
-                Riwayat terhapus otomatis setelah {HISTORY_TTL_MS / 3_600_000}{" "}
-                jam
+                Riwayat terhapus otomatis setelah {HISTORY_TTL_MS / 60_000}{" "}
+                menit
               </p>
             </div>
             <Button
@@ -214,7 +214,7 @@ export function HelpChat() {
         {open ? (
           <X className="size-5" aria-hidden="true" />
         ) : (
-          <MessageCircle className="size-5" aria-hidden="true" />
+          <Headset className="size-5" aria-hidden="true" />
         )}
       </Button>
     </div>

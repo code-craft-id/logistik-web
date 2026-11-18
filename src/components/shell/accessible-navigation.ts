@@ -30,6 +30,11 @@ const routeResources: Record<string, readonly string[]> = {
   "/finance/accounting/reports": ["financial_report"],
   "/dashboard": ["dashboard_report"],
   "/transactions": ["transaction"],
+  "/transactions/new": ["transaction"],
+  "/transactions/lookup": ["transaction"],
+  "/transactions/void": ["transaction"],
+  "/transactions/history": ["transaction"],
+  "/marketing/revenue": ["customer"],
   "/bookings": ["booking"],
   "/manifest": ["manifest"],
   "/marketing": ["customer", "consignee"],
@@ -90,7 +95,7 @@ export function accessibleNavigation(
   const showInventory = isAdministrator(actor);
   const allowed = (href?: string) =>
     !!href &&
-    !!routeResources[href]?.some(
+    !!routeResources[href.split("?")[0]]?.some(
       (resource) =>
         permits(actor, "view", resource) &&
         (resource !== "vendor_tax" || isAdministrator(actor)),

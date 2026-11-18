@@ -29,7 +29,11 @@ describe("adopted finance input", () => {
     const hrefs = navigationDestinations(groups)
       .map(({ item }) => item.href)
       .filter((p) => p?.startsWith("/finance/"));
-    expect(hrefs).toEqual(["/finance/invoices"]);
+    // Akunting > Invoice and the Modul > Keuangan > Invoice (new) shortcut.
+    expect(hrefs).toEqual([
+      "/finance/invoices",
+      "/finance/invoices?from=modul",
+    ]);
     expect(navigationPath("/finance/invoices/123", groups)?.labels).toEqual([
       "Akunting",
       "Invoice",

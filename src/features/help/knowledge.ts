@@ -354,6 +354,6 @@ export const helpEntries: HelpEntry[] = [
     title: "Tentang chat bantuan",
     keywords: ["chat", "bantuan", "help", "tanya", "riwayat"],
     answer:
-      "Chat ini menjawab dari daftar penjelasan fitur di aplikasi (tidak dikirim ke layanan luar). Riwayat chat tersimpan di browser Anda dan terhapus otomatis setelah 1 jam.",
+      "Chat ini menjawab dari daftar penjelasan fitur di aplikasi (tidak dikirim ke layanan luar). Riwayat chat tersimpan di browser Anda dan terhapus otomatis setelah 10 menit.",
   },
 ];

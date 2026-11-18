@@ -124,6 +124,24 @@ export function transactionScope(
   return Prisma.join(parts, " AND ");
 }
 
+/**
+ * Like transactionScope but without the deleted filter, for reports that
+ * must include deleted AWBs (void history).
+ */
+export function branchScopeAny(actor: AccessActor, f: Filters): Prisma.Sql {
+  const on = (ids: Prisma.Sql) =>
+    Prisma.sql`(t.origin_branch_id IN (${ids}) OR t.destination_branch_id IN (${ids}))`;
+  const parts: Prisma.Sql[] = [Prisma.sql`TRUE`];
+  if (!isAdministrator(actor))
+    parts.push(
+      actor.branchIds.length
+        ? on(Prisma.join(actor.branchIds))
+        : Prisma.sql`FALSE`,
+    );
+  if (f.branchId !== null) parts.push(on(Prisma.sql`${f.branchId}`));
+  return Prisma.join(parts, " AND ");
+}
+
 /** Owning-branch scope for a table alias with a branch column. */
 export function branchScope(
   actor: AccessActor,

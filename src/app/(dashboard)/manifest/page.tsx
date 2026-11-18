@@ -38,10 +38,16 @@ export default async function Page({
   const one = (v: string | string[] | undefined) =>
     typeof v === "string" ? v : undefined;
   const search = one(query.search) ?? "";
+  const type = one(query.type) ?? "";
+  const titles: Record<string, string> = {
+    Transit: "Cek Transit",
+    Inbound: "Cek Inbound",
+    Outbound: "Manifest Outbound",
+  };
   const page = Number(one(query.page) ?? 1) || 1;
-  const result = await listManifests(current.actor, { page, search });
+  const result = await listManifests(current.actor, { page, search, type });
   const href = (p: number) =>
-    `/manifest?${new URLSearchParams({ ...(search ? { search } : {}), page: String(p) })}`;
+    `/manifest?${new URLSearchParams({ ...(type ? { type } : {}), ...(search ? { search } : {}), page: String(p) })}`;
   const headers = [
     "Manifes No.",
     "Tanggal",
@@ -61,7 +67,7 @@ export default async function Page({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            Daftar Manifest
+            {titles[type] ?? "Daftar Manifest"}
           </h1>
           <p className="text-sm text-muted-foreground">
             Manifest dalam cakupan cabang Anda. Total dihitung dari AWB yang
@@ -78,6 +84,7 @@ export default async function Page({
         action="/manifest"
         className="flex flex-col gap-2 rounded-lg border bg-background p-4 sm:flex-row sm:items-end"
       >
+        {type && <input type="hidden" name="type" value={type} />}
         <div className="min-w-0 flex-1 space-y-2">
           <label htmlFor="manifest-search" className="text-sm font-medium">
             Cari nomor manifest

@@ -3,6 +3,7 @@ import "server-only";
 import { Prisma } from "@/lib/db/generated/client";
 import {
   branchScope,
+  branchScopeAny,
   type Cell,
   type ReportDef,
   ROW_LIMIT,
@@ -417,6 +418,80 @@ export const simpleReports: Record<string, ReportDef> = {
           { key: "tanggal", label: "Tanggal DRS (UTC)" },
           { key: "diterima", label: "Diterima oleh" },
           { key: "waktu", label: "Waktu terima (UTC)" },
+        ],
+        ...capped(rows),
+      };
+    },
+  },
+  "void-awb": {
+    title: "Void AWB",
+    resource: "transaction",
+    definition:
+      "AWB berstatus Cancelled atau sudah dihapus, menurut tanggal transaksi dalam periode. Belum ada persetujuan void terpisah; pembatalan tercatat di riwayat status.",
+    async run(actor, f, tx) {
+      const rows = await tx.$queryRaw<Row[]>`
+        SELECT t.awb_no AS awb, to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
+               t.do_no AS do_no, db.name AS tujuan, t.sender_name AS pengirim,
+               t.receiver_name AS penerima, t.koli, t.kilo::text AS kilo,
+               t.biaya::text AS biaya,
+               CASE WHEN t.deleted_at IS NOT NULL THEN 'Dihapus' ELSE t.status END AS keterangan,
+               to_char(COALESCE(t.deleted_at, h.changed_at), 'YYYY-MM-DD HH24:MI') AS waktu,
+               u.name AS oleh
+        FROM transactions t
+        LEFT JOIN branches db ON db.id = t.destination_branch_id
+        LEFT JOIN LATERAL (
+          SELECT sh.changed_at, sh.actor_id FROM transaction_status_history sh
+          WHERE sh.transaction_id = t.id AND sh.new_status = 'Cancelled'
+          ORDER BY sh.changed_at DESC LIMIT 1) h ON TRUE
+        LEFT JOIN auth_users u ON u.id = h.actor_id
+        WHERE (t.deleted_at IS NOT NULL OR t.status = 'Cancelled')
+          AND ${branchScopeAny(actor, f)}
+          AND t.transaction_date >= ${f.from} AND t.transaction_date < ${f.toExclusive}
+        ORDER BY t.transaction_date DESC, t.id DESC LIMIT ${ROW_LIMIT + 1}`;
+      return {
+        columns: [
+          { key: "awb", label: "AWB No." },
+          { key: "tanggal", label: "Tanggal (UTC)" },
+          { key: "do_no", label: "DO No." },
+          { key: "tujuan", label: "Tujuan" },
+          { key: "pengirim", label: "Pengirim" },
+          { key: "penerima", label: "Penerima" },
+          count("Koli", "koli"),
+          count("Berat (kg)", "kilo"),
+          money("Biaya (Rp)", "biaya"),
+          { key: "keterangan", label: "Keterangan" },
+          { key: "oleh", label: "Dibatalkan oleh" },
+          { key: "waktu", label: "Waktu (UTC)" },
+        ],
+        ...capped(rows),
+      };
+    },
+  },
+  "status-history": {
+    title: "Histori Resi",
+    resource: "transaction",
+    definition:
+      "Riwayat perubahan status AWB (siapa, kapan, dari status apa ke status apa, alasan) menurut waktu perubahan dalam periode. Perubahan data AWB selain status belum dicatat terpisah.",
+    async run(actor, f, tx) {
+      const rows = await tx.$queryRaw<Row[]>`
+        SELECT t.awb_no AS awb,
+               to_char(h.changed_at, 'YYYY-MM-DD HH24:MI') AS waktu,
+               COALESCE(h.prior_status, '-') AS dari, h.new_status AS ke,
+               h.reason AS alasan, u.name AS oleh
+        FROM transaction_status_history h
+        JOIN transactions t ON t.id = h.transaction_id
+        LEFT JOIN auth_users u ON u.id = h.actor_id
+        WHERE ${branchScopeAny(actor, f)}
+          AND h.changed_at >= ${f.from} AND h.changed_at < ${f.toExclusive}
+        ORDER BY h.changed_at DESC, h.id DESC LIMIT ${ROW_LIMIT + 1}`;
+      return {
+        columns: [
+          { key: "awb", label: "AWB No." },
+          { key: "waktu", label: "Waktu (UTC)" },
+          { key: "dari", label: "Dari status" },
+          { key: "ke", label: "Ke status" },
+          { key: "alasan", label: "Alasan" },
+          { key: "oleh", label: "Oleh" },
         ],
         ...capped(rows),
       };

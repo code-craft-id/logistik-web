@@ -39,6 +39,12 @@ export default async function Page({
         </p>
       </div>
       {tx.awbNo && <Barcode value={tx.awbNo} />}
+      <a
+        href={`/transactions/${tx.id}/print`}
+        className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+      >
+        Print AWB
+      </a>
       <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded border p-4 sm:grid-cols-2 lg:grid-cols-3">
         {(
           [

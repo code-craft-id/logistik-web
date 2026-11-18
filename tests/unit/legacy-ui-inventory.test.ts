@@ -41,15 +41,19 @@ describe("legacy inventory coverage and presentation routing", () => {
     const finance = navigationDestinations().filter(({ item }) =>
       item.href?.startsWith("/finance/"),
     );
-    // Seven Akunting entries plus Master Data > Perkiraan (chart of accounts).
-    expect(finance).toHaveLength(8);
+    // Seven Akunting entries, Master Data > Perkiraan and Modul > Invoice (new).
+    expect(finance).toHaveLength(9);
     for (const { item } of finance) {
-      expect(existsSync(`src/app/(dashboard)${item.href}/page.tsx`)).toBe(true);
+      expect(
+        existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),
+      ).toBe(true);
       if (item.href) available.add(item.href);
     }
     // Live report workflows added after the preview inventory must exist on disk.
     for (const href of liveRoutes) {
-      expect(existsSync(`src/app/(dashboard)${href}/page.tsx`)).toBe(true);
+      expect(
+        existsSync(`src/app/(dashboard)${href.split("?")[0]}/page.tsx`),
+      ).toBe(true);
       available.add(href);
     }
     for (const { item } of navigationDestinations())

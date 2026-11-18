@@ -181,6 +181,14 @@ export default async function Page({
             {tab === "customer" ? "Customer" : "Penerima"}
           </Link>
         ))}
+        {permits(actor, "view", "customer") && (
+          <Link
+            href="/marketing/revenue"
+            className="inline-flex min-h-11 items-center border-b-2 border-transparent px-1 text-sm"
+          >
+            Pendapatan Pelanggan
+          </Link>
+        )}
       </nav>
       {(editing ? canUpdate : canCreate) && (
         <details

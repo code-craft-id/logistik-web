@@ -17,6 +17,7 @@ const db = new PrismaClient({
 const tag = `SP${randomUUID().slice(0, 10)}`;
 const ids = { company: 0, office: 0, a: 0, b: 0, customers: [] as number[] };
 let parties: typeof import("../../src/features/sales/server/parties");
+let revenue: typeof import("../../src/features/sales/server/revenue");
 const grants = ["view", "create", "update", "delete"];
 const actor = (branchIds: number[], admin = false): AccessActor => ({
   id: 1,
@@ -37,6 +38,7 @@ const actor = (branchIds: number[], admin = false): AccessActor => ({
 
 beforeAll(async () => {
   parties = await import("../../src/features/sales/server/parties");
+  revenue = await import("../../src/features/sales/server/revenue");
   ids.company = (
     await db.company.create({
       data: { name: tag, isDepositAgent: false, showPriceOnPrint: false },
@@ -70,6 +72,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await db.transaction.deleteMany({ where: { awbNo: { startsWith: tag } } });
   await db.consignee.deleteMany({ where: { name: { startsWith: tag } } });
   await db.customer.deleteMany({ where: { name: { startsWith: tag } } });
   await db.branch.deleteMany({ where: { id: { in: [ids.a, ids.b] } } });
@@ -143,5 +146,45 @@ describe("customer and consignee maintenance", () => {
         branchId: String(ids.a),
       }),
     ).rejects.toMatchObject({ status: 403 });
+  });
+
+  it("lists every visible customer with monthly revenue and growth", async () => {
+    const me = actor([ids.a]);
+    const grow = await parties.saveParty(me, "customer", {
+      name: `${tag} Grow`,
+      branchId: String(ids.a),
+    });
+    const fresh = await parties.saveParty(me, "customer", {
+      name: `${tag} Fresh`,
+      branchId: String(ids.a),
+    });
+    await parties.saveParty(me, "customer", {
+      name: `${tag} Idle`,
+      branchId: String(ids.a),
+    });
+    const other = await parties.saveParty(actor([], true), "customer", {
+      name: `${tag} Hidden`,
+      branchId: String(ids.b),
+    });
+    const tx = (n: string, customerId: number, date: string, biaya: string) =>
+      db.transaction.create({
+        data: {
+          awbNo: `${tag}-${n}`,
+          originBranchId: ids.a,
+          customerId,
+          transactionDate: new Date(date),
+          biaya,
+        },
+      });
+    await tx("1", grow.id, "2026-10-10T00:00:00Z", "100.00");
+    await tx("2", grow.id, "2026-11-10T00:00:00Z", "150.00");
+    await tx("3", fresh.id, "2026-11-11T00:00:00Z", "50.00");
+    await tx("4", other.id, "2026-11-11T00:00:00Z", "999.00");
+    const rows = await revenue.customerRevenue(me, "2026-11", tag);
+    expect(rows.map((r) => [r.name, r.revenue, r.growth])).toEqual([
+      [`${tag} Grow`, "150.00", "50.0%"],
+      [`${tag} Fresh`, "50.00", "Baru"],
+      [`${tag} Idle`, "0", null],
+    ]);
   });
 });

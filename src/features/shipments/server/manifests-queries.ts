@@ -76,12 +76,16 @@ function totals(
 
 export async function listManifests(
   actor: AccessActor,
-  params: { page?: number; search?: string } = {},
+  params: { page?: number; search?: string; type?: string } = {},
 ) {
   const page = Math.max(1, Math.floor(params.page ?? 1));
   const search = params.search?.trim().slice(0, 50);
+  const type = ["Outbound", "Transit", "Inbound"].includes(params.type ?? "")
+    ? params.type
+    : undefined;
   const where: Prisma.ManifestWhereInput = {
     ...visible(actor),
+    ...(type ? { type } : {}),
     ...(search
       ? { manifestNo: { contains: search, mode: "insensitive" as const } }
       : {}),

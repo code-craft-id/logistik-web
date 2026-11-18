@@ -37,7 +37,16 @@ describe("available navigation", () => {
       destinations
         .filter(({ item }) => !item.href)
         .map(({ item }) => item.providerLabel),
-    ).toEqual([]);
+    ).toEqual([
+      // Reference items with no LMS workflow yet (approval, tariff, agent,
+      // supplier payment); kept unlinked rather than pointing to a fake page.
+      "Persetujuaan Edit/Delete AWB",
+      "Cek Ongkir",
+      "Inbound Booking",
+      "Cek Inbound Agen",
+      "Approval POD Kembali",
+      "Pembayaran Hutang",
+    ]);
     expect(paths).toContain("/office/company");
     expect(paths).toContain("/logistics/services");
     for (const path of [
@@ -47,7 +56,8 @@ describe("available navigation", () => {
       "/transactions",
       "/bookings",
       "/manifest",
-      "/marketing",
+      "/marketing?tab=customer",
+      "/marketing/revenue",
       "/branch-reports/manifest-vendor",
       "/courier-reports",
       "/financial-reports",
@@ -70,9 +80,18 @@ describe("available navigation", () => {
       navigationDestinations(accessibleNavigation(actor(resources))).map(
         ({ item }) => item.href,
       );
-    expect(hrefs(["transaction"])).toEqual(["/transactions"]);
+    expect(hrefs(["transaction"])).toEqual([
+      "/transactions/new",
+      "/transactions",
+      "/transactions/void",
+      "/transactions/lookup",
+      "/transactions/history",
+      "/transactions/void?view=deleted",
+    ]);
     expect(hrefs(["booking"])).toEqual(["/bookings"]);
     expect(hrefs(["transaction_report"])).toEqual([
+      "/branch-reports/inbound-transaction-details?view=onsite",
+      "/customer-reports/pod?view=ops",
       "/branch-reports/transaction-details",
       "/branch-reports/awb",
       "/branch-reports/customer-monthly-summary",

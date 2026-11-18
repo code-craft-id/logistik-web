@@ -72,28 +72,76 @@ export const legacyMenu = [
     children: [
       {
         label: "Pemasaran/Penjualan",
-        href: "/marketing",
+        children: [
+          { label: "Customer", href: "/marketing?tab=customer" },
+          { label: "Penerima", href: "/marketing?tab=consignee" },
+          { label: "Pendapatan Pelanggan", href: "/marketing/revenue" },
+        ],
+      },
+      {
+        label: "Layanan Pelanggan / Transaksi",
+        children: [
+          { label: "Onsite Outbound", href: "/transactions/new" },
+          {
+            label: "Onsite Inbound",
+            href: "/branch-reports/inbound-transaction-details?view=onsite",
+          },
+          { label: "Print AWB", href: "/transactions" },
+          { label: "Persetujuaan Edit/Delete AWB" },
+          { label: "Void AWB", href: "/transactions/void" },
+        ],
       },
       {
         label: "Layanan Pelanggan",
         children: [
           {
-            label: "Transaksi",
-            href: "/transactions",
+            label: "Status Pengantaran",
+            href: "/branch-reports/delivery?view=items",
           },
+          { label: "Cek Ongkir" },
+          { label: "Cek Resi", href: "/transactions/lookup" },
+          { label: "Histori Edit Resi", href: "/transactions/history" },
+          { label: "Booking", href: "/bookings" },
+          { label: "Inbound Booking" },
           {
-            label: "Booking",
-            href: "/bookings",
+            label: "History Delete Resi",
+            href: "/transactions/void?view=deleted",
           },
+        ],
+      },
+      {
+        label: "Operasional / Manifest",
+        children: [
+          { label: "Manifest", href: "/manifest" },
+          { label: "Cek Transit", href: "/manifest?type=Transit" },
+          { label: "Cek Inbound", href: "/manifest?type=Inbound" },
+          { label: "Cek Inbound Agen" },
+          { label: "Print Manifest", href: "/manifest?type=Outbound" },
+        ],
+      },
+      {
+        label: "Operasional / Lembar Pengantaran",
+        children: [
+          { label: "Kurir Kota", href: "/courier-reports?view=city" },
+          { label: "Print DRS", href: "/branch-reports/delivery" },
         ],
       },
       {
         label: "Operasional",
         children: [
+          { label: "POD Kembali", href: "/customer-reports/pod?view=ops" },
+          { label: "Approval POD Kembali" },
           {
-            label: "Manifest",
-            href: "/manifest",
+            label: "Proses Vendor",
+            href: "/branch-reports/manifest-vendor?view=process",
           },
+        ],
+      },
+      {
+        label: "Keuangan",
+        children: [
+          { label: "Invoice (new)", href: "/finance/invoices?from=modul" },
+          { label: "Pembayaran Hutang" },
         ],
       },
     ],

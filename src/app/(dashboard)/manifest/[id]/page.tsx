@@ -84,6 +84,19 @@ export default async function Page({
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Manifest {manifest.manifestNo}
         </h1>
+        <nav aria-label="Cetak" className="flex flex-wrap gap-4">
+          <Link className={link} href={`/manifest/${manifest.id}/print`}>
+            Print Manifest
+          </Link>
+          {manifest.deliverySheet && (
+            <Link
+              className={link}
+              href={`/manifest/${manifest.id}/print?doc=drs`}
+            >
+              Print DRS
+            </Link>
+          )}
+        </nav>
       </header>
       <section
         aria-label="Ringkasan manifest"

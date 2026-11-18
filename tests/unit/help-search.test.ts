@@ -29,7 +29,7 @@ describe("feature help chat", () => {
       if (href)
         expect(existsSync(`src/app/(dashboard)${href}/page.tsx`)).toBe(true);
   });
-  it("drops chat history older than one hour", () => {
+  it("drops chat history older than ten minutes", () => {
     const now = 10 * HISTORY_TTL_MS;
     const messages = [
       { id: "old", role: "user" as const, text: "a", at: now - HISTORY_TTL_MS },
