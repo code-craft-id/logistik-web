@@ -18,12 +18,35 @@ function visible(actor: AccessActor): Prisma.ManifestWhereInput {
   return { deletedAt: null, branchId: { in: actor.branchIds } };
 }
 
-const activeItems = {
-  where: { deletedAt: null, releasedAt: null },
-  select: {
-    transaction: { select: { koli: true, kilo: true, volume: true } },
-  },
-} as const;
+type TotalRow = {
+  manifestId: number;
+  awb: number;
+  koli: number | null;
+  kilo: string | null;
+  volume: string | null;
+};
+/**
+ * Active-item totals for many manifests in one aggregate query (no per-row
+ * item loading). A total is null when any active AWB lacks that value.
+ */
+async function manifestTotals(manifestIds: number[]) {
+  if (!manifestIds.length) return new Map<number, TotalRow>();
+  const rows = await prisma.$queryRaw<TotalRow[]>`
+    SELECT mi.manifest_id AS "manifestId",
+           count(*)::int AS awb,
+           CASE WHEN count(t.koli) = count(*) THEN COALESCE(sum(t.koli), 0)::int END AS koli,
+           CASE WHEN count(t.kilo) = count(*) THEN COALESCE(sum(t.kilo), 0)::text END AS kilo,
+           CASE WHEN count(t.volume) = count(*) THEN COALESCE(sum(t.volume), 0)::text END AS volume
+    FROM manifest_items mi
+    JOIN transactions t ON t.id = mi.transaction_id
+    WHERE mi.manifest_id IN (${Prisma.join(manifestIds)})
+      AND mi.deleted_at IS NULL AND mi.released_at IS NULL
+    GROUP BY mi.manifest_id`;
+  return new Map(rows.map((row) => [row.manifestId, row]));
+}
+const noItems = { awb: 0, koli: 0, kilo: "0", volume: "0" };
+const trim = (value: string | null) =>
+  value === null ? null : new Prisma.Decimal(value).toString();
 
 function totals(
   items: {
@@ -64,7 +87,7 @@ export async function listManifests(
       ? { manifestNo: { contains: search, mode: "insensitive" as const } }
       : {}),
   };
-  const [rows, total, branches] = await Promise.all([
+  const [rows, total] = await Promise.all([
     prisma.manifest.findMany({
       where,
       orderBy: [{ manifestDate: "desc" }, { id: "desc" }],
@@ -81,11 +104,20 @@ export async function listManifests(
         branch: { select: { name: true } },
         vehicle: { select: { name: true, licensePlate: true } },
         courier: { select: { name: true } },
-        items: activeItems,
       },
     }),
     prisma.manifest.count({ where }),
-    prisma.branch.findMany({ select: { id: true, name: true } }),
+  ]);
+  // Only the branches and totals this page needs.
+  const branchIds = [
+    ...new Set(rows.flatMap((r) => [r.originBranchId, r.destinationBranchId])),
+  ].filter((v): v is number => v !== null);
+  const [branches, sums] = await Promise.all([
+    prisma.branch.findMany({
+      where: { id: { in: branchIds } },
+      select: { id: true, name: true },
+    }),
+    manifestTotals(rows.map((r) => r.id)),
   ]);
   const branchName = new Map(branches.map((b) => [b.id, b.name]));
   return {
@@ -109,7 +141,17 @@ export async function listManifests(
         ? `${row.vehicle.licensePlate} · ${row.vehicle.name}`
         : null,
       courier: row.courier?.name ?? null,
-      ...totals(row.items),
+      ...(() => {
+        const sum = sums.get(row.id);
+        return sum
+          ? {
+              awb: sum.awb,
+              koli: sum.koli,
+              kilo: trim(sum.kilo),
+              volume: trim(sum.volume),
+            }
+          : noItems;
+      })(),
     })),
   };
 }

@@ -126,6 +126,16 @@ export const permissionResources = [
     actions: ["view", "create", "update", "delete"],
   },
   {
+    resource: "customer",
+    label: "Customer",
+    actions: ["view", "create", "update", "delete"],
+  },
+  {
+    resource: "consignee",
+    label: "Penerima",
+    actions: ["view", "create", "update", "delete"],
+  },
+  {
     resource: "courier",
     label: "Kurir",
     actions: ["view", "create", "update", "delete"],
@@ -269,6 +279,8 @@ export function permissionRestriction(resource: string): string | undefined {
     [
       "booking",
       "transaction",
+      "customer",
+      "consignee",
       "manifest",
       "delivery",
       "ticket",

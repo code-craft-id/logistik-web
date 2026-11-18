@@ -44,6 +44,7 @@ describe("available navigation", () => {
       "/transactions",
       "/bookings",
       "/manifest",
+      "/marketing",
       "/branch-reports/awb",
       "/customer-reports/all-status",
     ])
@@ -52,7 +53,7 @@ describe("available navigation", () => {
       "/branch-reports/manifest-vendor",
       "/perkiraan",
       "/akunting",
-      "/marketing",
+      "/courier-reports",
       "/ui-examples",
     ])
       expect(paths).not.toContain(path);
