@@ -677,3 +677,6 @@ DIRECT_NON_MUTATING_DISCOVERY, existing authenticated session, display-only quer
 
 ## 2026-11-18 — Delete guards, dashboard parity, invoice list
 Migration 20261118000100_fin_delete_guards (test DB only) + teardown guard toggle; dashboard legacy widgets from approved sources, month-to-date default, daily AWB count chart; invoice list legacy columns. Legacy dashboard observed read-only. Gates Node 24.15.0: lint437/typecheck/unit685/integration147/build PASS. Desktop browser check only. No staging.
+
+## 2026-11-18 — Modules, simplified reports, review pass
+Manifest/DRS UI, capture fields migration, Customer/Penerima, barcode, ten reports, nav fully linked. Review fixes: id grouping, incomplete-data counts, ambiguous AWB refusal, deliveredBy misuse. Reconciliation tests. Gates lint458/typecheck/unit689/integration161/build PASS. Pushed to PR #11.

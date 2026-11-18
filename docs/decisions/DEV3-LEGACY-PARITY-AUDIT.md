@@ -899,3 +899,9 @@ User direction: make every unavailable menu work from database data, simplified 
 | POD Kembali | DELIVERED delivery items with receiver and time | No physical POD-return event |
 
 Schema: migration 20261118000200_transaction_capture_fields (nullable FKs, no backfill). Needs Dev 2 and migration coordinator review. Verification: lint, typecheck, unit 689, integration 157 PASS (Node 24.15.0); desktop browser spot checks on local synthetic data.
+
+#### 14.1 Review pass — 2026-11-18
+
+- Relations: every new column has a RESTRICT foreign key to the intended master (customers, transport_modes, delivery_services, goods_types, cost_types, vendors). Dev DB consistency checks all zero: DRS items outside their manifest, AWB in two active manifests, customer/consignee/invoice branch mismatches. Known gap: legacy `manifests.origin_branch_id`/`destination_branch_id` have no foreign key (Dev 2 schema).
+- Report numbers: grouping by id (not name); missing koli/berat/biaya counted in an explicit column instead of silently treated as complete; reconciliation tests tie Rekap Customer and Omset totals to direct counts, GP/Rekap GP/Manifest Vendor AWB totals to active manifest items, and courier outcome buckets to their total.
+- Delivery sheets: create one DRS per manifest and record outcomes from the manifest page (Dev 2 outcome service), so Laporan Kurir and POD Kembali have a live source. Outcome DELIVERED still requires AWB status In Transit (Dev 2 transition rule).

@@ -1,3 +1,9 @@
+## Latest checkpoint: modules, reports and review pass (2026-11-18, night)
+
+Pushed to PR #11 (`dev3/ready-for-review`). Added at user direction: Manifest pages with DRS and delivery outcomes, Entry AWB/Booking dropdowns and capture fields (migration `20261118000200_transaction_capture_fields`), Customer/Penerima maintenance (`customer`/`consignee` permissions), AWB barcode, ten simplified reports, all legacy menu items linked. Simplifications are listed in `docs/decisions/DEV3-LEGACY-PARITY-AUDIT.md` §14/§14.1 and need owner confirmation. Gates (Node 24.15.0): lint 458, typecheck, unit 689, integration 161, build PASS. Dev and test DBs migrated locally. Dev server restarted from the agent session (log in scratchpad). Release NOT READY: Dev 1 re-review, Dev 2 and migration coordinator review of two new migrations, better-auth/Next.js security upgrade, staging/UAT, P3 decision.
+
+---
+
 ## Latest checkpoint: delete guards, dashboard parity, invoice list (2026-11-18, later)
 
 - **DELETE guards** (Dev 1 review 🟡): new forward-only migration `20261118000100_fin_delete_guards` rejects DELETE of POSTED journals and their lines, receipts, and non-draft invoices and their items. Applied to `logistik_web_test` only. Needs migration coordinator review; dev DB not migrated.
