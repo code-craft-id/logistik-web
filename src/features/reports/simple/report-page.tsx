@@ -1,6 +1,7 @@
 import Form from "next/form";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
@@ -76,12 +77,12 @@ export async function SimpleReportPage({
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-1">
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          {def.title}
-        </h1>
-        <p className="max-w-prose text-sm text-muted-foreground">
-          {def.definition}
-        </p>
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            {def.title}
+          </h1>
+          <InfoTip text={def.definition} />
+        </div>
       </header>
       <Form
         action={route}
@@ -161,6 +162,7 @@ export async function SimpleReportPage({
               <Table className="min-w-[48rem]">
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">No.</TableHead>
                     {result.columns.map((c) => (
                       <TableHead
                         key={c.key}
@@ -177,6 +179,9 @@ export async function SimpleReportPage({
                       // biome-ignore lint/suspicious/noArrayIndexKey: report rows have no stable id
                       key={index}
                     >
+                      <TableCell className="tabular-nums">
+                        {index + 1}
+                      </TableCell>
                       {result.columns.map((c) => (
                         <TableCell
                           key={c.key}
@@ -193,6 +198,7 @@ export async function SimpleReportPage({
                 {result.totals && (
                   <TableFooter>
                     <TableRow>
+                      <TableCell />
                       {result.columns.map((c) => (
                         <TableCell
                           key={c.key}

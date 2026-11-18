@@ -3,6 +3,7 @@ import Form from "next/form";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -162,13 +163,16 @@ export default async function Page({
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-1">
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          Pemasaran/Penjualan
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Data Customer dan Penerima dalam cakupan cabang Anda. Data yang
-          dihapus tetap tercatat pada AWB lama.
-        </p>
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Pemasaran/Penjualan
+          </h1>
+          <InfoTip
+            text={
+              "Data Customer dan Penerima dalam cakupan cabang Anda. Data yang dihapus tetap tercatat pada AWB lama."
+            }
+          />
+        </div>
       </header>
       <nav aria-label="Jenis data" className="flex gap-4 border-b">
         {tabs.map((tab) => (
@@ -240,6 +244,7 @@ export default async function Page({
             <Table className="min-w-[56rem]">
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">No.</TableHead>
                   {headers.map((h) => (
                     <TableHead key={h}>{h}</TableHead>
                   ))}
@@ -247,8 +252,11 @@ export default async function Page({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {result.items.map((item) => (
+                {result.items.map((item, index) => (
                   <TableRow key={item.id}>
+                    <TableCell className="tabular-nums">
+                      {(result.page - 1) * 25 + index + 1}
+                    </TableCell>
                     {item.columns.map((value, index) => (
                       <TableCell key={headers[index]}>{value ?? "—"}</TableCell>
                     ))}

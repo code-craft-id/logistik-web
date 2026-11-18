@@ -2,6 +2,7 @@ import Form from "next/form";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -161,6 +162,9 @@ function reportTable(result: OperationalReportResult) {
       </caption>
       <TableHeader>
         <TableRow>
+          <TableHead scope="col" className="w-12">
+            No.
+          </TableHead>
           {headers.map((header) => (
             <TableHead
               key={header}
@@ -181,8 +185,15 @@ function reportTable(result: OperationalReportResult) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {rows.map((row) => (
+        {rows.map((row, rowIndex) => (
           <TableRow key={row.id}>
+            <TableCell className="tabular-nums">
+              {(result.parsed.status === "valid"
+                ? result.parsed.filters.skip
+                : 0) +
+                rowIndex +
+                1}
+            </TableCell>
             {row.values.map((value, index) => (
               <TableCell
                 key={headers[index]}
@@ -279,23 +290,23 @@ export function OperationalReportView({
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          {titles[result.kind]}
-        </h1>
-        <p className="max-w-prose text-sm text-muted-foreground">
-          {dashboard
-            ? "Ringkasan operasional dalam cakupan cabang Anda. Setiap angka memakai tanggal sumber yang tertulis; status ditampilkan sesuai catatan tersimpan tanpa penggolongan keberhasilan."
-            : result.kind === "manifest"
-              ? "Satu baris per manifest sesuai jenis dan status tersimpan. Penugasan aktif dan kuantitas hanya mencakup transaksi yang masih ditugaskan dan terlihat dalam cakupan Anda. Kuantitas tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."
-              : "Laporan atas lembar pengantaran yang sudah tercatat. Periode mengikuti tanggal lembar pengantaran, bukan waktu diterima; hasil ditampilkan sesuai catatan tersimpan. Kuantitas hanya menjumlahkan transaksi terlihat dan tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."}
-        </p>
-        {dashboard && (
-          <p className="max-w-prose text-sm text-muted-foreground">
-            Transaksi mengikuti cabang asal/tujuan; manifest dan pengantaran
-            mengikuti cabang pemilik manifest. Transaksi pengantaran juga
-            dibatasi oleh cakupan asal/tujuan Anda.
-          </p>
-        )}
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            {titles[result.kind]}
+          </h1>
+          <InfoTip
+            text={
+              (dashboard
+                ? "Ringkasan operasional dalam cakupan cabang Anda. Setiap angka memakai tanggal sumber yang tertulis; status ditampilkan sesuai catatan tersimpan tanpa penggolongan keberhasilan."
+                : result.kind === "manifest"
+                  ? "Satu baris per manifest sesuai jenis dan status tersimpan. Penugasan aktif dan kuantitas hanya mencakup transaksi yang masih ditugaskan dan terlihat dalam cakupan Anda. Kuantitas tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman."
+                  : "Laporan atas lembar pengantaran yang sudah tercatat. Periode mengikuti tanggal lembar pengantaran, bukan waktu diterima; hasil ditampilkan sesuai catatan tersimpan. Kuantitas hanya menjumlahkan transaksi terlihat dan tidak tersedia jika ada nilai sumber yang belum diketahui. Maksimum 10.000 rincian per halaman.") +
+              (dashboard
+                ? " Transaksi mengikuti cabang asal/tujuan; manifest dan pengantaran mengikuti cabang pemilik manifest. Transaksi pengantaran juga dibatasi oleh cakupan asal/tujuan Anda."
+                : "")
+            }
+          />
+        </div>
       </header>
       {delivery && (
         <nav aria-label="Tampilan pengantaran" className="flex flex-wrap gap-4">

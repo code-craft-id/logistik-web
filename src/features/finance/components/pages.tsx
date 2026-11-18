@@ -88,6 +88,7 @@ export async function InvoiceListPage({
         <Table className="[&_th:last-child]:text-right">
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">No.</TableHead>
               {[
                 "Customer",
                 "Invoice No",
@@ -113,8 +114,11 @@ export async function InvoiceListPage({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {result.items.map((r) => (
+            {result.items.map((r, index) => (
               <TableRow key={r.id}>
+                <TableCell className="tabular-nums">
+                  {(result.page - 1) * 30 + index + 1}
+                </TableCell>
                 <TableCell>{r.customerName ?? r.customerId}</TableCell>
                 <TableCell>
                   <Link

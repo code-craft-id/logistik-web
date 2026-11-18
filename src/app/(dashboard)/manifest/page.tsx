@@ -3,6 +3,8 @@ import Form from "next/form";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
+import { SelectAllCheckbox } from "@/components/patterns/select-all";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -66,13 +68,16 @@ export default async function Page({
     <div className="min-w-0 space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            {titles[type] ?? "Daftar Manifest"}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Manifest dalam cakupan cabang Anda. Total dihitung dari AWB yang
-            masih aktif di manifest.
-          </p>
+          <div className="flex items-center gap-1">
+            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+              {titles[type] ?? "Daftar Manifest"}
+            </h1>
+            <InfoTip
+              text={
+                "Manifest dalam cakupan cabang Anda. Total dihitung dari AWB yang masih aktif di manifest."
+              }
+            />
+          </div>
         </div>
         {permits(current.actor, "create", "manifest") && (
           <Button asChild className="min-h-11">
@@ -106,51 +111,91 @@ export default async function Page({
         className="min-w-0 rounded-lg border bg-background"
       >
         {result.items.length ? (
-          <div className="overflow-x-auto">
-            <Table className="min-w-[64rem]">
-              <TableHeader>
-                <TableRow>
-                  {headers.map((h) => (
-                    <TableHead
-                      key={h}
-                      className={numeric.has(h) ? "text-right" : undefined}
-                    >
-                      {h}
+          <form
+            action="/print/manifests"
+            method="get"
+            target="_blank"
+            rel="noopener"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
+              <SelectAllCheckbox name="ids" />
+              <div className="flex flex-wrap gap-2">
+                <Button type="submit" className="min-h-11">
+                  Print terpilih
+                </Button>
+                <Button
+                  type="submit"
+                  name="doc"
+                  value="drs"
+                  variant="outline"
+                  className="min-h-11"
+                >
+                  Print DRS terpilih
+                </Button>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <Table className="min-w-[64rem]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10">
+                      <span className="sr-only">Pilih</span>
                     </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {result.items.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>
-                      <Link className={link} href={`/manifest/${row.id}`}>
-                        {row.manifestNo}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{row.date}</TableCell>
-                    <TableCell>{row.origin ?? "—"}</TableCell>
-                    <TableCell>{row.destination ?? "—"}</TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {row.awb}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {row.koli ?? "Tidak tersedia"}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {row.kilo ?? "Tidak tersedia"}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {row.volume ?? "Tidak tersedia"}
-                    </TableCell>
-                    <TableCell>{row.vehicle ?? "—"}</TableCell>
-                    <TableCell>{row.courier ?? "—"}</TableCell>
-                    <TableCell>{row.status}</TableCell>
+                    <TableHead className="w-12">No.</TableHead>
+                    {headers.map((h) => (
+                      <TableHead
+                        key={h}
+                        className={numeric.has(h) ? "text-right" : undefined}
+                      >
+                        {h}
+                      </TableHead>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {result.items.map((row, index) => (
+                    <TableRow key={row.id}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          name="ids"
+                          value={row.id}
+                          aria-label={`Pilih manifest ${row.manifestNo}`}
+                          className="size-4"
+                        />
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {(result.page - 1) * 25 + index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <Link className={link} href={`/manifest/${row.id}`}>
+                          {row.manifestNo}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{row.date}</TableCell>
+                      <TableCell>{row.origin ?? "—"}</TableCell>
+                      <TableCell>{row.destination ?? "—"}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.awb}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.koli ?? "Tidak tersedia"}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.kilo ?? "Tidak tersedia"}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.volume ?? "Tidak tersedia"}
+                      </TableCell>
+                      <TableCell>{row.vehicle ?? "—"}</TableCell>
+                      <TableCell>{row.courier ?? "—"}</TableCell>
+                      <TableCell>{row.status}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </form>
         ) : (
           <EmptyState
             title={

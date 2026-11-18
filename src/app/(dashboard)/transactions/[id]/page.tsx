@@ -40,7 +40,9 @@ export default async function Page({
       </div>
       {tx.awbNo && <Barcode value={tx.awbNo} />}
       <a
-        href={`/transactions/${tx.id}/print`}
+        href={`/print/awb?ids=${tx.id}`}
+        target="_blank"
+        rel="noopener"
         className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
       >
         Print AWB

@@ -42,6 +42,7 @@ describe("real report UI", () => {
     const host = document.createElement("div");
     host.innerHTML = html;
     expect([...host.querySelectorAll("th")].map((x) => x.textContent)).toEqual([
+      "No.",
       "AWB No.",
       "tanggal (UTC)",
       "Asal",

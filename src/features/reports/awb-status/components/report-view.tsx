@@ -2,6 +2,7 @@ import Form from "next/form";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -151,12 +152,12 @@ export function AwbStatusReportView({
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          {titles[kind]}
-        </h1>
-        <p className="max-w-prose text-sm text-muted-foreground">
-          {descriptions[kind]}
-        </p>
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            {titles[kind]}
+          </h1>
+          <InfoTip text={descriptions[kind]} />
+        </div>
       </header>
       {kind !== "all-status" && (
         <nav aria-label="Tampilan AWB" className="flex flex-wrap gap-4">
@@ -359,6 +360,9 @@ export function AwbStatusReportView({
               </caption>
               <TableHeader>
                 <TableRow>
+                  <TableHead scope="col" className="w-12">
+                    No.
+                  </TableHead>
                   {table.columns.map((column) => (
                     <TableHead
                       key={column.label}
@@ -371,8 +375,15 @@ export function AwbStatusReportView({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {table.rows.map((row) => (
+                {table.rows.map((row, rowIndex) => (
                   <TableRow key={row.id}>
+                    <TableCell className="tabular-nums">
+                      {(result.parsed.status === "valid"
+                        ? result.parsed.filters.skip
+                        : 0) +
+                        rowIndex +
+                        1}
+                    </TableCell>
                     {row.values.map((value, index) => (
                       <TableCell
                         key={table.columns[index].label}

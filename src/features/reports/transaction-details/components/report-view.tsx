@@ -1,6 +1,7 @@
 import Form from "next/form";
 import Link from "next/link";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,18 +83,12 @@ export function TransactionReportView({
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          Detail Transaksi
-        </h1>
-        <p className="max-w-prose text-sm text-muted-foreground">
-          Laporan operasional berdasarkan tanggal transaksi UTC. Setiap baris
-          adalah satu transaksi, termasuk status Cancelled; transaksi terhapus
-          tidak ditampilkan.
-        </p>
-        <p className="max-w-prose text-sm text-muted-foreground">
-          Laporan dan CSV UTF-8 menampilkan sembilan kolom non-finansial. Asal
-          dan Tujuan adalah cabang; Kilo ditampilkan sesuai nilai tersimpan.
-        </p>
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Detail Transaksi
+          </h1>
+          <InfoTip text="Laporan operasional berdasarkan tanggal transaksi UTC. Setiap baris adalah satu transaksi, termasuk status Cancelled; transaksi terhapus tidak ditampilkan. Laporan dan CSV UTF-8 menampilkan sembilan kolom non-finansial. Asal dan Tujuan adalah cabang; Kilo ditampilkan sesuai nilai tersimpan." />
+        </div>
       </header>
       <section
         aria-label="Filter laporan"
@@ -296,6 +291,9 @@ export function TransactionReportView({
               </caption>
               <TableHeader>
                 <TableRow>
+                  <TableHead scope="col" className="w-12">
+                    No.
+                  </TableHead>
                   {headers.map((header) => (
                     <TableHead
                       key={header}
@@ -312,8 +310,15 @@ export function TransactionReportView({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {result.items.map((row) => (
+                {result.items.map((row, rowIndex) => (
                   <TableRow key={row.id}>
+                    <TableCell className="tabular-nums">
+                      {(result.parsed.status === "valid"
+                        ? result.parsed.filters.skip
+                        : 0) +
+                        rowIndex +
+                        1}
+                    </TableCell>
                     <TableCell className="font-mono whitespace-nowrap">
                       {value(row.awbNo)}
                     </TableCell>

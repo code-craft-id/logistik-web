@@ -1,88 +1,137 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
+import { SelectAllCheckbox } from "@/components/patterns/select-all";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { listTransactions } from "@/features/bookings/server/queries";
 import { requirePermission } from "@/lib/auth/session";
-import type { Transaction } from "@/lib/db/generated/client";
 
 export const metadata: Metadata = { title: "On Site Outbound" };
+
+const link =
+  "inline-flex min-h-11 items-center text-primary underline underline-offset-4";
 
 export default async function Page() {
   await requirePermission("view", "transaction");
   const transactions = await listTransactions({ limit: 50 });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            On Site Outbound / AWB
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Daftar transaksi/AWB. Penomoran AWB mengikuti aturan yang belum
-            terkonfirmasi (D-06) - input opsional.
-          </p>
+    <div className="min-w-0 space-y-5">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-1">
+            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+              On Site Outbound / AWB
+            </h1>
+            <InfoTip
+              text={
+                "50 AWB terbaru. Centang AWB lalu Print terpilih untuk mencetak sekaligus di tab baru."
+              }
+            />
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href="/transactions/lookup"
-            className="px-3 py-2 border rounded"
-          >
-            Lookup AWB
-          </Link>
-          <Link href="/transactions/new" className="px-3 py-2 border rounded">
-            Tambah AWB
-          </Link>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="min-h-11">
+            <Link href="/transactions/lookup">Lookup AWB</Link>
+          </Button>
+          <Button asChild className="min-h-11">
+            <Link href="/transactions/new">Tambah AWB</Link>
+          </Button>
         </div>
-      </div>
-      <div className="border rounded">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-2">AWB No.</th>
-              <th className="text-left p-2">Tanggal</th>
-              <th className="text-left p-2">DO No.</th>
-              <th className="text-left p-2">Pengirim</th>
-              <th className="text-left p-2">Penerima</th>
-              <th className="text-left p-2">Cabang Asal</th>
-              <th className="text-left p-2">Status</th>
-              <th className="text-left p-2">Koli</th>
-              <th className="text-left p-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="p-4 text-center text-muted-foreground"
-                >
-                  Belum ada data
-                </td>
-              </tr>
-            ) : (
-              transactions.map((t: Transaction) => (
-                <tr key={t.id} className="border-b">
-                  <td className="p-2">{t.awbNo || "-"}</td>
-                  <td className="p-2">
-                    {t.transactionDate.toISOString().slice(0, 10)}
-                  </td>
-                  <td className="p-2">{t.doNo || "-"}</td>
-                  <td className="p-2">{t.senderName || "-"}</td>
-                  <td className="p-2">{t.receiverName || "-"}</td>
-                  <td className="p-2">{t.originBranchId ?? "-"}</td>
-                  <td className="p-2">{t.status}</td>
-                  <td className="p-2">{t.koli ?? 0}</td>
-                  <td className="p-2">
-                    <Link href={`/transactions/${t.id}`} className="underline">
-                      Detail
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      </header>
+      {transactions.length === 0 ? (
+        <EmptyState
+          title="Belum ada AWB"
+          description="AWB yang dibuat lewat Tambah AWB akan tampil di sini."
+        />
+      ) : (
+        <form
+          action="/print/awb"
+          method="get"
+          target="_blank"
+          className="min-w-0 space-y-3 rounded-lg border bg-background"
+          rel="noopener"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
+            <SelectAllCheckbox name="ids" />
+            <Button type="submit" className="min-h-11">
+              Print terpilih
+            </Button>
+          </div>
+          <div className="overflow-x-auto">
+            <Table className="min-w-[56rem]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10">
+                    <span className="sr-only">Pilih</span>
+                  </TableHead>
+                  <TableHead className="w-12">No.</TableHead>
+                  <TableHead>AWB No.</TableHead>
+                  <TableHead>Tanggal</TableHead>
+                  <TableHead>DO No.</TableHead>
+                  <TableHead>Pengirim</TableHead>
+                  <TableHead>Penerima</TableHead>
+                  <TableHead>Cabang Asal</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Koli</TableHead>
+                  <TableHead>Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {transactions.map((t, index) => (
+                  <TableRow key={t.id}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        name="ids"
+                        value={t.id}
+                        aria-label={`Pilih AWB ${t.awbNo ?? t.id}`}
+                        className="size-4"
+                      />
+                    </TableCell>
+                    <TableCell className="tabular-nums">{index + 1}</TableCell>
+                    <TableCell>{t.awbNo || "-"}</TableCell>
+                    <TableCell>
+                      {t.transactionDate.toISOString().slice(0, 10)}
+                    </TableCell>
+                    <TableCell>{t.doNo || "-"}</TableCell>
+                    <TableCell>{t.senderName || "-"}</TableCell>
+                    <TableCell>{t.receiverName || "-"}</TableCell>
+                    <TableCell>{t.originBranch?.name ?? "-"}</TableCell>
+                    <TableCell>{t.status}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {t.koli ?? 0}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <Link href={`/transactions/${t.id}`} className={link}>
+                        Detail
+                      </Link>{" "}
+                      ·{" "}
+                      <a
+                        href={`/print/awb?ids=${t.id}`}
+                        target="_blank"
+                        rel="noopener"
+                        className={link}
+                      >
+                        Print
+                      </a>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

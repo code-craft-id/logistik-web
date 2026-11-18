@@ -85,16 +85,23 @@ export default async function Page({
           Manifest {manifest.manifestNo}
         </h1>
         <nav aria-label="Cetak" className="flex flex-wrap gap-4">
-          <Link className={link} href={`/manifest/${manifest.id}/print`}>
+          <a
+            className={link}
+            href={`/print/manifest/${manifest.id}`}
+            target="_blank"
+            rel="noopener"
+          >
             Print Manifest
-          </Link>
+          </a>
           {manifest.deliverySheet && (
-            <Link
+            <a
               className={link}
-              href={`/manifest/${manifest.id}/print?doc=drs`}
+              href={`/print/manifest/${manifest.id}?doc=drs`}
+              target="_blank"
+              rel="noopener"
             >
               Print DRS
-            </Link>
+            </a>
           )}
         </nav>
       </header>
@@ -154,6 +161,7 @@ export default async function Page({
               <TableHeader>
                 <TableRow>
                   {[
+                    "No.",
                     "AWB No.",
                     "DO No.",
                     "Penerima",
@@ -169,8 +177,9 @@ export default async function Page({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {manifest.items.map((item) => (
+                {manifest.items.map((item, index) => (
                   <TableRow key={item.id}>
+                    <TableCell className="tabular-nums">{index + 1}</TableCell>
                     <TableCell>
                       {permits(current.actor, "view", "transaction") ? (
                         <Link

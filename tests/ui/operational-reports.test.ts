@@ -50,6 +50,7 @@ it("renders scoped manifest rows with accessible filters/table and no invented D
   const host = document.createElement("div");
   host.innerHTML = html;
   expect([...host.querySelectorAll("th")].map((x) => x.textContent)).toEqual([
+    "No.",
     "Manifes No.",
     "Tanggal (UTC)",
     "Cabang pemilik",

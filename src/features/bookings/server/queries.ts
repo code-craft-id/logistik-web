@@ -93,6 +93,7 @@ export async function listTransactions(params: { limit?: number } = {}) {
       where: { deletedAt: null },
       orderBy: { transactionDate: "desc" },
       take: limit,
+      include: { originBranch: { select: { name: true } } },
     });
   }
   const branchIds = await getUserBranchScope();
@@ -108,6 +109,7 @@ export async function listTransactions(params: { limit?: number } = {}) {
     },
     orderBy: { transactionDate: "desc" },
     take: limit,
+    include: { originBranch: { select: { name: true } } },
   });
 }
 

@@ -3,6 +3,7 @@ import Form from "next/form";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,13 +56,16 @@ export default async function Page({
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
       <header className="space-y-1">
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          Pemasaran/Penjualan
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Pendapatan = total biaya AWB customer pada bulan terpilih (UTC).
-          Growth dibandingkan dengan bulan sebelumnya.
-        </p>
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Pemasaran/Penjualan
+          </h1>
+          <InfoTip
+            text={
+              "Pendapatan = total biaya AWB customer pada bulan terpilih (UTC). Growth dibandingkan dengan bulan sebelumnya."
+            }
+          />
+        </div>
       </header>
       <nav aria-label="Jenis data" className="flex gap-4 border-b">
         {[

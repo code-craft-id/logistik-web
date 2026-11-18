@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { InfoTip } from "@/components/patterns/info-tip";
 import { currentIdentity } from "@/features/identity/server/context";
 import { ManifestCreateForm } from "@/features/shipments/components/manifest-forms";
 import { manifestFormOptions } from "@/features/shipments/server/manifests-queries";
@@ -25,13 +26,16 @@ export default async function Page() {
         >
           Kembali ke daftar manifest
         </Link>
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          Tambah Manifest
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Manifest dibuat berstatus Draft. Tambahkan AWB dari halaman detail
-          setelah disimpan.
-        </p>
+        <div className="flex items-center gap-1">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
+            Tambah Manifest
+          </h1>
+          <InfoTip
+            text={
+              "Manifest dibuat berstatus Draft. Tambahkan AWB dari halaman detail setelah disimpan."
+            }
+          />
+        </div>
       </header>
       <ManifestCreateForm
         {...options}

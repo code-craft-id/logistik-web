@@ -29,6 +29,7 @@ export default async function Page() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
+              <th className="text-left p-2">No.</th>
               <th className="text-left p-2">Booking No.</th>
               <th className="text-left p-2">Tanggal</th>
               <th className="text-left p-2">DO No.</th>
@@ -43,15 +44,16 @@ export default async function Page() {
             {bookings.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="p-4 text-center text-muted-foreground"
                 >
                   Belum ada data
                 </td>
               </tr>
             ) : (
-              bookings.map((b) => (
+              bookings.map((b, index) => (
                 <tr key={b.id} className="border-b">
+                  <td className="p-2 tabular-nums">{index + 1}</td>
                   <td className="p-2">{b.bookingNo || "-"}</td>
                   <td className="p-2">
                     {b.bookingDate.toISOString().slice(0, 10)}
