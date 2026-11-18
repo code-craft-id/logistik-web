@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createAccountingQueries } from "../../src/features/finance/server/queries";
 import { createFinanceService } from "../../src/features/finance/server/service";
 import { loadAccessActor } from "../../src/features/identity/server/access";
-import { PrismaClient } from "../../src/lib/db/generated/client";
+import { type Prisma, PrismaClient } from "../../src/lib/db/generated/client";
 import { testDatabaseUrl } from "../support/test-database-url";
 
 const db = new PrismaClient({
@@ -242,8 +242,26 @@ beforeAll(async () => {
       liabilityId: accounts[3],
     });
 });
+// Posted finance records are undeletable (20261118000100_fin_delete_guards).
+// Test-only teardown: the test-database owner suspends those guards inside the
+// cleanup transaction; ALTER TABLE is transactional, so they return on commit.
+const guards = [
+  ["fin_journals", "fin_journal_no_delete"],
+  ["fin_lines", "fin_line_no_delete"],
+  ["fin_receipts", "fin_receipt_no_delete"],
+  ["fin_invoices", "fin_invoice_no_delete"],
+  ["fin_invoice_items", "fin_invoice_item_no_delete"],
+] as const;
+async function toggleGuards(tx: Prisma.TransactionClient, on: boolean) {
+  for (const [table, trigger] of guards)
+    await tx.$executeRawUnsafe(
+      `ALTER TABLE ${table} ${on ? "ENABLE" : "DISABLE"} TRIGGER ${trigger}`,
+    );
+}
+
 afterAll(async () => {
   await db.$transaction(async (tx) => {
+    await toggleGuards(tx, false);
     const scope = { branchId: { in: [branch, financeBranch].filter(Boolean) } };
     await tx.finClosedPeriod.deleteMany({ where: scope });
     await tx.finLine.deleteMany({ where: { journal: scope } });
@@ -257,20 +275,23 @@ afterAll(async () => {
     await tx.finCost.deleteMany({ where: { source: scope } });
     await tx.finCostState.deleteMany({ where: scope });
     await tx.finMapping.deleteMany({ where: scope });
+    const invoices = await tx.finInvoice.findMany({
+      where: { branchId: { in: [branch, otherBranch, financeBranch] } },
+      select: { id: true },
+    });
+    const ids = invoices.map((x) => x.id);
+    await tx.finReceipt.deleteMany({
+      where: { invoiceId: { in: ids }, reversalOfId: { not: null } },
+    });
+    await tx.finReceipt.deleteMany({ where: { invoiceId: { in: ids } } });
+    await tx.finReservation.deleteMany({ where: { invoiceId: { in: ids } } });
+    await tx.finInvoiceItem.deleteMany({ where: { invoiceId: { in: ids } } });
+    await tx.finInvoice.deleteMany({ where: { id: { in: ids } } });
+    // Fire deferred balance triggers first; ALTER TABLE refuses pending events.
+    await tx.$executeRawUnsafe("SET CONSTRAINTS ALL IMMEDIATE");
+    await toggleGuards(tx, true);
   });
   await db.finCommand.deleteMany({ where: { actorId: { in: users } } });
-  const invoices = await db.finInvoice.findMany({
-    where: { branchId: { in: [branch, otherBranch, financeBranch] } },
-    select: { id: true },
-  });
-  const ids = invoices.map((x) => x.id);
-  await db.finReceipt.deleteMany({
-    where: { invoiceId: { in: ids }, reversalOfId: { not: null } },
-  });
-  await db.finReceipt.deleteMany({ where: { invoiceId: { in: ids } } });
-  await db.finReservation.deleteMany({ where: { invoiceId: { in: ids } } });
-  await db.finInvoiceItem.deleteMany({ where: { invoiceId: { in: ids } } });
-  await db.finInvoice.deleteMany({ where: { id: { in: ids } } });
   await db.transaction.deleteMany({
     where: { id: { in: [...sources, ...financeSources] } },
   });
@@ -872,6 +893,41 @@ describe("FIN-02 guarded ledger and reconciliation", () => {
       reason: "FAKE explicit zero; no supplier obligation confirmed",
     });
   });
+  it("rejects deletion of posted journals/lines, receipts and issued or void invoices (PR #11 review)", async () => {
+    const branches = [branch, otherBranch, financeBranch].filter(Boolean);
+    const journal = await db.finJournal.findFirstOrThrow({
+      where: { branchId: { in: branches }, status: "POSTED" },
+      select: { id: true },
+    });
+    const line = await db.finLine.findFirstOrThrow({
+      where: { journalId: journal.id },
+      select: { id: true },
+    });
+    const receipt = await db.finReceipt.findFirstOrThrow({
+      where: { invoice: { branchId: { in: branches } } },
+      select: { id: true },
+    });
+    const invoice = await db.finInvoice.findFirstOrThrow({
+      where: { branchId: { in: branches }, status: { not: "DRAFT" } },
+      select: { id: true },
+    });
+    const item = await db.finInvoiceItem.findFirstOrThrow({
+      where: { invoiceId: invoice.id },
+      select: { id: true },
+    });
+    for (const attempt of [
+      () => db.finLine.delete({ where: { id: line.id } }),
+      () => db.finJournal.delete({ where: { id: journal.id } }),
+      () => db.finReceipt.delete({ where: { id: receipt.id } }),
+      () => db.finInvoiceItem.delete({ where: { id: item.id } }),
+      () => db.$executeRaw`DELETE FROM fin_invoices WHERE id = ${invoice.id}`,
+    ])
+      await expect(attempt()).rejects.toThrow(/cannot be deleted/);
+    await expect(
+      db.finJournal.count({ where: { id: journal.id } }),
+    ).resolves.toBe(1);
+  });
+
   it("excludes internal cash transfers and rejects writes to closed periods while permitting forward reversals", async () => {
     await command("journal.transfer", {
       branchId: financeBranch,
