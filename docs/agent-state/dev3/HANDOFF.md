@@ -1,3 +1,13 @@
+## Latest checkpoint: PR #11 second review (REQUEST CHANGES) addressed (2026-11-18)
+
+- **P2 delivery soft-delete: CONFIRMED, fixed.** LP-R21 recipient lookup now ignores DRS items whose manifest is soft-deleted (`delivery_sheets` has no `deleted_at`; RPT-02 already uses the manifest). Regression fixture: newer DRS under deleted manifest M2; the test fails on `24d3618` and passes after the fix.
+- **P1 AWB Manifested grain: NOT REPRODUCIBLE.** `manifest_items_transaction_id_key` allows one manifest item per transaction, so rows cannot duplicate and total equals row count. Added a guard test (second item rejected with P2002; total = distinct AWBs) and a code comment: relaxing that constraint (Dev 2) requires transaction-grain rows.
+- **P3 finance VOID completeness: no code change, needs finance owner.** Including voided issued sources is the documented FIN-02 implementation rule (`docs/decisions/FIN-implementation.md` §completeness; FIN-02 contract row "reverse receipt then void" keeps cost 90000.00, GP -90000.00) and covered by `tests/integration/finance.test.ts` "void retains supplier costs". Changing it is a finance-owner decision, not a review fix.
+
+Verification (Node 24.15.0): lint 435 PASS, typecheck PASS, unit 70/683 PASS, integration 16/146 PASS, build PASS (retry after advisory notice). Staging smoke/UAT not done (no staging access from this session). Push and re-review request await the user.
+
+---
+
 ## Latest checkpoint: PR #11 review fixes and REL-01 readiness (2026-11-17, end of day)
 
 Pushed `dee2dc9` to `dev3/ready-for-review` (PR #11, draft). Review fixes: `/dashboard` falls back to the general overview without `dashboard_report.view`; finance permission notes match FIN-02 (rights-based, per user direction "akses sesuai hak akses"); finance P2002/P2025 messages; independent cost source/event pagination; global finance lock documented. AWB report self-review fixes in `98ab774`.

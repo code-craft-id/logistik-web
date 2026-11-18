@@ -208,6 +208,15 @@ beforeAll(async () => {
     },
   });
   ids.sheet.push(sheet4.id);
+  // DRS under the soft-deleted manifest M2 (PR #11 review P2).
+  const sheetDeleted = await db.deliverySheet.create({
+    data: {
+      manifestId: m2,
+      sheetNo: `${tag}-DRS2`,
+      deliveryDate: new Date("2026-11-09T00:00:00Z"),
+    },
+  });
+  ids.sheet.push(sheetDeleted.id);
   await db.deliverySheetItem.createMany({
     data: [
       // ACTIVE: first attempt has a recipient, later attempts do not.
@@ -247,6 +256,13 @@ beforeAll(async () => {
         deliverySheetId: sheet4.id,
         transactionId: oldManifest,
         receivedBy: "FAKE Newer",
+      },
+      // Newest DRS, but its manifest is soft-deleted: never the recipient source.
+      {
+        deliverySheetId: sheetDeleted.id,
+        transactionId: active,
+        receivedBy: "FAKE Deleted DRS",
+        deliveredAt: new Date("2026-11-09T10:00:00Z"),
       },
     ],
   });
@@ -379,6 +395,28 @@ describe("LP-R10/R11/R21 guarded real sources", () => {
     expect(awbs(october.items)).toEqual([awb("OLDMAN")]);
   });
 
+  it("LP-R11 rows and totals share one grain (PR #11 review P1)", async () => {
+    // A second item for an assigned AWB is rejected, so rows cannot duplicate.
+    const second = await manifest("M5", "2026-11-04T09:00:00Z");
+    await expect(
+      db.manifestItem.create({
+        data: { manifestId: second, transactionId: ids.transaction[1] },
+      }),
+    ).rejects.toMatchObject({ code: "P2002" });
+    const result = await service(scoped).read("manifested", {
+      ...period,
+      pageSize: "1",
+    });
+    expect(result.total).toBe(result.totals?.totalAwb);
+    expect(result.total).toBe(
+      new Set(
+        (await service(scoped).read("manifested", period)).items.map(
+          (row) => row.awbNo,
+        ),
+      ).size,
+    );
+  });
+
   it("LP-R21 uses stored status, active manifest and latest recorded recipient", async () => {
     const result = await service(scoped).read("all-status", period);
     expect(result.kind).toBe("all-status");
@@ -389,6 +427,7 @@ describe("LP-R10/R11/R21 guarded real sources", () => {
         .map(awb)
         .sort(),
     );
+    // The newer DRS under deleted manifest M2 is ignored (PR #11 review P2).
     expect(byAwb.get(awb("ACTIVE"))).toMatchObject({
       receivedBy: "FAKE R1",
       deliveredAt: "2026-11-05T10:00:00.000Z",

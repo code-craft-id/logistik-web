@@ -184,6 +184,9 @@ export function createAwbStatusReportService(
         };
 
         if (kind === "manifested") {
+          // Rows are manifest items, totals are transactions. They agree because
+          // manifest_items_transaction_id_key allows one item per transaction;
+          // relaxing that constraint requires transaction-grain rows here.
           const inPeriod: Prisma.ManifestItemWhereInput = {
             ...activeAssignment,
             manifest: { is: { deletedAt: null, manifestDate: range } },
@@ -303,10 +306,14 @@ export function createAwbStatusReportService(
               take: 1,
             },
             // Latest attempt with a recorded recipient: newest DRS date, then delivery time (D-22).
+            // A DRS has no own deletedAt; it is deleted with its manifest, as in RPT-02.
             deliverySheetItems: {
               where: {
                 deletedAt: null,
                 receivedBy: { not: null, notIn: [""] },
+                deliverySheet: {
+                  is: { manifest: { is: { deletedAt: null } } },
+                },
               },
               select: { receivedBy: true, deliveredAt: true },
               orderBy: [
