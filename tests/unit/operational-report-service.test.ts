@@ -14,6 +14,7 @@ const db = {
   deliverySheet: { findMany: vi.fn(), count: vi.fn() },
   deliverySheetItem: { findMany: vi.fn(), count: vi.fn() },
   $transaction: vi.fn(),
+  $queryRaw: vi.fn().mockResolvedValue([]),
 };
 const read = () =>
   createOperationalReportService(
@@ -180,6 +181,7 @@ describe("operational report boundaries", () => {
     db.manifest.count.mockResolvedValue(3);
     db.deliverySheet.count.mockResolvedValue(2);
     db.deliverySheetItem.count.mockResolvedValue(1);
+    db.$queryRaw.mockResolvedValue([]);
     db.transaction.groupBy.mockResolvedValue([
       { status: "Open", _count: { _all: 4 } },
     ]);
@@ -201,6 +203,7 @@ describe("operational report boundaries", () => {
     expect(result.insights).toMatchObject({
       actions: [],
       statuses: [{ status: "Open", count: 4 }],
+      daily: expect.arrayContaining([{ date: period.startDate, count: 0 }]),
       recent: null,
       invoices: null,
     });

@@ -149,6 +149,10 @@ it("renders legacy dashboard widgets from sources and hides gated detail", () =>
     insights: {
       actions: [{ label: "Entry AWB", href: "/transactions/new" }],
       awbPending: 3,
+      daily: [
+        { date: "2026-11-01", count: 0 },
+        { date: "2026-11-02", count: 4 },
+      ],
       statuses: [
         { status: "Delivered", count: 1 },
         { status: "Open", count: 3 },
@@ -174,6 +178,9 @@ it("renders legacy dashboard widgets from sources and hides gated detail", () =>
   expect(html).toContain("hanya tampil bagi pengguna dengan hak lihat invoice");
   expect(html).not.toContain("IDR");
   expect(html).toContain("Belum tersedia");
+  expect(html).toContain("Grafik Transaksi Harian");
+  expect(html).toContain("2026-11-02: 4 AWB");
+  expect(html).toContain("Tertinggi 4 AWB pada 2026-11-02");
 });
 it("distinguishes unavailable vendor, initial, empty and invalid states", () => {
   const vendor = render({

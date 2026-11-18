@@ -418,6 +418,9 @@ describe("guarded operational report real sources", () => {
     if (result.kind !== "dashboard" || dashOnly.kind !== "dashboard") return;
     const insights = result.insights;
     expect(insights?.statuses.reduce((n, row) => n + row.count, 0)).toBe(2);
+    // Daily series covers every period day and sums to the scoped count.
+    expect(insights?.daily).toHaveLength(15);
+    expect(insights?.daily.reduce((n, day) => n + day.count, 0)).toBe(2);
     expect(insights?.awbPending).toBeGreaterThanOrEqual(0);
     expect(insights?.awbPending).toBeLessThanOrEqual(2);
     expect(insights?.recent).toBeNull();

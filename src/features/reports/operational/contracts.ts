@@ -55,6 +55,8 @@ export type DashboardInsights = {
   actions: { label: string; href: string }[];
   /** In period, no active manifest assignment (LP-R10 definition). */
   awbPending: number;
+  /** AWB count per UTC transaction day across the whole period. */
+  daily: { date: string; count: number }[];
   /** Stored transaction status counts in period; no bucket mapping. */
   statuses: { status: string; count: number }[];
   /** Latest created AWBs in scope; null without transaction read rights. */

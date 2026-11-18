@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { TransactionReportFilters } from "../../transaction-details/filters";
 import type { DashboardInsights } from "../contracts";
+import { DashboardDailyChart } from "./dashboard-daily-chart";
 
 const panel = "min-w-0 rounded-lg border bg-background p-4 sm:p-6";
 const link =
@@ -121,6 +122,13 @@ export function DashboardInsightsView({
         )}
       </section>
 
+      <section
+        aria-label="Grafik transaksi"
+        className={`${panel} lg:col-span-2`}
+      >
+        <DashboardDailyChart days={insights.daily} />
+      </section>
+
       <section aria-labelledby="dash-status" className={panel}>
         <h2 id="dash-status" className="font-semibold">
           Shipment Status
@@ -199,10 +207,10 @@ export function DashboardInsightsView({
           Belum tersedia
         </h2>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-          Nominal transaksi, CASH/KREDIT/COD/TRANSFER, grafik penjualan, top
-          customer, POD outstanding, failed/return, rekomendasi otomatis dan
-          pengumuman menunggu aturan sumber yang disetujui (D-11, D-15, D-22).
-          Dashboard tidak menebak angka tersebut.
+          Nominal transaksi, CASH/KREDIT/COD/TRANSFER, grafik penjualan per
+          nominal, top customer, POD outstanding, failed/return, rekomendasi
+          otomatis dan pengumuman menunggu aturan sumber yang disetujui (D-11,
+          D-15, D-22). Dashboard tidak menebak angka tersebut.
         </p>
       </section>
     </div>

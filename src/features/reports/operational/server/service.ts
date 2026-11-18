@@ -127,6 +127,44 @@ async function invoiceBalances(
   return row ?? { unpaid: 0, partial: 0, paid: 0, outstanding: "0.00" };
 }
 
+/** AWB count per UTC transaction day, every day of the period present (zero-filled). */
+async function dailyTransactions(
+  tx: Prisma.TransactionClient,
+  actor: AccessActor,
+  branchId: number | null,
+  from: Date,
+  toExclusive: Date,
+) {
+  const scope: Prisma.Sql[] = [];
+  if (!isAdministrator(actor))
+    scope.push(
+      actor.branchIds.length
+        ? Prisma.sql`(t.origin_branch_id IN (${Prisma.join(actor.branchIds)}) OR t.destination_branch_id IN (${Prisma.join(actor.branchIds)}))`
+        : Prisma.sql`FALSE`,
+    );
+  if (branchId !== null)
+    scope.push(
+      Prisma.sql`(t.origin_branch_id = ${branchId} OR t.destination_branch_id = ${branchId})`,
+    );
+  const where = scope.length
+    ? Prisma.sql`AND ${Prisma.join(scope, " AND ")}`
+    : Prisma.empty;
+  const rows = await tx.$queryRaw<{ day: string; count: number }[]>`
+    SELECT to_char(t.transaction_date, 'YYYY-MM-DD') AS day, count(*)::int AS count
+    FROM transactions t
+    WHERE t.deleted_at IS NULL
+      AND t.transaction_date >= ${from} AND t.transaction_date < ${toExclusive}
+      ${where}
+    GROUP BY 1`;
+  const counts = new Map(rows.map((row) => [row.day, row.count]));
+  const days: { date: string; count: number }[] = [];
+  for (let at = from.getTime(); at < toExclusive.getTime(); at += 86_400_000) {
+    const date = new Date(at).toISOString().slice(0, 10);
+    days.push({ date, count: counts.get(date) ?? 0 });
+  }
+  return days;
+}
+
 export function createOperationalReportService(
   db: PrismaClient,
   resolve: () => Promise<AccessActor | null>,
@@ -391,6 +429,13 @@ export function createOperationalReportService(
                   createdAt: row.createdAt.toISOString(),
                 }))
               : null;
+            const daily = await dailyTransactions(
+              tx,
+              actor,
+              f.branchId,
+              f.from,
+              f.toExclusive,
+            );
             const invoices = permits(actor, "view", "invoice")
               ? await invoiceBalances(tx, actor, f.branchId)
               : null;
@@ -408,6 +453,7 @@ export function createOperationalReportService(
               insights: {
                 actions: quickActions(actor),
                 awbPending,
+                daily,
                 statuses,
                 recent,
                 invoices,
