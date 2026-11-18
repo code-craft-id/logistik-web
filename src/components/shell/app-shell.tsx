@@ -75,33 +75,42 @@ function DesktopNavigation({
         {item.providerLabel} <span className="text-xs">— unavailable</span>
       </p>
     );
-  const groupPanel = (group: NavigationGroup) => (
-    <NavigationMenuContent aria-label={`${group.providerLabel} destinations`}>
-      <p className="mb-3 border-b px-3 pb-3 text-xs text-muted-foreground">
-        Navigate LMS pages
-      </p>
-      <ul className="grid grid-cols-2 items-start gap-4">
-        {navigationEntries(group).map((entry) => (
-          <li key={entry.label}>
-            {isNavigationSection(entry) ? (
-              <section aria-label={entry.providerPath.join(" / ")}>
-                <h2 className="mb-1 px-3 text-sm font-semibold">
-                  {entry.providerPath.join(" / ")}
-                </h2>
-                <ul>
-                  {entry.items.map((item) => (
-                    <li key={item.label}>{routeLink(item)}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : (
-              routeLink(entry)
-            )}
-          </li>
-        ))}
-      </ul>
-    </NavigationMenuContent>
-  );
+  // Panel width follows its content: one column for short groups, two for long ones.
+  const groupPanel = (group: NavigationGroup) => {
+    const entries = navigationEntries(group);
+    const links = entries.reduce(
+      (n, entry) => n + (isNavigationSection(entry) ? entry.items.length : 1),
+      0,
+    );
+    const wide = entries.length > 1 && links > 6;
+    return (
+      <NavigationMenuContent
+        aria-label={`${group.providerLabel} destinations`}
+        className={`left-1/2 -translate-x-1/2 p-2 ${wide ? "w-xl" : "w-64"}`}
+      >
+        <ul className={wide ? "columns-2 gap-2" : undefined}>
+          {entries.map((entry) => (
+            <li key={entry.label} className="mb-3 break-inside-avoid last:mb-0">
+              {isNavigationSection(entry) ? (
+                <section aria-label={entry.providerPath.join(" / ")}>
+                  <h2 className="mb-1 px-3 text-sm font-semibold">
+                    {entry.providerPath.join(" / ")}
+                  </h2>
+                  <ul>
+                    {entry.items.map((item) => (
+                      <li key={item.label}>{routeLink(item)}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                routeLink(entry)
+              )}
+            </li>
+          ))}
+        </ul>
+      </NavigationMenuContent>
+    );
+  };
   return (
     <NavigationMenu
       aria-label="Main navigation"
@@ -110,7 +119,11 @@ function DesktopNavigation({
     >
       <NavigationMenuList>
         {primary.map((group) => (
-          <NavigationMenuItem key={group.label} value={group.label}>
+          <NavigationMenuItem
+            key={group.label}
+            value={group.label}
+            className="relative"
+          >
             {group.href ? (
               <NavigationMenuLink
                 asChild
@@ -132,7 +145,7 @@ function DesktopNavigation({
           </NavigationMenuItem>
         ))}
         {additional.length > 0 && (
-          <NavigationMenuItem value="supplementary">
+          <NavigationMenuItem value="supplementary" className="relative">
             <NavigationMenuTrigger
               data-active={current && additional.includes(current.group)}
             >

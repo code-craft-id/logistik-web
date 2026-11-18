@@ -41,16 +41,33 @@ describe("available navigation", () => {
       "/dashboard",
       "/branch-reports/manifest-outbound",
       "/branch-reports/delivery",
+      "/transactions",
+      "/bookings",
+      "/branch-reports/awb",
+      "/customer-reports/all-status",
     ])
       expect(paths).toContain(path);
     for (const path of [
       "/branch-reports/manifest-vendor",
       "/perkiraan",
       "/akunting",
-      "/transactions",
+      "/manifest",
       "/ui-examples",
     ])
       expect(paths).not.toContain(path);
+  });
+  it("links Dev 2 modules and Dev 3 AWB reports only with their own grants", () => {
+    const hrefs = (resources: string[]) =>
+      navigationDestinations(accessibleNavigation(actor(resources))).map(
+        ({ item }) => item.href,
+      );
+    expect(hrefs(["transaction"])).toEqual(["/transactions"]);
+    expect(hrefs(["booking"])).toEqual(["/bookings"]);
+    expect(hrefs(["transaction_report"])).toEqual([
+      "/branch-reports/transaction-details",
+      "/branch-reports/awb",
+      "/customer-reports/all-status",
+    ]);
   });
   it("prunes empty groups and includes only granted view routes", () => {
     const groups = accessibleNavigation(actor(["driver"]));

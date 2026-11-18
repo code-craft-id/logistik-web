@@ -232,9 +232,12 @@ type LegacyItem = {
   href?: string;
   children?: readonly LegacyItem[];
 };
-const implemented = new Set<string>(
-  implementedPreviewRoutes.map((item) => item.href),
-);
+// Live workflows added after the frozen preview inventory (outside its 43 screens).
+export const liveRoutes = ["/customer-reports/all-status"];
+const implemented = new Set<string>([
+  ...implementedPreviewRoutes.map((item) => item.href),
+  ...liveRoutes,
+]);
 const leaf = (item: LegacyItem): NavigationLeaf => {
   const href = item.href ? applicationPreviewPath(item.href) : undefined;
   return {

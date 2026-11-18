@@ -5,6 +5,7 @@ import screenMap from "../../docs/experiments/legacy-ui-screen-map.json";
 import { implementedPreviewRoutes } from "../../src/components/shell/implemented-preview-routes";
 import { legacyMenu } from "../../src/components/shell/legacy-menu";
 import {
+  liveRoutes,
   navigation,
   navigationDestinations,
   providerNavigation,
@@ -44,6 +45,11 @@ describe("legacy inventory coverage and presentation routing", () => {
     for (const { item } of finance) {
       expect(existsSync(`src/app/(dashboard)${item.href}/page.tsx`)).toBe(true);
       if (item.href) available.add(item.href);
+    }
+    // Live report workflows added after the preview inventory must exist on disk.
+    for (const href of liveRoutes) {
+      expect(existsSync(`src/app/(dashboard)${href}/page.tsx`)).toBe(true);
+      available.add(href);
     }
     for (const { item } of navigationDestinations())
       if (item.href) expect(available.has(item.href)).toBe(true);

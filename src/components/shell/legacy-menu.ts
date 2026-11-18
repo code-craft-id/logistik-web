@@ -156,7 +156,14 @@ export const legacyMenu = [
       },
       {
         label: "Customer Reports",
-        href: "/customer-reports",
+        children: [
+          { label: "Pengiriman" },
+          { label: "POD Kembali" },
+          {
+            label: "Semua Status",
+            href: "/customer-reports/all-status",
+          },
+        ],
       },
     ],
   },
