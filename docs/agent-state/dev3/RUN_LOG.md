@@ -671,3 +671,6 @@ Base af28516eac27d6dd6a2930372baab6f83e21e8f0, branch codex/dev3-ready-for-revie
 
 ## 2026-11-18 — PR #11 second review fixes
 P2 confirmed and fixed (LP-R21 ignores DRS under soft-deleted manifest), regression test proven failing on 24d3618. P1 not reproducible due to manifest_items_transaction_id_key; guard test added. P3 unchanged per documented FIN-02 ever-issued completeness rule; finance owner decision. Node 24.15.0: lint435/typecheck/unit683/integration146/build PASS. No push, no staging.
+
+## 2026-11-18 — Legacy observation for PR #11 P3 (invoice VOID completeness)
+DIRECT_NON_MUTATING_DISCOVERY, existing authenticated session, display-only queries. /sales Invoice (New) Periode Date 2016-01-01..2026-11-18 Search: 0 invoices, so no invoice void lifecycle observable. Legacy finance menu has Piutang/Hutang Dagang, Pembayaran Hutang, Laporan AR/AP, Gross Profit / Manifest and Rekap Gross Profit; no P&L, journal, period close or cost-completeness screen seen. Legacy "Void AWB" (/void-awb) is AWB deletion (columns incl. Biaya, Delete User, Delete Date), empty list; not invoice void. Conclusion: legacy offers no oracle for P3; remains finance-owner decision on FIN-02. No forms submitted, no export.
