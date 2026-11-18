@@ -125,6 +125,11 @@ export async function getTransactionById(id: number) {
         originBranch: true,
         destinationBranch: true,
         courier: true,
+        customer: { select: { name: true } },
+        transportMode: { select: { name: true } },
+        deliveryService: { select: { name: true } },
+        goodsType: { select: { name: true } },
+        costType: { select: { name: true } },
         createdBy: true,
         statusHistory: {
           orderBy: { changedAt: "desc" },
@@ -149,6 +154,11 @@ export async function getTransactionById(id: number) {
       originBranch: true,
       destinationBranch: true,
       courier: true,
+      customer: { select: { name: true } },
+      transportMode: { select: { name: true } },
+      deliveryService: { select: { name: true } },
+      goodsType: { select: { name: true } },
+      costType: { select: { name: true } },
       createdBy: true,
       statusHistory: {
         orderBy: { changedAt: "desc" },

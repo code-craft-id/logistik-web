@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { Barcode } from "@/components/patterns/barcode";
 import { StatusUpdateForm } from "@/features/bookings/components/status-update-form";
 import { getTransactionById } from "@/features/bookings/server/queries";
 import { requirePermission } from "@/lib/auth/session";
@@ -37,54 +38,41 @@ export default async function Page({
           AWB No: {tx.awbNo || "-"}
         </p>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="border rounded p-4 space-y-2">
-          <div>
-            <span className="font-medium">Tanggal:</span>{" "}
-            {tx.transactionDate.toISOString().slice(0, 10)}
+      {tx.awbNo && <Barcode value={tx.awbNo} />}
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded border p-4 sm:grid-cols-2 lg:grid-cols-3">
+        {(
+          [
+            ["Tanggal", tx.transactionDate.toISOString().slice(0, 10)],
+            ["DO No.", tx.doNo],
+            ["Status", tx.status],
+            ["Asal", tx.originBranch?.name],
+            ["Tujuan", tx.destinationBranch?.name],
+            ["Customer", tx.customer?.name],
+            ["Pengirim", tx.senderName],
+            ["Penerima", tx.receiverName],
+            ["Layanan", tx.deliveryService?.name],
+            ["DOC / PAC", tx.goodsType?.name],
+            ["Via Moda", tx.transportMode?.name],
+            ["Pembayaran", tx.costType?.name],
+            ["Koli", tx.koli],
+            ["Berat (kg)", tx.kilo?.toString()],
+            ["Volume", tx.volume?.toString()],
+            ["Biaya (Rp.)", tx.biaya?.toString()],
+            ["Isi Barang", tx.description],
+            ["Keterangan", tx.remarks],
+            ["Kurir", tx.courier?.name],
+            ["Booking", tx.booking?.bookingNo ?? tx.bookingId],
+            ["Dibuat oleh", tx.createdBy?.name],
+          ] as const
+        ).map(([label, value]) => (
+          <div key={label} className="min-w-0">
+            <dt className="text-sm text-muted-foreground">{label}</dt>
+            <dd className="font-medium [overflow-wrap:anywhere]">
+              {value ?? "-"}
+            </dd>
           </div>
-          <div>
-            <span className="font-medium">DO No:</span> {tx.doNo || "-"}
-          </div>
-          <div>
-            <span className="font-medium">Pengirim:</span>{" "}
-            {tx.senderName || "-"}
-          </div>
-          <div>
-            <span className="font-medium">Penerima:</span>{" "}
-            {tx.receiverName || "-"}
-          </div>
-          <div>
-            <span className="font-medium">Status:</span> {tx.status}
-          </div>
-          <div>
-            <span className="font-medium">Koli/Kilo/Volume:</span>{" "}
-            {tx.koli ?? 0} / {String(tx.kilo ?? "-")} /{" "}
-            {String(tx.volume ?? "-")}
-          </div>
-          <div>
-            <span className="font-medium">Biaya:</span>{" "}
-            {String(tx.biaya ?? "-")}
-          </div>
-        </div>
-        <div className="border rounded p-4 space-y-2">
-          <div>
-            <span className="font-medium">Cabang Asal:</span>{" "}
-            {tx.originBranchId}
-          </div>
-          <div>
-            <span className="font-medium">Cabang Tujuan:</span>{" "}
-            {tx.destinationBranchId ?? "-"}
-          </div>
-          <div>
-            <span className="font-medium">Booking ID:</span>{" "}
-            {tx.bookingId ?? "-"}
-          </div>
-          <div>
-            <span className="font-medium">Kurir ID:</span> {tx.courierId ?? "-"}
-          </div>
-        </div>
-      </div>
+        ))}
+      </dl>
       <div className="border rounded p-4 space-y-3">
         <h2 className="font-medium">Ubah Status</h2>
         <div>
