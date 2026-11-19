@@ -954,3 +954,57 @@ describe("Import Status Excel", () => {
     ).toThrow("file Excel");
   });
 });
+
+describe("Laporan AP (Rekap Aging Pemasok)", () => {
+  it("lists unpaid vendor bills of the month with age buckets", async () => {
+    const ap = await import("../../src/features/reports/aging/server/ap-aging");
+    const now = new Date();
+    const day = (n: number) =>
+      new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), n));
+    const open = await db.vendorBill.create({
+      data: {
+        category: "Vendor",
+        vendorId: ids.vendor,
+        invoiceNo: `${tag}-AP1`,
+        billDate: day(1),
+        termDays: 30,
+        amount: "250000",
+        createdById: ids.approver,
+      },
+    });
+    const paid = await db.vendorBill.create({
+      data: {
+        category: "Agen",
+        vendorId: ids.vendor,
+        invoiceNo: `${tag}-AP2`,
+        billDate: day(1),
+        amount: "90000",
+        status: "PAID",
+        createdById: ids.approver,
+      },
+    });
+    const report = await ap.apAgingReport(actor(ids.approver, [ids.a]), {
+      month: String(now.getUTCMonth() + 1),
+      year: String(now.getUTCFullYear()),
+      vendorId: String(ids.vendor),
+    });
+    expect(report.items.map((r) => r.number)).toEqual([`${tag}-AP1`]);
+    expect(report.items[0]).toMatchObject({
+      category: "Vendor",
+      total: 250000,
+      b0_30: 250000,
+    });
+    expect(report.percent.b0_30).toBe(100);
+    // Another user without the bill's branch or authorship sees nothing.
+    const other = await ap.apAgingReport(actor(ids.requester, [ids.b]), {
+      month: String(now.getUTCMonth() + 1),
+      year: String(now.getUTCFullYear()),
+      vendorId: String(ids.vendor),
+    });
+    expect(other.items).toEqual([]);
+    expect(ap.apAgingWorkbook(report).length).toBeGreaterThan(0);
+    await db.vendorBill.deleteMany({
+      where: { id: { in: [open.id, paid.id] } },
+    });
+  });
+});

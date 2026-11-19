@@ -89,8 +89,24 @@ export const helpEntries: HelpEntry[] = [
       "usia faktur",
     ],
     answer:
-      "Quick Action Report AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (Termin pelanggan dari master Termin, misalnya 21 Hari; bila pelanggan tidak punya termin dipakai jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total tiap kolom dan persentasenya terhadap total Jumlah Tagihan (NAN% bila tidak ada tagihan, seperti di aplikasi lama). Tanggal dan nama penerima faktur diambil dari Serah Terima Faktur di detail invoice ('-' bila belum dicatat). Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
+      "Quick Action Report AR atau Laporan > Laporan Keuangan > Laporan AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (Termin pelanggan dari master Termin, misalnya 21 Hari; bila pelanggan tidak punya termin dipakai jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total tiap kolom dan persentasenya terhadap total Jumlah Tagihan (NAN% bila tidak ada tagihan, seperti di aplikasi lama). Tanggal dan nama penerima faktur diambil dari Serah Terima Faktur di detail invoice ('-' bila belum dicatat). Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
     href: "/financial-reports/aging",
+  },
+  {
+    id: "report-ap-aging",
+    title: "Laporan AP (Rekap Aging Pemasok)",
+    keywords: [
+      "laporan ap",
+      "aging pemasok",
+      "hutang",
+      "umur hutang",
+      "rekap aging pemasok",
+      "vendor",
+      "agen",
+    ],
+    answer:
+      "Laporan > Laporan Keuangan > Laporan AP (/financial-reports/ap-aging). Pilih Bulan, Tahun dan Pemasok lalu Menampilkan atau Ekspor Excel. Isinya tagihan vendor/agen dari Proses Vendor yang belum lunas dan bertanggal faktur di bulan itu: nama perusahaan, No. KWT/INV, tanggal faktur, ATAS (Vendor/Agen/Lainnya), batas waktu (tanggal terima atau faktur + termin), jumlah tagihan, kolom umur 0-30, 31-60, 61-90 dan > 90 hari sejak tanggal faktur, serta keterangan Lewat batas waktu. HASIL AKHIR berisi total dan persentase terhadap total tagihan. Tagihan yang sudah ditutup di Pembayaran Hutang (Lunas) tidak tampil. Butuh hak Pembayaran Hutang: lihat.",
+    href: "/financial-reports/ap-aging",
   },
   {
     id: "booking",

@@ -204,7 +204,11 @@ export const legacyMenu = [
       },
       {
         label: "Laporan Keuangan",
-        href: "/financial-reports",
+        children: [
+          { label: "Laporan AR", href: "/financial-reports/aging" },
+          { label: "Laporan AP", href: "/financial-reports/ap-aging" },
+          { label: "Umur Piutang per Customer", href: "/financial-reports" },
+        ],
       },
       {
         label: "Customer Reports",
