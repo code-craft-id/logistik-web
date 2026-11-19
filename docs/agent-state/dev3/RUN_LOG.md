@@ -703,3 +703,12 @@ Built /transactions/scan (FEATURE_AWB_SCAN, right awb_scan.use) reusing updateTr
 
 ## 2026-11-19 — Owner direction: courier points and withdrawal out of scope
 Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial title only). Owner: do not build courier points or withdrawal for now. Other Progi-like gaps tracked: delivery proof scan screen (in progress), koli labels AWB-n, longer DO No., pickup from booking (rule: booking branch must match courier branch, observed in Progi), DRS with courier/driver/vehicle, manifest per koli (unconfirmed).
+
+## 2026-11-19 — Booking flow, confirmations, Quick Action parity (HEAD 784f916)
+- Booking stands alone (provider): statuses WAITING/PROGRESS/CANCEL PICKUP, ✔/✖ dialogs (Booking: approve), scan mode Booking (jemput) with branch rule; Tambah Booking form like the provider (B- number, Manual AWB, route/masters/price/courier). Migrations 20261119000600 and 000700 applied to dev and test.
+- Confirmation modal for every delete/void/cancel (useConfirm, ConfirmSubmit).
+- Quick Action compared one by one with the provider dashboard (read-only): order aligned; added Tracking AWB card (AWB/DO search), Status Pengantaran list, Transit1..5 columns, Invoice Paid filter.
+- Required fields (owner request): AWB and booking, enforced in form actions; automatic number shown at once, Manual AWB empties it.
+- Bug found by test and fixed: tracking search overwrote the branch-scope OR.
+- Gates: lint 534 files, typecheck, unit 713, integration 185, build PASS; crawl of 115 routes x 6 role accounts: no errors, no cross-branch leak.
+- Still open: Rekap Transaksi Excel format, Report AR aging (finance confirmation), SLA on-time rule, Import Excel status, Acc. In / User Transit / Transit Date columns (no data source), Dimensi button on booking.

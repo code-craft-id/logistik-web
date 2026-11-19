@@ -49,6 +49,11 @@ Next: upgrade better-auth and Next.js on a separate branch with full test run (a
 
 ---
 
+## Latest checkpoint: booking flow and Quick Action parity (2026-11-19)
+- Branch dev3/ready-for-review (PR #11). See RUN_LOG entry of 2026-11-19 for the full list.
+- Needs review: migrations 20261119000500–000700 (migration coordinator), booking approve permission, required-field rules (owner choice), Quick Action Manifest now needs Manifest: view.
+- Decisions pending: SLA on-time/late rule, AR aging buckets (observed 0–21 / 21–30 / >30 days), Rekap Transaksi sheet layout, status Import Excel, Acc. In / User Transit / Transit Date sources.
+
 ## Latest checkpoint: LP-R10 / LP-R11 / LP-R21 implemented (2026-11-17)
 
 User directed continuing past the review stop point and decided the three missing definitions (PRD D-22, 2026-11-17). New feature `src/features/reports/awb-status/` with routes `/branch-reports/awb` (views pending/manifested), `/customer-reports/all-status`, and CSV exports; shell footer and breadcrumb updated. No schema, migration or `permissions.ts` change; uses `transaction_report` view/export. Read-only legacy observation confirmed opening states; deviations in audit §12.
