@@ -89,7 +89,7 @@ export const helpEntries: HelpEntry[] = [
       "usia faktur",
     ],
     answer:
-      "Quick Action Report AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (termin = jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total dan persentase tiap kolom. Tanggal dan nama penerima faktur belum dicatat sehingga tampil '-'. Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
+      "Quick Action Report AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (Termin pelanggan dari master Termin, misalnya 21 Hari; bila pelanggan tidak punya termin dipakai jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total tiap kolom dan persentasenya terhadap total Jumlah Tagihan (NAN% bila tidak ada tagihan, seperti di aplikasi lama). Tanggal dan nama penerima faktur belum dicatat sehingga tampil '-'. Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
     href: "/financial-reports/aging",
   },
   {

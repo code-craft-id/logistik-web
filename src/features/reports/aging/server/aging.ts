@@ -23,7 +23,10 @@ import { Prisma } from "@/lib/db/generated/client";
  * - invoices issued in the chosen month, not fully paid (FIN-01 net
  *   receipts), in the user's branches;
  * - JUMLAH TAGIHAN = invoice total; buckets hold the remaining balance;
- * - KETENTUAN = term in days (due date - invoice date);
+ * - percentages = bucket / total JUMLAH TAGIHAN, "NAN%" when there is none
+ *   (provider export and prototype);
+ * - KETENTUAN = the customer's Termin (master Termin, e.g. "21 Hari" as in
+ *   the prototype), else the invoice term (due date - invoice date);
  * - USIA FAKTUR = days from the invoice date to today; buckets 0-21,
  *   >21-30 and >30 days as labelled by the provider;
  * - TANGGAL / NAMA PENERIMA FAKTUR are not recorded yet, shown as "-".
@@ -43,6 +46,8 @@ export type AgingRow = {
   company: string;
   total: number;
   termDays: number;
+  /** KETENTUAN text. */
+  term: string;
   ageDays: number;
   b0_21: number;
   b21_30: number;
@@ -69,6 +74,7 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
       id: number;
       company: string;
       total: string;
+      termName: string | null;
       termDays: number;
       ageDays: number;
       sisa: string;
@@ -85,11 +91,12 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
         ${input.customerId ? Prisma.sql`AND i."customerId" = ${input.customerId}` : Prisma.empty}
       GROUP BY i.id)
     SELECT to_char(b."invoiceDate", 'DD-MM-YYYY') AS "invoiceDate", b.number, b.id,
-           c.name AS company, b.total::text AS total,
+           c.name AS company, b.total::text AS total, tm.name AS "termName",
            (b."dueDate" - b."invoiceDate")::int AS "termDays",
            GREATEST(current_date - b."invoiceDate", 0)::int AS "ageDays",
            b.sisa::text AS sisa
     FROM b JOIN customers c ON c.id = b."customerId"
+    LEFT JOIN terms tm ON tm.id = c.term_id AND tm.deleted_at IS NULL
     WHERE b.sisa > 0
     ORDER BY b."invoiceDate", b.id
     LIMIT 5000`;
@@ -101,6 +108,11 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
       company: r.company,
       total: Number(r.total),
       termDays: r.termDays,
+      term: r.termName
+        ? /^\d+$/.test(r.termName.trim())
+          ? `${r.termName.trim()} Hari`
+          : r.termName.trim()
+        : `${r.termDays} Hari`,
       ageDays: r.ageDays,
       b0_21: r.ageDays <= 21 ? sisa : 0,
       b21_30: r.ageDays > 21 && r.ageDays <= 30 ? sisa : 0,
@@ -114,8 +126,9 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
     b21_30: sum("b21_30"),
     b30plus: sum("b30plus"),
   };
-  const all = totals.b0_21 + totals.b21_30 + totals.b30plus;
-  const pct = (v: number) => (all ? Math.round((v / all) * 10000) / 100 : null);
+  const billed = items.reduce((t, r) => t + r.total, 0);
+  const pct = (v: number) =>
+    billed ? Math.round((v / billed) * 10000) / 100 : null;
   const [customer, company] = await Promise.all([
     input.customerId
       ? prisma.customer.findFirst({
@@ -171,7 +184,7 @@ export const AGING_HEADERS = [
 
 /** Workbook bytes (.xlsx) in the provider's layout. */
 export function agingWorkbook(report: Awaited<ReturnType<typeof agingReport>>) {
-  const pct = (v: number | null) => (v === null ? "-" : `${v}%`);
+  const pct = (v: number | null) => (v === null ? "NAN%" : `${v}%`);
   const data: (string | number)[][] = [
     ["REKAP AGING PELANGGAN, BELUM LUNAS"],
     [report.company],
@@ -188,7 +201,7 @@ export function agingWorkbook(report: Awaited<ReturnType<typeof agingReport>>) {
       "-",
       r.company,
       r.total,
-      `${r.termDays} HARI`,
+      r.term,
       r.ageDays,
       r.b0_21,
       r.b21_30,

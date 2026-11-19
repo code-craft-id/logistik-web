@@ -80,7 +80,7 @@ export default async function Page({
   const report = show
     ? await agingReport(current.actor, { month, year, customerId })
     : null;
-  const pct = (v: number | null) => (v === null ? "-" : `${v}%`);
+  const pct = (v: number | null) => (v === null ? "NAN%" : `${v}%`);
 
   return (
     <div className="min-w-0 space-y-5">
@@ -214,7 +214,7 @@ export default async function Page({
                       <TableCell className="text-right tabular-nums">
                         {money(r.total)}
                       </TableCell>
-                      <TableCell>{r.termDays} HARI</TableCell>
+                      <TableCell>{r.term}</TableCell>
                       <TableCell className="text-right tabular-nums">
                         {r.ageDays}
                       </TableCell>

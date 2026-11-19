@@ -399,7 +399,12 @@ describe("FIN-01 guarded persistence", () => {
       year: "2026",
     });
     const line = aging.items.find((x) => x.number === row.number);
-    expect(line).toMatchObject({ total: 100000, termDays: 15 });
+    // No customer Termin in this fixture: invoice term (due - invoice date).
+    expect(line).toMatchObject({
+      total: 100000,
+      termDays: 15,
+      term: "15 Hari",
+    });
     expect(
       (line?.b0_21 ?? 0) + (line?.b21_30 ?? 0) + (line?.b30plus ?? 0),
     ).toBe(20000);
