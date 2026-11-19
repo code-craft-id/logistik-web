@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Barcode } from "@/components/patterns/barcode";
 import { StatusUpdateForm } from "@/features/bookings/components/status-update-form";
 import { getTransactionById } from "@/features/bookings/server/queries";
+import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { AwbChangePanel } from "@/features/modul/components/awb-change-panel";
 import { DeliveryProof } from "@/features/shipments/components/delivery-proof";
@@ -118,10 +119,19 @@ export default async function Page({
       {current && <DeliveryProof actor={current.actor} transactionId={tx.id} />}
       {current && <AwbChangePanel actor={current.actor} transaction={tx} />}
       <div className="border rounded p-4 space-y-3">
-        <h2 className="font-medium">Ubah Status</h2>
-        <div>
-          <StatusUpdateForm transactionId={tx.id} currentStatus={tx.status} />
-        </div>
+        {/* Only groups with "Transaksi: ubah" can change the status here; the
+            server action checks the same right. */}
+        {current && permits(current.actor, "update", "transaction") && (
+          <>
+            <h2 className="font-medium">Ubah Status</h2>
+            <div>
+              <StatusUpdateForm
+                transactionId={tx.id}
+                currentStatus={tx.status}
+              />
+            </div>
+          </>
+        )}
         <h2 className="font-medium">Riwayat Status (Immutable)</h2>
         <div className="space-y-1">
           {tx.statusHistory.length === 0 ? (
