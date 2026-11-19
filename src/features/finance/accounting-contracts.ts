@@ -22,6 +22,10 @@ export const categoryInput = z.object({
   flowClass: z.enum(["OPERATING", "INVESTING", "FINANCING"]).optional(),
   active: boolean.default(true),
 });
+const optionalId = z.preprocess(
+  (v) => (v === "" || v === null ? undefined : v),
+  id.optional(),
+);
 export const accountInput = z.object({
   id: id.optional(),
   code: z.string().trim().min(1).max(30),
@@ -29,6 +33,22 @@ export const accountInput = z.object({
   kind: accountKind,
   categoryId: id,
   isCash: boolean.default(false),
+  active: boolean.default(true),
+  /** Perkiraan: Inisial Akun, Induk, Tampil, Rugi Laba, Cabang. */
+  initial: z.preprocess(
+    (v) => (v === "" || v === null ? undefined : v),
+    z.string().trim().max(20).optional(),
+  ),
+  parentId: optionalId,
+  visible: boolean.default(true),
+  plCategoryId: optionalId,
+  branchId: optionalId,
+});
+/** Kategori Rugi Laba (provider "Rugi Laba" master). */
+export const plCategoryInput = z.object({
+  id: id.optional(),
+  code: z.string().trim().min(1).max(30),
+  name: z.string().trim().min(1).max(100),
   active: boolean.default(true),
 });
 export const mappingInput = z.object({
@@ -47,7 +67,7 @@ export const accountingCommand = z.discriminatedUnion("action", [
   z.object({
     ...base,
     action: z.literal("finance_account.manage"),
-    entity: z.enum(["category", "account", "mapping"]),
+    entity: z.enum(["category", "account", "mapping", "plcategory"]),
     id: id.optional(),
     code: z.string().optional(),
     name: z.string().optional(),
@@ -59,11 +79,18 @@ export const accountingCommand = z.discriminatedUnion("action", [
     categoryId: id.optional(),
     isCash: boolean.optional(),
     active: boolean.optional(),
-    branchId: id.optional(),
+    branchId: z.preprocess(
+      (v) => (v === "" || v === null ? undefined : v),
+      id.optional(),
+    ),
     receivableId: id.optional(),
     revenueId: id.optional(),
     costId: id.optional(),
     liabilityId: id.optional(),
+    initial: z.string().nullish(),
+    parentId: z.union([z.string(), z.number()]).nullish(),
+    visible: boolean.optional(),
+    plCategoryId: z.union([z.string(), z.number()]).nullish(),
   }),
   z.object({
     ...base,
@@ -75,6 +102,16 @@ export const accountingCommand = z.discriminatedUnion("action", [
     lines: z.array(line).min(2).max(100),
   }),
   z.object({ ...base, action: z.literal("journal.post"), id }),
+  /** Opening Balance (Perkiraan): balanced journal against an equity account. */
+  z.object({
+    ...base,
+    action: z.literal("journal.opening"),
+    branchId: id,
+    accountingDate: date,
+    accountId: id,
+    counterAccountId: id,
+    amount: money,
+  }),
   z.object({
     ...base,
     action: z.literal("journal.reverse"),

@@ -783,6 +783,149 @@ describe("FIN-02 guarded ledger and reconciliation", () => {
       code: "FORBIDDEN",
     });
   });
+  it("keeps the Perkiraan structure, opening balances and Hitung Rugi Laba consistent", async () => {
+    // Kategori Rugi Laba + Induk / Tampil / Cabang on accounts.
+    const pl = await command("finance_account.manage", {
+      entity: "plcategory",
+      code: randomUUID().slice(0, 20),
+      name: "FAKE TRX LabaRugi",
+    });
+    const revenue = await db.finAccount.findUniqueOrThrow({
+      where: { id: accounts[1] },
+    });
+    await command("finance_account.manage", {
+      entity: "account",
+      id: revenue.id,
+      code: revenue.code,
+      name: revenue.name,
+      kind: "REVENUE",
+      categoryId: revenue.categoryId,
+      isCash: "false",
+      active: "true",
+      initial: "PDP",
+      parentId: "",
+      visible: "true",
+      plCategoryId: String(pl.id),
+      branchId: "",
+    });
+    // Rules: no Kategori Rugi Laba on a balance-sheet account, no loops.
+    const asset = await db.finAccount.findUniqueOrThrow({
+      where: { id: accounts[0] },
+    });
+    const editAsset = (extra: Record<string, unknown>) =>
+      command("finance_account.manage", {
+        entity: "account",
+        id: asset.id,
+        code: asset.code,
+        name: asset.name,
+        kind: "ASSET",
+        categoryId: asset.categoryId,
+        isCash: "false",
+        active: "true",
+        ...extra,
+      });
+    await expect(editAsset({ plCategoryId: String(pl.id) })).rejects.toThrow(
+      "hanya untuk akun pendapatan",
+    );
+    await expect(editAsset({ parentId: String(asset.id) })).rejects.toThrow(
+      "akun itu sendiri",
+    );
+    await editAsset({ parentId: String(accounts[7]) });
+    const child = await db.finAccount.findUniqueOrThrow({
+      where: { id: accounts[7] },
+    });
+    await expect(
+      command("finance_account.manage", {
+        entity: "account",
+        id: child.id,
+        code: child.code,
+        name: child.name,
+        kind: "ASSET",
+        categoryId: child.categoryId,
+        isCash: "true",
+        active: "true",
+        parentId: String(asset.id),
+      }),
+    ).rejects.toThrow("melingkar");
+    await editAsset({ parentId: "" });
+
+    // Hitung Rugi Laba matches the reconciled P&L of the same month.
+    const { profitLoss } = await import(
+      "../../src/features/finance/server/profit-loss"
+    );
+    const reader = await loadAccessActor(db, users[0]);
+    if (!reader) throw new Error("actor not found");
+    const plReport = await profitLoss(reader, {
+      month: "11",
+      year: "2026",
+      branchId: String(financeBranch),
+    });
+    expect(plReport.total.month).toBe(50000);
+    expect(plReport.total.year).toBe(50000);
+    expect(plReport.total.percent).toBe(33.33);
+    const group = plReport.groups.find((g) => g.code !== null);
+    expect(group).toMatchObject({ name: "FAKE TRX LabaRugi", month: 150000 });
+    expect(group?.rows[0]).toMatchObject({ code: revenue.code, percent: 100 });
+
+    // Opening balance: cash account against equity; once per account and
+    // branch until reversed; the P&L is untouched.
+    const opening = await command("journal.opening", {
+      branchId: financeBranch,
+      accountingDate: "2026-11-01",
+      accountId: accounts[4],
+      counterAccountId: accounts[6],
+      amount: "750000.00",
+    });
+    const lines = await db.finLine.findMany({
+      where: { journalId: opening.id },
+      orderBy: { id: "asc" },
+    });
+    expect(
+      lines.map((l) => [l.accountId, l.debit.toFixed(2), l.credit.toFixed(2)]),
+    ).toEqual([
+      [accounts[4], "750000.00", "0.00"],
+      [accounts[6], "0.00", "750000.00"],
+    ]);
+    await expect(
+      command("journal.opening", {
+        branchId: financeBranch,
+        accountingDate: "2026-11-01",
+        accountId: accounts[4],
+        counterAccountId: accounts[6],
+        amount: "1.00",
+      }),
+    ).rejects.toThrow("sudah ada");
+    await expect(
+      command("journal.opening", {
+        branchId: financeBranch,
+        accountingDate: "2026-11-01",
+        accountId: accounts[4],
+        counterAccountId: accounts[5],
+        amount: "1.00",
+      }),
+    ).rejects.toThrow();
+    await command("journal.reverse", {
+      id: opening.id,
+      accountingDate: "2026-11-02",
+      reason: "FAKE wrong opening amount",
+    });
+    await command("journal.opening", {
+      branchId: financeBranch,
+      accountingDate: "2026-11-02",
+      accountId: accounts[4],
+      counterAccountId: accounts[6],
+      amount: "700000.00",
+    });
+    expect(
+      (
+        await profitLoss(reader, {
+          month: "11",
+          year: "2026",
+          branchId: String(financeBranch),
+        })
+      ).total.month,
+    ).toBe(50000);
+  });
   it("enforces balanced persistence, posted immutability, controlled accounts and one-time concurrent posting", async () => {
     await expect(
       command("journal.create", {

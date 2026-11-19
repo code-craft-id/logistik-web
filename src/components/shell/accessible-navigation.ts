@@ -43,6 +43,7 @@ const routeResources: Record<string, readonly string[]> = {
   "/branch-reports/rekap-transaksi": ["transaction_report"],
   "/financial-reports/aging": ["invoice"],
   "/financial-reports/ap-aging": ["debt_payment"],
+  "/akunting/rugi-laba": ["financial_report"],
   "/pod-returns": ["pod_return"],
   "/finance/debt-payments": ["debt_payment"],
   "/manifest": ["manifest"],

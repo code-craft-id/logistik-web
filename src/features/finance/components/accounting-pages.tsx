@@ -191,6 +191,16 @@ export async function AccountsPage({ query }: { query: Query }) {
   const catalog = await accountingQueries.accounts(),
     mappings = await accountingQueries.mappings(parsed.data);
   const manage = permits(actor, "manage", "finance_account");
+  const parents = catalog.accounts
+    .filter((a) => !a.deletedAt)
+    .map((a) => ({ id: a.id, name: `${a.code} · ${a.name}` }));
+  const plChoices = catalog.plCategories
+    .filter((c) => c.active)
+    .map((c) => ({ id: c.id, name: `${c.code} | ${c.name}` }));
+  const branchChoices = catalog.branches.map((b) => ({
+    id: b.id,
+    name: `${b.code} | ${b.name}`,
+  }));
   const accountCategories = catalog.categories
     .filter((c) => c.kind === "ACCOUNT" && c.active)
     .map((c) => ({ id: c.id, name: `${c.code} · ${c.name}` }));
@@ -240,9 +250,56 @@ export async function AccountsPage({ query }: { query: Query }) {
           options={bool}
           value={String(a?.active ?? true)}
         />
+        <FinanceField
+          prefix={prefix}
+          name="initial"
+          label="Inisial akun"
+          value={a?.initial ?? undefined}
+          optional
+        />
+        <FinanceField
+          prefix={prefix}
+          name="parentId"
+          label="Induk (kosong = akun utama / ledger)"
+          options={parents.filter((p) => p.id !== a?.id)}
+          value={a?.parentId ?? undefined}
+          optional
+          emptyLabel="Tanpa induk"
+        />
+        <FinanceField
+          prefix={prefix}
+          name="visible"
+          label="Tampil"
+          options={[
+            { id: "true", name: "Show" },
+            { id: "false", name: "Hide" },
+          ]}
+          value={String(a?.visible ?? true)}
+        />
+        <FinanceField
+          prefix={prefix}
+          name="plCategoryId"
+          label="Kategori Rugi Laba (akun pendapatan/beban)"
+          options={plChoices}
+          value={a?.plCategoryId ?? undefined}
+          optional
+          emptyLabel="Tidak dipilih"
+        />
+        <FinanceField
+          prefix={prefix}
+          name="branchId"
+          label="Cabang"
+          options={branchChoices}
+          value={a?.branchId ?? undefined}
+          optional
+          emptyLabel="Nasional"
+        />
       </div>
     );
   }
+  const position = (kind: string) =>
+    ["REVENUE", "EXPENSE"].includes(kind) ? "Rugi Laba" : "Neraca";
+  const canOpen = permits(actor, "post", "journal");
   return (
     <Workspace title="Akun & kategori">
       <p className="text-sm text-muted-foreground">
@@ -254,10 +311,16 @@ export async function AccountsPage({ query }: { query: Query }) {
           <TableRow>
             {[
               "ID",
-              "Kode",
-              "Nama",
+              "Kode Rekening",
+              "Nama Rekening",
+              "Induk",
               "Klasifikasi",
-              "Saldo normal",
+              "Posisi",
+              "Normal",
+              "Tampil",
+              "Rugi Laba",
+              "Cabang",
+              "Saldo",
               "Status",
             ].map((h) => (
               <TableHead key={h}>{h}</TableHead>
@@ -268,13 +331,27 @@ export async function AccountsPage({ query }: { query: Query }) {
           {catalog.accounts.map((a) => (
             <TableRow key={a.id}>
               <TableCell>{a.id}</TableCell>
-              <TableCell>{a.code}</TableCell>
+              <TableCell className="font-mono">
+                {a.parentId ? "\u00a0\u00a0" : ""}
+                {a.code}
+                {a.initial ? ` (${a.initial})` : ""}
+              </TableCell>
               <TableCell>{a.name}</TableCell>
+              <TableCell>{a.parent ? a.parent.code : "-"}</TableCell>
               <TableCell>
                 {a.kind}
                 {a.isCash ? " · Kas/bank" : ""}
               </TableCell>
-              <TableCell>{a.normalBalance}</TableCell>
+              <TableCell>{position(a.kind)}</TableCell>
+              <TableCell>
+                {a.normalBalance === "DEBIT" ? "Debet" : "Kredit"}
+              </TableCell>
+              <TableCell>{a.visible ? "Show" : "Hide"}</TableCell>
+              <TableCell>{a.plCategory?.code ?? "-"}</TableCell>
+              <TableCell>{a.branch?.code ?? "Nasional"}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {formatRupiah(a.balance, { prefix: false })}
+              </TableCell>
               <TableCell>{a.active ? "Aktif" : "Nonaktif"}</TableCell>
             </TableRow>
           ))}
@@ -311,6 +388,119 @@ export async function AccountsPage({ query }: { query: Query }) {
           ))}
         </section>
       )}
+      {canOpen && catalog.accounts.length > 1 && (
+        <section className="space-y-4 border-t pt-5">
+          <h2 className="text-lg font-semibold">
+            Opening Balance (saldo awal)
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Membuat jurnal saldo awal yang langsung terposting: akun dicatat di
+            sisi saldo normalnya, lawannya akun ekuitas (mis. Laba Ditahan).
+            Satu saldo awal per akun per cabang; untuk mengubah, balik jurnalnya
+            di menu Jurnal lalu isi ulang.
+          </p>
+          <CommandForm
+            label="Simpan saldo awal"
+            values={{ action: "journal.opening" }}
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FinanceField
+                prefix="opening"
+                name="accountId"
+                label="Akun"
+                options={parents}
+              />
+              <FinanceField
+                prefix="opening"
+                name="counterAccountId"
+                label="Akun lawan (ekuitas)"
+                options={catalog.accounts
+                  .filter((a) => a.kind === "EQUITY" && a.active)
+                  .map((a) => ({ id: a.id, name: `${a.code} · ${a.name}` }))}
+              />
+              <FinanceField
+                prefix="opening"
+                name="branchId"
+                label="Cabang"
+                options={branchChoices}
+              />
+              <FinanceField
+                prefix="opening"
+                name="accountingDate"
+                label="Tanggal saldo awal"
+                type="date"
+              />
+              <FinanceField
+                prefix="opening"
+                name="amount"
+                label="Jumlah (IDR)"
+              />
+            </div>
+          </CommandForm>
+        </section>
+      )}
+      <section className="space-y-4 border-t pt-5">
+        <h2 className="text-lg font-semibold">Kategori Rugi Laba</h2>
+        <p className="text-sm text-muted-foreground">
+          Pengelompokan akun pendapatan dan beban pada laporan Hitung Rugi Laba.
+        </p>
+        {catalog.plCategories.map((c) => (
+          <div key={c.id}>
+            <p>
+              {c.code} | {c.name} · {c.active ? "Aktif" : "Nonaktif"}
+            </p>
+            {manage && (
+              <details>
+                <summary className="cursor-pointer py-2">
+                  Ubah kategori Rugi Laba {c.code}
+                </summary>
+                <CommandForm
+                  label="Simpan kategori Rugi Laba"
+                  values={{
+                    action: "finance_account.manage",
+                    entity: "plcategory",
+                    id: c.id,
+                  }}
+                >
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <FinanceField
+                      prefix={`pl-${c.id}`}
+                      name="code"
+                      label="Kode"
+                      value={c.code}
+                    />
+                    <FinanceField
+                      prefix={`pl-${c.id}`}
+                      name="name"
+                      label="Nama"
+                      value={c.name}
+                    />
+                    <FinanceField
+                      prefix={`pl-${c.id}`}
+                      name="active"
+                      label="Aktif"
+                      options={bool}
+                      value={String(c.active)}
+                    />
+                  </div>
+                </CommandForm>
+              </details>
+            )}
+          </div>
+        ))}
+        {!catalog.plCategories.length && <p>Belum ada kategori Rugi Laba.</p>}
+        {manage && (
+          <CommandForm
+            label="Tambah kategori Rugi Laba"
+            values={{ action: "finance_account.manage", entity: "plcategory" }}
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FinanceField prefix="pl-new" name="code" label="Kode" />
+              <FinanceField prefix="pl-new" name="name" label="Nama" />
+            </div>
+          </CommandForm>
+        )}
+      </section>
       <section className="space-y-4 border-t pt-5">
         <h2 className="text-lg font-semibold">Kategori</h2>
         {catalog.categories.map((c) => (

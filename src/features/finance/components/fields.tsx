@@ -11,6 +11,7 @@ export function FinanceField({
   value,
   options,
   optional = false,
+  emptyLabel,
 }: {
   prefix: string;
   name: string;
@@ -19,6 +20,8 @@ export function FinanceField({
   value?: string | number;
   options?: Choice[];
   optional?: boolean;
+  /** Text of the empty choice (defaults to Semua / Pilih…). */
+  emptyLabel?: string;
 }) {
   const id = `${prefix}-${name}`;
   return (
@@ -31,7 +34,9 @@ export function FinanceField({
           defaultValue={value ?? ""}
           className="min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base md:text-sm"
         >
-          <option value="">{optional ? "Semua" : "Pilih…"}</option>
+          <option value="">
+            {emptyLabel ?? (optional ? "Semua" : "Pilih…")}
+          </option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>
               {o.name}

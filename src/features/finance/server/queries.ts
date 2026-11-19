@@ -30,11 +30,46 @@ export function createAccountingQueries(
   }
   return {
     async accounts() {
-      await actor(db, "finance_account");
+      const current = await actor(db, "finance_account");
       const accounts = await db.finAccount.findMany({
         orderBy: { code: "asc" },
         take: 501,
+        include: {
+          parent: { select: { code: true, name: true } },
+          plCategory: { select: { code: true, name: true } },
+          branch: { select: { code: true, name: true } },
+        },
       });
+      const [plCategories, branches, balances] = await Promise.all([
+        db.finPlCategory.findMany({
+          where: { deletedAt: null },
+          orderBy: { code: "asc" },
+          take: 500,
+        }),
+        db.branch.findMany({
+          where: {
+            deletedAt: null,
+            ...(isAdministrator(current)
+              ? {}
+              : { id: { in: current.branchIds } }),
+          },
+          select: { id: true, code: true, name: true },
+          orderBy: { name: "asc" },
+        }),
+        // Saldo (Perkiraan list): posted debit - credit in the user's branches.
+        db.$queryRaw<{ accountId: number; net: string }[]>`
+          SELECT l."accountId", sum(l.debit - l.credit)::text AS net
+          FROM fin_lines l JOIN fin_journals j ON j.id = l."journalId"
+          WHERE j.status = 'POSTED' AND ${
+            isAdministrator(current)
+              ? Prisma.sql`TRUE`
+              : current.branchIds.length
+                ? Prisma.sql`j."branchId" IN (${Prisma.join(current.branchIds)})`
+                : Prisma.sql`FALSE`
+          }
+          GROUP BY l."accountId"`,
+      ]);
+      const net = new Map(balances.map((b) => [b.accountId, b.net]));
       const categories = await db.finCategory.findMany({
         orderBy: { code: "asc" },
         take: 501,
@@ -48,10 +83,17 @@ export function createAccountingQueries(
       return {
         accounts: accounts.map((a) => ({
           ...a,
+          // Shown on the account's normal side (debit accounts: debit - credit).
+          balance: (() => {
+            const v = new Prisma.Decimal(net.get(a.id) ?? "0");
+            return (a.normalBalance === "DEBIT" ? v : v.negated()).toFixed(2);
+          })(),
           createdAt: a.createdAt.toISOString(),
           updatedAt: a.updatedAt.toISOString(),
           deletedAt: a.deletedAt?.toISOString() ?? null,
         })),
+        plCategories,
+        branches,
         categories: categories.map((c) => ({
           ...c,
           createdAt: c.createdAt.toISOString(),

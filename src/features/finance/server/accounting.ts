@@ -13,6 +13,7 @@ import {
   accountingCommand,
   categoryInput,
   mappingInput,
+  plCategoryInput,
 } from "../accounting-contracts";
 import { asDate, day, sum } from "../contracts";
 
@@ -307,6 +308,53 @@ async function manualAccounts(tx: Tx, ids: number[]) {
     if (a.isCash) fail("Gunakan beban kas atau transfer untuk akun kas/bank.");
   }
 }
+/** Induk, Kategori Rugi Laba and Cabang rules for a Perkiraan. */
+async function accountStructure(
+  tx: Tx,
+  data: {
+    id?: number;
+    kind: string;
+    parentId?: number;
+    plCategoryId?: number;
+    branchId?: number;
+  },
+) {
+  if (data.parentId) {
+    if (data.parentId === data.id) fail("Induk tidak boleh akun itu sendiri.");
+    // Walk up the parents: the account must not become its own ancestor.
+    let cursor: number | null = data.parentId;
+    for (let depth = 0; cursor !== null; depth++) {
+      if (depth > 50) fail("Struktur induk terlalu dalam.");
+      const parent: { parentId: number | null; deletedAt: Date | null } | null =
+        await tx.finAccount.findUnique({
+          where: { id: cursor },
+          select: { parentId: true, deletedAt: true },
+        });
+      if (!parent || parent.deletedAt) fail("Akun induk tidak tersedia.");
+      if (data.id && parent?.parentId === data.id)
+        fail("Induk membuat struktur melingkar.");
+      cursor = parent?.parentId ?? null;
+    }
+  }
+  if (data.plCategoryId) {
+    if (!["REVENUE", "EXPENSE"].includes(data.kind))
+      fail("Kategori Rugi Laba hanya untuk akun pendapatan atau beban.");
+    if (
+      !(await tx.finPlCategory.findFirst({
+        where: { id: data.plCategoryId, active: true, deletedAt: null },
+      }))
+    )
+      fail("Kategori Rugi Laba tidak tersedia.");
+  }
+  if (
+    data.branchId &&
+    !(await tx.branch.findFirst({
+      where: { id: data.branchId, deletedAt: null },
+    }))
+  )
+    fail("Cabang akun tidak tersedia.");
+}
+
 export async function accountingWrite(
   tx: Tx,
   current: AccessActor,
@@ -341,8 +389,17 @@ export async function accountingWrite(
         : await tx.finCategory.create({ data: fields });
       return { id: row.id, branchId: null };
     }
+    if (d.entity === "plcategory") {
+      const data = plCategoryInput.parse(d);
+      const { id, ...fields } = data;
+      const row = id
+        ? await tx.finPlCategory.update({ where: { id }, data: fields })
+        : await tx.finPlCategory.create({ data: fields });
+      return { id: row.id, branchId: null };
+    }
     if (d.entity === "account") {
       const data = accountInput.parse(d);
+      await accountStructure(tx, data);
       if (data.isCash && data.kind !== "ASSET")
         fail("Kas/bank harus akun aset.");
       if (
@@ -469,6 +526,48 @@ export async function accountingWrite(
     );
     return { id: row.id, branchId: row.branchId };
   }
+  if (d.action === "journal.opening") {
+    // Opening Balance (Perkiraan): the account on its normal side against
+    // an equity account (e.g. LABA DITAHAN / saldo awal). One active opening
+    // per account and branch; correct it with Balik jurnal, then re-enter.
+    await activeBranch(tx, current, d.branchId);
+    if (d.accountId === d.counterAccountId) fail("Akun lawan harus berbeda.");
+    const target = await account(tx, d.accountId);
+    await account(tx, d.counterAccountId, "EQUITY");
+    const existing = await tx.finJournal.findMany({
+      where: {
+        branchId: d.branchId,
+        sourceType: "OPENING",
+        sourceId: d.accountId,
+      },
+      select: { id: true, reversal: { select: { id: true } } },
+    });
+    if (existing.some((j) => !j.reversal))
+      fail(
+        "Saldo awal akun ini sudah ada; balik jurnalnya dulu untuk mengubah.",
+      );
+    const debitSide = target.normalBalance === "DEBIT";
+    const row = await journal(tx, {
+      branchId: d.branchId,
+      accountingDate: d.accountingDate,
+      reference: `Saldo awal ${target.code}`,
+      reason: `Opening balance ${target.code} ${target.name}`,
+      sourceType: "OPENING",
+      sourceId: d.accountId,
+      sourceKey: `opening:${d.branchId}:${d.accountId}:${existing.length + 1}`,
+      lines: [
+        {
+          accountId: d.accountId,
+          [debitSide ? "debit" : "credit"]: d.amount,
+        },
+        {
+          accountId: d.counterAccountId,
+          [debitSide ? "credit" : "debit"]: d.amount,
+        },
+      ],
+    });
+    return { id: row.id, branchId: row.branchId };
+  }
   if (d.action === "journal.post" || d.action === "journal.reverse") {
     const row = await tx.finJournal.findUniqueOrThrow({
       where: { id: d.id },
@@ -506,7 +605,11 @@ export async function accountingWrite(
       });
       return { id: row.id, branchId: row.branchId };
     }
-    if (!["MANUAL", "CASH_EXPENSE", "TRANSFER"].includes(row.sourceType))
+    if (
+      !["MANUAL", "CASH_EXPENSE", "TRANSFER", "OPENING"].includes(
+        row.sourceType,
+      )
+    )
       fail("Balikkan dokumen sumber, bukan jurnal kontrol.");
     const reversed = await reverse(
       tx,

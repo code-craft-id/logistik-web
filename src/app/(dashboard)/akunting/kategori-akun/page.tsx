@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/accounting/preview/screens";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Kategori Akun" };
+// Simplified chart of accounts (owner decision 2026-11-19): Ledger = an
+// account without Induk; Kategori Akun, Kategori Cashflow and Perkiraan are
+// managed on Akun & kategori.
 export default function Page() {
-  return <PreviewScreenPage screen={screens["/akunting/kategori-akun"]} />;
+  redirect("/finance/accounting/accounts");
 }

@@ -173,7 +173,8 @@ export function createFinanceService(
       const data = z.union([invoiceCommand, accountingCommand]).parse(input);
       const [resource, action] = data.action.split(".");
       const permission =
-        resource === "journal" && ["expense", "transfer"].includes(action)
+        resource === "journal" &&
+        ["expense", "transfer", "opening"].includes(action)
           ? "post"
           : data.action === "invoice.handover"
             ? "update"

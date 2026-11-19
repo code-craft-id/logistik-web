@@ -109,6 +109,40 @@ export const helpEntries: HelpEntry[] = [
     href: "/financial-reports/ap-aging",
   },
   {
+    id: "perkiraan-structure",
+    title: "Perkiraan: induk, rugi laba, cabang dan saldo awal",
+    keywords: [
+      "perkiraan",
+      "akun",
+      "induk",
+      "ledger",
+      "opening balance",
+      "saldo awal",
+      "kategori rugi laba",
+      "cost centre",
+      "inisial",
+      "tampil",
+    ],
+    answer:
+      "Akunting > Akun & kategori. Tiap akun (Perkiraan) punya Kode Rekening, Nama, Inisial, Induk, Klasifikasi, Kategori akun, Tampil (Show/Hide), Kategori Rugi Laba (khusus akun pendapatan/beban) dan Cabang (kosong = Nasional). Akun tanpa induk berfungsi sebagai Ledger/grup, akun yang punya induk adalah Child; induk tidak boleh melingkar. Posisi (Neraca atau Rugi Laba) dan tanda +/- di Rugi Laba otomatis dari klasifikasi, jadi tidak perlu diisi. Tabel menampilkan Saldo dari jurnal terposting di sisi saldo normal. Kategori Rugi Laba dikelola di bagian Kategori Rugi Laba (kode dan nama). Opening Balance (saldo awal): pilih akun, akun lawan ekuitas (mis. Laba Ditahan), cabang, tanggal dan jumlah; sistem membuat jurnal saldo awal yang langsung terposting (butuh hak Jurnal: posting dan periode belum ditutup). Satu saldo awal per akun per cabang; untuk mengubah, balik jurnal saldo awal di menu Jurnal lalu isi ulang.",
+    href: "/finance/accounting/accounts",
+  },
+  {
+    id: "hitung-rugi-laba",
+    title: "Hitung Rugi Laba",
+    keywords: [
+      "rugi laba",
+      "laba rugi",
+      "hitung rugi laba",
+      "profit loss",
+      "cost centre",
+      "current year",
+    ],
+    answer:
+      "Akunting > Hitung Rugi Laba (/akunting/rugi-laba). Pilih Bulan, Tahun dan Cost Centre (NASIONAL = semua cabang yang boleh Anda lihat, atau satu cabang) lalu Search. Hasilnya dari jurnal terposting akun pendapatan dan beban, dikelompokkan per Kategori Rugi Laba: KODE AKUN, INDUK, HASIL bulan itu, % terhadap pendapatan bulan itu (nan % bila belum ada pendapatan) dan Current Year (Januari sampai bulan terpilih), dengan TOTAL per kategori dan LABA (RUGI) BERSIH. Pendapatan bernilai plus, beban minus. Akun tanpa kategori masuk Tanpa Kategori Rugi Laba. Butuh hak Laporan keuangan: lihat.",
+    href: "/akunting/rugi-laba",
+  },
+  {
     id: "booking",
     title: "Booking",
     keywords: [
@@ -420,7 +454,7 @@ export const helpEntries: HelpEntry[] = [
       "gp",
     ],
     answer:
-      "Menu Akunting: Akun & kategori (chart of accounts, juga lewat Master Data > Perkiraan), Jurnal (wajib seimbang; yang sudah diposting dikoreksi dengan jurnal balik), Biaya aktual per AWB, Periode (tutup bulan) dan Laporan P&L, GP dan arus kas. Jurnal, pembayaran dan invoice terbit tidak bisa dihapus.",
+      "Menu Akunting: Akun & kategori (chart of accounts / Perkiraan, juga lewat Master Data > Perkiraan; menu Ledger, Kategori Akun dan Kategori Cashflow juga diarahkan ke sini), Hitung Rugi Laba, Jurnal (wajib seimbang; yang sudah diposting dikoreksi dengan jurnal balik), Biaya aktual per AWB, Periode (tutup bulan) dan Laporan P&L, GP dan arus kas. Jurnal, pembayaran dan invoice terbit tidak bisa dihapus.",
     href: "/finance/accounting",
   },
   {

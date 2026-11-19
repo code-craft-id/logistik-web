@@ -110,6 +110,19 @@ model FinAccount {
   isCash             Boolean      @default(false)
   categoryId         Int
   category           FinCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Perkiraan fields as in the provider's hidden Edit Perkiraan form
+  /// (OBSERVED 2026-11-19), simplified by owner decision: Induk replaces
+  /// Ledger and Parent/Child; Posisi and Operator Rugi Laba follow kind.
+  initial            String?        @db.VarChar(20)
+  parentId           Int?
+  parent             FinAccount?    @relation("AccountParent", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  children           FinAccount[]   @relation("AccountParent")
+  visible            Boolean        @default(true)
+  plCategoryId       Int?
+  plCategory         FinPlCategory? @relation(fields: [plCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Cost centre; null = Nasional.
+  branchId           Int?
+  branch             Branch?        @relation("FinAccountBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   active             Boolean      @default(true)
   deletedAt          DateTime?
   createdAt          DateTime     @default(now())
@@ -121,7 +134,24 @@ model FinAccount {
   liabilityMappings  FinMapping[] @relation("MappingLiability")
 
   @@index([kind, active])
+  @@index([parentId])
+  @@index([plCategoryId])
   @@map("fin_accounts")
+}
+
+/// Kategori Rugi Laba (provider "Rugi Laba" master, e.g. Test | TRX
+/// LabaRugi): groups revenue and expense accounts in Hitung Rugi Laba.
+model FinPlCategory {
+  id        Int          @id @default(autoincrement())
+  code      String       @unique @db.VarChar(30)
+  name      String       @db.VarChar(100)
+  active    Boolean      @default(true)
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  accounts  FinAccount[]
+
+  @@map("fin_pl_categories")
 }
 
 // Append-only mapping versions. Journals pin the version used.

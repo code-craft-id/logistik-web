@@ -262,6 +262,7 @@ export const liveRoutes = [
   "/branch-reports/rekap-transaksi",
   "/financial-reports/aging",
   "/financial-reports/ap-aging",
+  "/akunting/rugi-laba",
   "/transactions/lookup",
   "/transactions/history",
   "/transactions/void?view=deleted",
@@ -321,6 +322,11 @@ export const navigation: readonly NavigationGroup[] = [
                 label: "Periode",
                 providerLabel: "Periode",
                 href: "/finance/accounting/periods",
+              },
+              {
+                label: "Hitung Rugi Laba",
+                providerLabel: "Hitung Rugi Laba",
+                href: "/akunting/rugi-laba",
               },
               {
                 label: "P&L, GP & arus kas",
