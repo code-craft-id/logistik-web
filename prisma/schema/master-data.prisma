@@ -91,6 +91,7 @@ model Driver {
 }
 
 model Courier {
+  bookings Booking[] @relation("BookingCourier")
   pickupTransactions Transaction[] @relation("TransactionPickupCourier")
   deletedAt        DateTime?    @map("deleted_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")

@@ -23,24 +23,43 @@ export function requireNonEmptyBranchScope(
 export async function listBookings(params: { limit?: number } = {}) {
   const current = await currentIdentity();
   const actor = current?.actor ?? null;
-  if (isAdministrator(actor)) {
-    const limit = params.limit ?? 50;
+  const include = {
+    branch: { select: { name: true } },
+    courier: { select: { name: true } },
+    createdBy: { select: { name: true } },
+  };
+  const limit = params.limit ?? 50;
+  if (isAdministrator(actor))
     return prisma.booking.findMany({
       where: { deletedAt: null },
-      orderBy: { bookingDate: "desc" },
+      orderBy: [{ bookingDate: "desc" }, { id: "desc" }],
       take: limit,
+      include,
     });
-  }
   const branchIds = await getUserBranchScope();
   requireNonEmptyBranchScope(branchIds, actor);
-  const limit = params.limit ?? 50;
   return prisma.booking.findMany({
+    where: { deletedAt: null, branchId: { in: branchIds } },
+    orderBy: [{ bookingDate: "desc" }, { id: "desc" }],
+    take: limit,
+    include,
+  });
+}
+
+/** Active couriers of the actor's branches, for assigning bookings. */
+export async function bookingCourierOptions(actor: AccessActor) {
+  const admin = isAdministrator(actor);
+  return prisma.courier.findMany({
     where: {
       deletedAt: null,
-      branchId: { in: branchIds },
+      status: "ACTIVE",
+      ...(admin
+        ? {}
+        : { OR: [{ branchId: { in: actor.branchIds } }, { branchId: null }] }),
     },
-    orderBy: { bookingDate: "desc" },
-    take: limit,
+    select: { id: true, name: true, branchId: true },
+    orderBy: { name: "asc" },
+    take: 1000,
   });
 }
 

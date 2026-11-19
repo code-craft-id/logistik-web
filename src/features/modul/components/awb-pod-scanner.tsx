@@ -2,6 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  confirmPickupAction,
+  scanBookingAction,
+} from "@/features/bookings/pickup-actions";
+import type { BookingScanView } from "@/features/bookings/server/pickup";
 import { scanLookupAction } from "../proof-actions";
 import type { ScanAwbView } from "../server/proof";
 import { ProofForm } from "./proof-form";
@@ -33,35 +38,84 @@ function Field({
 /** Scan an AWB, see its details and tracking, then update its status (Progi-style). */
 export function AwbPodScanner() {
   const [awb, setAwb] = useState<ScanAwbView | null>(null);
+  const [booking, setBooking] = useState<BookingScanView | null>(null);
+  const [mode, setMode] = useState<"awb" | "booking">("awb");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
 
-  const lookup = useCallback(async (code: string) => {
-    setBusy(true);
-    setError(null);
-    setSaved(null);
-    try {
-      const result = await scanLookupAction(code);
-      scanFeedback(result.ok);
-      if (result.ok) setAwb(result.awb);
-      else {
+  const lookup = useCallback(
+    async (code: string) => {
+      setBusy(true);
+      setError(null);
+      setSaved(null);
+      try {
+        setBooking(null);
         setAwb(null);
-        setError(result.message);
+        if (mode === "booking") {
+          const asBooking = await scanBookingAction(code);
+          if (asBooking.ok && asBooking.booking) {
+            scanFeedback(true);
+            setBooking(asBooking.booking);
+            return;
+          }
+          scanFeedback(false);
+          setError(
+            asBooking.ok ? "Nomor booking tidak ditemukan." : asBooking.message,
+          );
+          return;
+        }
+        const result = await scanLookupAction(code);
+        scanFeedback(result.ok);
+        if (result.ok) setAwb(result.awb);
+        else setError(result.message);
+      } catch {
+        setError("Koneksi terputus. Scan ulang.");
+      } finally {
+        setBusy(false);
       }
-    } catch {
-      setError("Koneksi terputus. Scan ulang.");
-    } finally {
-      setBusy(false);
-    }
-  }, []);
+    },
+    [mode],
+  );
 
   const latest = awb?.proofs[0];
   const final = awb?.status === "Delivered" || awb?.status === "Cancelled";
   return (
     <div className="space-y-5">
-      <ScanInput onCode={lookup} busy={busy} />
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Yang di-scan</legend>
+        <div className="grid grid-cols-2 gap-2 sm:max-w-sm">
+          {(
+            [
+              ["awb", "AWB / Resi"],
+              ["booking", "Booking (jemput)"],
+            ] as const
+          ).map(([value, text]) => (
+            <Button
+              key={value}
+              type="button"
+              variant={mode === value ? "default" : "outline"}
+              aria-pressed={mode === value}
+              className="min-h-11"
+              onClick={() => {
+                setMode(value);
+                setAwb(null);
+                setBooking(null);
+                setError(null);
+                setSaved(null);
+              }}
+            >
+              {text}
+            </Button>
+          ))}
+        </div>
+      </fieldset>
+      <ScanInput
+        onCode={lookup}
+        busy={busy}
+        label={mode === "booking" ? "Nomor Booking" : "Nomor AWB"}
+      />
       {error && (
         <p
           role="alert"
@@ -74,6 +128,20 @@ export function AwbPodScanner() {
         <output className="block rounded-md border border-primary p-3 text-sm">
           {saved}
         </output>
+      )}
+      {booking && (
+        <BookingCard
+          booking={booking}
+          onConfirmed={(next) => {
+            setBooking(next);
+            setSaved(`Booking ${next.bookingNo} dijemput (${next.status}).`);
+            scanFeedback(true);
+          }}
+          onError={(message) => {
+            setError(message);
+            scanFeedback(false);
+          }}
+        />
       )}
       {awb && (
         <article className="space-y-4" aria-label={`AWB ${awb.awbNo}`}>
@@ -185,5 +253,73 @@ export function AwbPodScanner() {
         </article>
       )}
     </div>
+  );
+}
+
+/** Scanned booking (pickup order): details and Konfirmasi Jemput. */
+function BookingCard({
+  booking,
+  onConfirmed,
+  onError,
+}: {
+  booking: BookingScanView;
+  onConfirmed: (booking: BookingScanView) => void;
+  onError: (message: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <article className="space-y-4" aria-label={`Booking ${booking.bookingNo}`}>
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-mono text-lg font-semibold">
+          Booking {booking.bookingNo}
+        </h2>
+        <span className="rounded-full border px-3 py-1 text-sm">
+          {booking.status}
+        </span>
+      </header>
+      <section className="rounded-lg border bg-background p-4">
+        <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+          <Field label="Cabang" value={booking.branch} />
+          <Field label="Kurir" value={booking.courier} />
+          <Field label="Tanggal" value={when(booking.bookingDate)} />
+          <Field label="Tujuan" value={booking.destination} />
+          <Field label="Pengirim" value={booking.senderName} />
+          <Field label="Penerima" value={booking.receiverName} />
+          <Field label="Koli" value={booking.koli} />
+          <Field label="Berat (kg)" value={booking.kilo} />
+          {booking.pickedUpAt && (
+            <Field
+              label="Dijemput"
+              value={`${when(booking.pickedUpAt)}${booking.pickedUpBy ? ` · ${booking.pickedUpBy}` : ""}`}
+            />
+          )}
+          {booking.cancelReason && (
+            <Field label="Alasan batal" value={booking.cancelReason} />
+          )}
+        </dl>
+      </section>
+      {booking.blocked && (
+        <p className="text-sm text-muted-foreground">{booking.blocked}</p>
+      )}
+      <Button
+        type="button"
+        className="min-h-11 w-full"
+        disabled={!!booking.blocked || busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            const result = await confirmPickupAction(booking.id);
+            if (result.ok) onConfirmed(result.booking);
+            else onError(result.message);
+          } catch {
+            onError("Koneksi terputus. Coba lagi.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? "Menyimpan…" : "Konfirmasi Jemput"}
+      </Button>
+    </article>
   );
 }

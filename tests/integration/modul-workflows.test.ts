@@ -40,6 +40,7 @@ const all = [
   ["debt_payment", ["view", "create", "close"]],
   ["booking", ["view"]],
   ["awb_scan", ["use"]],
+  ["booking", ["view", "approve"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -147,6 +148,7 @@ afterAll(async () => {
     where: { originBranchId: { in: [ids.a, ids.b] } },
   });
   await db.booking.deleteMany({ where: { bookingNo: { startsWith: tag } } });
+  await db.courier.deleteMany({ where: { name: { startsWith: tag } } });
   await db.transactionStatusHistory.deleteMany({
     where: { transactionId: { in: ids.tx } },
   });
@@ -560,6 +562,92 @@ describe("Scan & Konfirmasi (bukti terima)", () => {
     expect((await m.proof.scanLookup(courier, `${tag}-K-3`)).id).toBe(t.id);
     await expect(m.proof.scanLookup(courier, `${tag}-K-4`)).rejects.toThrow(
       "tidak ditemukan",
+    );
+  });
+});
+
+describe("Booking pickup (berdiri sendiri)", () => {
+  it("assigns a courier, refuses other branches and confirms the pickup once", async () => {
+    const pickup = await import("../../src/features/bookings/server/pickup");
+    const courierA = await db.courier.create({
+      data: {
+        name: `${tag} kurir A`,
+        address: "-",
+        nationalIdNumber: "1",
+        phone: "1",
+        branchId: ids.a,
+      },
+    });
+    const courierB = await db.courier.create({
+      data: {
+        name: `${tag} kurir B`,
+        address: "-",
+        nationalIdNumber: "2",
+        phone: "2",
+        branchId: ids.b,
+      },
+    });
+    const booking = await db.booking.create({
+      data: { bookingNo: `${tag}-BK1`, branchId: ids.a, senderName: "Toko" },
+    });
+    expect(booking.status).toBe("WAITING TO PICKUP");
+    const adminA = actor(ids.approver, [ids.a]);
+    // Scanning from another branch: the provider's message.
+    await expect(
+      pickup.scanBooking(actor(ids.approver, [ids.b]), `${tag}-bk1`),
+    ).rejects.toThrow("No. Booking tidak sesuai dengan cabang asal kurir.");
+    // Not assigned yet: the card explains, confirming is refused.
+    expect((await pickup.scanBooking(adminA, `${tag}-BK1`))?.blocked).toContain(
+      "belum ditugaskan",
+    );
+    await expect(pickup.confirmPickup(adminA, booking.id)).rejects.toThrow(
+      "belum ditugaskan",
+    );
+    await expect(
+      pickup.assignCourier(adminA, {
+        bookingId: booking.id,
+        courierId: courierB.id,
+      }),
+    ).rejects.toThrow("cabang yang sama");
+    await pickup.assignCourier(adminA, {
+      bookingId: booking.id,
+      courierId: courierA.id,
+    });
+    const done = await pickup.confirmPickup(adminA, booking.id);
+    expect(done).toMatchObject({
+      status: "PROGRESS PICKUP",
+      courier: `${tag} kurir A`,
+    });
+    await expect(pickup.confirmPickup(adminA, booking.id)).rejects.toThrow(
+      "sudah dijemput",
+    );
+    await expect(
+      pickup.cancelBooking(adminA, { bookingId: booking.id, reason: "Batal" }),
+    ).rejects.toThrow("tidak bisa dibatalkan");
+  });
+
+  it("cancels a waiting booking with a reason", async () => {
+    const pickup = await import("../../src/features/bookings/server/pickup");
+    const booking = await db.booking.create({
+      data: { bookingNo: `${tag}-BK2`, branchId: ids.a },
+    });
+    const adminA = actor(ids.approver, [ids.a]);
+    await expect(
+      pickup.cancelBooking(adminA, { bookingId: booking.id, reason: "x" }),
+    ).rejects.toThrow("minimal 3");
+    await pickup.cancelBooking(adminA, {
+      bookingId: booking.id,
+      reason: "Pengirim membatalkan",
+    });
+    const saved = await db.booking.findUniqueOrThrow({
+      where: { id: booking.id },
+    });
+    expect(saved).toMatchObject({
+      status: "CANCEL PICKUP",
+      cancelReason: "Pengirim membatalkan",
+    });
+    expect((await pickup.scanBooking(adminA, `${tag}-BK2`))?.blocked).toBe(
+      "Booking sudah dibatalkan.",
     );
   });
 });

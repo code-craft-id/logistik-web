@@ -126,7 +126,22 @@ model Booking {
   kilo          Decimal?      @db.Decimal(10, 2)
   volume        Decimal?      @db.Decimal(10, 3)
   biaya         Decimal?      @db.Decimal(15, 2)
-  status        String        @default("Open") @db.VarChar(30)
+  /// Pickup lifecycle as in the provider app (OBSERVED 2026-11-19):
+  /// WAITING TO PICKUP, PROGRESS PICKUP, CANCEL PICKUP. Bookings stand alone
+  /// (not linked to AWBs in the provider web).
+  status        String        @default("WAITING TO PICKUP") @db.VarChar(30)
+  courierId     Int?          @map("courier_id")
+  courier       Courier?      @relation("BookingCourier", fields: [courierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  assignedAt    DateTime?     @map("assigned_at")
+  assignedById  Int?          @map("assigned_by_id")
+  assignedBy    User?         @relation("BookingAssignedBy", fields: [assignedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  pickedUpAt    DateTime?     @map("picked_up_at")
+  pickedUpById  Int?          @map("picked_up_by_id")
+  pickedUpBy    User?         @relation("BookingPickedUpBy", fields: [pickedUpById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cancelledAt   DateTime?     @map("cancelled_at")
+  cancelledById Int?          @map("cancelled_by_id")
+  cancelledBy   User?         @relation("BookingCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cancelReason  String?       @map("cancel_reason") @db.VarChar(500)
   createdById   Int?          @map("created_by_id")
   createdBy     User?         @relation("BookingCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt     DateTime      @default(now()) @map("created_at")
@@ -138,6 +153,7 @@ model Booking {
   @@index([customerId])
   @@index([status])
   @@index([bookingDate])
+  @@index([courierId])
   @@map("bookings")
 }
 

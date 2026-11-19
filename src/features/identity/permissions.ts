@@ -178,7 +178,7 @@ export const permissionResources = [
   {
     resource: "booking",
     label: "Booking",
-    actions: ["view", "create", "update"],
+    actions: ["view", "create", "update", "approve"],
   },
   {
     resource: "transaction",

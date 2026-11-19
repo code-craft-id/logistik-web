@@ -43,7 +43,7 @@ export const helpEntries: HelpEntry[] = [
       "slip",
     ],
     answer:
-      "Modul > Layanan Pelanggan > Booking. Klik Tambah Booking dan pilih Cabang: nomor booking terisi otomatis (BK + kode cabang + tahun bulan + nomor urut, contoh BKJKT261100001) dan boleh diubah (nomor manual tidak boleh dobel di cabang yang sama). Isi Customer, pengirim, penerima, DO, tujuan, koli, berat, volume dan biaya. Di daftar Booking, centang lalu Print terpilih (barcode) atau Print per baris untuk mencetak slip booking dengan barcode dan QR. Relasi: booking adalah pesanan jemput (pickup) yang berdiri sendiri; AWB dibuat terpisah oleh admin setelah barang tiba di kantor. Tab Inbound Booking menampilkan booking yang tujuannya sama dengan nama cabang Anda.",
+      "Modul > Layanan Pelanggan > Booking. Booking adalah pesanan jemput (pickup) yang berdiri sendiri, tidak tertaut ke AWB. Klik Tambah Booking dan pilih Cabang: nomor booking terisi otomatis (BK + kode cabang + tahun bulan + nomor urut) dan boleh diubah (nomor manual tidak boleh dobel di cabang yang sama). Status awal WAITING TO PICKUP. Admin cabang dengan hak Booking: Setujui menekan ✔ Tugaskan (pilih kurir dari cabang booking) atau ✖ Batal (wajib alasan, status CANCEL PICKUP). Kurir membuka Scan AWB, memilih mode Booking (jemput), scan barcode slip booking lalu Konfirmasi Jemput: status menjadi PROGRESS PICKUP. Booking cabang lain ditolak dengan pesan No. Booking tidak sesuai dengan cabang asal kurir; booking yang belum ditugaskan kurir belum bisa dijemput. AWB dibuat terpisah oleh admin setelah barang tiba. Print atau Print terpilih (barcode) mencetak slip booking dengan barcode dan QR. Tab Inbound Booking menampilkan booking yang tujuannya sama dengan nama cabang Anda.",
 
     href: "/bookings",
   },
@@ -156,7 +156,7 @@ export const helpEntries: HelpEntry[] = [
       "kurir",
     ],
     answer:
-      'Fitur ini tersembunyi sampai admin server mengisi FEATURE_AWB_SCAN="true" dan grup Anda diberi hak Scan AWB (Pakai) di Hak Akses Menu. Bila aktif, tombol Scan AWB muncul di daftar AWB. Scan barcode/QR resi dengan scanner genggam, kamera HP (Chrome Android) atau ketik nomor lalu Enter. Muncul data Pengirim, Penerima, Tracking details dan foto/tanda tangan terakhir. Klik Update Status: pilih DITERIMA (nama penerima wajib) atau RETUR, isi keterangan, foto 1–5 dan tanda tangan (opsional, digores di kotak putih). DITERIMA mengubah AWB menjadi Delivered; RETUR tidak mengubah status AWB. Hasilnya ikut tercatat di DRS dan detail AWB. Hanya AWB cabang Anda yang bisa di-scan.',
+      'Fitur ini tersembunyi sampai admin server mengisi FEATURE_AWB_SCAN="true" dan grup Anda diberi hak Scan AWB (Pakai) di Hak Akses Menu. Bila aktif, tombol Scan AWB muncul di daftar AWB. Pilih yang di-scan: AWB / Resi atau Booking (jemput). Mode Booking menampilkan data booking dan tombol Konfirmasi Jemput (lihat penjelasan Booking). Untuk AWB: scan barcode/QR resi dengan scanner genggam, kamera HP (Chrome Android) atau ketik nomor lalu Enter. Muncul data Pengirim, Penerima, Tracking details dan foto/tanda tangan terakhir. Klik Update Status: pilih DITERIMA (nama penerima wajib) atau RETUR, isi keterangan, foto 1–5 dan tanda tangan (opsional, digores di kotak putih). DITERIMA mengubah AWB menjadi Delivered; RETUR tidak mengubah status AWB. Hasilnya ikut tercatat di DRS dan detail AWB. Hanya AWB cabang Anda yang bisa di-scan.',
     href: "/transactions",
   },
   {
@@ -188,7 +188,7 @@ export const helpEntries: HelpEntry[] = [
       "cara kerja",
     ],
     answer:
-      "Alur utama: Booking (pesanan pickup, slip ber-barcode) → AWB/Transaksi (dibuat admin di kantor, terpisah dari booking; label per koli AWB-n; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dibuat dari manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
+      "Alur utama: Booking (pesanan jemput: WAITING TO PICKUP → kurir ditugaskan → scan jemput PROGRESS PICKUP, atau CANCEL PICKUP; berdiri sendiri) → AWB/Transaksi (dibuat admin di kantor, terpisah dari booking; label per koli AWB-n; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dibuat dari manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
   },
   {
     id: "access",

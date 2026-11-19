@@ -47,7 +47,12 @@ describe("group-owned roles and deny-by-default access", () => {
       expect(
         permissionResources.find((entry) => entry.resource === resource)
           ?.actions,
-      ).toEqual(["view", "create", "update"]);
+      ).toEqual(
+        // Booking adds "approve" for assigning a courier / cancelling (✔/✖).
+        resource === "booking"
+          ? ["view", "create", "update", "approve"]
+          : ["view", "create", "update"],
+      );
       expect(validPermission({ resource, action: "delete" })).toBe(false);
       expect(permits(actor(), "view", resource)).toBe(false);
       expect(

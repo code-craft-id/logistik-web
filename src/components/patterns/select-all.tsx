@@ -1,6 +1,6 @@
 "use client";
 
-/** Checks or clears every checkbox with the given name in the same form. */
+/** Checks or clears every checkbox with the given name in the same form (including ones linked with form="…"). */
 export function SelectAllCheckbox({
   name,
   label = "Pilih semua",
@@ -16,10 +16,14 @@ export function SelectAllCheckbox({
         onChange={(event) => {
           const form = event.currentTarget.form;
           if (!form) return;
-          for (const box of form.querySelectorAll<HTMLInputElement>(
-            `input[type="checkbox"][name="${name}"]`,
-          ))
-            box.checked = event.currentTarget.checked;
+          // form.elements also covers checkboxes linked with form="…".
+          for (const box of Array.from(form.elements))
+            if (
+              box instanceof HTMLInputElement &&
+              box.type === "checkbox" &&
+              box.name === name
+            )
+              box.checked = event.currentTarget.checked;
         }}
       />
       {label}
