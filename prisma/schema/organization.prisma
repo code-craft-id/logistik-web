@@ -48,6 +48,7 @@ model Office {
 }
 
 model Branch {
+  manifestScans ManifestScan[] @relation("ManifestScanBranch")
   finAccounts FinAccount[] @relation("FinAccountBranch")
   bookingsInbound Booking[] @relation("BookingDestinationBranch")
   tariffOrigins Tariff[] @relation("TariffOrigin")

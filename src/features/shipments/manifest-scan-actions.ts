@@ -1,0 +1,43 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { IdentityError } from "@/features/identity/server/access";
+import { currentIdentity } from "@/features/identity/server/context";
+import { ModulError } from "@/features/modul/server/common";
+import { type ScanKind, scanKoli } from "./server/manifest-scan";
+
+export async function scanKoliAction(
+  manifestId: number,
+  kind: ScanKind,
+  code: string,
+): Promise<{ ok: true; message: string } | { ok: false; message: string }> {
+  try {
+    const current = await currentIdentity();
+    if (!current) throw new IdentityError("UNAUTHENTICATED", 401);
+    if (kind !== "TRANSIT" && kind !== "INBOUND")
+      return { ok: false, message: "Jenis scan tidak valid." };
+    const r = await scanKoli(
+      current.actor,
+      Number(manifestId),
+      kind,
+      String(code ?? ""),
+    );
+    revalidatePath(`/manifest/${manifestId}/scan`);
+    return {
+      ok: true,
+      message: `${r.awbNo}-${r.piece} tercatat (${r.scanned}/${r.koli} koli).`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof ModulError
+          ? error.message
+          : error instanceof IdentityError
+            ? error.code === "UNAUTHENTICATED"
+              ? "Sesi Anda berakhir. Silakan masuk kembali."
+              : "Grup Anda belum punya hak Manifest: ubah untuk scan."
+            : "Scan gagal karena kesalahan sistem.",
+    };
+  }
+}

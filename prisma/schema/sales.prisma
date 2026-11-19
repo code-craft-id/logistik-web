@@ -185,6 +185,7 @@ model Booking {
 
 /// Transaction/AWB - operational document. Idempotent creation required (AC-02).
 model Transaction {
+  manifestScans ManifestScan[]
   deliveryProofs DeliveryProof[]
   awbChangeRequests AwbChangeRequest[]
   podReturnItems PodReturnItem[]
@@ -296,6 +297,7 @@ model TransactionStatusHistory {
 /// Manifest - OBSERVED structure partially, D-08 rules TBD.
 /// Supports outbound/transit/inbound concepts via type/routes tracked flexibly.
 model Manifest {
+  scans ManifestScan[]
   id                Int                @id @default(autoincrement())
   manifestNo        String             @unique @map("manifest_no") @db.VarChar(50)
   manifestDate      DateTime           @default(now()) @map("manifest_date")

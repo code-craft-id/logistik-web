@@ -143,6 +143,24 @@ export const helpEntries: HelpEntry[] = [
     href: "/akunting/rugi-laba",
   },
   {
+    id: "scan-koli-transit-inbound",
+    title: "Scan koli Transit / Inbound (User Transit, Transit Date, Acc. In)",
+    keywords: [
+      "scan transit",
+      "scan inbound",
+      "cek transit",
+      "cek inbound",
+      "user transit",
+      "transit date",
+      "acc in",
+      "sisa koli",
+      "scan koli",
+    ],
+    answer:
+      "Modul > Operasional > Manifest, tab Transit (Cek Transit) atau Inbound (Cek Inbound), klik Scan pada manifest. Ketik atau scan No. AWB/Koli lalu Enter (scanner genggam atau kamera HP juga bisa): label koli AWB-n mencatat koli itu, nomor AWB saja mencatat koli berikutnya; satu koli hanya bisa di-scan sekali. Tabel menampilkan Biaya Kirim, Berat Terbesar, Total Koli, Scan Koli dan Sisa Koli per AWB serta GRAND TOTAL. Scan Transit hanya untuk cabang yang namanya ada di Transit1-5 manifest (Transit Ke- menunjukkan urutannya), Scan Inbound hanya untuk cabang tujuan; manifest Draft belum bisa di-scan; butuh hak Manifest: ubah. Scan transit pertama mengisi kolom User Transit dan Transit Date di Cek Transit; scan inbound pertama sebuah AWB mengisi Acc. In di Status Pengantaran; semua scan tampil di Tracking Details. Pindah Manifest belum tersedia sampai aturan D-08 (AWB pindah manifest) diputuskan.",
+    href: "/manifest?type=Transit",
+  },
+  {
     id: "booking",
     title: "Booking",
     keywords: [

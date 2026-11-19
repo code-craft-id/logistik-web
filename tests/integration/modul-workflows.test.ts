@@ -43,6 +43,7 @@ const all = [
   ["booking", ["view", "approve"]],
   ["transaction", ["view", "update"]],
   ["transaction_report", ["view", "export"]],
+  ["manifest", ["view", "update"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -165,6 +166,9 @@ afterAll(async () => {
   });
   await db.deliverySheet.deleteMany({
     where: { manifest: { branchId: { in: [ids.a, ids.b] } } },
+  });
+  await db.manifestScan.deleteMany({
+    where: { transactionId: { in: ids.tx } },
   });
   await db.manifestItem.deleteMany({
     where: { transactionId: { in: ids.tx } },
@@ -1006,5 +1010,84 @@ describe("Laporan AP (Rekap Aging Pemasok)", () => {
     await db.vendorBill.deleteMany({
       where: { id: { in: [open.id, paid.id] } },
     });
+  });
+});
+
+describe("Scan koli transit / inbound", () => {
+  it("records each koli once at the transit and destination branches", async () => {
+    const scan = await import(
+      "../../src/features/shipments/server/manifest-scan"
+    );
+    const t = await awb("MS1");
+    await db.transaction.update({ where: { id: t.id }, data: { koli: 2 } });
+    const manifest = await db.manifest.create({
+      data: {
+        manifestNo: `${tag}-MS`,
+        branchId: ids.a,
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+        transit1: `${tag}A`,
+        status: "Draft",
+      },
+    });
+    await db.manifestItem.create({
+      data: { manifestId: manifest.id, transactionId: t.id },
+    });
+    const inA = actor(ids.approver, [ids.a]);
+    const inB = actor(ids.approver, [ids.b]);
+    await expect(
+      scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-MS1`),
+    ).rejects.toThrow("Draft");
+    await db.manifest.update({
+      where: { id: manifest.id },
+      data: { status: "In Transit" },
+    });
+    // Only the destination scans inbound; only a listed transit branch scans transit.
+    await expect(
+      scan.scanKoli(inA, manifest.id, "INBOUND", `${tag}-MS1`),
+    ).rejects.toThrow("cabang tujuan");
+    await expect(
+      scan.scanKoli(inB, manifest.id, "TRANSIT", `${tag}-MS1`),
+    ).rejects.toThrow("Transit1-5");
+    const transit = await scan.scanKoli(
+      inA,
+      manifest.id,
+      "TRANSIT",
+      `${tag}-ms1`,
+    );
+    expect(transit).toMatchObject({ piece: 1, scanned: 1, koli: 2 });
+    expect(
+      (await scan.manifestScanView(inA, manifest.id, "TRANSIT")).transitNo,
+    ).toBe(1);
+    // Inbound: bare AWB takes the next koli, a label takes its koli.
+    await scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-MS1-2`);
+    expect(
+      await scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-MS1`),
+    ).toMatchObject({ piece: 1, scanned: 2 });
+    await expect(
+      scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-MS1`),
+    ).rejects.toThrow("Semua koli");
+    await expect(
+      scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-MS1-2`),
+    ).rejects.toThrow("sudah di-scan");
+    await expect(
+      scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-MS1-3`),
+    ).rejects.toThrow("hanya 2 koli");
+    await expect(
+      scan.scanKoli(inB, manifest.id, "INBOUND", `${tag}-NOPE`),
+    ).rejects.toThrow("tidak ada di manifest");
+    const view = await scan.manifestScanView(inB, manifest.id, "INBOUND");
+    expect(view).toMatchObject({ totalKoli: 2, totalScanned: 2 });
+    expect(
+      (await scan.firstTransitScans([manifest.id])).get(manifest.id)?.user,
+    ).toBe("FAKE approver");
+    expect((await scan.firstInboundScans([t.id])).has(t.id)).toBe(true);
+    const list = await import(
+      "../../src/features/shipments/server/status-list"
+    );
+    const row = (
+      await list.listShipmentStatus(inB, { search: `${tag}-MS1` })
+    ).rows.find((r) => r.id === t.id);
+    expect(row?.accIn).not.toBeNull();
   });
 });

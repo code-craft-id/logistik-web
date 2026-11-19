@@ -93,7 +93,9 @@ export default async function Page({
     "Kendaraan",
     "Driver",
     ...(agent ? ["Agen / Vendor"] : []),
+    ...(type === "Transit" ? ["User Transit", "Transit Date"] : []),
     "Status",
+    ...(type === "Transit" || type === "Inbound" ? ["Action"] : []),
   ];
   const numeric = new Set(headers.filter((h) => h.startsWith("Tot.")));
   return (
@@ -258,7 +260,26 @@ export default async function Page({
                       <TableCell>{row.vehicle ?? "—"}</TableCell>
                       <TableCell>{row.courier ?? "—"}</TableCell>
                       {agent && <TableCell>{row.vendor ?? "—"}</TableCell>}
+                      {type === "Transit" && (
+                        <>
+                          <TableCell>{row.transitUser ?? "-"}</TableCell>
+                          <TableCell className="tabular-nums">
+                            {row.transitDate ?? "-"}
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell>{row.status}</TableCell>
+                      {(type === "Transit" || type === "Inbound") && (
+                        <TableCell>
+                          <Link
+                            className={link}
+                            href={`/manifest/${row.id}/scan?kind=${type === "Transit" ? "TRANSIT" : "INBOUND"}`}
+                            aria-label={`Scan koli manifest ${row.manifestNo}`}
+                          >
+                            Scan
+                          </Link>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

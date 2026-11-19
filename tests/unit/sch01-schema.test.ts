@@ -47,6 +47,8 @@ describe("SCH-01 preservation and adapter contract", () => {
       "FinMapping",
       "FinCost",
       "FinClosedPeriod",
+      // Append-only koli scan log (Cek Transit / Cek Inbound).
+      "ManifestScan",
     ];
     const noSoftDelete = [
       ...parentOwned,

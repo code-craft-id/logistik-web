@@ -139,6 +139,7 @@ export default async function Page({
                 <TableHead>Penerima</TableHead>
                 <TableHead>Diterima Oleh</TableHead>
                 <TableHead>Tanggal Diterima</TableHead>
+                <TableHead>Acc. In</TableHead>
                 <TableHead className="text-right">L.Time</TableHead>
                 <TableHead>SLA</TableHead>
                 <TableHead>Action</TableHead>
@@ -148,7 +149,7 @@ export default async function Page({
               {data.rows.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={13}
+                    colSpan={14}
                     className="p-4 text-center text-muted-foreground"
                   >
                     Tidak ada AWB untuk pencarian ini.
@@ -176,6 +177,9 @@ export default async function Page({
                     <TableCell>{r.receivedBy ?? "-"}</TableCell>
                     <TableCell className="tabular-nums">
                       {when(r.receivedAt)}
+                    </TableCell>
+                    <TableCell className="tabular-nums">
+                      {when(r.accIn)}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {r.leadTimeDays ?? "-"}

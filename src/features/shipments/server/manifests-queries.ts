@@ -7,6 +7,7 @@ import {
 } from "@/features/identity/permissions";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
+import { firstTransitScans } from "./manifest-scan";
 
 export const MANIFEST_PAGE_SIZE = 25;
 
@@ -149,12 +150,13 @@ export async function listManifests(
   const branchIds = [
     ...new Set(rows.flatMap((r) => [r.originBranchId, r.destinationBranchId])),
   ].filter((v): v is number => v !== null);
-  const [branches, sums] = await Promise.all([
+  const [branches, sums, transitScans] = await Promise.all([
     prisma.branch.findMany({
       where: { id: { in: branchIds } },
       select: { id: true, name: true },
     }),
     manifestTotals(rows.map((r) => r.id)),
+    firstTransitScans(rows.map((r) => r.id)),
   ]);
   const branchName = new Map(branches.map((b) => [b.id, b.name]));
   return {
@@ -179,6 +181,10 @@ export async function listManifests(
         : null,
       courier: row.courier?.name ?? null,
       vendor: row.vendor?.name ?? null,
+      /** First transit koli scan (provider User Transit / Transit Date). */
+      transitUser: transitScans.get(row.id)?.user ?? null,
+      transitDate:
+        transitScans.get(row.id)?.at.toISOString().slice(0, 10) ?? null,
       /** Transit1..Transit5 as on the provider's Cek Transit list. */
       transits: [
         row.transit1,

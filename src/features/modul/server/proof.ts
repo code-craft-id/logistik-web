@@ -133,6 +133,18 @@ export async function awbForScan(
           assignedBy: { select: { name: true } },
         },
       },
+      manifestScans: {
+        orderBy: { createdAt: "asc" },
+        take: 200,
+        select: {
+          kind: true,
+          piece: true,
+          createdAt: true,
+          branch: { select: { name: true } },
+          scannedBy: { select: { name: true } },
+          manifest: { select: { manifestNo: true } },
+        },
+      },
       deliveryProofs: {
         where: { deletedAt: null },
         orderBy: { createdAt: "desc" },
@@ -166,6 +178,11 @@ export async function awbForScan(
       at: m.assignedAt.toISOString(),
       by: m.assignedBy?.name ?? null,
       text: `Masuk manifest ${m.manifest.manifestNo}`,
+    })),
+    ...t.manifestScans.map((m) => ({
+      at: m.createdAt.toISOString(),
+      by: m.scannedBy?.name ?? null,
+      text: `${m.kind === "TRANSIT" ? "Scan transit" : "Diterima cabang tujuan"}${m.branch ? ` ${m.branch.name}` : ""}: koli ${m.piece} (manifest ${m.manifest.manifestNo})`,
     })),
     ...t.statusHistory
       .filter((h) => h.priorStatus !== null)

@@ -180,3 +180,31 @@ model DeliveryProofPhoto {
   @@unique([proofId, position])
   @@map("delivery_proof_photos")
 }
+
+/// Koli scan at a transit or destination branch (provider Cek Transit /
+/// Cek Inbound detail, OBSERVED 2026-11-19: "Masukan No. AWB/Koli No.",
+/// Scan Koli / Sisa Koli). The first TRANSIT scan of a manifest gives User
+/// Transit / Transit Date; the first INBOUND scan of an AWB gives Acc. In.
+/// Owner-approved 2026-11-19 (D-05), Dev 2 review pending. Append-only
+/// (immutable): no updatedAt or soft delete.
+model ManifestScan {
+  id            Int         @id @default(autoincrement())
+  manifestId    Int         @map("manifest_id")
+  manifest      Manifest    @relation(fields: [manifestId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Koli number 1..koli (label AWB-n).
+  piece         Int
+  /// TRANSIT or INBOUND.
+  kind          String      @db.VarChar(10)
+  branchId      Int?        @map("branch_id")
+  branch        Branch?     @relation("ManifestScanBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  scannedById   Int?        @map("scanned_by_id")
+  scannedBy     User?       @relation("ManifestScanBy", fields: [scannedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@unique([manifestId, transactionId, piece, kind])
+  @@index([transactionId, kind])
+  @@index([manifestId, kind])
+  @@map("manifest_scans")
+}

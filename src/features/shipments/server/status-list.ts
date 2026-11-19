@@ -6,6 +6,7 @@ import { transactionScope } from "@/features/modul/server/common";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/lib/db/generated/client";
 import { slaLabel, slaTargetDays } from "../sla";
+import { firstInboundScans } from "./manifest-scan";
 
 export const SHIPMENT_STATUS_PAGE_SIZE = 50;
 
@@ -21,6 +22,8 @@ export type ShipmentStatusRow = {
   receiver: string | null;
   receivedBy: string | null;
   receivedAt: string | null;
+  /** First inbound koli scan at the destination (provider Acc. In). */
+  accIn: string | null;
   leadTimeDays: number | null;
   /** Target days from the route's Cek Ongkir Estimasi, if any. */
   slaTargetDays: number | null;
@@ -143,6 +146,7 @@ export async function listShipmentStatus(
       onRoute.find((x) => x.deliveryServiceId === null);
     return slaTargetDays(tariff?.eta ?? null);
   };
+  const accIn = await firstInboundScans(rows.map((t) => t.id));
   return {
     total,
     page,
@@ -164,6 +168,7 @@ export async function listShipmentStatus(
         receiver: t.receiverName,
         receivedBy: proof?.receiverName ?? drs?.receivedBy ?? null,
         receivedAt: receivedAt?.toISOString() ?? null,
+        accIn: accIn.get(t.id)?.toISOString() ?? null,
         leadTimeDays: receivedAt
           ? Math.max(
               0,
