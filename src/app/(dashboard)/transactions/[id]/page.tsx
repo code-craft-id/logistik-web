@@ -55,6 +55,14 @@ export default async function Page({
       >
         Print AWB
       </a>
+      <a
+        href={`/print/koli?ids=${tx.id}`}
+        target="_blank"
+        rel="noopener"
+        className="ml-4 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+      >
+        Print label koli ({Math.max(1, tx.koli ?? 1)})
+      </a>
       <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded border p-4 sm:grid-cols-2 lg:grid-cols-3">
         {(
           [
@@ -104,7 +112,6 @@ export default async function Page({
             ["Isi Barang", tx.description],
             ["Keterangan", tx.remarks],
             ["Kurir", tx.courier?.name],
-            ["Booking", tx.booking?.bookingNo ?? tx.bookingId],
             ["Dibuat oleh", tx.createdBy?.name],
           ] as const
         ).map(([label, value]) => (

@@ -48,6 +48,7 @@ function Choice({
   required = false,
   empty,
   onChange,
+  defaultValue = "",
 }: {
   name: string;
   text: string;
@@ -55,6 +56,7 @@ function Choice({
   required?: boolean;
   empty?: string;
   onChange?: (value: string) => void;
+  defaultValue?: string;
 }) {
   return (
     <div className={row}>
@@ -66,7 +68,7 @@ function Choice({
         id={name}
         name={name}
         required={required}
-        defaultValue=""
+        defaultValue={defaultValue}
         className={field}
         onChange={(event) => onChange?.(event.target.value)}
       >
@@ -169,6 +171,7 @@ export function TransactionForm({
     service: "",
   });
   const [receiver, setReceiver] = useState(emptyReceiver);
+  const [version, setVersion] = useState(0);
   const [manualPrice, setManualPrice] = useState(false);
   const [ppnOn, setPpnOn] = useState(false);
   const set =
@@ -281,6 +284,7 @@ export function TransactionForm({
           setReceiver(emptyReceiver);
           setAwb("");
           setRoute({ origin: "", destination: "", service: "" });
+          setVersion((v) => v + 1);
           // Fetch fresh suggested numbers.
           router.refresh();
         } else {
@@ -388,6 +392,7 @@ export function TransactionForm({
             empty="Delivery to Office"
           />
           <Choice
+            key={`origin-${version}`}
             name="originBranchId"
             text="Asal"
             options={options.branches}
@@ -395,12 +400,14 @@ export function TransactionForm({
             onChange={pickRoute("origin")}
           />
           <Choice
+            key={`destination-${version}`}
             name="destinationBranchId"
             text="Tujuan"
             options={options.destinations}
             onChange={pickRoute("destination")}
           />
           <Choice
+            key={`customer-${version}`}
             name="customerId"
             text="Customer"
             options={options.customers}
@@ -411,6 +418,7 @@ export function TransactionForm({
             options={options.marketing}
           />
           <Text
+            key={`sender-${version}`}
             name="senderName"
             text="Nama"
             placeholder="Nama Pengirim"
@@ -437,10 +445,11 @@ export function TransactionForm({
             inputMode="tel"
           />
           <Text
+            key={`do-${version}`}
             name="doNo"
             text="DO / Reff"
-            placeholder="No. DO / Reff"
-            maxLength={50}
+            placeholder="No. DO / Reff (boleh lebih dari satu, pisahkan spasi)"
+            maxLength={255}
           />
           <Choice
             name="deliveryServiceId"

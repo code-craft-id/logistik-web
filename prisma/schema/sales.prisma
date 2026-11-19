@@ -120,7 +120,7 @@ model Booking {
   customer      Customer?     @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   senderName    String?       @map("sender_name")
   receiverName  String?       @map("receiver_name")
-  doNo          String?       @map("do_no") @db.VarChar(50)
+  doNo          String?       @map("do_no") @db.VarChar(255)
   destination   String?
   koli          Int?          @default(0)
   kilo          Decimal?      @db.Decimal(10, 2)
@@ -157,7 +157,7 @@ model Transaction {
   bookingId             Int?                       @map("booking_id")
   booking               Booking?                   @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   transactionDate       DateTime                   @default(now()) @map("transaction_date")
-  doNo                  String?                    @map("do_no") @db.VarChar(50)
+  doNo                  String?                    @map("do_no") @db.VarChar(255)
   senderName            String?                    @map("sender_name")
   receiverName          String?                    @map("receiver_name")
   originBranchId        Int?                       @map("origin_branch_id")

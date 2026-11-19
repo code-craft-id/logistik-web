@@ -176,7 +176,7 @@ const editSchema = z.object({
   senderPhone: text(30),
   receiverAddress: text(500),
   receiverPhone: text(30),
-  doNo: text(50),
+  doNo: text(255),
   koli: z.coerce.number().int().min(0).max(1_000_000).optional(),
   kilo: decimal(2),
   volume: decimal(3),

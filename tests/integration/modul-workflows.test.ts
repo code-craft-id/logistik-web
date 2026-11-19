@@ -544,4 +544,22 @@ describe("Scan & Konfirmasi (bukti terima)", () => {
       m.proof.assertProofAllowed(courier, t.id, "DELIVERED"),
     ).resolves.toBeUndefined();
   });
+
+  it("resolves a koli label AWB-n to its AWB when n is within the koli", async () => {
+    const t = await db.transaction.create({
+      data: {
+        awbNo: `${tag}-K`,
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+        koli: 3,
+      },
+    });
+    ids.tx.push(t.id);
+    const courier = actor(ids.approver, [ids.a]);
+    expect((await m.proof.scanLookup(courier, `${tag}-K-2`)).id).toBe(t.id);
+    expect((await m.proof.scanLookup(courier, `${tag}-K-3`)).id).toBe(t.id);
+    await expect(m.proof.scanLookup(courier, `${tag}-K-4`)).rejects.toThrow(
+      "tidak ditemukan",
+    );
+  });
 });

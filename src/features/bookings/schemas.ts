@@ -61,7 +61,7 @@ export const createBookingSchema = z
     customerId: optionalPositiveInt,
     senderName: z.string().trim().max(150).optional().nullable(),
     receiverName: z.string().trim().max(150).optional().nullable(),
-    doNo: z.string().trim().max(50).optional().nullable(),
+    doNo: z.string().trim().max(255).optional().nullable(),
     destination: z.string().trim().max(150).optional().nullable(),
     koli: z.preprocess(
       emptyToUndefined,
@@ -103,7 +103,7 @@ export const createTransactionSchema = z
       z.string().min(1).max(50).nullable().optional(),
     ),
     transactionDate: z.coerce.date().optional(),
-    doNo: z.string().trim().max(50).optional().nullable(),
+    doNo: z.string().trim().max(255).optional().nullable(),
     senderName: z.string().trim().max(150).optional().nullable(),
     receiverName: z.string().trim().max(150).optional().nullable(),
     originBranchId: z.preprocess((v) => {

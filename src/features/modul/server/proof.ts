@@ -52,19 +52,35 @@ export type ScanAwbView = {
   proofs: ProofView[];
 };
 
-/** The AWB a scan refers to, within the actor's branches. */
-async function findScanned(actor: AccessActor, awbNo: string) {
-  const code = awbNo.replace(/\s+/g, "").slice(0, 50);
-  if (!code) throw new ModulError("Nomor AWB kosong.");
-  const matches = await prisma.transaction.findMany({
+/** AWBs matching a number exactly (case-insensitive) in the actor's branches. */
+function matching(actor: AccessActor, awbNo: string) {
+  return prisma.transaction.findMany({
     where: {
       deletedAt: null,
-      awbNo: { equals: code, mode: "insensitive" },
+      awbNo: { equals: awbNo, mode: "insensitive" },
       ...transactionScope(actor),
     },
-    select: { id: true },
+    select: { id: true, koli: true },
     take: 2,
   });
+}
+
+/**
+ * The AWB a scan refers to, within the actor's branches. A koli label
+ * "AWB-n" (provider format) resolves to its AWB when n is within the koli.
+ */
+async function findScanned(actor: AccessActor, awbNo: string) {
+  const code = awbNo.replace(/\s+/g, "").slice(0, 60);
+  if (!code) throw new ModulError("Nomor AWB kosong.");
+  let matches = await matching(actor, code);
+  const koli = /^(.+)-(\d{1,3})$/.exec(code);
+  if (!matches.length && koli) {
+    const parent = await matching(actor, koli[1]);
+    const piece = Number(koli[2]);
+    matches = parent.filter(
+      (t) => piece >= 1 && piece <= Math.max(1, t.koli ?? 1),
+    );
+  }
   if (!matches.length)
     throw new ModulError("AWB tidak ditemukan atau bukan milik cabang Anda.");
   if (matches.length > 1)

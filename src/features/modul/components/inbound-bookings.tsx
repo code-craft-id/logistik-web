@@ -38,7 +38,7 @@ export async function InboundBookings({
     <>
       <ModulHeader
         title="Kelola Inbound Booking"
-        info="Booking yang menuju cabang Anda: tujuan booking sama dengan nama cabang, atau salah satu AWB-nya menuju cabang Anda. Maksimal 500 baris terbaru."
+        info="Booking yang menuju cabang Anda: tujuan booking sama dengan nama cabang Anda. Maksimal 500 baris terbaru."
       />
       <ListFilter
         action="/bookings"

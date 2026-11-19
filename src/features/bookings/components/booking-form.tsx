@@ -109,6 +109,7 @@ export function BookingForm({
           </label>
           <input
             id="doNo"
+            maxLength={255}
             name="doNo"
             className="w-full border rounded px-2 py-1"
           />

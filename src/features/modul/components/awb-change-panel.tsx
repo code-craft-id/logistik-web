@@ -105,7 +105,7 @@ export async function AwbChangePanel({
             {field("receiverName", "Penerima", { maxLength: "255" })}
             {field("receiverPhone", "No. Telp Penerima", { maxLength: "30" })}
             {field("receiverAddress", "Alamat Penerima", { maxLength: "500" })}
-            {field("doNo", "DO No.", { maxLength: "50" })}
+            {field("doNo", "DO No.", { maxLength: "255" })}
             {field("koli", "Koli", { type: "number", min: "0" })}
             {field("kilo", "Berat (kg)", {
               type: "number",

@@ -28,7 +28,8 @@ export type InboundBookingRow = {
 /**
  * Inbound Booking: bookings headed to the actor's branches. A booking has
  * only a free-text destination, so it matches when that text equals a branch
- * name (case-insensitive) or when one of its AWBs goes to the branch.
+ * name (case-insensitive). Bookings stand alone (not linked to AWBs), as in
+ * the provider app.
  */
 export async function listInboundBookings(
   actor: AccessActor,
@@ -39,8 +40,8 @@ export async function listInboundBookings(
   if (!admin && !actor.branchIds.length) return [];
   const ids = admin ? null : Prisma.join(actor.branchIds);
   const scope = ids
-    ? Prisma.sql`(db.id IN (${ids}) OR EXISTS (SELECT 1 FROM transactions t WHERE t.booking_id = b.id AND t.deleted_at IS NULL AND t.destination_branch_id IN (${ids})))`
-    : Prisma.sql`(db.id IS NOT NULL OR EXISTS (SELECT 1 FROM transactions t WHERE t.booking_id = b.id AND t.deleted_at IS NULL AND t.destination_branch_id IS NOT NULL))`;
+    ? Prisma.sql`db.id IN (${ids})`
+    : Prisma.sql`db.id IS NOT NULL`;
   const search = params.search?.trim().slice(0, 50);
   const from = dayStart(params.from);
   const to = dayEnd(params.to);

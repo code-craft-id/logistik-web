@@ -43,7 +43,7 @@ export const helpEntries: HelpEntry[] = [
       "slip",
     ],
     answer:
-      "Modul > Layanan Pelanggan > Booking. Klik Tambah Booking dan pilih Cabang: nomor booking terisi otomatis (BK + kode cabang + tahun bulan + nomor urut, contoh BKJKT261100001) dan boleh diubah (nomor manual tidak boleh dobel di cabang yang sama). Isi Customer, pengirim, penerima, DO, tujuan, koli, berat, volume dan biaya. Di daftar Booking, centang lalu Print terpilih (barcode) atau Print per baris untuk mencetak slip booking dengan barcode dan QR. Relasi: booking adalah pesanan pickup; AWB bisa ditautkan ke booking asalnya. Tab Inbound Booking menampilkan booking yang menuju cabang Anda.",
+      "Modul > Layanan Pelanggan > Booking. Klik Tambah Booking dan pilih Cabang: nomor booking terisi otomatis (BK + kode cabang + tahun bulan + nomor urut, contoh BKJKT261100001) dan boleh diubah (nomor manual tidak boleh dobel di cabang yang sama). Isi Customer, pengirim, penerima, DO, tujuan, koli, berat, volume dan biaya. Di daftar Booking, centang lalu Print terpilih (barcode) atau Print per baris untuk mencetak slip booking dengan barcode dan QR. Relasi: booking adalah pesanan jemput (pickup) yang berdiri sendiri; AWB dibuat terpisah oleh admin setelah barang tiba di kantor. Tab Inbound Booking menampilkan booking yang tujuannya sama dengan nama cabang Anda.",
 
     href: "/bookings",
   },
@@ -62,7 +62,7 @@ export const helpEntries: HelpEntry[] = [
       "kirim",
     ],
     answer:
-      "Modul > Layanan Pelanggan > Transaksi > On Site Outbound, lalu Tambah AWB. Kolom AWB No. terisi otomatis setelah Asal dipilih (kode cabang asal + tahun bulan + nomor urut, contoh JKT261100001) dan boleh diubah; bila tidak diubah, nomor dikunci saat disimpan sehingga tidak bentrok dengan pengguna lain. Pilih Pricing Type (Harga/Kg, Harga/Koli, Trucking), Pickup By, Asal (wajib), Tujuan, Customer, Marketing, data pengirim dan penerima (pilih Penerima untuk mengisi otomatis), Layanan, DOC/PAC, Via Moda, Pembayaran, koli, volume dan berat. Harga/Kg dan Min KG terisi dari tarif Cek Ongkir bila ada. Grand Total = harga x Terberat (minimal Min KG) / koli / tarif tetap + biaya lain, packing, pickup - discount + PPN, dihitung ulang oleh server. Ganti Harga = isi Grand Total manual. Kirim ulang form yang sama tidak membuat AWB ganda. Tab On Site Inbound menampilkan AWB yang menuju cabang Anda.",
+      "Modul > Layanan Pelanggan > Transaksi > On Site Outbound, lalu Tambah AWB. Kolom AWB No. terisi otomatis setelah Asal dipilih (kode cabang asal + tahun bulan + nomor urut, contoh JKT261100001) dan boleh diubah; bila tidak diubah, nomor dikunci saat disimpan sehingga tidak bentrok dengan pengguna lain. DO / Reff boleh berisi beberapa nomor DO (maks. 255 karakter). Pilih Pricing Type (Harga/Kg, Harga/Koli, Trucking), Pickup By, Asal (wajib), Tujuan, Customer, Marketing, data pengirim dan penerima (pilih Penerima untuk mengisi otomatis), Layanan, DOC/PAC, Via Moda, Pembayaran, koli, volume dan berat. Harga/Kg dan Min KG terisi dari tarif Cek Ongkir bila ada. Grand Total = harga x Terberat (minimal Min KG) / koli / tarif tetap + biaya lain, packing, pickup - discount + PPN, dihitung ulang oleh server. Ganti Harga = isi Grand Total manual. Kirim ulang form yang sama tidak membuat AWB ganda. Tab On Site Inbound menampilkan AWB yang menuju cabang Anda.",
     href: "/transactions/new",
   },
   {
@@ -101,7 +101,7 @@ export const helpEntries: HelpEntry[] = [
     title: "Inbound Booking",
     keywords: ["inbound booking", "booking masuk", "booking tujuan"],
     answer:
-      "Modul > Layanan Pelanggan > Inbound Booking (tab di halaman Booking) menampilkan booking yang menuju cabang Anda: tujuan booking sama dengan nama cabang, atau AWB-nya menuju cabang Anda.",
+      "Modul > Layanan Pelanggan > Inbound Booking (tab di halaman Booking) menampilkan booking yang menuju cabang Anda: tujuan booking sama dengan nama cabang Anda.",
     href: "/bookings?tab=inbound",
   },
   {
@@ -172,7 +172,7 @@ export const helpEntries: HelpEntry[] = [
       "scan",
     ],
     answer:
-      "Resi AWB, slip booking, manifest dan DRS dicetak dengan barcode Code 128 dan QR berisi nomornya, sehingga bisa dibaca scanner genggam, kamera HP atau aplikasi kurir. Cetak AWB dari daftar Transaksi (centang lalu Print terpilih), slip booking dari daftar Booking, manifest dan DRS dari daftar/detail manifest. Label per koli (AWB-1, AWB-2, …) belum tersedia.",
+      "Resi AWB, slip booking, manifest dan DRS dicetak dengan barcode Code 128 dan QR berisi nomornya, sehingga bisa dibaca scanner genggam, kamera HP atau aplikasi kurir. Cetak AWB dari daftar Transaksi (centang lalu Print terpilih), slip booking dari daftar Booking, manifest dan DRS dari daftar/detail manifest. Label per koli: centang AWB di daftar Transaksi lalu Print label koli, atau Print label koli di detail AWB. Setiap koli mendapat label sendiri bernomor AWB-1, AWB-2, … (Koli n dari N) dengan barcode dan QR; scan label koli di Scan AWB membuka AWB induknya.",
     href: "/transactions",
   },
   {
@@ -188,7 +188,7 @@ export const helpEntries: HelpEntry[] = [
       "cara kerja",
     ],
     answer:
-      "Alur utama: Booking (pesanan pickup) → AWB/Transaksi (bisa ditautkan ke booking; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dibuat dari manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
+      "Alur utama: Booking (pesanan pickup, slip ber-barcode) → AWB/Transaksi (dibuat admin di kantor, terpisah dari booking; label per koli AWB-n; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dibuat dari manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
   },
   {
     id: "access",

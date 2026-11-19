@@ -133,9 +133,19 @@ export default async function Page({
         >
           <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
             <SelectAllCheckbox name="ids" />
-            <Button type="submit" className="min-h-11">
-              Print terpilih
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" className="min-h-11">
+                Print terpilih
+              </Button>
+              <Button
+                type="submit"
+                formAction="/print/koli"
+                variant="outline"
+                className="min-h-11"
+              >
+                Print label koli
+              </Button>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <Table className="min-w-[56rem]">

@@ -25,7 +25,9 @@ async function AuthorizedShell({ children }: { children: ReactNode }) {
     <>
       <AppShell
         groups={accessibleNavigation(current?.actor ?? null)}
-        headerActions={current ? <NotificationBell /> : null}
+        headerActions={
+          current ? <NotificationBell key="notifications" /> : null
+        }
         accountContent={
           <Suspense
             fallback={
