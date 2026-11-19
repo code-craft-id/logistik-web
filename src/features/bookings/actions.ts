@@ -5,6 +5,7 @@ import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePermission } from "@/lib/auth/session";
 import type { Transaction } from "@/lib/db/generated/client";
+import { missingAwbFields, missingBookingFields } from "./required-fields";
 import {
   createBookingSchema,
   createTransactionSchema,
@@ -27,6 +28,7 @@ type CreateTransactionResult =
 
 export type CreateBookingActionResult =
   | { ok: true; id: number; bookingNo?: string | null }
+  | { ok: false; error: "REQUIRED"; missing: string[] }
   | {
       ok: false;
       error:
@@ -46,6 +48,7 @@ export type CreateTransactionActionResult =
       idempotent: boolean;
       matchedBy?: string;
     }
+  | { ok: false; error: "REQUIRED"; missing: string[] }
   | {
       ok: false;
       error:
@@ -66,6 +69,8 @@ export async function createBookingAction(
     if (!current) return { ok: false, error: "UNAUTHENTICATED" };
 
     const raw = Object.fromEntries(formData.entries());
+    const missing = missingBookingFields(raw);
+    if (missing.length) return { ok: false, error: "REQUIRED", missing };
     const parsed = createBookingSchema.parse(raw);
     const result = await createBooking(parsed, current.actor);
     revalidatePath("/bookings");
@@ -100,6 +105,8 @@ export async function createTransactionAction(
     if (!current) return { ok: false, error: "UNAUTHENTICATED" };
 
     const raw = Object.fromEntries(formData.entries());
+    const missing = missingAwbFields(raw);
+    if (missing.length) return { ok: false, error: "REQUIRED", missing };
     const parsed = createTransactionSchema.parse(raw);
     const result: CreateTransactionResult = await createTransaction(
       parsed,

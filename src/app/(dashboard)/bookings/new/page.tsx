@@ -21,6 +21,11 @@ export default async function Page() {
     transactionFormOptions(current.actor),
     bookingCourierOptions(current.actor),
   ]);
+  // Asal starts at the user's own branch so the automatic number shows at once.
+  const defaultOrigin =
+    current.actor.branchIds.find((id) =>
+      options.branches.some((b) => b.id === id),
+    ) ?? (options.branches.length === 1 ? options.branches[0].id : undefined);
   return (
     <div className="space-y-6">
       <div>
@@ -33,6 +38,7 @@ export default async function Page() {
         </p>
       </div>
       <BookingForm
+        defaultOrigin={defaultOrigin}
         options={{
           branches: options.branches,
           destinations: options.destinations,

@@ -111,6 +111,7 @@ function Text({
     <div className={row}>
       <label htmlFor={`booking-${name}`} className={label}>
         {text}
+        {rest.required ? " *" : ""}
       </label>
       <input id={`booking-${name}`} name={name} className={field} {...rest} />
     </div>
@@ -139,9 +140,13 @@ const emptyMeasure = {
  */
 export function BookingForm({
   options,
+  defaultOrigin,
 }: {
   options?: BookingFormOptions;
+  /** Asal preselected (the user's branch) so the number shows at once. */
+  defaultOrigin?: number;
 } = {}) {
+  const startOrigin = defaultOrigin ? String(defaultOrigin) : "";
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -150,7 +155,7 @@ export function BookingForm({
   const [manualNo, setManualNo] = useState(false);
   const [typedNo, setTypedNo] = useState("");
   const [route, setRoute] = useState({
-    origin: "",
+    origin: startOrigin,
     destination: "",
     service: "",
   });
@@ -234,7 +239,7 @@ export function BookingForm({
           formRef.current?.reset();
           setManualNo(false);
           setTypedNo("");
-          setRoute({ origin: "", destination: "", service: "" });
+          setRoute({ origin: startOrigin, destination: "", service: "" });
           setMeasure(emptyMeasure);
           setReceiver(emptyReceiver);
           setManualPrice(false);
@@ -242,7 +247,11 @@ export function BookingForm({
           router.refresh();
           return;
         }
-        setErrorMessage(getErrorMessage(result.error));
+        setErrorMessage(
+          result.error === "REQUIRED"
+            ? `Wajib diisi: ${result.missing.join(", ")}.`
+            : getErrorMessage(result.error),
+        );
       } catch {
         setErrorMessage(
           "Koneksi ke server terputus. Periksa jaringan lalu coba simpan lagi.",
@@ -295,7 +304,7 @@ export function BookingForm({
                   aria-pressed={manualNo}
                   onClick={() => {
                     setManualNo((v) => !v);
-                    setTypedNo(manualNo ? "" : suggested);
+                    setTypedNo("");
                   }}
                   className="min-h-11 rounded-md border px-3 text-sm"
                 >
@@ -330,6 +339,7 @@ export function BookingForm({
           <Choice
             name="destinationBranchId"
             text="Tujuan"
+            required
             options={options?.destinations ?? options?.branches ?? []}
             value={route.destination}
             onChange={pick("destination")}
@@ -342,18 +352,21 @@ export function BookingForm({
           />
           <Text
             name="senderName"
+            required
             text="Nama"
             placeholder="Nama Pengirim"
             maxLength={150}
           />
           <Text
             name="senderAddress"
+            required
             text="Alamat"
             placeholder="Alamat Pengirim"
             maxLength={500}
           />
           <Text
             name="senderPhone"
+            required
             text="No. Telp"
             placeholder="No. Telepon"
             maxLength={30}
@@ -404,12 +417,14 @@ export function BookingForm({
               <div key={key} className="min-w-0 space-y-1">
                 <label htmlFor={`booking-${key}`} className={label}>
                   {text}
+                  {key === "koli" ? " *" : ""}
                 </label>
                 <input
                   id={`booking-${key}`}
                   name={key}
                   type="number"
-                  min="0"
+                  required={key === "koli"}
+                  min={key === "koli" ? "1" : "0"}
                   step={step}
                   value={measure[key]}
                   onChange={setM(key)}

@@ -97,6 +97,7 @@ function Text({
     <div className={row}>
       <label htmlFor={name} className={label}>
         {text}
+        {rest.required ? " *" : ""}
       </label>
       <input id={name} name={name} className={field} {...rest} />
     </div>
@@ -127,13 +128,19 @@ const emptyReceiver = { id: "", name: "", address: "", phone: "" };
 export function TransactionForm({
   options,
   today,
+  defaultOrigin,
 }: {
   options: TransactionFormOptions;
   today: string;
+  /** Asal preselected (the user's branch) so the AWB number shows at once. */
+  defaultOrigin?: number;
 }) {
+  const startOrigin = defaultOrigin ? String(defaultOrigin) : "";
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  // Automatic number shown in the input; "Manual AWB" empties it for typing.
+  const [manualAwb, setManualAwb] = useState(false);
   const [awb, setAwb] = useState("");
   const router = useRouter();
   const generateKey = () => {
@@ -166,7 +173,7 @@ export function TransactionForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [price, setPrice] = useState(initialPrice);
   const [route, setRoute] = useState({
-    origin: "",
+    origin: startOrigin,
     destination: "",
     service: "",
   });
@@ -196,9 +203,6 @@ export function TransactionForm({
   const suggested = options.nextAwb[Number(route.origin)] ?? "";
   const pickRoute = (key: keyof typeof route) => (value: string) => {
     const next = { ...route, [key]: value };
-    // Follow the origin's suggested number unless the user typed their own.
-    if (key === "origin" && (awb === "" || awb === suggested))
-      setAwb(options.nextAwb[Number(value)] ?? "");
     setRoute(next);
     const o = Number(next.origin);
     const d = Number(next.destination);
@@ -251,7 +255,7 @@ export function TransactionForm({
     // Unchanged suggestion or empty: the server assigns the number under a
     // lock, so two users saving at once still get different numbers.
     const typed = String(formData.get("awbNo") ?? "").trim();
-    if (!typed || typed === suggested) {
+    if (!manualAwb || !typed) {
       formData.delete("awbNo");
       formData.set("autoAwb", "true");
     }
@@ -283,12 +287,15 @@ export function TransactionForm({
           setPrice(initialPrice);
           setReceiver(emptyReceiver);
           setAwb("");
-          setRoute({ origin: "", destination: "", service: "" });
+          setManualAwb(false);
+          setRoute({ origin: startOrigin, destination: "", service: "" });
           setVersion((v) => v + 1);
           // Fetch fresh suggested numbers.
           router.refresh();
         } else {
-          if (res.error === "VALIDATION") {
+          if (res.error === "REQUIRED") {
+            setError(`Wajib diisi: ${res.missing.join(", ")}.`);
+          } else if (res.error === "VALIDATION") {
             setError(
               "Data belum lengkap atau tidak valid. Periksa Asal (wajib), angka koli/berat/volume/biaya, dan pilihan master yang aktif.",
             );
@@ -343,22 +350,39 @@ export function TransactionForm({
               AWB No.
             </label>
             <div className="min-w-0 space-y-1">
-              <input
-                id="awbNo"
-                name="awbNo"
-                maxLength={50}
-                value={awb}
-                onChange={(event) => setAwb(event.target.value)}
-                placeholder="Pilih Asal untuk nomor otomatis"
-                aria-describedby="awbNo-hint"
-                className={field}
-              />
+              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <input
+                  id="awbNo"
+                  name="awbNo"
+                  maxLength={50}
+                  readOnly={!manualAwb}
+                  required={manualAwb}
+                  value={manualAwb ? awb : suggested}
+                  onChange={(event) => setAwb(event.target.value)}
+                  placeholder={
+                    manualAwb
+                      ? "Ketik nomor AWB"
+                      : "Pilih Asal untuk nomor otomatis"
+                  }
+                  aria-describedby="awbNo-hint"
+                  className={manualAwb ? field : readOnlyField}
+                />
+                <button
+                  type="button"
+                  aria-pressed={manualAwb}
+                  onClick={() => {
+                    setManualAwb((v) => !v);
+                    setAwb("");
+                  }}
+                  className="min-h-11 rounded-md border px-3 text-sm"
+                >
+                  {manualAwb ? "Nomor Otomatis" : "Manual AWB"}
+                </button>
+              </div>
               <p id="awbNo-hint" className="text-xs text-muted-foreground">
-                {awb && awb === suggested
-                  ? "Nomor otomatis (dikunci saat disimpan). Ubah bila ingin nomor manual."
-                  : awb
-                    ? "Nomor manual."
-                    : "Kosongkan untuk nomor otomatis."}
+                {manualAwb
+                  ? "Nomor manual; tidak boleh sama dengan AWB lain di cabang asal."
+                  : "Nomor otomatis (dikunci saat disimpan). Tekan Manual AWB untuk mengetik sendiri."}
               </p>
             </div>
           </div>
@@ -397,11 +421,13 @@ export function TransactionForm({
             text="Asal"
             options={options.branches}
             required
+            defaultValue={startOrigin}
             onChange={pickRoute("origin")}
           />
           <Choice
             key={`destination-${version}`}
             name="destinationBranchId"
+            required
             text="Tujuan"
             options={options.destinations}
             onChange={pickRoute("destination")}
@@ -420,6 +446,7 @@ export function TransactionForm({
           <Text
             key={`sender-${version}`}
             name="senderName"
+            required
             text="Nama"
             placeholder="Nama Pengirim"
             maxLength={150}
@@ -453,6 +480,7 @@ export function TransactionForm({
           />
           <Choice
             name="deliveryServiceId"
+            required
             text="Layanan"
             options={options.deliveryServices}
             onChange={pickRoute("service")}
@@ -469,6 +497,7 @@ export function TransactionForm({
           />
           <Choice
             name="costTypeId"
+            required
             text="Pembayaran"
             options={options.costTypes}
           />
@@ -485,12 +514,14 @@ export function TransactionForm({
               <div key={key} className="min-w-0 space-y-1">
                 <label htmlFor={key} className={label}>
                   {text}
+                  {key === "koli" || key === "kilo" ? " *" : ""}
                 </label>
                 <input
                   id={key}
                   name={key}
                   type="number"
-                  min="0"
+                  required={key === "koli" || key === "kilo"}
+                  min={key === "koli" ? "1" : key === "kilo" ? "0.01" : "0"}
                   step={step}
                   value={price[key]}
                   onChange={set(key)}
@@ -547,6 +578,7 @@ export function TransactionForm({
           </div>
           <Text
             name="receiverName"
+            required
             text="Nama"
             placeholder="Nama Penerima"
             maxLength={150}
@@ -557,11 +589,12 @@ export function TransactionForm({
           />
           <div className={row}>
             <label htmlFor="receiverAddress" className={label}>
-              Alamat Penerima
+              Alamat Penerima *
             </label>
             <textarea
               id="receiverAddress"
               name="receiverAddress"
+              required
               maxLength={500}
               rows={2}
               placeholder="Alamat Penerima"
@@ -574,6 +607,7 @@ export function TransactionForm({
           </div>
           <Text
             name="receiverPhone"
+            required
             text="No. Telp"
             placeholder="No. Telepon"
             maxLength={30}

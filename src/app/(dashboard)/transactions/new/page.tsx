@@ -15,6 +15,11 @@ export default async function Page() {
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const options = await transactionFormOptions(current.actor);
+  // Asal starts at the user's own branch so the automatic number shows at once.
+  const defaultOrigin =
+    current.actor.branchIds.find((id) =>
+      options.branches.some((b) => b.id === id),
+    ) ?? (options.branches.length === 1 ? options.branches[0].id : undefined);
   return (
     <div className="space-y-6">
       <div>
@@ -22,12 +27,13 @@ export default async function Page() {
           Transaksi On Site Add
         </h1>
         <p className="text-sm text-muted-foreground">
-          Nomor AWB terisi otomatis setelah Asal dipilih dan boleh diubah. Kirim
-          ulang form yang sama tidak membuat AWB ganda.
+          Asal terisi cabang Anda dan Nomor AWB langsung terisi otomatis (boleh
+          diubah). Kirim ulang form yang sama tidak membuat AWB ganda.
         </p>
       </div>
       <TransactionForm
         options={options}
+        defaultOrigin={defaultOrigin}
         today={new Date().toISOString().slice(0, 10)}
       />
     </div>
