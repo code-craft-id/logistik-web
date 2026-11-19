@@ -67,7 +67,7 @@ export default async function Page({
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Kelola Status Pengiriman
         </h1>
-        <InfoTip text="Daftar AWB dari/ke cabang Anda beserta status pengantaran: penerima, diterima oleh, tanggal diterima dan lead time. Tombol Ubah membuka detail AWB untuk mengubah status (butuh hak Transaksi: ubah) atau scan Konfirmasi. SLA: In Progress sampai diterima." />
+        <InfoTip text="Daftar AWB dari/ke cabang Anda beserta status pengantaran: penerima, diterima oleh, tanggal diterima dan lead time. Tombol Ubah membuka detail AWB untuk mengubah status (butuh hak Transaksi: ubah) atau scan Konfirmasi. SLA: In Progress sampai diterima, lalu On Time bila lead time tidak melebihi Estimasi rute di Cek Ongkir (angka terbesar, mis. 1-2 hari = 2 hari) atau Late bila melebihi; - bila rute belum punya Estimasi." />
       </header>
       <Form
         action="/customer-service/status-pengantaran"

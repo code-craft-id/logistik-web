@@ -719,6 +719,14 @@ describe("Kelola Status Pengiriman", () => {
         receiverName: "Pak Penerima",
       },
     });
+    await db.tariff.create({
+      data: {
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+        pricePerKg: "1000",
+        eta: "1-2 hari",
+      },
+    });
     const inA = actor(ids.approver, [ids.a]);
     const result = await list.listShipmentStatus(inA, { search: `${tag}-STS` });
     const byId = new Map(result.rows.map((r) => [r.id, r]));
@@ -727,7 +735,8 @@ describe("Kelola Status Pengiriman", () => {
       receivedBy: null,
     });
     expect(byId.get(done.id)).toMatchObject({
-      sla: "Selesai",
+      // Received the same day: On Time against the route's Estimasi.
+      sla: "On Time",
       receivedBy: "Pak Penerima",
       leadTimeDays: 0,
     });

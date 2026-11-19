@@ -5,6 +5,7 @@ import { assertPermission } from "@/features/identity/server/access";
 import { transactionScope } from "@/features/modul/server/common";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/lib/db/generated/client";
+import { slaLabel, slaTargetDays } from "../sla";
 
 export const SHIPMENT_STATUS_PAGE_SIZE = 50;
 
@@ -21,10 +22,9 @@ export type ShipmentStatusRow = {
   receivedBy: string | null;
   receivedAt: string | null;
   leadTimeDays: number | null;
-  /**
-   * Provider SLA column: "In Progress" until received (OBSERVED). On-time /
-   * late after receipt needs an approved ETA rule, so "Selesai" for now.
-   */
+  /** Target days from the route's Cek Ongkir Estimasi, if any. */
+  slaTargetDays: number | null;
+  /** In Progress (OBSERVED) until received, then On Time / Late. */
   sla: string;
 };
 
@@ -75,6 +75,9 @@ export async function listShipmentStatus(
         senderName: true,
         receiverName: true,
         status: true,
+        originBranchId: true,
+        destinationBranchId: true,
+        deliveryServiceId: true,
         originBranch: { select: { name: true } },
         destinationBranch: { select: { name: true } },
         deliveryService: { select: { name: true } },
@@ -100,6 +103,46 @@ export async function listShipmentStatus(
       take: 50,
     }),
   ]);
+  // SLA target per route from Cek Ongkir "Estimasi" (owner decision).
+  const routes = [
+    ...new Set(
+      rows
+        .filter((t) => t.originBranchId && t.destinationBranchId)
+        .map((t) => `${t.originBranchId}:${t.destinationBranchId}`),
+    ),
+  ];
+  const tariffs = routes.length
+    ? await prisma.tariff.findMany({
+        where: {
+          deletedAt: null,
+          OR: routes.map((r) => {
+            const [o, d] = r.split(":").map(Number);
+            return { originBranchId: o, destinationBranchId: d };
+          }),
+        },
+        select: {
+          originBranchId: true,
+          destinationBranchId: true,
+          deliveryServiceId: true,
+          eta: true,
+        },
+      })
+    : [];
+  const targetFor = (t: {
+    originBranchId: number | null;
+    destinationBranchId: number | null;
+    deliveryServiceId: number | null;
+  }) => {
+    const onRoute = tariffs.filter(
+      (x) =>
+        x.originBranchId === t.originBranchId &&
+        x.destinationBranchId === t.destinationBranchId,
+    );
+    const tariff =
+      onRoute.find((x) => x.deliveryServiceId === t.deliveryServiceId) ??
+      onRoute.find((x) => x.deliveryServiceId === null);
+    return slaTargetDays(tariff?.eta ?? null);
+  };
   return {
     total,
     page,
@@ -129,7 +172,19 @@ export async function listShipmentStatus(
               ),
             )
           : null,
-        sla: receivedAt || t.status === "Delivered" ? "Selesai" : "In Progress",
+        slaTargetDays: targetFor(t),
+        sla: slaLabel(
+          receivedAt
+            ? Math.max(
+                0,
+                Math.round(
+                  (day(receivedAt) - day(t.transactionDate)) / 86_400_000,
+                ),
+              )
+            : null,
+          targetFor(t),
+          t.status,
+        ),
       };
     }),
   };
