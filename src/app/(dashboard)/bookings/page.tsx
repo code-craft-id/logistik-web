@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
 import { InfoTip } from "@/components/patterns/info-tip";
 import { PageTabs } from "@/components/patterns/page-tabs";
 import { SelectAllCheckbox } from "@/components/patterns/select-all";
@@ -14,10 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  assignCourierAction,
-  cancelBookingAction,
-} from "@/features/bookings/pickup-actions";
+import { BookingRowActions } from "@/features/bookings/components/booking-row-actions";
 import { BOOKING_STATUS } from "@/features/bookings/server/pickup";
 import {
   bookingCourierOptions,
@@ -25,7 +21,6 @@ import {
 } from "@/features/bookings/server/queries";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
-import { ActionForm } from "@/features/modul/components/action-form";
 import { InboundBookings } from "@/features/modul/components/inbound-bookings";
 import { one } from "@/features/modul/components/page-bits";
 import { requirePagePermission } from "@/lib/auth/page-access";
@@ -201,83 +196,28 @@ export default async function Page({
                         )}
                       </TableCell>
                       <TableCell>{b.courier?.name ?? "-"}</TableCell>
-                      <TableCell className="min-w-64 space-y-2">
-                        <a
-                          href={`/print/bookings?ids=${b.id}`}
-                          target="_blank"
-                          rel="noopener"
-                          className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
-                        >
-                          Print
-                        </a>
-                        {waiting && canApprove && (
-                          <>
-                            <ActionForm
-                              action={assignCourierAction}
-                              className="flex flex-wrap items-end gap-2"
-                              submit={
-                                <Button
-                                  type="submit"
-                                  className="min-h-11"
-                                  aria-label="Tugaskan kurir"
-                                >
-                                  ✔ Tugaskan
-                                </Button>
-                              }
-                            >
-                              <input
-                                type="hidden"
-                                name="bookingId"
-                                value={b.id}
-                              />
-                              <select
-                                name="courierId"
-                                required
-                                defaultValue={b.courierId ?? ""}
-                                aria-label={`Kurir untuk booking ${b.bookingNo ?? b.id}`}
-                                className="min-h-11 rounded-md border bg-background px-2 text-sm"
-                              >
-                                <option value="">Pilih kurir…</option>
-                                {branchCouriers.map((c) => (
-                                  <option key={c.id} value={c.id}>
-                                    {c.name}
-                                  </option>
-                                ))}
-                              </select>
-                            </ActionForm>
-                            <ActionForm
-                              action={cancelBookingAction}
-                              className="flex flex-wrap items-end gap-2"
-                              submit={
-                                <ConfirmSubmit
-                                  title={`Batalkan booking ${b.bookingNo ?? b.id}?`}
-                                  description="Status menjadi CANCEL PICKUP dan tidak bisa dikembalikan."
-                                  confirmLabel="Ya, batalkan"
-                                  variant="outline"
-                                  className="min-h-11"
-                                  aria-label="Batalkan booking"
-                                >
-                                  ✖ Batal
-                                </ConfirmSubmit>
-                              }
-                            >
-                              <input
-                                type="hidden"
-                                name="bookingId"
-                                value={b.id}
-                              />
-                              <input
-                                name="reason"
-                                required
-                                minLength={3}
-                                maxLength={500}
-                                placeholder="Alasan batal"
-                                aria-label={`Alasan batal booking ${b.bookingNo ?? b.id}`}
-                                className="min-h-11 rounded-md border bg-background px-2 text-sm"
-                              />
-                            </ActionForm>
-                          </>
-                        )}
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`/print/bookings?ids=${b.id}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
+                          >
+                            Print
+                          </a>
+                          {waiting && canApprove && (
+                            <BookingRowActions
+                              bookingId={b.id}
+                              bookingNo={b.bookingNo ?? `#${b.id}`}
+                              courierId={b.courierId}
+                              couriers={branchCouriers.map(({ id, name }) => ({
+                                id,
+                                name,
+                              }))}
+                            />
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

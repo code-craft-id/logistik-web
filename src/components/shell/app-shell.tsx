@@ -362,8 +362,7 @@ export function AppShell({
   groups?: readonly NavigationGroup[];
 }) {
   const pathname = usePathname();
-  const breadcrumbs = navigationPath(pathname, groups)?.labels ??
-    navigationPath(pathname)?.labels ?? ["Page"];
+  const breadcrumbs = breadcrumbLabels(pathname, groups);
   return (
     <div className="min-h-dvh min-w-0 bg-workspace">
       <a
@@ -464,4 +463,42 @@ export function AppShell({
       </footer>
     </div>
   );
+}
+
+const segmentLabels: Record<string, string> = {
+  new: "Tambah",
+  edit: "Edit",
+  scan: "Scan AWB",
+  approvals: "Persetujuan",
+  history: "Riwayat",
+  lookup: "Cari AWB",
+};
+
+/**
+ * Menu path of the page; a sub-page without its own menu entry (for example
+ * /bookings/new or /manifest/7) gets its parent's path plus a short label,
+ * never the bare "Page".
+ */
+function breadcrumbLabels(
+  pathname: string,
+  groups: readonly NavigationGroup[],
+): string[] {
+  const find = (path: string) =>
+    navigationPath(path, groups)?.labels ?? navigationPath(path)?.labels;
+  const extra: string[] = [];
+  let path = pathname;
+  for (let depth = 0; depth < 4 && path.length > 1; depth++) {
+    const found = find(path);
+    if (found) return [...found, ...extra];
+    const segment = path.slice(path.lastIndexOf("/") + 1);
+    extra.unshift(
+      segmentLabels[segment] ??
+        (/^\d+$/.test(segment)
+          ? "Detail"
+          : segment.charAt(0).toUpperCase() +
+            segment.slice(1).replaceAll("-", " ")),
+    );
+    path = path.slice(0, path.lastIndexOf("/")) || "/";
+  }
+  return extra;
 }

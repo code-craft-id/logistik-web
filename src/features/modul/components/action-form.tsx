@@ -17,6 +17,7 @@ export function ActionForm({
   submit,
   className,
   reset = false,
+  onDone,
 }: {
   action: (formData: FormData) => Promise<ModulResult>;
   children?: ReactNode;
@@ -24,6 +25,8 @@ export function ActionForm({
   submit?: ReactNode;
   className?: string;
   reset?: boolean;
+  /** Called after a successful action (for example to close a dialog). */
+  onDone?: () => void;
 }) {
   const router = useRouter();
   const form = useRef<HTMLFormElement>(null);
@@ -46,6 +49,7 @@ export function ActionForm({
             if (reset) form.current?.reset();
             if (next.redirect) router.push(next.redirect);
             else router.refresh();
+            onDone?.();
           }
         });
       }}
