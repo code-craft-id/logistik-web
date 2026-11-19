@@ -5,6 +5,7 @@ import {
   permitsBranch,
 } from "@/features/identity/permissions";
 import { cloudinaryConfigured } from "@/lib/cloudinary";
+import { prisma } from "@/lib/db";
 import { deliveryProofs } from "../server/manifests-queries";
 import { DeliveryPhotoForm } from "./delivery-photo-form";
 
@@ -24,7 +25,28 @@ export async function DeliveryProof({
   actor: AccessActor;
   transactionId: number;
 }) {
-  const proofs = await deliveryProofs(transactionId);
+  const [proofs, scans] = await Promise.all([
+    deliveryProofs(transactionId),
+    prisma.deliveryProof.findMany({
+      where: { transactionId, deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        outcome: true,
+        receiverName: true,
+        notes: true,
+        createdAt: true,
+        signatureUrl: true,
+        createdBy: { select: { name: true } },
+        photos: {
+          where: { deletedAt: null },
+          orderBy: { position: "asc" },
+          select: { position: true, url: true },
+        },
+      },
+    }),
+  ]);
   const canUpdate = permits(actor, "update", "delivery");
   const enabled = cloudinaryConfigured();
   return (
@@ -35,10 +57,61 @@ export async function DeliveryProof({
       <h2 id="pod-proof" className="font-medium">
         Bukti Terima (POD)
       </h2>
-      {proofs.length === 0 ? (
+      {scans.map((scan) => (
+        <div key={`scan-${scan.id}`} className="space-y-2 border-b pb-3">
+          <p className="text-sm">
+            <span className="font-semibold">
+              {scan.outcome === "DELIVERED" ? "DITERIMA" : "RETUR"}
+            </span>
+            {scan.receiverName ? ` oleh ${scan.receiverName}` : ""} ·{" "}
+            {time(scan.createdAt)}
+            {scan.createdBy ? ` · dicatat ${scan.createdBy.name}` : ""}
+            {scan.notes ? ` · ${scan.notes}` : ""}
+          </p>
+          {(scan.photos.length > 0 || scan.signatureUrl) && (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              {[
+                ...scan.photos.map((p) => ({
+                  key: `p${p.position}`,
+                  url: p.url,
+                  alt: `Foto penerima ${p.position}`,
+                })),
+                ...(scan.signatureUrl
+                  ? [
+                      {
+                        key: "sig",
+                        url: scan.signatureUrl,
+                        alt: "Tanda tangan penerima",
+                      },
+                    ]
+                  : []),
+              ].map((img) => (
+                <a
+                  key={img.key}
+                  href={img.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {/* biome-ignore lint/performance/noImgElement: Cloudinary thumbnail */}
+                  <img
+                    src={img.url.replace(
+                      "/image/upload/",
+                      "/image/upload/c_pad,w_200,h_200,b_white,f_webp,q_auto/",
+                    )}
+                    alt={img.alt}
+                    loading="lazy"
+                    className="aspect-square w-full rounded-md border bg-white object-contain"
+                  />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+      {proofs.length === 0 && scans.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          AWB ini belum masuk lembar pengantaran (DRS). Buat DRS dari detail
-          manifest, catat hasil antar, lalu foto bukti bisa ditambahkan di sini.
+          Belum ada bukti terima. Catat lewat Scan AWB (Update Status), atau
+          lewat DRS di detail manifest lalu unggah foto di sini.
         </p>
       ) : (
         proofs.map((p) => {

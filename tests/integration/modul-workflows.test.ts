@@ -31,6 +31,7 @@ type Modules = {
   bills: typeof import("../../src/features/modul/server/vendor-bills");
   inbound: typeof import("../../src/features/modul/server/inbound");
   scan: typeof import("../../src/features/modul/server/scan");
+  proof: typeof import("../../src/features/modul/server/proof");
 };
 let m: Modules;
 const all = [
@@ -79,6 +80,7 @@ beforeAll(async () => {
     bills: await import("../../src/features/modul/server/vendor-bills"),
     inbound: await import("../../src/features/modul/server/inbound"),
     scan: await import("../../src/features/modul/server/scan"),
+    proof: await import("../../src/features/modul/server/proof"),
   };
   ids.company = (
     await db.company.create({
@@ -150,6 +152,22 @@ afterAll(async () => {
   await db.transactionStatusHistory.deleteMany({
     where: { transactionId: { in: ids.tx } },
   });
+  await db.deliveryProofPhoto.deleteMany({
+    where: { proof: { transactionId: { in: ids.tx } } },
+  });
+  await db.deliveryProof.deleteMany({
+    where: { transactionId: { in: ids.tx } },
+  });
+  await db.deliverySheetItem.deleteMany({
+    where: { transactionId: { in: ids.tx } },
+  });
+  await db.deliverySheet.deleteMany({
+    where: { manifest: { branchId: { in: [ids.a, ids.b] } } },
+  });
+  await db.manifestItem.deleteMany({
+    where: { transactionId: { in: ids.tx } },
+  });
+  await db.manifest.deleteMany({ where: { branchId: { in: [ids.a, ids.b] } } });
   await db.transaction.deleteMany({ where: { id: { in: ids.tx } } });
   await db.vendor.deleteMany({ where: { id: ids.vendor } });
   await db.user.deleteMany({
@@ -482,5 +500,113 @@ describe("Scan AWB", () => {
     await expect(
       m.scan.scanAwb(noRight, { awbNo: `${tag}-scan2`, status: "In Transit" }),
     ).rejects.toMatchObject({ status: 403 });
+  });
+});
+
+describe("Scan & Konfirmasi (bukti terima)", () => {
+  const photo = (n: number) => ({
+    url: `https://res.cloudinary.com/demo/image/upload/v1/lms/pod/${tag}-${n}.webp`,
+    publicId: `lms/pod/${tag}-${n}`,
+  });
+
+  it("shows the AWB card with tracking and records DITERIMA from Open", async () => {
+    const t = await awb("pod1");
+    const manifest = await db.manifest.create({
+      data: {
+        manifestNo: `${tag}-M1`,
+        branchId: ids.a,
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+      },
+    });
+    await db.manifestItem.create({
+      data: { manifestId: manifest.id, transactionId: t.id },
+    });
+    const sheet = await db.deliverySheet.create({
+      data: { sheetNo: `${tag}-D1`, manifestId: manifest.id },
+    });
+    const courier = actor(ids.approver, [ids.a]);
+    const card = await m.proof.scanLookup(courier, `${tag}-pod1`.toLowerCase());
+    expect(card.awbNo).toBe(`${tag}-pod1`);
+    expect(card.tracking.some((e) => e.text.startsWith("Masuk manifest"))).toBe(
+      true,
+    );
+    await m.proof.recordProof(
+      courier,
+      {
+        transactionId: t.id,
+        outcome: "DELIVERED",
+        receiverName: "Budi",
+        notes: "Diterima satpam",
+      },
+      { photos: [photo(1), photo(2)], signature: photo(9) },
+    );
+    const after = await m.proof.awbForScan(courier, t.id);
+    expect(after.status).toBe("Delivered");
+    expect(after.proofs[0]).toMatchObject({
+      outcome: "DELIVERED",
+      receiverName: "Budi",
+      signatureUrl: photo(9).url,
+    });
+    expect(after.proofs[0].photos.map((p) => p.position)).toEqual([1, 2]);
+    const history = await db.transactionStatusHistory.findMany({
+      where: { transactionId: t.id },
+      orderBy: { id: "asc" },
+    });
+    expect(history.map((h) => `${h.priorStatus}>${h.newStatus}`)).toEqual([
+      "Open>In Transit",
+      "In Transit>Delivered",
+    ]);
+    const line = await db.deliverySheetItem.findFirstOrThrow({
+      where: { deliverySheetId: sheet.id, transactionId: t.id },
+    });
+    expect(line).toMatchObject({ outcome: "DELIVERED", receivedBy: "Budi" });
+    await expect(
+      m.proof.recordProof(
+        courier,
+        { transactionId: t.id, outcome: "RETURNED" },
+        { photos: [] },
+      ),
+    ).rejects.toThrow("sudah DITERIMA");
+  });
+
+  it("records RETUR without changing the AWB status and enforces the rules", async () => {
+    const t = await awb("pod2", "In Transit");
+    const courier = actor(ids.approver, [ids.a]);
+    await expect(
+      m.proof.recordProof(
+        courier,
+        { transactionId: t.id, outcome: "DELIVERED" },
+        { photos: [] },
+      ),
+    ).rejects.toThrow("Nama penerima wajib");
+    await expect(
+      m.proof.recordProof(
+        courier,
+        { transactionId: t.id, outcome: "RETURNED" },
+        { photos: [1, 2, 3, 4, 5, 6].map(photo) },
+      ),
+    ).rejects.toThrow("Maksimal 5 foto");
+    await expect(
+      m.proof.recordProof(
+        actor(ids.approver, [ids.vendor + 999_999]),
+        { transactionId: t.id, outcome: "RETURNED" },
+        { photos: [] },
+      ),
+    ).rejects.toThrow("bukan milik cabang");
+    await m.proof.recordProof(
+      courier,
+      {
+        transactionId: t.id,
+        outcome: "RETURNED",
+        notes: "Alamat tidak ditemukan",
+      },
+      { photos: [] },
+    );
+    const row = await db.transaction.findUniqueOrThrow({ where: { id: t.id } });
+    expect(row.status).toBe("In Transit");
+    await expect(
+      m.proof.assertProofAllowed(courier, t.id, "DELIVERED"),
+    ).resolves.toBeUndefined();
   });
 });

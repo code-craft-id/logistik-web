@@ -700,3 +700,6 @@ Role accounts (optional, DEMO_BRANCH_PASSWORD): owner, admin cabang JKT, staf JK
 
 ## 2026-11-19 — Scan AWB behind a feature flag
 Built /transactions/scan (FEATURE_AWB_SCAN, right awb_scan.use) reusing updateTransactionStatus. Verified in a production build: enabled = scan In Transit worked, unknown AWB refused; disabled = 404 and no button. Gates: lint 517, typecheck, unit 707, integration 178, build PASS. Permission matrix action labels completed.
+
+## 2026-11-19 — Owner direction: courier points and withdrawal out of scope
+Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial title only). Owner: do not build courier points or withdrawal for now. Other Progi-like gaps tracked: delivery proof scan screen (in progress), koli labels AWB-n, longer DO No., pickup from booking (rule: booking branch must match courier branch, observed in Progi), DRS with courier/driver/vehicle, manifest per koli (unconfirmed).

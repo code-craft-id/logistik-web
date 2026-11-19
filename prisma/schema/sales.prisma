@@ -143,6 +143,7 @@ model Booking {
 
 /// Transaction/AWB - operational document. Idempotent creation required (AC-02).
 model Transaction {
+  deliveryProofs DeliveryProof[]
   awbChangeRequests AwbChangeRequest[]
   podReturnItems PodReturnItem[]
   vendorBillItems VendorBillItem[]

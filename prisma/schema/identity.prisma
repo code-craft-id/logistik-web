@@ -23,6 +23,7 @@ model LegacyUser {
 // Better Auth 1.6.23 core contract. Runtime activation is PLT-01.
 // Auth storage uses native expiry/cleanup, not domain soft deletion.
 model User {
+  deliveryProofsCreated DeliveryProof[] @relation("DeliveryProofCreatedBy")
   awbChangeRequests AwbChangeRequest[] @relation("AwbChangeRequestedBy")
   awbChangeDecisions AwbChangeRequest[] @relation("AwbChangeDecidedBy")
   podReturnsCreated PodReturn[] @relation("PodReturnCreatedBy")

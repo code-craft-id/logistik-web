@@ -140,3 +140,43 @@ model VendorBillItem {
   @@index([transactionId])
   @@map("vendor_bill_items")
 }
+
+/// Bukti terima per AWB from Scan AWB (OBSERVED in the provider's courier app
+/// Progi, 2026-11-19): outcome DITERIMA/RETUR, receiver name, note, up to five
+/// photos and a drawn signature, all stored on Cloudinary (URL and id only).
+/// Outcome: DELIVERED or RETURNED.
+model DeliveryProof {
+  id                 Int                  @id @default(autoincrement())
+  transactionId      Int                  @map("transaction_id")
+  transaction        Transaction          @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  outcome            String               @db.VarChar(20)
+  receiverName       String?              @map("receiver_name") @db.VarChar(150)
+  notes              String?              @db.VarChar(500)
+  signatureUrl       String?              @map("signature_url") @db.VarChar(500)
+  signaturePublicId  String?              @map("signature_public_id") @db.VarChar(255)
+  createdById        Int?                 @map("created_by_id")
+  createdBy          User?                @relation("DeliveryProofCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  deletedAt          DateTime?            @map("deleted_at")
+  photos             DeliveryProofPhoto[]
+
+  @@index([transactionId])
+  @@index([createdAt])
+  @@map("delivery_proofs")
+}
+
+model DeliveryProofPhoto {
+  id        Int           @id @default(autoincrement())
+  proofId   Int           @map("proof_id")
+  proof     DeliveryProof @relation(fields: [proofId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  position  Int
+  url       String        @db.VarChar(500)
+  publicId  String        @map("public_id") @db.VarChar(255)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  deletedAt DateTime?     @map("deleted_at")
+
+  @@unique([proofId, position])
+  @@map("delivery_proof_photos")
+}
