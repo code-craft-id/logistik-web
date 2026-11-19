@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useConfirm } from "@/components/patterns/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
@@ -142,18 +143,21 @@ export function DeletePartyButton({
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const { confirm, dialog } = useConfirm();
   return (
     <span className="inline-flex flex-col">
+      {dialog}
       <Button
         type="button"
         variant="ghost"
         className="min-h-11 text-destructive"
         disabled={pending}
-        onClick={() => {
+        onClick={async () => {
           if (
-            !window.confirm(
-              `Hapus ${name}? Data lama yang memakai ini tetap tersimpan.`,
-            )
+            !(await confirm({
+              title: `Hapus ${name}?`,
+              description: "Data lama yang memakai ini tetap tersimpan.",
+            }))
           )
             return;
           const data = new FormData();

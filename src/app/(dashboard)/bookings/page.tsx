@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
 import { InfoTip } from "@/components/patterns/info-tip";
 import { PageTabs } from "@/components/patterns/page-tabs";
 import { SelectAllCheckbox } from "@/components/patterns/select-all";
@@ -248,14 +249,16 @@ export default async function Page({
                               action={cancelBookingAction}
                               className="flex flex-wrap items-end gap-2"
                               submit={
-                                <Button
-                                  type="submit"
+                                <ConfirmSubmit
+                                  title={`Batalkan booking ${b.bookingNo ?? b.id}?`}
+                                  description="Status menjadi CANCEL PICKUP dan tidak bisa dikembalikan."
+                                  confirmLabel="Ya, batalkan"
                                   variant="outline"
                                   className="min-h-11"
                                   aria-label="Batalkan booking"
                                 >
                                   ✖ Batal
-                                </Button>
+                                </ConfirmSubmit>
                               }
                             >
                               <input

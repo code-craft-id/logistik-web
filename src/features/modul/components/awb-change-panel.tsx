@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type AccessActor, permits } from "@/features/identity/permissions";
@@ -128,7 +129,22 @@ export async function AwbChangePanel({
         </ActionForm>
       )}
       {canRequest && (
-        <ActionForm action={requestAwbChangeAction} reset>
+        <ActionForm
+          action={requestAwbChangeAction}
+          reset
+          submit={
+            <ConfirmSubmit
+              className="min-h-11"
+              destructive={false}
+              onlyWhen={{ field: "kind", equals: "DELETE" }}
+              title="Ajukan hapus AWB ini?"
+              description="AWB akan dihapus setelah pengajuan ini disetujui atasan."
+              confirmLabel="Ya, ajukan hapus"
+            >
+              Kirim pengajuan
+            </ConfirmSubmit>
+          }
+        >
           <input type="hidden" name="transactionId" value={t.id} />
           <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
             <div className="min-w-0 space-y-2">

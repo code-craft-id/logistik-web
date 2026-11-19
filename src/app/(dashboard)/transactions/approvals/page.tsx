@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
 import { EmptyState } from "@/components/patterns/content-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -160,17 +161,29 @@ export default async function Page({
                             action={decideAwbChangeAction}
                             submit={
                               <>
-                                <Button
-                                  type="submit"
-                                  name="decision"
-                                  value="APPROVE"
-                                  className="min-h-11"
-                                >
-                                  Setujui{" "}
-                                  {AWB_CHANGE_KINDS[
-                                    row.kind as "EDIT"
-                                  ]?.toLowerCase()}
-                                </Button>
+                                {row.kind === "DELETE" ? (
+                                  <ConfirmSubmit
+                                    name="decision"
+                                    value="APPROVE"
+                                    className="min-h-11"
+                                    title={`Setujui hapus AWB ${row.transaction?.awbNo ?? ""}?`}
+                                    description="AWB langsung dihapus dari daftar setelah disetujui. Tindakan ini tidak bisa dibatalkan dari layar."
+                                  >
+                                    Setujui hapus
+                                  </ConfirmSubmit>
+                                ) : (
+                                  <Button
+                                    type="submit"
+                                    name="decision"
+                                    value="APPROVE"
+                                    className="min-h-11"
+                                  >
+                                    Setujui{" "}
+                                    {AWB_CHANGE_KINDS[
+                                      row.kind as "EDIT"
+                                    ]?.toLowerCase()}
+                                  </Button>
+                                )}
                                 <Button
                                   type="submit"
                                   name="decision"

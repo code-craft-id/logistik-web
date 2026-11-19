@@ -29,6 +29,22 @@ export const helpEntries: HelpEntry[] = [
     href: "/dashboard",
   },
   {
+    id: "delete-confirmation",
+    title: "Konfirmasi sebelum hapus",
+    keywords: [
+      "hapus",
+      "konfirmasi",
+      "batal",
+      "void",
+      "nonaktifkan",
+      "salah hapus",
+      "modal",
+    ],
+    answer:
+      "Semua tindakan hapus, nonaktifkan, batal dan void selalu menampilkan jendela konfirmasi dulu; data baru diproses setelah Anda menekan tombol Ya. Tekan Batal atau Escape untuk membatalkan. Berlaku untuk master data, perusahaan/kantor, konfigurasi, customer/penerima, user, grup user, tarif, batal booking, pengajuan hapus AWB dan persetujuannya, serta void invoice/balik jurnal/pembayaran dan tutup periode. Hapus baris di form yang belum disimpan (misalnya baris invoice atau foto sebelum Simpan) tidak perlu konfirmasi.",
+    href: "/dashboard",
+  },
+  {
     id: "booking",
     title: "Booking",
     keywords: [

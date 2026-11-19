@@ -35,6 +35,16 @@ async function submit() {
       ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   });
 }
+/** Clicks a button of the confirmation modal (rendered in a portal). */
+async function answer(text: "Batal" | "Ya") {
+  await act(async () => {
+    const button = [...document.body.querySelectorAll("button")].find((b) =>
+      b.textContent?.startsWith(text),
+    );
+    if (!button) throw new Error(`modal button ${text} not found`);
+    button.click();
+  });
+}
 it("announces a failed command, retains its retry key and distinguishes confirmed success", async () => {
   save
     .mockResolvedValueOnce({ ok: false, message: "Periode tertutup." })
@@ -47,7 +57,12 @@ it("announces a failed command, retains its retry key and distinguishes confirme
       }),
     ),
   );
+  // Destructive: the modal asks first; Batal sends nothing.
   await submit();
+  await answer("Batal");
+  expect(save).not.toHaveBeenCalled();
+  await submit();
+  await answer("Ya");
   expect(host.querySelector('[role="alert"]')?.textContent).toBe(
     "Periode tertutup.",
   );
@@ -55,6 +70,7 @@ it("announces a failed command, retains its retry key and distinguishes confirme
     "destructive",
   );
   await submit();
+  await answer("Ya");
   expect(save.mock.calls[0][0].key).toBe(save.mock.calls[1][0].key);
   expect(host.querySelector('[role="status"]')?.textContent).toBe("Tersimpan.");
   expect(host.querySelector('[role="alert"]')).toBeNull();

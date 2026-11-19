@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { type FormEvent, type ReactNode, useRef, useState } from "react";
+import { useConfirm } from "@/components/patterns/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { financeCommand } from "../actions";
 
@@ -29,12 +30,25 @@ export function CommandForm({
     "finance_cost.reverse",
     "finance_period.close",
   ].includes(String(values.action));
+  const { confirm, dialog } = useConfirm();
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (busy.current) return;
+    const form = e.currentTarget;
+    // Void, reverse and period close cannot be undone from the screen.
+    if (
+      destructive &&
+      !(await confirm({
+        title: `${label}?`,
+        description:
+          "Tindakan ini dicatat permanen dan tidak bisa dibatalkan dari layar (koreksi lewat jurnal balik).",
+        confirmLabel: `Ya, ${label.toLowerCase()}`,
+      }))
+    )
+      return;
     const payload = {
       ...values,
-      ...Object.fromEntries(new FormData(e.currentTarget)),
+      ...Object.fromEntries(new FormData(form)),
     };
     const serialized = JSON.stringify(payload);
     if (serialized !== lastPayload.current) token.current = null;
@@ -76,6 +90,7 @@ export function CommandForm({
         if (!busy.current) token.current = null;
       }}
     >
+      {dialog}
       <fieldset
         disabled={pending}
         className="min-w-0 space-y-4 disabled:opacity-70"

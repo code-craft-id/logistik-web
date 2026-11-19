@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useConfirm } from "@/components/patterns/confirm-dialog";
 import { EmptyState, LoadingState } from "@/components/patterns/content-state";
 import { FormField } from "@/components/patterns/form-field";
 import { PageHeading } from "@/components/patterns/page-heading";
@@ -136,6 +137,7 @@ export function UserManagementPageClient({
   capabilities?: IdentityCapabilities;
 }) {
   const [users, setUsers] = useState<User[]>([]);
+  const { confirm: confirmDialog, dialog: confirmDialogNode } = useConfirm();
   const groupOptions = useAssignmentOptions<Group>("groups");
   const filterGroups = useAssignmentOptions<Group>("groups");
   const branchOptions = useAssignmentOptions<Branch>("branches");
@@ -261,9 +263,12 @@ export function UserManagementPageClient({
 
   const handleDelete = async (id: number) => {
     if (
-      !confirm(
-        "Nonaktifkan user ini? Login akan ditolak dan sesi aktif dicabut. Identitas tetap disimpan.",
-      )
+      !(await confirmDialog({
+        title: "Nonaktifkan user ini?",
+        description:
+          "Login akan ditolak dan sesi aktif dicabut. Identitas tetap disimpan.",
+        confirmLabel: "Ya, nonaktifkan",
+      }))
     )
       return;
 
@@ -466,6 +471,7 @@ export function UserManagementPageClient({
 
   return (
     <div className="space-y-6">
+      {confirmDialogNode}
       <PageHeading
         title="Manajemen User"
         description="Kelola pengguna sistem, grup, dan akses cabang"

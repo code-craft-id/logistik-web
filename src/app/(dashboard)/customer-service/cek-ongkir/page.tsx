@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Form from "next/form";
 import { redirect } from "next/navigation";
+import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
 import { EmptyState } from "@/components/patterns/content-state";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
@@ -187,13 +188,14 @@ export default async function Page({
                         <ActionForm
                           action={deleteTariffAction}
                           submit={
-                            <Button
-                              type="submit"
+                            <ConfirmSubmit
                               variant="outline"
                               className="min-h-11"
+                              title="Hapus tarif ini?"
+                              description={`Tarif ${row.origin} → ${row.destination} tidak dipakai lagi untuk hitung ongkir.`}
                             >
                               Hapus
-                            </Button>
+                            </ConfirmSubmit>
                           }
                         >
                           <input type="hidden" name="id" value={row.id} />
