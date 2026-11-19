@@ -205,13 +205,18 @@ export function BookingForm({
         minWeight: found.minWeight,
       }));
   };
+  // Terberat from Dimensi (per-koli max), cleared by any manual change.
+  const [dims, setDims] = useState("");
   const setM =
     (key: keyof typeof emptyMeasure) =>
-    (event: React.ChangeEvent<HTMLInputElement>) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (key === "koli" || key === "kilo" || key === "volume") setDims("");
       setMeasure((m) => ({ ...m, [key]: event.target.value }));
+    };
 
   // Preview only; the server recalculates with exact decimals.
-  const heaviest = Math.max(num(measure.kilo), num(measure.volume));
+  const heaviest =
+    num(dims) || Math.max(num(measure.kilo), num(measure.volume));
   const total = round2(
     Math.max(heaviest, num(measure.minWeight)) * num(measure.pricePerKg),
   );
@@ -246,6 +251,7 @@ export function BookingForm({
           setTypedNo("");
           setRoute({ origin: startOrigin, destination: "", service: "" });
           setMeasure(emptyMeasure);
+          setDims("");
           setReceiver(emptyReceiver);
           setManualPrice(false);
           setModeId("");
@@ -445,14 +451,18 @@ export function BookingForm({
                 koli={num(measure.koli)}
                 divider={modeDivider(mode?.divider)}
                 modeName={mode?.name ?? null}
-                onApply={(r) =>
+                onApply={(r) => {
                   setMeasure((m) => ({
                     ...m,
                     volume: r.volume || m.volume,
                     kilo: r.kilo || m.kilo,
-                  }))
-                }
+                  }));
+                  setDims(r.chargeable);
+                }}
               />
+              {dims && (
+                <input type="hidden" name="chargeableWeight" value={dims} />
+              )}
             </div>
             <div className="min-w-0 space-y-1">
               <label htmlFor="booking-heaviest" className={label}>

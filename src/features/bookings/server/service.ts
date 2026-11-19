@@ -37,6 +37,8 @@ export function priceAwb(input: {
   koli?: number | null;
   kilo?: string | null;
   volume?: string | null;
+  /** Terberat from Dimensi: per-koli max(volume, berat), summed. */
+  chargeableWeight?: string | null;
   pricePerKg?: string | null;
   minWeight?: string | null;
   otherFee?: string | null;
@@ -48,8 +50,21 @@ export function priceAwb(input: {
 }) {
   const kilo = dec(input.kilo);
   const volume = dec(input.volume);
-  const heaviest: Money | null =
+  const totals: Money | null =
     kilo && volume ? Prisma.Decimal.max(kilo, volume) : (kilo ?? volume);
+  // Dimensi (OBSERVED in the provider): Terberat = sum over koli of
+  // max(volume, berat). It lies between max(total volume, total berat)
+  // and total volume + total berat; anything else is refused.
+  const dims = dec(input.chargeableWeight);
+  if (dims) {
+    const low = totals ?? new Prisma.Decimal(0);
+    const high = (kilo ?? new Prisma.Decimal(0)).plus(
+      volume ?? new Prisma.Decimal(0),
+    );
+    if (dims.lt(low.minus(0.01)) || dims.gt(high.plus(0.01)))
+      throw new Error("VALIDATION_CHARGEABLE_WEIGHT");
+  }
+  const heaviest: Money | null = dims ?? totals;
   const price = dec(input.pricePerKg);
   if (!price) {
     return {
@@ -261,6 +276,7 @@ export async function createBooking(
       pricingType: "KG",
       kilo: data.kilo ?? null,
       volume: data.volume ?? null,
+      chargeableWeight: data.chargeableWeight ?? null,
       pricePerKg: data.pricePerKg ?? null,
       minWeight: data.minWeight ?? null,
       biaya: data.biaya ?? null,

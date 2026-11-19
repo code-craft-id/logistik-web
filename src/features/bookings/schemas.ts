@@ -97,6 +97,8 @@ export const createBookingSchema = z
     ),
     pricePerKg: decimalField(13, 2),
     minWeight: decimalField(8, 2),
+    /** Terberat from Dimensi (sum of per-koli max(volume, berat)). */
+    chargeableWeight: decimalField(8, 2),
     koli: z.preprocess(
       emptyToUndefined,
       z.coerce.number().int().min(0).optional(),
@@ -196,6 +198,8 @@ export const createTransactionSchema = z
     ),
     pricePerKg: decimalField(13, 2),
     minWeight: decimalField(8, 2),
+    /** Terberat from Dimensi (sum of per-koli max(volume, berat)). */
+    chargeableWeight: decimalField(8, 2),
     insured: z.preprocess(
       (v) =>
         v === "Y" || v === true

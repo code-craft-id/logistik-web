@@ -72,6 +72,37 @@ it("computes volume per koli as P x L x T / divider and applies totals", async (
   await type("Biaya packing koli 2", "15000");
   await act(async () => button("Berikutnya").click());
   expect(onApply).toHaveBeenCalledWith(
-    expect.objectContaining({ volume: "51", kilo: "7", packingFee: "15000" }),
+    expect.objectContaining({
+      volume: "51",
+      kilo: "7",
+      packingFee: "15000",
+      // Provider "Berat diambil": max(50, 5) + max(1, 2).
+      chargeable: "52",
+    }),
+  );
+});
+
+it("copies the first koli to all koli (Copy All)", async () => {
+  const onApply = vi.fn();
+  await act(async () =>
+    root.render(
+      createElement(DimensionDialog, {
+        koli: 3,
+        divider: 4000,
+        modeName: "DARAT",
+        onApply,
+      }),
+    ),
+  );
+  await act(async () => button("Dimensi").click());
+  await type("Panjang koli 1", "40");
+  await type("Lebar koli 1", "40");
+  await type("Tinggi koli 1", "50");
+  await type("Berat koli 1", "3");
+  await act(async () => button("Copy All").click());
+  await act(async () => button("Berikutnya").click());
+  // 3 x (40*40*50/4000 = 20)
+  expect(onApply).toHaveBeenCalledWith(
+    expect.objectContaining({ volume: "60", kilo: "9", chargeable: "60" }),
   );
 });

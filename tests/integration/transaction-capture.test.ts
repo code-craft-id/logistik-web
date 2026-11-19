@@ -346,4 +346,31 @@ describe("Entry AWB capture fields", () => {
       where: { id: { in: [courier.id, otherCourier.id] } },
     });
   });
+
+  it("prices with the Dimensi Terberat (sum of per-koli max) within sane bounds", async () => {
+    const base = {
+      originBranchId: ids.branch,
+      kilo: "7",
+      volume: "51",
+      koli: 2,
+      pricingType: "KG" as const,
+      pricePerKg: "1000",
+    };
+    // Koli 1: volume 50 / berat 5, koli 2: volume 1 / berat 2 -> 50 + 2.
+    const dims = await service.createTransaction(
+      { ...base, awbNo: `${tag}-dim`, chargeableWeight: "52" },
+      actor([ids.branch]),
+    );
+    ids.tx.push(dims.transaction.id);
+    expect(dims.transaction.chargeableWeight?.toString()).toBe("52");
+    expect(dims.transaction.biaya?.toString()).toBe("52000");
+    // Below max(total volume, total berat) or above their sum: refused.
+    for (const bad of ["50", "59"])
+      await expect(
+        service.createTransaction(
+          { ...base, awbNo: `${tag}-dim-${bad}`, chargeableWeight: bad },
+          actor([ids.branch]),
+        ),
+      ).rejects.toThrow("VALIDATION_CHARGEABLE_WEIGHT");
+  });
 });

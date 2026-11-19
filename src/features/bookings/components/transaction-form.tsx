@@ -184,10 +184,14 @@ export function TransactionForm({
   const [ppnOn, setPpnOn] = useState(false);
   const [modeId, setModeId] = useState("");
   const mode = options.transportModes.find((m) => String(m.id) === modeId);
+  // Terberat from Dimensi (per-koli max), cleared by any manual change.
+  const [dims, setDims] = useState("");
   const set =
     (key: keyof typeof initialPrice) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      if (key === "koli" || key === "kilo" || key === "volume") setDims("");
       setPrice((p) => ({ ...p, [key]: event.target.value }));
+    };
 
   // Cek Ongkir tariff for the chosen route; a service-specific one first.
   const tariff = useMemo(() => {
@@ -224,7 +228,7 @@ export function TransactionForm({
   };
 
   // Preview only; the server recalculates with exact decimals.
-  const heaviest = Math.max(num(price.kilo), num(price.volume));
+  const heaviest = num(dims) || Math.max(num(price.kilo), num(price.volume));
   const freight =
     price.pricingType === "TRUCKING"
       ? num(price.pricePerKg)
@@ -288,6 +292,7 @@ export function TransactionForm({
           formRef.current?.reset();
           window.scrollTo({ top: 0, behavior: "smooth" });
           setPrice(initialPrice);
+          setDims("");
           setReceiver(emptyReceiver);
           setAwb("");
           setManualAwb(false);
@@ -541,15 +546,19 @@ export function TransactionForm({
                 koli={num(price.koli)}
                 divider={modeDivider(mode?.divider)}
                 modeName={mode?.name ?? null}
-                onApply={(r) =>
+                onApply={(r) => {
                   setPrice((p) => ({
                     ...p,
                     volume: r.volume || p.volume,
                     kilo: r.kilo || p.kilo,
                     packingFee: r.packingFee || p.packingFee,
-                  }))
-                }
+                  }));
+                  setDims(r.chargeable);
+                }}
               />
+              {dims && (
+                <input type="hidden" name="chargeableWeight" value={dims} />
+              )}
             </div>
             <div className="min-w-0 space-y-1">
               <label htmlFor="heaviest" className={label}>

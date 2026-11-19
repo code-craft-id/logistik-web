@@ -14,6 +14,8 @@ import {
 export type DimensionResult = {
   volume: string;
   kilo: string;
+  /** Terberat: sum over koli of max(volume, berat) (provider "Berat diambil"). */
+  chargeable: string;
   packingFee: string;
   notes: string;
 };
@@ -85,7 +87,23 @@ export function DimensionDialog({
     (t, r) => t + (r.packed ? num(r.packing) : 0),
     0,
   );
-  const heaviest = Math.max(totalVolume, totalKilo);
+  const takenOf = (r: Row) => Math.max(volumeOf(r), num(r.kilo));
+  // Provider: Terberat = sum of each koli's "Berat diambil".
+  const heaviest = rows.reduce((t, r) => t + takenOf(r), 0);
+  const copyRow = (from: number, to: number[]) =>
+    setRows((prev) =>
+      prev.map((r, j) =>
+        to.includes(j)
+          ? {
+              ...r,
+              length: prev[from].length,
+              width: prev[from].width,
+              height: prev[from].height,
+              kilo: prev[from].kilo,
+            }
+          : r,
+      ),
+    );
   const cell =
     "min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-2 text-sm";
   return (
@@ -109,7 +127,7 @@ export function DimensionDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[56rem] text-sm">
+            <table className="w-full min-w-[64rem] text-sm">
               <thead>
                 <tr className="text-left">
                   {[
@@ -119,9 +137,11 @@ export function DimensionDialog({
                     "Tinggi",
                     "Volume",
                     "Berat (Kg)",
+                    "Berat diambil",
                     "Packing",
                     "Biaya Packing",
                     "Keterangan",
+                    "",
                   ].map((h) => (
                     <th key={h} className="p-1 font-medium">
                       {h}
@@ -161,6 +181,7 @@ export function DimensionDialog({
                         className={cell}
                       />
                     </td>
+                    <td className="p-1 tabular-nums">{fixed(takenOf(r), 2)}</td>
                     <td className="p-1 text-center">
                       <input
                         type="checkbox"
@@ -191,6 +212,19 @@ export function DimensionDialog({
                         className={cell}
                       />
                     </td>
+                    <td className="p-1">
+                      {i < rows.length - 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="min-h-11"
+                          aria-label={`Salin ukuran koli ${i + 1} ke koli ${i + 2}`}
+                          onClick={() => copyRow(i, [i + 1])}
+                        >
+                          Copy
+                        </Button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -201,9 +235,27 @@ export function DimensionDialog({
                   </td>
                   <td className="p-1 tabular-nums">{fixed(totalVolume, 3)}</td>
                   <td className="p-1 tabular-nums">{fixed(totalKilo, 2)}</td>
+                  <td className="p-1 tabular-nums">{fixed(heaviest, 2)}</td>
                   <td />
                   <td className="p-1 tabular-nums">{fixed(totalPacking, 0)}</td>
                   <td />
+                  <td className="p-1">
+                    {rows.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="min-h-11"
+                        onClick={() =>
+                          copyRow(
+                            0,
+                            rows.map((_, j) => j).filter((j) => j > 0),
+                          )
+                        }
+                      >
+                        Copy All
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               </tfoot>
             </table>
@@ -219,6 +271,7 @@ export function DimensionDialog({
                 onApply({
                   volume: totalVolume ? fixed(totalVolume, 3) : "",
                   kilo: totalKilo ? fixed(totalKilo, 2) : "",
+                  chargeable: heaviest ? fixed(heaviest, 2) : "",
                   packingFee: totalPacking ? fixed(totalPacking, 0) : "",
                   notes: rows
                     .map((r, i) =>
