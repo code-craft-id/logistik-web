@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, useTransition } from "react";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { createBookingAction } from "../actions";
+import { DimensionDialog, modeDivider } from "./dimension-dialog";
 
 type BookingActionError =
   | "UNAUTHENTICATED"
@@ -36,7 +37,7 @@ export type BookingFormOptions = {
   nextBooking?: Record<number, string>;
   deliveryServices?: Option[];
   goodsTypes?: Option[];
-  transportModes?: Option[];
+  transportModes?: (Option & { divider?: string })[];
   costTypes?: Option[];
   couriers?: (Option & { branchId: number | null })[];
   consignees?: (Option & { address: string; phone: string })[];
@@ -162,6 +163,10 @@ export function BookingForm({
   const [measure, setMeasure] = useState(emptyMeasure);
   const [receiver, setReceiver] = useState(emptyReceiver);
   const [manualPrice, setManualPrice] = useState(false);
+  const [modeId, setModeId] = useState("");
+  const mode = (options?.transportModes ?? []).find(
+    (m) => String(m.id) === modeId,
+  );
   const [version, setVersion] = useState(0);
 
   const suggested = options?.nextBooking?.[Number(route.origin)] ?? "";
@@ -243,6 +248,7 @@ export function BookingForm({
           setMeasure(emptyMeasure);
           setReceiver(emptyReceiver);
           setManualPrice(false);
+          setModeId("");
           setVersion((v) => v + 1);
           router.refresh();
           return;
@@ -397,6 +403,7 @@ export function BookingForm({
             name="transportModeId"
             text="Via Moda"
             options={options?.transportModes ?? []}
+            onChange={setModeId}
           />
           <Choice
             key={`cost-${version}`}
@@ -432,6 +439,21 @@ export function BookingForm({
                 />
               </div>
             ))}
+            <div className="min-w-0 space-y-1">
+              <span className={label}>Detail</span>
+              <DimensionDialog
+                koli={num(measure.koli)}
+                divider={modeDivider(mode?.divider)}
+                modeName={mode?.name ?? null}
+                onApply={(r) =>
+                  setMeasure((m) => ({
+                    ...m,
+                    volume: r.volume || m.volume,
+                    kilo: r.kilo || m.kilo,
+                  }))
+                }
+              />
+            </div>
             <div className="min-w-0 space-y-1">
               <label htmlFor="booking-heaviest" className={label}>
                 Terberat (Kg)

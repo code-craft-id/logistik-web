@@ -119,7 +119,7 @@ model TransportMode {
   createdAt        DateTime          @default(now()) @map("created_at")
   id               Int               @id @default(autoincrement())
   name             String            @db.VarChar(100)
-  /// DRAFT: Legacy text maintenance approved by coordinator in chat, 2026-10-25. Numeric interpretation remains TBD, D-26; never calculate charges from this field.
+  /// Volume divider kept as legacy text (2026-10-25). D-26, OBSERVED 2026-11-19 and owner-approved: volume weight = P x L x T (cm) / divider in the Dimensi popup; non-numeric or zero disables it.
   divider          String            @db.VarChar(100)
   status           RecordStatus      @default(ACTIVE)
   deliveryServices DeliveryService[]

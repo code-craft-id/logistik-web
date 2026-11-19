@@ -8,6 +8,7 @@ import {
   type CreateTransactionActionResult,
   createTransactionAction,
 } from "../actions";
+import { DimensionDialog, modeDivider } from "./dimension-dialog";
 
 type Option = { id: number; name: string };
 export type TransactionFormOptions = {
@@ -16,7 +17,7 @@ export type TransactionFormOptions = {
   branches: Option[];
   destinations: Option[];
   customers: Option[];
-  transportModes: Option[];
+  transportModes: (Option & { divider?: string })[];
   deliveryServices: Option[];
   goodsTypes: Option[];
   costTypes: Option[];
@@ -181,6 +182,8 @@ export function TransactionForm({
   const [version, setVersion] = useState(0);
   const [manualPrice, setManualPrice] = useState(false);
   const [ppnOn, setPpnOn] = useState(false);
+  const [modeId, setModeId] = useState("");
+  const mode = options.transportModes.find((m) => String(m.id) === modeId);
   const set =
     (key: keyof typeof initialPrice) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -289,6 +292,7 @@ export function TransactionForm({
           setAwb("");
           setManualAwb(false);
           setRoute({ origin: startOrigin, destination: "", service: "" });
+          setModeId("");
           setVersion((v) => v + 1);
           // Fetch fresh suggested numbers.
           router.refresh();
@@ -491,9 +495,11 @@ export function TransactionForm({
             options={options.goodsTypes}
           />
           <Choice
+            key={`moda-${version}`}
             name="transportModeId"
             text="Via Moda"
             options={options.transportModes}
+            onChange={setModeId}
           />
           <Choice
             name="costTypeId"
@@ -529,6 +535,22 @@ export function TransactionForm({
                 />
               </div>
             ))}
+            <div className="min-w-0 space-y-1">
+              <span className={label}>Detail</span>
+              <DimensionDialog
+                koli={num(price.koli)}
+                divider={modeDivider(mode?.divider)}
+                modeName={mode?.name ?? null}
+                onApply={(r) =>
+                  setPrice((p) => ({
+                    ...p,
+                    volume: r.volume || p.volume,
+                    kilo: r.kilo || p.kilo,
+                    packingFee: r.packingFee || p.packingFee,
+                  }))
+                }
+              />
+            </div>
             <div className="min-w-0 space-y-1">
               <label htmlFor="heaviest" className={label}>
                 Terberat (Kg)

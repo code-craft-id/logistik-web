@@ -338,7 +338,7 @@ export async function transactionFormOptions(actor: AccessActor) {
     }),
     prisma.transportMode.findMany({
       where: active,
-      select: pick,
+      select: { ...pick, divider: true },
       orderBy: byName,
     }),
     prisma.deliveryService.findMany({
