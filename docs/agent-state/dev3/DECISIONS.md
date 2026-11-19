@@ -39,3 +39,16 @@ Technical fix only: page-local Suspense contains session-dependent AccountingHom
 D15/D19/D22: PARTIAL. Owner explicitly requests all22report identities plus actual export inspection; previous ROADMAP/NOT NEEDED acceptance retained historically. LP-R09 is now part of the comprehensive reporting objective without another inclusion-approval question; vendor capture/attribution remains BLOCKED_SOURCE. No business rule auto-confirmed. Source-ready quantity/branch-reference contracts implemented under this instruction; source/reconciliation limits and17actual inspected export identities are recorded in DEV3-LEGACY-PARITY-AUDIT.md section11. No VERIFIED_EQUIVALENT or exact migration established.
 
 D11–14/D21: existing FIN A+B adoption unchanged. Legacy GP vendor allocations/trucking, cash/credit categories, invoice receipt/aging and supplier settlement are OBSERVED structures or unresolved rules, not newly approved postings. SUP omission decisions unchanged. Cross-domain code review timing remains final combined review; remaining source/business semantics, not developer availability, block19full report migrations.
+
+## 2026-11-19 / 2026-11-20 — Owner decisions in the Dev 3 session
+Recorded from chat; business owner approval, not Dev 2 / finance review.
+- Bookings stand alone (not linked to AWBs); pickup flow WAITING / PROGRESS / CANCEL PICKUP.
+- Required fields on Entry AWB and booking; automatic numbers shown at once, Manual AWB empties the input.
+- SLA = Cek Ongkir Estimasi (largest number) vs AWB-to-receipt days: On Time / Late.
+- Report AR: remaining balance in 0-21 / >21-30 / >30 day buckets by invoice age; KETENTUAN from customer Termin; Serah Terima Faktur on invoices.
+- RETUR sets status Returned (D-09); resend allowed.
+- Import status: codes 2 and 1 only.
+- Accounting simplified: Induk instead of Ledger + Parent/Child; Posisi and Rugi Laba sign follow kind; Opening Balance as a balanced journal against equity.
+- Dimensi (D-26) and koli scan (D-05) approved; Pindah Manifest waits for D-08.
+Open items: BACKLOG.md.
+

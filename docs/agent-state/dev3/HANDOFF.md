@@ -1,3 +1,7 @@
+## Latest checkpoint: backlog recorded (2026-11-20)
+- Open work, pending decisions and pending reviews are listed in BACKLOG.md (sections A-E). Start there.
+- HEAD before this note: 8ebb283 on dev3/ready-for-review (PR #11). Gates at that commit: lint, typecheck, unit 718, integration 191, build PASS.
+
 ## Latest checkpoint: remaining Modul items, Entry AWB parity (2026-11-19, later)
 
 At owner direction: Persetujuan Edit/delete AWB, Cek Ongkir (tariffs), Inbound Booking, Cek Inbound Agen, POD Kembali + approval, Pembayaran Hutang (register only, no journal), Tambah AWB with legacy inputs, automatic AWB numbering and server pricing, tabs for identical lists, header approval bell, realistic demo seed (JKT/BDG, 2 per feature). Two new migrations (audit §16) need migration coordinator and Dev 2 review; pricing formula and debt-payment accounting need finance confirmation; Tujuan by area waits on D-27. Optional proof-of-delivery photo (WebP to Cloudinary, migration `20261119000300`); needs `CLOUDINARY_*` env, live upload untested. Security upgrade done at owner direction: next 16.4.6, better-auth 1.7.25, npm audit 0 (Dev 1 review of the auth bump needed). Release NOT READY (review, staging/UAT).
