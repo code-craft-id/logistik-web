@@ -6,8 +6,10 @@ import { StatusUpdateForm } from "@/features/bookings/components/status-update-f
 import { getTransactionById } from "@/features/bookings/server/queries";
 import { currentIdentity } from "@/features/identity/server/context";
 import { AwbChangePanel } from "@/features/modul/components/awb-change-panel";
+import { DeliveryProof } from "@/features/shipments/components/delivery-proof";
 import { requirePermission } from "@/lib/auth/session";
 import type { TransactionStatusHistory } from "@/lib/db/generated/client";
+import { formatRupiah } from "@/lib/format/rupiah";
 
 export const instant = false;
 
@@ -88,16 +90,16 @@ export default async function Page({
             ["Berat (kg)", tx.kilo?.toString()],
             ["Volume", tx.volume?.toString()],
             ["Terberat (Kg)", tx.chargeableWeight?.toString()],
-            ["Harga", tx.pricePerKg?.toString()],
+            ["Harga", formatRupiah(tx.pricePerKg)],
             ["Min KG", tx.minWeight?.toString()],
             ["Asuransi", tx.insured === null ? null : tx.insured ? "Y" : "N"],
-            ["Biaya Lain", tx.otherFee?.toString()],
-            ["Biaya Packing", tx.packingFee?.toString()],
-            ["Biaya Pickup", tx.pickupFee?.toString()],
-            ["Total Biaya", tx.totalCost?.toString()],
+            ["Biaya Lain", formatRupiah(tx.otherFee)],
+            ["Biaya Packing", formatRupiah(tx.packingFee)],
+            ["Biaya Pickup", formatRupiah(tx.pickupFee)],
+            ["Total Biaya", formatRupiah(tx.totalCost)],
             ["Discount (%)", tx.discountPercent?.toString()],
             ["PPN (%)", tx.ppnPercent?.toString()],
-            ["Grand Total / Biaya (Rp.)", tx.biaya?.toString()],
+            ["Grand Total", formatRupiah(tx.biaya)],
             ["Isi Barang", tx.description],
             ["Keterangan", tx.remarks],
             ["Kurir", tx.courier?.name],
@@ -113,6 +115,7 @@ export default async function Page({
           </div>
         ))}
       </dl>
+      {current && <DeliveryProof actor={current.actor} transactionId={tx.id} />}
       {current && <AwbChangePanel actor={current.actor} transaction={tx} />}
       <div className="border rounded p-4 space-y-3">
         <h2 className="font-medium">Ubah Status</h2>

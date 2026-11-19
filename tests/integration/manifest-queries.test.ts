@@ -117,6 +117,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await db.deliverySheetItem.deleteMany({
+    where: { transactionId: { in: ids.transactions } },
+  });
   await db.deliverySheet.deleteMany({
     where: { manifestId: { in: ids.manifests } },
   });
@@ -228,5 +231,63 @@ describe("manifest list/detail queries", () => {
       sheetNo: `${tag}-DRS`,
       date: "2026-11-05",
     });
+  });
+
+  it("stores an optional delivery photo and never replaces it", async () => {
+    const [a, b] = ids.branches;
+    const service = await import(
+      "../../src/features/shipments/server/manifests-service"
+    );
+    const sheet = await db.deliverySheet.findFirstOrThrow({
+      where: { manifestId: ids.manifests[0] },
+    });
+    const courier = actor([a], true);
+    const photo = {
+      url: "https://res.cloudinary.com/demo/image/upload/v1/lms/pod/a.webp",
+      publicId: "lms/pod/a",
+    };
+    // Outcome with a photo.
+    await service.recordDeliveryOutcome(
+      {
+        deliverySheetId: sheet.id,
+        transactionId: ids.transactions[0],
+        outcome: "FAILED_DELIVERY",
+      },
+      courier,
+      photo,
+    );
+    // Outcome without a photo (optional), then attached later.
+    await service.recordDeliveryOutcome(
+      {
+        deliverySheetId: sheet.id,
+        transactionId: ids.transactions[1],
+        outcome: "FAILED_DELIVERY",
+      },
+      courier,
+    );
+    await expect(
+      service.attachDeliveryPhoto(
+        { deliverySheetId: sheet.id, transactionId: ids.transactions[1] },
+        actor([b]),
+        { ...photo, publicId: "lms/pod/x" },
+      ),
+    ).rejects.toMatchObject({ status: 403 });
+    await service.attachDeliveryPhoto(
+      { deliverySheetId: sheet.id, transactionId: ids.transactions[1] },
+      courier,
+      { url: photo.url.replace("a.webp", "b.webp"), publicId: "lms/pod/b" },
+    );
+    await expect(
+      service.attachDeliveryPhoto(
+        { deliverySheetId: sheet.id, transactionId: ids.transactions[0] },
+        courier,
+        { url: photo.url, publicId: "lms/pod/c" },
+      ),
+    ).rejects.toThrow("DELIVERY_PHOTO_EXISTS");
+    const detail = await queries.getManifest(courier, ids.manifests[0]);
+    expect(detail?.items.map((i) => i.photoUrl)).toEqual([
+      photo.url,
+      photo.url.replace("a.webp", "b.webp"),
+    ]);
   });
 });

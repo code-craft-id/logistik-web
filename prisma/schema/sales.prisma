@@ -335,6 +335,10 @@ model DeliverySheetItem {
   deliveredAt      DateTime?     @map("delivered_at")
   receivedBy       String?       @map("received_by")
   notes            String?
+  /// Proof-of-delivery photo stored on Cloudinary (WebP); URL and id only.
+  podPhotoUrl      String?       @map("pod_photo_url") @db.VarChar(500)
+  podPhotoPublicId String?       @map("pod_photo_public_id") @db.VarChar(255)
+  podPhotoAt       DateTime?     @map("pod_photo_at")
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
   deletedAt        DateTime?     @map("deleted_at")

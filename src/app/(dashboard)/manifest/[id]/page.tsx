@@ -213,6 +213,27 @@ export default async function Page({
                             {item.receivedBy ? ` · ${item.receivedBy}` : ""}
                           </span>
                         ) : null}
+                        {item.photoUrl ? (
+                          <a
+                            href={item.photoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 block w-fit"
+                          >
+                            {/* biome-ignore lint/performance/noImgElement: external Cloudinary thumbnail */}
+                            <img
+                              src={item.photoUrl.replace(
+                                "/image/upload/",
+                                "/image/upload/c_fill,w_96,h_96,f_webp,q_auto/",
+                              )}
+                              alt={`Foto bukti terima AWB ${item.awbNo ?? item.transactionId}`}
+                              width={48}
+                              height={48}
+                              loading="lazy"
+                              className="size-12 rounded border object-cover"
+                            />
+                          </a>
+                        ) : null}
                         {canRecord &&
                           item.outcome !== "DELIVERED" &&
                           item.outcome !== "RETURNED" && (

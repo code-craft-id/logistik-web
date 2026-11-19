@@ -686,3 +686,6 @@ Pendapatan Pelanggan, Modul menu mirror, print tab with QR and bulk print, Combo
 
 ## 2026-11-19 — Remaining Modul items and Entry AWB parity
 Legacy observed read-only (forms opened, never submitted). Built approvals, tariffs/Cek Ongkir, Inbound Booking, Inbound Agen, POD Kembali, Pembayaran Hutang, Entry AWB inputs with auto numbering and Decimal pricing, list tabs, approval bell, realistic demo seed. Migrations 20261119000100/000200 applied to dev and test; fresh-database deploy verified. Fixed an auto-number bug (substring FROM param typed as text = regex) found by a concurrency test. A drift line was briefly included and applied locally, then removed and the default restored.
+
+## 2026-11-19 — Proof-of-delivery photo (Cloudinary, WebP)
+Optional photo on delivery outcome; browser WebP compression, server magic-byte check and signed Cloudinary upload, orphan cleanup, add-later for final outcomes. Migration 20261119000300 applied to dev and test. Verified in the local app without Cloudinary env (clear message); live upload not tested (no credentials).

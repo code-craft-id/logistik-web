@@ -7,6 +7,7 @@ import { isAdministrator } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePermission } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import { formatRupiah } from "@/lib/format/rupiah";
 
 export const metadata: Metadata = { title: "Print AWB" };
 
@@ -156,7 +157,7 @@ export default async function Page({
                     ["Volume", tx.volume?.toString()],
                     ["Terberat (kg)", tx.chargeableWeight?.toString()],
                     ...(company?.showPriceOnPrint
-                      ? ([["Biaya (Rp)", tx.biaya?.toString()]] as const)
+                      ? ([["Biaya", formatRupiah(tx.biaya)]] as const)
                       : []),
                     ["Isi Barang", tx.description],
                     ["Keterangan", tx.remarks],

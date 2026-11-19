@@ -5,6 +5,12 @@ import { ZodError } from "zod";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePermission } from "@/lib/auth/session";
+import {
+  cloudinaryConfigured,
+  destroyImage,
+  UploadError,
+  uploadWebp,
+} from "@/lib/cloudinary";
 import { Prisma } from "@/lib/db/generated/client";
 import {
   assignToManifestSchema,
@@ -15,6 +21,7 @@ import { createDeliverySheet } from "./server/delivery-sheets";
 import { findAssignableTransaction } from "./server/manifests-queries";
 import {
   assignTransactionToManifest,
+  attachDeliveryPhoto,
   createManifest,
   recordDeliveryOutcome,
 } from "./server/manifests-service";
@@ -157,7 +164,16 @@ const outcomeMessages: Record<string, string> = {
   DELIVERY_OUTCOME_CONCURRENTLY_UPDATED:
     "Data berubah bersamaan. Muat ulang halaman.",
   STATUS_CONCURRENTLY_UPDATED: "Data berubah bersamaan. Muat ulang halaman.",
+  DELIVERY_SHEET_ITEM_NOT_FOUND: "AWB tidak ada di lembar pengantaran ini.",
+  DELIVERY_PHOTO_NEEDS_OUTCOME: "Catat hasil antar dulu sebelum menambah foto.",
+  DELIVERY_PHOTO_EXISTS: "AWB ini sudah punya foto bukti terima.",
 };
+
+/** A non-empty uploaded file under `photo`, or undefined. */
+function photoFile(formData: FormData) {
+  const value = formData.get("photo");
+  return value instanceof File && value.size > 0 ? value : undefined;
+}
 
 export async function recordOutcomeFormAction(
   formData: FormData,
@@ -168,16 +184,27 @@ export async function recordOutcomeFormAction(
     if (!current) throw new IdentityError("UNAUTHENTICATED", 401);
     const raw = Object.fromEntries(
       [...formData.entries()].filter(
-        ([key, v]) => key !== "manifestId" && v !== "",
+        ([key, v]) =>
+          key !== "manifestId" &&
+          key !== "photo" &&
+          typeof v === "string" &&
+          v !== "",
       ),
     );
-    const result = await recordDeliveryOutcome(
-      deliveryOutcomeSchema.parse(raw),
-      current.actor,
-    );
-    revalidatePath(`/manifest/${formData.get("manifestId")}`);
-    return { ok: true, id: result?.id ?? 0 };
+    const input = deliveryOutcomeSchema.parse(raw);
+    const file = photoFile(formData);
+    const photo = file ? await uploadWebp(file) : undefined;
+    try {
+      const result = await recordDeliveryOutcome(input, current.actor, photo);
+      revalidatePath(`/manifest/${formData.get("manifestId")}`);
+      return { ok: true, id: result?.id ?? 0 };
+    } catch (e) {
+      // Do not leave an orphan image when the outcome was not saved.
+      if (photo) await destroyImage(photo.publicId);
+      throw e;
+    }
   } catch (e) {
+    if (e instanceof UploadError) return { ok: false, message: e.message };
     if (e instanceof Error && !(e instanceof IdentityError)) {
       const known = Object.keys(outcomeMessages).find((k) =>
         e.message.startsWith(k),
@@ -186,4 +213,57 @@ export async function recordOutcomeFormAction(
     }
     return failure(e);
   }
+}
+
+/** Add a proof-of-delivery photo to a line that already has an outcome. */
+export async function attachDeliveryPhotoFormAction(
+  formData: FormData,
+): Promise<ManifestFormResult> {
+  try {
+    await requirePermission("update", "delivery");
+    const current = await currentIdentity();
+    if (!current) throw new IdentityError("UNAUTHENTICATED", 401);
+    const deliverySheetId = Number(formData.get("deliverySheetId"));
+    const transactionId = Number(formData.get("transactionId"));
+    if (
+      !Number.isSafeInteger(deliverySheetId) ||
+      !Number.isSafeInteger(transactionId) ||
+      deliverySheetId <= 0 ||
+      transactionId <= 0
+    )
+      return {
+        ok: false,
+        message: "Data AWB tidak valid. Muat ulang halaman.",
+      };
+    const file = photoFile(formData);
+    if (!file) return { ok: false, message: "Pilih foto terlebih dahulu." };
+    const photo = await uploadWebp(file);
+    try {
+      const result = await attachDeliveryPhoto(
+        { deliverySheetId, transactionId },
+        current.actor,
+        photo,
+      );
+      revalidatePath(`/manifest/${formData.get("manifestId")}`);
+      revalidatePath(`/transactions/${transactionId}`);
+      return { ok: true, id: result.id };
+    } catch (e) {
+      await destroyImage(photo.publicId);
+      throw e;
+    }
+  } catch (e) {
+    if (e instanceof UploadError) return { ok: false, message: e.message };
+    if (e instanceof Error && !(e instanceof IdentityError)) {
+      const known = Object.keys(outcomeMessages).find((k) =>
+        e.message.startsWith(k),
+      );
+      if (known) return { ok: false, message: outcomeMessages[known] };
+    }
+    return failure(e);
+  }
+}
+
+/** Whether photo upload is configured (no secrets exposed). */
+export async function photoUploadEnabledAction() {
+  return cloudinaryConfigured();
 }

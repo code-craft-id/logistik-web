@@ -274,9 +274,17 @@ export function OutcomeForm({
         const data = new FormData(event.currentTarget);
         setError(null);
         start(async () => {
-          const result = await recordOutcomeFormAction(data);
-          if (result.ok) router.refresh();
-          else setError(result.message);
+          try {
+            const result = await recordOutcomeFormAction(data);
+            if (result.ok) router.refresh();
+            else setError(result.message);
+          } catch (e) {
+            setError(
+              e instanceof Error && e.message
+                ? e.message
+                : "Gagal menyimpan. Periksa koneksi lalu coba lagi.",
+            );
+          }
         });
       }}
     >
@@ -303,7 +311,7 @@ export function OutcomeForm({
         className="min-h-11 w-40"
       />
       <Button type="submit" size="sm" disabled={pending} className="min-h-11">
-        {pending ? "…" : "Simpan"}
+        {pending ? "Menyimpan…" : "Simpan"}
       </Button>
       {error && (
         <span role="alert" className="w-full text-xs text-destructive">

@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type AccessActor, permits } from "@/features/identity/permissions";
 import type { Prisma } from "@/lib/db/generated/client";
+import { formatRupiah } from "@/lib/format/rupiah";
 import { applyAwbEditAction, requestAwbChangeAction } from "../actions";
 import {
   AWB_CHANGE_KINDS,
@@ -10,6 +11,11 @@ import {
 } from "../server/awb-changes";
 import { ActionForm } from "./action-form";
 import { StatusText, selectClass } from "./page-bits";
+
+/** Before/after value of a change; money fields as Rupiah. */
+export function showValue(key: string, value: string | null) {
+  return key === "biaya" ? formatRupiah(value) : (value ?? "-");
+}
 
 export const FIELD_LABELS: Record<string, string> = {
   senderName: "Pengirim",
@@ -183,8 +189,8 @@ export async function AwbChangePanel({
                     <ul className="mt-1 list-disc pl-5">
                       {Object.entries(changes).map(([key, [before, after]]) => (
                         <li key={key} className="[overflow-wrap:anywhere]">
-                          {FIELD_LABELS[key] ?? key}: {before ?? "-"} →{" "}
-                          {after ?? "-"}
+                          {FIELD_LABELS[key] ?? key}: {showValue(key, before)} →{" "}
+                          {showValue(key, after)}
                           {r.usedAt
                             ? ` (${r.usedAt.toISOString().slice(0, 16).replace("T", " ")})`
                             : ""}

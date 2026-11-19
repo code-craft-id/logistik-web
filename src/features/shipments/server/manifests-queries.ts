@@ -210,6 +210,7 @@ export async function getManifest(actor: AccessActor, id: number) {
               outcome: true,
               receivedBy: true,
               deliveredAt: true,
+              podPhotoUrl: true,
             },
           },
         },
@@ -286,6 +287,7 @@ export async function getManifest(actor: AccessActor, id: number) {
         outcome: outcome?.outcome ?? null,
         receivedBy: outcome?.receivedBy ?? null,
         deliveredAt: outcome?.deliveredAt?.toISOString() ?? null,
+        photoUrl: outcome?.podPhotoUrl ?? null,
         id: item.id,
         assignedAt: item.assignedAt.toISOString(),
         transactionId: item.transaction.id,
@@ -380,4 +382,37 @@ export async function findAssignableTransaction(
   });
   if (matches.length > 1) return "AMBIGUOUS" as const;
   return matches[0] ?? null;
+}
+
+/**
+ * Delivery sheet lines of one AWB for its detail page (proof of delivery).
+ * Callers have already checked that the AWB is visible to the actor.
+ */
+export async function deliveryProofs(transactionId: number) {
+  return prisma.deliverySheetItem.findMany({
+    where: {
+      transactionId,
+      deletedAt: null,
+      deliverySheet: { manifest: { deletedAt: null } },
+    },
+    orderBy: { id: "desc" },
+    take: 10,
+    select: {
+      deliverySheetId: true,
+      outcome: true,
+      receivedBy: true,
+      deliveredAt: true,
+      notes: true,
+      podPhotoUrl: true,
+      podPhotoAt: true,
+      deliverySheet: {
+        select: {
+          sheetNo: true,
+          manifest: {
+            select: { id: true, manifestNo: true, branchId: true },
+          },
+        },
+      },
+    },
+  });
 }

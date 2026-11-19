@@ -197,9 +197,11 @@ export const helpEntries: HelpEntry[] = [
       "gagal",
       "retur",
       "pod",
+      "foto",
+      "bukti terima",
     ],
     answer:
-      "Di detail manifest, bagian Lembar Pengantaran: klik Buat DRS (satu DRS per manifest). Lalu di tabel AWB pilih hasil antar (Terkirim, Gagal, Retur) dan nama penerima, klik Simpan. Terkirim mengubah status AWB menjadi Delivered. Hasil Terkirim dan Retur bersifat final.",
+      "Di detail manifest, bagian Lembar Pengantaran: klik Buat DRS (satu DRS per manifest). Lalu di tabel AWB pilih hasil antar (Terkirim, Gagal, Retur) dan nama penerima, klik Simpan. Foto bukti terima (opsional) diunggah di detail AWB, bagian Bukti Terima (POD), setelah hasil antar dicatat: pilih foto atau buka kamera, foto dikompres ke WebP lalu disimpan di Cloudinary. Foto yang sudah ada tidak bisa diganti. Terkirim mengubah status AWB menjadi Delivered. Hasil Terkirim dan Retur bersifat final.",
     href: "/manifest",
   },
   {

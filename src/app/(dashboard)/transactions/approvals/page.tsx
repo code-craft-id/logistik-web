@@ -16,7 +16,10 @@ import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { decideAwbChangeAction } from "@/features/modul/actions";
 import { ActionForm } from "@/features/modul/components/action-form";
-import { FIELD_LABELS } from "@/features/modul/components/awb-change-panel";
+import {
+  FIELD_LABELS,
+  showValue,
+} from "@/features/modul/components/awb-change-panel";
 import {
   ListFilter,
   ModulHeader,
@@ -128,8 +131,9 @@ export default async function Page({
                             {Object.entries(changes).map(
                               ([key, [before, after]]) => (
                                 <li key={key}>
-                                  {FIELD_LABELS[key] ?? key}: {before ?? "-"} →{" "}
-                                  {after ?? "-"}
+                                  {FIELD_LABELS[key] ?? key}:{" "}
+                                  {showValue(key, before)} →{" "}
+                                  {showValue(key, after)}
                                 </li>
                               ),
                             )}

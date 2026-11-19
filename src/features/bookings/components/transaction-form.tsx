@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { ComboSelect } from "@/components/ui/combo-select";
+import { formatRupiah } from "@/lib/format/rupiah";
 import {
   type CreateTransactionActionResult,
   createTransactionAction,
@@ -105,8 +106,7 @@ const num = (v: string) => {
   return Number.isFinite(n) && n > 0 ? n : 0;
 };
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
-const rupiah = (n: number) =>
-  new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(n);
+const rupiah = (n: number) => formatRupiah(round2(n).toFixed(2));
 const initialPrice = {
   pricingType: "KG",
   koli: "",
