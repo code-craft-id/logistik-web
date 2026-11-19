@@ -712,3 +712,9 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Bug found by test and fixed: tracking search overwrote the branch-scope OR.
 - Gates: lint 534 files, typecheck, unit 713, integration 185, build PASS; crawl of 115 routes x 6 role accounts: no errors, no cross-branch leak.
 - Still open: Rekap Transaksi Excel format, Report AR aging (finance confirmation), SLA on-time rule, Import Excel status, Acc. In / User Transit / Transit Date columns (no data source), Dimensi button on booking.
+
+## 2026-11-19 — Rekap Transaksi, Report AR, Import Status (HEAD 9396280)
+- Owner supplied provider samples: Rekap Transaksi export (Multiple Sheet), Rekap Aging Pelanggan layout, Import Status template; M.Shipment Status codes read from the provider list (read-only).
+- Built: Rekap Transaksi Excel (multi/one sheet), Report AR on screen + Excel, Import Status (preview then apply valid rows; codes 2/1), shared writeProof for scan and import.
+- Pending confirmation: CASH/KREDIT/COD amounts and day inclusion in the recap, One Sheet layout, AR rules (balance in buckets, age from invoice date to today, invoice receipt date/receiver not recorded), import of codes 003-012.
+- Gates: lint 544 files, typecheck, unit 713, integration 187, build PASS.
