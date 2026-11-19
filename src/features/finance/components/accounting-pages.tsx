@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
+import { formatRupiah } from "@/lib/format/rupiah";
 import { reportInput } from "../accounting-contracts";
 import { costListInput, listInput } from "../contracts";
 import { accountingQueries } from "../server/context";
@@ -537,10 +538,10 @@ export async function JournalsPage({ query }: { query: Query }) {
                 <TableRow key={l.id}>
                   <TableCell>{l.accountId}</TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {l.debit}
+                    {formatRupiah(l.debit, { prefix: false })}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {l.credit}
+                    {formatRupiah(l.credit, { prefix: false })}
                   </TableCell>
                   <TableCell>{l.transactionId ?? "—"}</TableCell>
                 </TableRow>
@@ -697,7 +698,7 @@ export async function CostsPage({ query }: { query: Query }) {
           <div key={c.id} className="space-y-3 border-b pb-4">
             <p className="break-words">
               Biaya #{c.id} · Transaksi {c.transactionId} · {c.accountingDate} ·{" "}
-              {c.amount} IDR · {c.supplierReference}
+              {formatRupiah(c.amount)} · {c.supplierReference}
               {c.reversalOfId ? ` · Pembalikan #${c.reversalOfId}` : ""}
             </p>
             <p className="text-sm">{c.reason}</p>
@@ -818,7 +819,7 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
         <dl className="grid gap-4 rounded-lg border bg-background p-4 sm:grid-cols-3 [&_dt]:text-sm [&_dt]:text-muted-foreground [&_dd]:mt-1 [&_dd]:font-semibold">
           <div>
             <dt>Pendapatan bersih</dt>
-            <dd className="tabular-nums">{r.revenue}</dd>
+            <dd className="tabular-nums">{formatRupiah(r.revenue)}</dd>
           </div>
           <div>
             <dt>Beban bersih</dt>
@@ -851,7 +852,9 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
           r.cashflow.map((c) => (
             <p key={c.category}>
               {c.category} ·{" "}
-              <span className="text-right tabular-nums">{c.amount}</span>
+              <span className="text-right tabular-nums">
+                {formatRupiah(c.amount)}
+              </span>
             </p>
           ))
         ) : (
@@ -881,10 +884,10 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
                   {l.code} · {l.name}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {l.debit}
+                  {formatRupiah(l.debit, { prefix: false })}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {l.credit}
+                  {formatRupiah(l.credit, { prefix: false })}
                 </TableCell>
               </TableRow>
             ))}
@@ -931,10 +934,10 @@ export async function FinancialReportsPage({ query }: { query: Query }) {
                 <TableCell>{l.transactionId ?? "—"}</TableCell>
                 <TableCell>{l.accountId}</TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {l.debit}
+                  {formatRupiah(l.debit, { prefix: false })}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {l.credit}
+                  {formatRupiah(l.credit, { prefix: false })}
                 </TableCell>
               </TableRow>
             ))}
@@ -969,9 +972,11 @@ function MarginTable({
           <TableRow key={r.key}>
             <TableCell>{r.key}</TableCell>
             <TableCell className="text-right tabular-nums">
-              {r.revenue}
+              {formatRupiah(r.revenue, { prefix: false })}
             </TableCell>
-            <TableCell className="text-right tabular-nums">{r.cost}</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {formatRupiah(r.cost, { prefix: false })}
+            </TableCell>
             <TableCell className="text-right tabular-nums">
               {r.profit ?? "BELUM LENGKAP"}
             </TableCell>

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
+import { formatRupiah } from "@/lib/format/rupiah";
 import { id, listInput } from "../contracts";
 import { accountingQueries, financeService } from "../server/context";
 import { FinanceBranchField } from "./branch-field";
@@ -138,10 +139,10 @@ export async function InvoiceListPage({
                 </TableCell>
                 <TableCell>{r.branchName ?? r.branchId}</TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {r.total}
+                  {formatRupiah(r.total, { prefix: false })}
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {r.balance}
+                  {formatRupiah(r.balance, { prefix: false })}
                 </TableCell>
               </TableRow>
             ))}
@@ -222,11 +223,11 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
         </div>
         <div>
           <dt>Tagihan IDR</dt>
-          <dd className="tabular-nums">{row.total}</dd>
+          <dd className="tabular-nums">{formatRupiah(row.total)}</dd>
         </div>
         <div>
           <dt>Sisa IDR</dt>
-          <dd className="tabular-nums">{row.balance}</dd>
+          <dd className="tabular-nums">{formatRupiah(row.balance)}</dd>
         </div>
       </dl>
       <Table className="[&_th:last-child]:text-right">
@@ -245,7 +246,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
                 )?.awbNo ?? `Transaksi #${i.transactionId}`}
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {i.amount}
+                {formatRupiah(i.amount, { prefix: false })}
               </TableCell>
             </TableRow>
           ))}
@@ -354,7 +355,7 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
           {row.receipts.map((r) => (
             <div key={r.id} className="space-y-3 border-b pb-4">
               <p className="break-words">
-                #{r.id} · {r.receivedDate} · {r.amount} IDR ·{" "}
+                #{r.id} · {r.receivedDate} · {formatRupiah(r.amount)} ·{" "}
                 {r.reversalOfId ? `Pembalikan #${r.reversalOfId}` : r.method} ·{" "}
                 {r.reference}
               </p>

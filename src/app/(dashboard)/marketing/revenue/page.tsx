@@ -18,16 +18,14 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { customerRevenue } from "@/features/sales/server/revenue";
+import { formatRupiah } from "@/lib/format/rupiah";
 
 export const metadata: Metadata = { title: "Pendapatan Pelanggan" };
 
 // Session-dependent page; blocking render.
 export const instant = false;
 
-const rupiah = (value: string) =>
-  new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(
-    Number(value),
-  );
+const rupiah = (value: string) => formatRupiah(value, { prefix: false });
 
 export default async function Page({
   searchParams,
