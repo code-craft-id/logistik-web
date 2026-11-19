@@ -163,4 +163,89 @@ describe("Entry AWB capture fields", () => {
       ),
     ).rejects.toThrow("VALIDATION_MASTER_NOT_FOUND");
   });
+
+  it("numbers automatic AWBs per branch and month without duplicates", async () => {
+    const date = new Date("2026-11-05T00:00:00.000Z");
+    const made = await Promise.all(
+      [1, 2, 3].map((n) =>
+        service.createTransaction(
+          {
+            originBranchId: ids.branch,
+            autoAwb: true,
+            transactionDate: date,
+            idempotencyKey: `${tag}-auto-${n}`,
+          },
+          actor([ids.branch]),
+        ),
+      ),
+    );
+    for (const m of made) ids.tx.push(m.transaction.id);
+    const numbers = made.map((m) => m.transaction.awbNo ?? "").sort();
+    const code = (
+      await db.branch.findUniqueOrThrow({ where: { id: ids.branch } })
+    ).code
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 10);
+    expect(numbers).toEqual([
+      `${code}261100001`,
+      `${code}261100002`,
+      `${code}261100003`,
+    ]);
+    // A retried request with the same key returns the same AWB.
+    const again = await service.createTransaction(
+      {
+        originBranchId: ids.branch,
+        autoAwb: true,
+        transactionDate: date,
+        idempotencyKey: `${tag}-auto-1`,
+      },
+      actor([ids.branch]),
+    );
+    expect(again.created).toBe(false);
+  });
+
+  it("prices Harga/Kg, Harga/Koli and Trucking on the server", async () => {
+    const base = { originBranchId: ids.branch };
+    const kg = await service.createTransaction(
+      {
+        ...base,
+        awbNo: `${tag}-kg`,
+        kilo: "3.5",
+        volume: "4",
+        pricingType: "KG",
+        pricePerKg: "10000",
+        minWeight: "5",
+        otherFee: "1000",
+        packingFee: "2000",
+        pickupFee: "3000",
+        discountPercent: "10",
+        ppnPercent: "11",
+        biaya: "1",
+      },
+      actor([ids.branch]),
+    );
+    const koli = await service.createTransaction(
+      {
+        ...base,
+        awbNo: `${tag}-koli`,
+        koli: 3,
+        pricingType: "KOLI",
+        pricePerKg: "25000",
+      },
+      actor([ids.branch]),
+    );
+    const manual = await service.createTransaction(
+      { ...base, awbNo: `${tag}-manual`, kilo: "2", biaya: "75000" },
+      actor([ids.branch]),
+    );
+    ids.tx.push(kg.transaction.id, koli.transaction.id, manual.transaction.id);
+    // Terberat 4; billed max(4, 5) = 5 x 10000 + 6000 = 56000; -10% = 50400; +11% = 55944.
+    expect(kg.transaction.chargeableWeight?.toString()).toBe("4");
+    expect(kg.transaction.totalCost?.toString()).toBe("56000");
+    expect(kg.transaction.biaya?.toString()).toBe("55944");
+    expect(koli.transaction.biaya?.toString()).toBe("75000");
+    expect(manual.transaction.biaya?.toString()).toBe("75000");
+    expect(manual.transaction.totalCost).toBeNull();
+  });
 });

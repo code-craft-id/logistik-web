@@ -132,6 +132,56 @@ export const createTransactionSchema = z
       emptyToUndefined,
       z.string().trim().max(500).optional().nullable(),
     ),
+    pickupCourierId: optionalPositiveInt,
+    marketingPersonId: optionalPositiveInt,
+    consigneeId: optionalPositiveInt,
+    senderAddress: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    senderPhone: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(30).optional().nullable(),
+    ),
+    receiverAddress: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    receiverPhone: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(30).optional().nullable(),
+    ),
+    pricingType: z.preprocess(
+      emptyToUndefined,
+      z.enum(["KG", "KOLI", "TRUCKING"]).optional(),
+    ),
+    pricePerKg: decimalField(13, 2),
+    minWeight: decimalField(8, 2),
+    insured: z.preprocess(
+      (v) =>
+        v === "Y" || v === true
+          ? true
+          : v === "N" || v === false
+            ? false
+            : undefined,
+      z.boolean().optional(),
+    ),
+    otherFee: decimalField(13, 2),
+    packingFee: decimalField(13, 2),
+    pickupFee: decimalField(13, 2),
+    discountPercent: decimalField(3, 2).refine(
+      (v) => v == null || Number(v) <= 100,
+      "Discount maksimal 100%",
+    ),
+    ppnPercent: decimalField(3, 2).refine(
+      (v) => v == null || Number(v) <= 100,
+      "PPN maksimal 100%",
+    ),
+    /** Generate the AWB number when none is typed (legacy "Manual AWB" off). */
+    autoAwb: z.preprocess(
+      (v) => v === true || v === "on" || v === "true",
+      z.boolean().optional(),
+    ),
     status: z.never().optional(),
   })
   .strict();

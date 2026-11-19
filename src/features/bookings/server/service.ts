@@ -20,6 +20,108 @@ import { ALLOWED_TRANSITIONS } from "../status";
 
 type TxClient = Prisma.TransactionClient;
 
+type Money = Prisma.Decimal;
+const dec = (v: string | null | undefined) =>
+  v == null ? null : new Prisma.Decimal(v);
+
+/**
+ * Entry AWB pricing as observed in the legacy form (rules pending finance
+ * confirmation): Terberat = max(Berat, Volume). Freight by Pricing Type:
+ * KG = max(Terberat, Min KG) x Harga; KOLI = Koli x Harga; TRUCKING = Harga.
+ * Total Biaya = freight + Biaya Lain + Packing + Pickup; Grand Total = (Total - Discount%) + PPN% of the discounted amount,
+ * each step rounded half-up to 2 decimals. Grand Total is stored as `biaya`.
+ * Without Harga/Kg the typed Biaya is kept (legacy "Ganti Harga").
+ */
+export function priceAwb(input: {
+  pricingType?: "KG" | "KOLI" | "TRUCKING" | null;
+  koli?: number | null;
+  kilo?: string | null;
+  volume?: string | null;
+  pricePerKg?: string | null;
+  minWeight?: string | null;
+  otherFee?: string | null;
+  packingFee?: string | null;
+  pickupFee?: string | null;
+  discountPercent?: string | null;
+  ppnPercent?: string | null;
+  biaya?: string | null;
+}) {
+  const kilo = dec(input.kilo);
+  const volume = dec(input.volume);
+  const heaviest: Money | null =
+    kilo && volume ? Prisma.Decimal.max(kilo, volume) : (kilo ?? volume);
+  const price = dec(input.pricePerKg);
+  if (!price) {
+    return {
+      chargeableWeight: heaviest?.toFixed(2) ?? null,
+      totalCost: null,
+      biaya: input.biaya ?? null,
+    };
+  }
+  const round = (v: Money) =>
+    v.toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
+  const zero = new Prisma.Decimal(0);
+  const freight =
+    input.pricingType === "TRUCKING"
+      ? price
+      : input.pricingType === "KOLI"
+        ? price.times(input.koli ?? 0)
+        : Prisma.Decimal.max(
+            heaviest ?? zero,
+            dec(input.minWeight) ?? zero,
+          ).times(price);
+  const total = round(
+    freight
+      .plus(dec(input.otherFee) ?? zero)
+      .plus(dec(input.packingFee) ?? zero)
+      .plus(dec(input.pickupFee) ?? zero),
+  );
+  const discount = round(
+    total.times(dec(input.discountPercent) ?? zero).div(100),
+  );
+  const afterDiscount = total.minus(discount);
+  const ppn = round(
+    afterDiscount.times(dec(input.ppnPercent) ?? zero).div(100),
+  );
+  return {
+    chargeableWeight: heaviest?.toFixed(2) ?? null,
+    totalCost: total.toFixed(2),
+    biaya: afterDiscount.plus(ppn).toFixed(2),
+  };
+}
+
+/**
+ * Next automatic AWB number for a branch, as observed in the legacy app:
+ * branch code + YYMM (UTC) + a 5-digit running number, e.g. JKT261100001.
+ * The branch row lock serializes concurrent numbering for one branch.
+ */
+export async function nextAwbNo(
+  tx: TxClient,
+  branchId: number,
+  date: Date,
+  { lock = true }: { lock?: boolean } = {},
+) {
+  const locked = lock
+    ? await tx.$queryRaw<{ code: string }[]>`
+        SELECT code FROM branches WHERE id = ${branchId} FOR UPDATE`
+    : await tx.$queryRaw<{ code: string }[]>`
+        SELECT code FROM branches WHERE id = ${branchId}`;
+  const code =
+    (locked[0]?.code ?? "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 10) || `C${branchId}`;
+  const yymm = `${String(date.getUTCFullYear()).slice(2)}${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+  const prefix = `${code}${yymm}`;
+  const start = prefix.length + 1;
+  const rows = await tx.$queryRaw<{ max: number | null }[]>`
+    SELECT max(CASE WHEN substring(awb_no FROM ${start}::int) ~ '^[0-9]{1,9}$'
+                    THEN substring(awb_no FROM ${start}::int)::int END) AS max
+    FROM transactions
+    WHERE origin_branch_id = ${branchId} AND awb_no LIKE ${`${prefix}%`}`;
+  return `${prefix}${String((rows[0]?.max ?? 0) + 1).padStart(5, "0")}`;
+}
+
 export async function createBooking(
   input: CreateBookingInput,
   actor: AccessActor,
@@ -204,6 +306,8 @@ function payloadMatchesExisting(
     const a = existing[f];
     const b = f === "awbNo" ? normalizeAwbValue(data[f]) : data[f];
     if (f === "awbNo") {
+      // A retried automatic-number request matches the number it was given.
+      if (b == null && data.autoAwb === true) continue;
       if (a === b) continue;
       if (a == null && b == null) continue;
       if (String(a ?? null) !== String(b ?? null)) {
@@ -374,6 +478,34 @@ export async function createTransaction(
         });
         if (!customer) throw new IdentityError("FORBIDDEN_BRANCH", 403);
       }
+      const scoped = (id: number | undefined | null) =>
+        id
+          ? {
+              id,
+              deletedAt: null,
+              ...(isAdministrator(actor)
+                ? {}
+                : {
+                    OR: [
+                      { branchId: { in: actor.branchIds } },
+                      { branchId: null },
+                    ],
+                  }),
+            }
+          : null;
+      for (const [where, model] of [
+        [scoped(data.pickupCourierId), tx.courier],
+        [scoped(data.marketingPersonId), tx.marketingPerson],
+        [scoped(data.consigneeId), tx.consignee],
+      ] as const) {
+        if (!where) continue;
+        const found = await (
+          model as unknown as {
+            findFirst: (a: unknown) => Promise<{ id: number } | null>;
+          }
+        ).findFirst({ where, select: { id: true } });
+        if (!found) throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
       const masters = [
         [data.transportModeId, tx.transportMode],
         [data.deliveryServiceId, tx.deliveryService],
@@ -455,7 +587,14 @@ export async function createTransaction(
         }
       }
 
-      const { status: _status, idempotencyKey, ...rest } = data;
+      if (!data.awbNo && data.autoAwb) {
+        data.awbNo = await nextAwbNo(
+          tx,
+          data.originBranchId,
+          data.transactionDate ?? new Date(),
+        );
+      }
+      const { status: _status, idempotencyKey, autoAwb: _auto, ...rest } = data;
       const created = await tx.transaction.create({
         data: {
           idempotencyKey: idempotencyKey ?? null,
@@ -470,7 +609,30 @@ export async function createTransaction(
           koli: rest.koli ?? null,
           kilo: rest.kilo ?? null,
           volume: rest.volume ?? null,
-          biaya: rest.biaya ?? null,
+          ...(() => {
+            const priced = priceAwb(rest);
+            return {
+              biaya: priced.biaya,
+              chargeableWeight: priced.chargeableWeight,
+              totalCost: priced.totalCost,
+            };
+          })(),
+          pickupCourierId: rest.pickupCourierId ?? null,
+          marketingPersonId: rest.marketingPersonId ?? null,
+          consigneeId: rest.consigneeId ?? null,
+          senderAddress: rest.senderAddress ?? null,
+          senderPhone: rest.senderPhone ?? null,
+          receiverAddress: rest.receiverAddress ?? null,
+          receiverPhone: rest.receiverPhone ?? null,
+          pricingType: rest.pricingType ?? (rest.pricePerKg ? "KG" : null),
+          pricePerKg: rest.pricePerKg ?? null,
+          minWeight: rest.minWeight ?? null,
+          insured: rest.insured ?? null,
+          otherFee: rest.otherFee ?? null,
+          packingFee: rest.packingFee ?? null,
+          pickupFee: rest.pickupFee ?? null,
+          discountPercent: rest.discountPercent ?? null,
+          ppnPercent: rest.ppnPercent ?? null,
           courierId: rest.courierId ?? null,
           customerId: rest.customerId ?? null,
           transportModeId: rest.transportModeId ?? null,

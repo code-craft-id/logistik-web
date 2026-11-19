@@ -19,14 +19,17 @@ export default async function Page() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Tambah AWB / On Site Outbound
+          Transaksi On Site Add
         </h1>
         <p className="text-sm text-muted-foreground">
-          Isi data AWB lalu Simpan. Nomor AWB boleh dikosongkan; kirim ulang
-          form yang sama tidak membuat AWB ganda.
+          Nomor AWB terisi otomatis setelah Asal dipilih dan boleh diubah. Kirim
+          ulang form yang sama tidak membuat AWB ganda.
         </p>
       </div>
-      <TransactionForm options={options} />
+      <TransactionForm
+        options={options}
+        today={new Date().toISOString().slice(0, 10)}
+      />
     </div>
   );
 }

@@ -41,6 +41,7 @@ export type CreateTransactionActionResult =
   | {
       ok: true;
       id: number;
+      awbNo?: string | null;
       created: boolean;
       idempotent: boolean;
       matchedBy?: string;
@@ -110,6 +111,7 @@ export async function createTransactionAction(
       return {
         ok: true,
         id: tx.id,
+        awbNo: tx.awbNo,
         created: true,
         idempotent: false,
       };
@@ -121,6 +123,7 @@ export async function createTransactionAction(
     return {
       ok: true,
       id: tx.id,
+      awbNo: tx.awbNo,
       created: false,
       idempotent: true,
       matchedBy: result.matchedBy,
