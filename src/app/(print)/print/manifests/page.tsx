@@ -4,7 +4,7 @@ import { PrintToolbar } from "@/components/patterns/auto-print";
 import { currentIdentity } from "@/features/identity/server/context";
 import { ManifestDocument } from "@/features/shipments/components/manifest-document";
 import { getManifest } from "@/features/shipments/server/manifests-queries";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Print Manifest" };
 
@@ -19,7 +19,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePermission("view", "manifest");
+  await requirePagePermission("view", "manifest");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const query = await searchParams;

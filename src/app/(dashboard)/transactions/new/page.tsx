@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { TransactionForm } from "@/features/bookings/components/transaction-form";
 import { transactionFormOptions } from "@/features/bookings/server/queries";
 import { currentIdentity } from "@/features/identity/server/context";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 // Session-dependent form options; blocking render.
 export const instant = false;
@@ -11,7 +11,7 @@ export const instant = false;
 export const metadata: Metadata = { title: "Tambah AWB/Transaction" };
 
 export default async function Page() {
-  await requirePermission("create", "transaction");
+  await requirePagePermission("create", "transaction");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const options = await transactionFormOptions(current.actor);

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { AwbLookup } from "@/features/bookings/components/awb-lookup";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Lookup AWB" };
 
 export default async function Page() {
-  await requirePermission("view", "transaction");
+  await requirePagePermission("view", "transaction");
   return (
     <div className="space-y-6">
       <div>

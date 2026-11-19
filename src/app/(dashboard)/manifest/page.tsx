@@ -22,7 +22,7 @@ import { currentIdentity } from "@/features/identity/server/context";
 import { selectClass } from "@/features/modul/components/page-bits";
 import { branchChoices } from "@/features/modul/server/inbound";
 import { listManifests } from "@/features/shipments/server/manifests-queries";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Daftar Manifest" };
 
@@ -37,7 +37,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePermission("view", "manifest");
+  await requirePagePermission("view", "manifest");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const query = await searchParams;

@@ -19,7 +19,7 @@ import {
   OutcomeForm,
 } from "@/features/shipments/components/manifest-forms";
 import { getManifest } from "@/features/shipments/server/manifests-queries";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Detail Manifest" };
 
@@ -34,7 +34,7 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requirePermission("view", "manifest");
+  await requirePagePermission("view", "manifest");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const parsed = z.coerce

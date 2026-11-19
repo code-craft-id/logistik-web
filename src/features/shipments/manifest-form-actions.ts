@@ -20,6 +20,7 @@ import {
 import { createDeliverySheet } from "./server/delivery-sheets";
 import { findAssignableTransaction } from "./server/manifests-queries";
 import {
+  assertDeliveryPhotoAllowed,
   assignTransactionToManifest,
   attachDeliveryPhoto,
   createManifest,
@@ -192,17 +193,10 @@ export async function recordOutcomeFormAction(
       ),
     );
     const input = deliveryOutcomeSchema.parse(raw);
-    const file = photoFile(formData);
-    const photo = file ? await uploadWebp(file) : undefined;
-    try {
-      const result = await recordDeliveryOutcome(input, current.actor, photo);
-      revalidatePath(`/manifest/${formData.get("manifestId")}`);
-      return { ok: true, id: result?.id ?? 0 };
-    } catch (e) {
-      // Do not leave an orphan image when the outcome was not saved.
-      if (photo) await destroyImage(photo.publicId);
-      throw e;
-    }
+    // Photos are added on the AWB detail page (attachDeliveryPhoto) only.
+    const result = await recordDeliveryOutcome(input, current.actor);
+    revalidatePath(`/manifest/${formData.get("manifestId")}`);
+    return { ok: true, id: result?.id ?? 0 };
   } catch (e) {
     if (e instanceof UploadError) return { ok: false, message: e.message };
     if (e instanceof Error && !(e instanceof IdentityError)) {
@@ -237,6 +231,11 @@ export async function attachDeliveryPhotoFormAction(
       };
     const file = photoFile(formData);
     if (!file) return { ok: false, message: "Pilih foto terlebih dahulu." };
+    // Access, scope, outcome and "no photo yet" are checked before uploading.
+    await assertDeliveryPhotoAllowed(
+      { deliverySheetId, transactionId },
+      current.actor,
+    );
     const photo = await uploadWebp(file);
     try {
       const result = await attachDeliveryPhoto(

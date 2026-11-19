@@ -118,9 +118,28 @@ export async function destroyImage(publicId: string) {
   for (const [k, v] of Object.entries(params)) body.set(k, v);
   body.set("api_key", cfg.key);
   body.set("signature", signParams(params, cfg.secret));
-  await fetch(`https://api.cloudinary.com/v1_1/${cfg.cloud}/image/destroy`, {
-    method: "POST",
-    body,
-    signal: AbortSignal.timeout(15_000),
-  }).catch(() => undefined);
+  try {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cfg.cloud}/image/destroy`,
+      { method: "POST", body, signal: AbortSignal.timeout(15_000) },
+    );
+    const result = (await response.json().catch(() => null)) as {
+      result?: string;
+    } | null;
+    if (
+      !response.ok ||
+      (result?.result !== "ok" && result?.result !== "not found")
+    )
+      console.warn("cloudinary destroy failed", {
+        publicId,
+        status: response.status,
+        result: result?.result ?? null,
+      });
+  } catch (error) {
+    // An orphan image remains; log it so it can be removed manually.
+    console.warn("cloudinary destroy failed", {
+      publicId,
+      error: error instanceof Error ? error.name : "unknown",
+    });
+  }
 }

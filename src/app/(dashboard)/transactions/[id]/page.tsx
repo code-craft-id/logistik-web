@@ -7,7 +7,7 @@ import { getTransactionById } from "@/features/bookings/server/queries";
 import { currentIdentity } from "@/features/identity/server/context";
 import { AwbChangePanel } from "@/features/modul/components/awb-change-panel";
 import { DeliveryProof } from "@/features/shipments/components/delivery-proof";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 import type { TransactionStatusHistory } from "@/lib/db/generated/client";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -22,7 +22,7 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requirePermission("view", "transaction");
+  await requirePagePermission("view", "transaction");
   const { id } = await params;
   const parsed = idSchema.safeParse(id);
   if (!parsed.success) {

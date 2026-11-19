@@ -5,7 +5,7 @@ import { Barcode } from "@/components/patterns/barcode";
 import { QrCode } from "@/components/patterns/qr-code";
 import { isAdministrator } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 import { prisma } from "@/lib/db";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -22,7 +22,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePermission("view", "transaction");
+  await requirePagePermission("view", "transaction");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const raw = (await searchParams).ids;

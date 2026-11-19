@@ -242,52 +242,48 @@ describe("manifest list/detail queries", () => {
       where: { manifestId: ids.manifests[0] },
     });
     const courier = actor([a], true);
-    const photo = {
-      url: "https://res.cloudinary.com/demo/image/upload/v1/lms/pod/a.webp",
-      publicId: "lms/pod/a",
-    };
-    // Outcome with a photo.
-    await service.recordDeliveryOutcome(
-      {
-        deliverySheetId: sheet.id,
-        transactionId: ids.transactions[0],
-        outcome: "FAILED_DELIVERY",
-      },
-      courier,
-      photo,
-    );
-    // Outcome without a photo (optional), then attached later.
-    await service.recordDeliveryOutcome(
-      {
-        deliverySheetId: sheet.id,
-        transactionId: ids.transactions[1],
-        outcome: "FAILED_DELIVERY",
-      },
-      courier,
-    );
+    const line = (n: number) => ({
+      deliverySheetId: sheet.id,
+      transactionId: ids.transactions[n],
+    });
+    const photo = (name: string) => ({
+      url: `https://res.cloudinary.com/demo/image/upload/v1/lms/pod/${name}.webp`,
+      publicId: `lms/pod/${name}`,
+    });
+    // No delivery line exists before an outcome is recorded; checked before upload.
     await expect(
-      service.attachDeliveryPhoto(
-        { deliverySheetId: sheet.id, transactionId: ids.transactions[1] },
-        actor([b]),
-        { ...photo, publicId: "lms/pod/x" },
-      ),
-    ).rejects.toMatchObject({ status: 403 });
-    await service.attachDeliveryPhoto(
-      { deliverySheetId: sheet.id, transactionId: ids.transactions[1] },
-      courier,
-      { url: photo.url.replace("a.webp", "b.webp"), publicId: "lms/pod/b" },
-    );
-    await expect(
-      service.attachDeliveryPhoto(
-        { deliverySheetId: sheet.id, transactionId: ids.transactions[0] },
+      service.assertDeliveryPhotoAllowed(line(0), courier),
+    ).rejects.toThrow("DELIVERY_SHEET_ITEM_NOT_FOUND");
+    for (const n of [0, 1])
+      await service.recordDeliveryOutcome(
+        { ...line(n), outcome: "FAILED_DELIVERY" },
         courier,
-        { url: photo.url, publicId: "lms/pod/c" },
-      ),
+      );
+    // Another branch is refused before uploading.
+    await expect(
+      service.assertDeliveryPhotoAllowed(line(1), actor([b])),
+    ).rejects.toMatchObject({ status: 403 });
+    await expect(
+      service.attachDeliveryPhoto(line(1), actor([b]), photo("x")),
+    ).rejects.toMatchObject({ status: 403 });
+    await service.assertDeliveryPhotoAllowed(line(0), courier);
+    await service.attachDeliveryPhoto(line(0), courier, photo("a"));
+    await service.attachDeliveryPhoto(line(1), courier, photo("b"));
+    // Existing photos are never replaced, also when re-recording the outcome.
+    await expect(
+      service.assertDeliveryPhotoAllowed(line(0), courier),
     ).rejects.toThrow("DELIVERY_PHOTO_EXISTS");
+    await expect(
+      service.attachDeliveryPhoto(line(0), courier, photo("c")),
+    ).rejects.toThrow("DELIVERY_PHOTO_EXISTS");
+    await service.recordDeliveryOutcome(
+      { ...line(0), outcome: "FAILED_DELIVERY", notes: "Coba lagi besok" },
+      courier,
+    );
     const detail = await queries.getManifest(courier, ids.manifests[0]);
     expect(detail?.items.map((i) => i.photoUrl)).toEqual([
-      photo.url,
-      photo.url.replace("a.webp", "b.webp"),
+      photo("a").url,
+      photo("b").url,
     ]);
   });
 });

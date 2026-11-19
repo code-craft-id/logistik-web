@@ -5,7 +5,7 @@ import { InfoTip } from "@/components/patterns/info-tip";
 import { currentIdentity } from "@/features/identity/server/context";
 import { ManifestCreateForm } from "@/features/shipments/components/manifest-forms";
 import { manifestFormOptions } from "@/features/shipments/server/manifests-queries";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Tambah Manifest" };
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Tambah Manifest" };
 export const instant = false;
 
 export default async function Page() {
-  await requirePermission("create", "manifest");
+  await requirePagePermission("create", "manifest");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const options = await manifestFormOptions(current.actor);

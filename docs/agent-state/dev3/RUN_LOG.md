@@ -692,3 +692,8 @@ Optional photo on delivery outcome; browser WebP compression, server magic-byte 
 
 ## 2026-11-19 — Security dependency upgrade (owner approved)
 next 16.4.2 -> 16.4.6, better-auth 1.6.23 -> 1.7.25 (exact pins), npm audit fix (happy-dom 21.0.4, fast-uri 3.1.9). `npm audit --omit=dev`: 0 vulnerabilities. Auth integration suites (identity, session, profile, admin seed, SCH-01) pass unchanged; no schema change needed. Better Auth is Dev 1's contract: needs Dev 1 review.
+
+## 2026-11-19 — Review fixes, page access guard, role access check
+Review of 61a3f16/c1d5f85: photo no longer accepted by recordDeliveryOutcome (no overwrite path); access, scope, outcome and "no photo yet" checked before any Cloudinary upload; failed image deletes are logged. better-auth 1.7 changelog read (1.7.9-1.7.26): no required schema change, no hash format change; existing 1.6 password hashes still sign in. Seed guard confirmed local-only (logistik_web on localhost, refuses NODE_ENV=production).
+Pages using requirePermission rendered blank on denial (no (dashboard) error/not-found boundary): added requirePagePermission (redirect to /akses-ditolak), (dashboard)/not-found.tsx and error.tsx.
+Role accounts (optional, DEMO_BRANCH_PASSWORD): owner, admin cabang JKT, staf JKT, marketing JKT, kurir JKT, driver BDG. Production-build crawl of 113 routes per role: no server errors; denied pages show "Akses ditolak"; other-branch AWB/manifest/invoice and others' tickets show "Data tidak ditemukan"; no cross-branch data in lists. Login rate limit (429) observed when signing in 5 accounts at once from one IP.

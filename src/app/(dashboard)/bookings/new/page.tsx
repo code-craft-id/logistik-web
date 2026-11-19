@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { BookingForm } from "@/features/bookings/components/booking-form";
 import { transactionFormOptions } from "@/features/bookings/server/queries";
 import { currentIdentity } from "@/features/identity/server/context";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Tambah Booking" };
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Tambah Booking" };
 export const instant = false;
 
 export default async function Page() {
-  await requirePermission("create", "booking");
+  await requirePagePermission("create", "booking");
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const { branches, customers } = await transactionFormOptions(current.actor);

@@ -775,11 +775,221 @@ try {
             { vendorBillId: bill.id, transactionId: awbs[awbNo].id },
           );
       }
+
+      // Draft invoices (no number, no journal) with their AWB reservations.
+      for (const [awbNo, branchCode, cust, date, due] of [
+        ["JKT261100001", "JKT", custA, "2026-11-15", "2026-12-15"],
+        ["BDG261100001", "BDG", custB, "2026-11-16", "2026-11-30"],
+      ]) {
+        const t = awbs[awbNo];
+        if (
+          await tx.finReservation.findUnique({ where: { transactionId: t.id } })
+        )
+          continue;
+        const invoice = await tx.finInvoice.create({
+          data: {
+            branchId: branch[branchCode].id,
+            customerId: cust.id,
+            invoiceDate: new Date(`${date}T00:00:00Z`),
+            dueDate: new Date(`${due}T00:00:00Z`),
+            total: t.biaya,
+          },
+        });
+        await tx.finInvoiceItem.create({
+          data: { invoiceId: invoice.id, transactionId: t.id, amount: t.biaya },
+        });
+        await tx.finReservation.create({
+          data: { transactionId: t.id, invoiceId: invoice.id },
+        });
+      }
+
+      // Support tickets.
+      if (admin)
+        for (const [key, code, subject, menu, url, priority, remarks] of [
+          [
+            "demo-ticket-1",
+            "JKT",
+            "Cetak AWB tidak muncul QR code",
+            "Print AWB",
+            "/transactions",
+            "High",
+            "Saat cetak beberapa AWB sekaligus, QR code kosong di halaman kedua.",
+          ],
+          [
+            "demo-ticket-2",
+            "BDG",
+            "Tambah pilihan layanan SAMEDAY",
+            "Cek Ongkir",
+            "/customer-service/cek-ongkir",
+            "Normal",
+            "Mohon ditambahkan layanan SAMEDAY untuk rute Bandung - Jakarta.",
+          ],
+        ])
+          await ensure(
+            tx.ticket,
+            { createdById: admin.id, idempotencyKey: key },
+            {
+              branchId: branch[code].id,
+              createdById: admin.id,
+              subject,
+              menuName: menu,
+              relatedPageUrl: url,
+              priority,
+              remarks,
+              idempotencyKey: key,
+            },
+          );
+
+      // Optional role accounts for testing access (local only). Created only
+      // when DEMO_BRANCH_PASSWORD is set; existing users are never changed.
+      const demoPassword = process.env.DEMO_BRANCH_PASSWORD;
+      if (demoPassword && demoPassword.length >= 8) {
+        const { hashPassword } = await import("better-auth/crypto");
+        const hash = await hashPassword(demoPassword);
+        const roles = [
+          {
+            username: "demo_owner",
+            name: "Demo Owner",
+            group: "DEMO Owner",
+            branches: [],
+            grants: { system_admin: ["manage"] },
+          },
+          {
+            username: "demo_admin_jkt",
+            name: "Demo Admin Cabang JKT",
+            group: "DEMO Admin Cabang",
+            branches: ["JKT"],
+            grants: {
+              transaction: ["view", "create", "update"],
+              booking: ["view", "create", "update"],
+              manifest: ["view", "create", "update"],
+              delivery: ["view", "create", "update"],
+              customer: ["view", "create", "update"],
+              consignee: ["view", "create", "update"],
+              awb_change: ["view", "request", "approve"],
+              pod_return: ["view", "create", "approve"],
+              tariff: ["view"],
+              debt_payment: ["view", "create"],
+              invoice: ["view"],
+              payment: ["view"],
+              transaction_report: ["view", "export"],
+              manifest_report: ["view"],
+              delivery_report: ["view"],
+              dashboard_report: ["view"],
+              ticket: ["view", "create"],
+            },
+          },
+          {
+            username: "demo_marketing",
+            name: "Demo Marketing JKT",
+            group: "DEMO Marketing",
+            branches: ["JKT"],
+            grants: {
+              customer: ["view", "create", "update"],
+              consignee: ["view", "create", "update"],
+              booking: ["view", "create"],
+              transaction: ["view"],
+              tariff: ["view"],
+              transaction_report: ["view"],
+              dashboard_report: ["view"],
+              ticket: ["view", "create"],
+            },
+          },
+          {
+            username: "demo_kurir",
+            name: "Demo Kurir JKT",
+            group: "DEMO Kurir",
+            branches: ["JKT"],
+            grants: {
+              transaction: ["view"],
+              manifest: ["view"],
+              delivery: ["view", "update"],
+              pod_return: ["view", "create"],
+              ticket: ["view", "create"],
+            },
+          },
+          {
+            username: "demo_driver",
+            name: "Demo Driver BDG",
+            group: "DEMO Driver",
+            branches: ["BDG"],
+            grants: {
+              transaction: ["view"],
+              manifest: ["view"],
+              pod_return: ["view", "create"],
+              ticket: ["view", "create"],
+            },
+          },
+          {
+            username: "demo_jkt",
+            name: "Demo Staf Cabang JKT",
+            group: "DEMO Staf Cabang",
+            branches: ["JKT"],
+            grants: {
+              transaction: ["view", "create", "update"],
+              booking: ["view", "create"],
+              manifest: ["view", "create", "update"],
+              delivery: ["view", "create", "update"],
+              customer: ["view"],
+              consignee: ["view"],
+              awb_change: ["view", "request"],
+              pod_return: ["view", "create", "approve"],
+              tariff: ["view"],
+              transaction_report: ["view"],
+              dashboard_report: ["view"],
+              ticket: ["view", "create"],
+            },
+          },
+        ];
+        for (const role of roles) {
+          const group = await ensure(
+            tx.userGroup,
+            { name: role.group },
+            {
+              name: role.group,
+              description: "Akun demo lokal untuk uji hak akses per peran",
+              status: "ACTIVE",
+              permissions: {
+                create: Object.entries(role.grants).flatMap(
+                  ([resource, actions]) =>
+                    actions.map((action) => ({ resource, action })),
+                ),
+              },
+            },
+          );
+          if (await tx.user.findFirst({ where: { username: role.username } }))
+            continue;
+          const user = await tx.user.create({
+            data: {
+              name: role.name,
+              username: role.username,
+              displayUsername: role.username,
+              email: `${role.username}@example.invalid`,
+              emailVerified: true,
+              status: "ACTIVE",
+              groupId: group.id,
+              allowedBranches: {
+                create: role.branches.map((code) => ({
+                  branchId: branch[code].id,
+                })),
+              },
+            },
+          });
+          await tx.authAccount.create({
+            data: {
+              userId: user.id,
+              accountId: String(user.id),
+              providerId: "credential",
+              password: hash,
+            },
+          });
+        }
+      }
     },
     { timeout: 120000 },
   );
   console.log(
-    "Demo seed complete: branches JKT/BDG with 2 records per feature (masters, customers, consignees, tariffs, bookings, 4 AWB, manifests, DRS, POD Kembali, AWB requests, vendor invoices). Existing rows unchanged.",
+    "Demo seed complete: branches JKT/BDG with 2 records per feature (masters, customers, consignees, tariffs, bookings, 4 AWB, manifests, DRS, POD Kembali, AWB requests, vendor invoices, draft invoices, tickets). Existing rows unchanged. Set DEMO_BRANCH_PASSWORD to also create the role accounts demo_owner, demo_admin_jkt, demo_marketing, demo_kurir, demo_driver and demo_jkt.",
   );
 } catch (error) {
   console.error(

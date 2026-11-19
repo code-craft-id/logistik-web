@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { listTransactions } from "@/features/bookings/server/queries";
 import { one } from "@/features/modul/components/page-bits";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Kelola On Site" };
 
@@ -41,7 +41,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePermission("view", "transaction");
+  await requirePagePermission("view", "transaction");
   const query = await searchParams;
   const direction = one(query.tab) === "inbound" ? "inbound" : "outbound";
   const search = one(query.search) ?? "";

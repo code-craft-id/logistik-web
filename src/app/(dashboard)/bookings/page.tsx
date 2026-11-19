@@ -6,7 +6,7 @@ import { listBookings } from "@/features/bookings/server/queries";
 import { currentIdentity } from "@/features/identity/server/context";
 import { InboundBookings } from "@/features/modul/components/inbound-bookings";
 import { one } from "@/features/modul/components/page-bits";
-import { requirePermission } from "@/lib/auth/session";
+import { requirePagePermission } from "@/lib/auth/page-access";
 
 export const metadata: Metadata = { title: "Kelola Booking" };
 
@@ -23,7 +23,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePermission("view", "booking");
+  await requirePagePermission("view", "booking");
   const query = await searchParams;
   if (one(query.tab) === "inbound") {
     const current = await currentIdentity();
