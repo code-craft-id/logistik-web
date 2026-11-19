@@ -115,6 +115,12 @@ const QUICK_ACTIONS = [
     action: "view",
     resource: "transaction_report",
   },
+  {
+    label: "Report AR",
+    href: "/financial-reports/aging",
+    action: "view",
+    resource: "invoice",
+  },
 ] as const;
 function quickActions(actor: AccessActor) {
   return QUICK_ACTIONS.filter((item) =>

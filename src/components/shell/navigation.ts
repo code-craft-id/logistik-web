@@ -260,6 +260,7 @@ export const liveRoutes = [
   "/branch-reports/delivery?view=items",
   "/customer-service/status-pengantaran",
   "/branch-reports/rekap-transaksi",
+  "/financial-reports/aging",
   "/transactions/lookup",
   "/transactions/history",
   "/transactions/void?view=deleted",

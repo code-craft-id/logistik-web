@@ -7,13 +7,14 @@ import { loadAccessActor } from "../../src/features/identity/server/access";
 import { type Prisma, PrismaClient } from "../../src/lib/db/generated/client";
 import { testDatabaseUrl } from "../support/test-database-url";
 
+const url = testDatabaseUrl(
+  process.env.TEST_DATABASE_URL,
+  process.env.DATABASE_URL,
+);
+// Report modules use the shared client (@/lib/db): point it at the test DB.
+process.env.DATABASE_URL = url;
 const db = new PrismaClient({
-  adapter: new PrismaPg({
-    connectionString: testDatabaseUrl(
-      process.env.TEST_DATABASE_URL,
-      process.env.DATABASE_URL,
-    ),
-  }),
+  adapter: new PrismaPg({ connectionString: url }),
 });
 const tag = `FAKE FIN ${randomUUID()}`;
 let company: number,
@@ -386,6 +387,24 @@ describe("FIN-01 guarded persistence", () => {
     const row = await service().detail(id);
     expect(row.balance).toBe("20000.00");
     expect(row.paymentStatus).toBe("PARTIAL");
+    // Report AR (Rekap Aging Pelanggan, Belum Lunas): remaining balance in
+    // one age bucket, term = due - invoice date.
+    const { agingReport, agingWorkbook } = await import(
+      "../../src/features/reports/aging/server/aging"
+    );
+    const agingActor = await loadAccessActor(db, users[0]);
+    if (!agingActor) throw new Error("actor not found");
+    const aging = await agingReport(agingActor, {
+      month: "11",
+      year: "2026",
+    });
+    const line = aging.items.find((x) => x.number === row.number);
+    expect(line).toMatchObject({ total: 100000, termDays: 15 });
+    expect(
+      (line?.b0_21 ?? 0) + (line?.b21_30 ?? 0) + (line?.b30plus ?? 0),
+    ).toBe(20000);
+    expect(aging.end).toBe("30-11-2026");
+    expect(agingWorkbook(aging).length).toBeGreaterThan(0);
     // Legacy list columns: snapshot customer/branch, term in days, AWB count.
     const listed = (await service().list({ branchId: branch })).items.find(
       (x) => x.id === id,

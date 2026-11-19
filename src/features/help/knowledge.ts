@@ -25,7 +25,7 @@ export const helpEntries: HelpEntry[] = [
       "pending",
     ],
     answer:
-      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi, Rekap Transaksi) dan hanya menampilkan menu yang boleh Anda buka.",
+      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi, Rekap Transaksi, Report AR) dan hanya menampilkan menu yang boleh Anda buka.",
     href: "/dashboard",
   },
   {
@@ -75,6 +75,22 @@ export const helpEntries: HelpEntry[] = [
     answer:
       "Laporan > Laporan Cabang > Rekap Transaksi (juga Quick Action). Pilih Bulan, Tahun, Cabang asal dan Jenis Lembar lalu Ekspor Excel. Multiple Sheet = satu sheet per tanggal (nama sheet YYYY-MM-DD), One Sheet = semua tanggal dalam satu sheet plus TOTAL BULAN. Tiap tanggal berisi baris per Cabang Tujuan: Total AWB, Total Koli, Total Berat, Total Volume, CASH, KREDIT, COD (Grand Total AWB menurut jenis pembayaran) dan Total Penagihan (CASH + KREDIT + COD), ditutup baris TOTAL. Tanggal yang AWB-nya semuanya di-void tetap punya sheet dengan total 0, seperti di aplikasi lama. Membuka halaman butuh hak Laporan Transaksi: lihat; mengunduh butuh hak ekspor.",
     href: "/branch-reports/rekap-transaksi",
+  },
+  {
+    id: "report-ar-aging",
+    title: "Report AR (Rekap Aging Pelanggan, Belum Lunas)",
+    keywords: [
+      "report ar",
+      "aging",
+      "umur piutang",
+      "piutang",
+      "belum lunas",
+      "rekap aging",
+      "usia faktur",
+    ],
+    answer:
+      "Quick Action Report AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (termin = jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total dan persentase tiap kolom. Tanggal dan nama penerima faktur belum dicatat sehingga tampil '-'. Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
+    href: "/financial-reports/aging",
   },
   {
     id: "booking",
