@@ -31,9 +31,20 @@ export const helpEntries: HelpEntry[] = [
   {
     id: "booking",
     title: "Booking",
-    keywords: ["booking", "pesan", "pickup", "jemput", "tambah booking"],
+    keywords: [
+      "booking",
+      "pesan",
+      "pickup",
+      "jemput",
+      "tambah booking",
+      "nomor booking",
+      "barcode booking",
+      "print booking",
+      "slip",
+    ],
     answer:
-      "Menu Modul > Layanan Pelanggan > Booking. Klik Tambah Booking, pilih Cabang dan (opsional) Customer, isi pengirim, penerima, DO, tujuan, koli, berat, volume dan biaya, lalu simpan. Booking boleh dihubungkan ke AWB, tetapi tidak wajib.",
+      "Modul > Layanan Pelanggan > Booking. Klik Tambah Booking dan pilih Cabang: nomor booking terisi otomatis (BK + kode cabang + tahun bulan + nomor urut, contoh BKJKT261100001) dan boleh diubah (nomor manual tidak boleh dobel di cabang yang sama). Isi Customer, pengirim, penerima, DO, tujuan, koli, berat, volume dan biaya. Di daftar Booking, centang lalu Print terpilih (barcode) atau Print per baris untuk mencetak slip booking dengan barcode dan QR. Relasi: booking adalah pesanan pickup; AWB bisa ditautkan ke booking asalnya. Tab Inbound Booking menampilkan booking yang menuju cabang Anda.",
+
     href: "/bookings",
   },
   {
@@ -130,6 +141,74 @@ export const helpEntries: HelpEntry[] = [
     href: "/finance/debt-payments",
   },
   {
+    id: "scan-awb",
+    title: "Scan AWB (Scan & Konfirmasi)",
+    keywords: [
+      "scan",
+      "scanner",
+      "kamera",
+      "barcode",
+      "update status",
+      "diterima",
+      "retur",
+      "tanda tangan",
+      "progi",
+      "kurir",
+    ],
+    answer:
+      'Fitur ini tersembunyi sampai admin server mengisi FEATURE_AWB_SCAN="true" dan grup Anda diberi hak Scan AWB (Pakai) di Hak Akses Menu. Bila aktif, tombol Scan AWB muncul di daftar AWB. Scan barcode/QR resi dengan scanner genggam, kamera HP (Chrome Android) atau ketik nomor lalu Enter. Muncul data Pengirim, Penerima, Tracking details dan foto/tanda tangan terakhir. Klik Update Status: pilih DITERIMA (nama penerima wajib) atau RETUR, isi keterangan, foto 1–5 dan tanda tangan (opsional, digores di kotak putih). DITERIMA mengubah AWB menjadi Delivered; RETUR tidak mengubah status AWB. Hasilnya ikut tercatat di DRS dan detail AWB. Hanya AWB cabang Anda yang bisa di-scan.',
+    href: "/transactions",
+  },
+  {
+    id: "barcode",
+    title: "Barcode dan QR (AWB, booking, manifest, DRS)",
+    keywords: [
+      "barcode",
+      "qr",
+      "label",
+      "cetak",
+      "print",
+      "koli label",
+      "scan",
+    ],
+    answer:
+      "Resi AWB, slip booking, manifest dan DRS dicetak dengan barcode Code 128 dan QR berisi nomornya, sehingga bisa dibaca scanner genggam, kamera HP atau aplikasi kurir. Cetak AWB dari daftar Transaksi (centang lalu Print terpilih), slip booking dari daftar Booking, manifest dan DRS dari daftar/detail manifest. Label per koli (AWB-1, AWB-2, …) belum tersedia.",
+    href: "/transactions",
+  },
+  {
+    id: "relations",
+    title: "Alur dan relasi antar fitur",
+    keywords: [
+      "alur",
+      "relasi",
+      "hubungan",
+      "proses",
+      "urutan",
+      "flow",
+      "cara kerja",
+    ],
+    answer:
+      "Alur utama: Booking (pesanan pickup) → AWB/Transaksi (bisa ditautkan ke booking; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dibuat dari manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
+  },
+  {
+    id: "access",
+    title: "Hak akses, Akses ditolak dan notifikasi",
+    keywords: [
+      "akses",
+      "hak akses",
+      "ditolak",
+      "izin",
+      "permission",
+      "role",
+      "grup",
+      "notifikasi",
+      "lonceng",
+    ],
+    answer:
+      "Menu dan halaman mengikuti hak grup di Sistem Setting > Hak Akses Menu (kolom Lihat, Tambah, Ubah, Hapus, Setujui, Ajukan, Ekspor, Pakai, dll). Bila hak kurang, halaman menampilkan Akses ditolak beserta hak yang dibutuhkan; data cabang lain tampil sebagai Data tidak ditemukan. Lonceng di kanan atas menunjukkan jumlah Persetujuan Edit/delete AWB dan POD Kembali yang menunggu keputusan Anda (diperbarui tiap pindah halaman dan setiap menit).",
+    href: "/hak-akses-menu",
+  },
+  {
     id: "awb-detail",
     title: "Detail AWB dan barcode",
     keywords: [
@@ -139,9 +218,14 @@ export const helpEntries: HelpEntry[] = [
       "scan",
       "awb detail",
       "riwayat status",
+      "bukti terima",
+      "tanda tangan",
+      "foto penerima",
+      "resi",
     ],
     answer:
-      "Buka AWB dari daftar Transaksi. Halaman detail menampilkan barcode Code 128 dari nomor AWB, semua data pengiriman (cabang, customer, layanan, moda, pembayaran) dan riwayat status. Barcode bisa dipindai alat scanner standar.",
+      "Buka AWB dari daftar Transaksi. Halaman detail menampilkan barcode Code 128 nomor AWB, semua data pengiriman dan harga (format Rupiah), bagian Bukti Terima (POD) berisi hasil antar, nama penerima, keterangan, foto penerima 1–5 dan tanda tangan (dari DRS atau Scan AWB), panel Edit/Hapus AWB (lewat persetujuan) beserta riwayat sebelum → sesudah, dan riwayat status. Print AWB membuka resi di tab baru dengan kop perusahaan, barcode dan QR (biaya tampil bila diizinkan di master Perusahaan).",
+
     href: "/transactions",
   },
   {
@@ -156,7 +240,8 @@ export const helpEntries: HelpEntry[] = [
       "batal",
     ],
     answer:
-      "Di detail AWB, bagian Ubah Status. Urutan yang diizinkan: Open → In Transit → Delivered, atau Open/In Transit → Cancelled. Setiap perubahan tercatat (siapa, kapan, alasan). AWB harus In Transit sebelum hasil antar dicatat Terkirim.",
+      "Di detail AWB, bagian Ubah Status (hanya tampil untuk grup yang punya hak Transaksi: ubah). Urutan yang diizinkan: Open → In Transit → Delivered, atau Open/In Transit → Cancelled. Setiap perubahan tercatat (siapa, kapan, alasan) dan tampil di tracking. Kurir mencatat hasil antar lewat DRS di detail manifest atau lewat Scan AWB (bila diaktifkan); DITERIMA lewat scan otomatis mengubah AWB menjadi Delivered.",
+
     href: "/transactions",
   },
   {
@@ -164,7 +249,8 @@ export const helpEntries: HelpEntry[] = [
     title: "Tracking AWB",
     keywords: ["tracking", "lacak", "cek resi", "cari awb", "lookup"],
     answer:
-      "Gunakan Tracking AWB (Quick Action di Dashboard atau /transactions/lookup). Masukkan nomor AWB untuk melihat status dan riwayatnya, sebatas cabang yang boleh Anda lihat.",
+      "Gunakan Cek Resi (Quick Action di Dashboard atau /transactions/lookup). Masukkan nomor AWB untuk melihat status dan riwayatnya, sebatas cabang yang boleh Anda lihat. Tracking lebih lengkap (input transaksi, masuk manifest, perubahan status, DITERIMA/RETUR beserta foto dan tanda tangan) tampil di Scan AWB setelah AWB di-scan.",
+
     href: "/transactions/lookup",
   },
   {
@@ -201,7 +287,8 @@ export const helpEntries: HelpEntry[] = [
       "bukti terima",
     ],
     answer:
-      "Di detail manifest, bagian Lembar Pengantaran: klik Buat DRS (satu DRS per manifest). Lalu di tabel AWB pilih hasil antar (Terkirim, Gagal, Retur) dan nama penerima, klik Simpan. Foto bukti terima (opsional) diunggah di detail AWB, bagian Bukti Terima (POD), setelah hasil antar dicatat: pilih foto atau buka kamera, foto dikompres ke WebP lalu disimpan di Cloudinary. Foto yang sudah ada tidak bisa diganti. Terkirim mengubah status AWB menjadi Delivered. Hasil Terkirim dan Retur bersifat final.",
+      "Di detail manifest, bagian Lembar Pengantaran: klik Buat DRS (satu DRS per manifest). Lalu di tabel AWB pilih hasil antar (Terkirim, Gagal, Retur) dan nama penerima, klik Simpan. Foto bukti terima (opsional) diunggah di detail AWB, bagian Bukti Terima (POD): pilih foto atau buka kamera, foto dikompres ke WebP lalu disimpan di Cloudinary; foto yang sudah ada tidak bisa diganti. Konfirmasi DITERIMA/RETUR lewat Scan AWB otomatis mengisi hasil antar di DRS yang sama. Cetak manifest/DRS memuat barcode dan QR. Terkirim mengubah status AWB menjadi Delivered; Terkirim dan Retur bersifat final.",
+
     href: "/manifest",
   },
   {
