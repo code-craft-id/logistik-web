@@ -113,6 +113,7 @@ model Courier {
 }
 
 model TransportMode {
+  bookings Booking[] @relation("BookingTransportMode")
   deletedAt        DateTime?         @map("deleted_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
   createdAt        DateTime          @default(now()) @map("created_at")
@@ -143,6 +144,7 @@ model ServiceCategory {
 
 /// Service dictionary only; this is not an operational delivery model.
 model DeliveryService {
+  bookings Booking[] @relation("BookingDeliveryService")
   tariffs Tariff[]
   deletedAt         DateTime?        @map("deleted_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
@@ -163,6 +165,7 @@ model DeliveryService {
 }
 
 model GoodsType {
+  bookings Booking[] @relation("BookingGoodsType")
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
   createdAt DateTime     @default(now()) @map("created_at")
@@ -176,6 +179,7 @@ model GoodsType {
 }
 
 model CostType {
+  bookings Booking[] @relation("BookingCostType")
   customers    Customer[]
   transactions Transaction[]
   deletedAt DateTime?    @map("deleted_at")

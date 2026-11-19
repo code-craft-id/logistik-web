@@ -27,8 +27,8 @@ export type InboundBookingRow = {
 
 /**
  * Inbound Booking: bookings headed to the actor's branches. A booking has
- * only a free-text destination, so it matches when that text equals a branch
- * name (case-insensitive). Bookings stand alone (not linked to AWBs), as in
+ * a Tujuan branch (booking form) or, for older rows, a free-text destination
+ * matched to a branch name (case-insensitive). Bookings stand alone (not linked to AWBs), as in
  * the provider app.
  */
 export async function listInboundBookings(
@@ -55,7 +55,10 @@ export async function listInboundBookings(
     LEFT JOIN branches ob ON ob.id = b.branch_id
     LEFT JOIN LATERAL (
       SELECT x.id, x.name FROM branches x
-      WHERE x.deleted_at IS NULL AND lower(x.name) = lower(trim(b.destination))
+      WHERE x.deleted_at IS NULL
+        AND (x.id = b.destination_branch_id
+             OR (b.destination_branch_id IS NULL
+                 AND lower(x.name) = lower(trim(b.destination))))
       ORDER BY x.id LIMIT 1) db ON TRUE
     LEFT JOIN auth_users u ON u.id = b.created_by_id
     WHERE b.deleted_at IS NULL AND ${scope}

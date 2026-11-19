@@ -81,6 +81,8 @@ export async function createBookingAction(
       return { ok: false, error: "VALIDATION" };
     }
     if (e instanceof Error) {
+      if (e.message.startsWith("VALIDATION_"))
+        return { ok: false, error: "VALIDATION" };
       if (e.message.includes("CONFLICT") || e.message.includes("P2002")) {
         return { ok: false, error: "CONFLICT" };
       }

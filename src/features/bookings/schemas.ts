@@ -63,6 +63,40 @@ export const createBookingSchema = z
     receiverName: z.string().trim().max(150).optional().nullable(),
     doNo: z.string().trim().max(255).optional().nullable(),
     destination: z.string().trim().max(150).optional().nullable(),
+    destinationBranchId: optionalPositiveInt,
+    senderAddress: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    senderPhone: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(30).optional().nullable(),
+    ),
+    consigneeId: optionalPositiveInt,
+    receiverAddress: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    receiverPhone: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(30).optional().nullable(),
+    ),
+    deliveryServiceId: optionalPositiveInt,
+    goodsTypeId: optionalPositiveInt,
+    transportModeId: optionalPositiveInt,
+    costTypeId: optionalPositiveInt,
+    /** Kurir chosen on the form: the booking is assigned right away. */
+    courierId: optionalPositiveInt,
+    description: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    remarks: z.preprocess(
+      emptyToUndefined,
+      z.string().trim().max(500).optional().nullable(),
+    ),
+    pricePerKg: decimalField(13, 2),
+    minWeight: decimalField(8, 2),
     koli: z.preprocess(
       emptyToUndefined,
       z.coerce.number().int().min(0).optional(),

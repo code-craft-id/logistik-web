@@ -63,6 +63,7 @@ model Customer {
 
 /// Approved provider form inventory; branch authorization is PLT-01.
 model Consignee {
+  bookings Booking[] @relation("BookingConsignee")
   transactions Transaction[]
   id         Int          @id @default(autoincrement())
   name       String
@@ -122,6 +123,30 @@ model Booking {
   receiverName  String?       @map("receiver_name")
   doNo          String?       @map("do_no") @db.VarChar(255)
   destination   String?
+  /// Booking form fields as in the provider's Tambah Booking (OBSERVED
+  /// 2026-11-19): same shape as the AWB form without fees/discount/PPN.
+  destinationBranchId Int?             @map("destination_branch_id")
+  destinationBranch   Branch?          @relation("BookingDestinationBranch", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  senderAddress       String?          @map("sender_address") @db.VarChar(500)
+  senderPhone         String?          @map("sender_phone") @db.VarChar(30)
+  consigneeId         Int?             @map("consignee_id")
+  consignee           Consignee?       @relation("BookingConsignee", fields: [consigneeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  receiverAddress     String?          @map("receiver_address") @db.VarChar(500)
+  receiverPhone       String?          @map("receiver_phone") @db.VarChar(30)
+  deliveryServiceId   Int?             @map("delivery_service_id")
+  deliveryService     DeliveryService? @relation("BookingDeliveryService", fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  goodsTypeId         Int?             @map("goods_type_id")
+  goodsType           GoodsType?       @relation("BookingGoodsType", fields: [goodsTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId     Int?             @map("transport_mode_id")
+  transportMode       TransportMode?   @relation("BookingTransportMode", fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  costTypeId          Int?             @map("cost_type_id")
+  costType            CostType?        @relation("BookingCostType", fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  description         String?          @db.VarChar(500)
+  remarks             String?          @db.VarChar(500)
+  chargeableWeight    Decimal?         @map("chargeable_weight") @db.Decimal(10, 2)
+  pricePerKg          Decimal?         @map("price_per_kg") @db.Decimal(15, 2)
+  minWeight           Decimal?         @map("min_weight") @db.Decimal(10, 2)
+  totalCost           Decimal?         @map("total_cost") @db.Decimal(15, 2)
   koli          Int?          @default(0)
   kilo          Decimal?      @db.Decimal(10, 2)
   volume        Decimal?      @db.Decimal(10, 3)
@@ -154,6 +179,7 @@ model Booking {
   @@index([status])
   @@index([bookingDate])
   @@index([courierId])
+  @@index([destinationBranchId])
   @@map("bookings")
 }
 

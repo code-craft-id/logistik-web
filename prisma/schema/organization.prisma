@@ -48,6 +48,7 @@ model Office {
 }
 
 model Branch {
+  bookingsInbound Booking[] @relation("BookingDestinationBranch")
   tariffOrigins Tariff[] @relation("TariffOrigin")
   tariffDestinations Tariff[] @relation("TariffDestination")
   podReturnOrigins PodReturn[] @relation("PodReturnOrigin")

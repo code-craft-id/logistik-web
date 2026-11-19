@@ -112,7 +112,7 @@ async function nextNumber(
       .replace(/[^A-Z0-9]/g, "")
       .slice(0, 10) || `C${branchId}`;
   const yymm = `${String(date.getUTCFullYear()).slice(2)}${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
-  const prefix = kind === "booking" ? `BK${code}${yymm}` : `${code}${yymm}`;
+  const prefix = kind === "booking" ? `B-${code}${yymm}` : `${code}${yymm}`;
   const start = prefix.length + 1;
   const found =
     kind === "booking"
@@ -129,7 +129,11 @@ async function nextNumber(
   return `${prefix}${String((found[0]?.max ?? 0) + 1).padStart(5, "0")}`;
 }
 
-/** Next automatic booking number, e.g. BKJKT261100001. */
+/**
+ * Next automatic booking number, e.g. B-JKT261100001 (the provider shows
+ * B-JKT26485800001: "B-" + branch code + year; its middle digits are not
+ * documented, so YYMM is used as for AWBs).
+ */
 export function nextBookingNo(
   tx: TxClient,
   branchId: number,
@@ -202,6 +206,66 @@ export async function createBooking(
       }
     }
 
+    // Same master rules as Entry AWB: active masters, branch-scoped parties.
+    const scopedParty = isAdministrator(actor)
+      ? {}
+      : { OR: [{ branchId: { in: actor.branchIds } }, { branchId: null }] };
+    if (data.consigneeId) {
+      const found = await tx.consignee.findFirst({
+        where: { id: data.consigneeId, deletedAt: null, ...scopedParty },
+        select: { id: true },
+      });
+      if (!found) throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+    if (data.courierId) {
+      const courier = await tx.courier.findFirst({
+        where: { id: data.courierId, deletedAt: null, status: "ACTIVE" },
+        select: { branchId: true },
+      });
+      if (
+        !courier ||
+        (courier.branchId !== null && courier.branchId !== branchId)
+      )
+        throw new Error("VALIDATION_COURIER_BRANCH");
+    }
+    let destinationName: string | null = data.destination ?? null;
+    if (data.destinationBranchId) {
+      const destination = await tx.branch.findFirst({
+        where: { id: data.destinationBranchId, deletedAt: null },
+        select: { name: true },
+      });
+      if (!destination) throw new Error("VALIDATION_MASTER_NOT_FOUND");
+      // Kept in the free-text column too (Inbound Booking, older rows).
+      destinationName = destination.name;
+    }
+    for (const [id, model] of [
+      [data.transportModeId, tx.transportMode],
+      [data.deliveryServiceId, tx.deliveryService],
+      [data.goodsTypeId, tx.goodsType],
+      [data.costTypeId, tx.costType],
+    ] as const) {
+      if (!id) continue;
+      const found = await (
+        model as unknown as {
+          findFirst: (a: unknown) => Promise<{ id: number } | null>;
+        }
+      ).findFirst({
+        where: { id, deletedAt: null, status: "ACTIVE" },
+        select: { id: true },
+      });
+      if (!found) throw new Error("VALIDATION_MASTER_NOT_FOUND");
+    }
+    // Booking price as on the provider form: Harga/Kg x max(Terberat, Min
+    // KG); "Ganti Harga" keeps the typed Grand Total.
+    const priced = priceAwb({
+      pricingType: "KG",
+      kilo: data.kilo ?? null,
+      volume: data.volume ?? null,
+      pricePerKg: data.pricePerKg ?? null,
+      minWeight: data.minWeight ?? null,
+      biaya: data.biaya ?? null,
+    });
+
     let bookingNo = data.bookingNo?.trim() || null;
     if (!bookingNo && data.autoBookingNo)
       bookingNo = await nextBookingNo(
@@ -226,11 +290,34 @@ export async function createBooking(
         senderName: data.senderName ?? null,
         receiverName: data.receiverName ?? null,
         doNo: data.doNo ?? null,
-        destination: data.destination ?? null,
+        destination: destinationName,
+        destinationBranchId: data.destinationBranchId ?? null,
+        senderAddress: data.senderAddress ?? null,
+        senderPhone: data.senderPhone ?? null,
+        consigneeId: data.consigneeId ?? null,
+        receiverAddress: data.receiverAddress ?? null,
+        receiverPhone: data.receiverPhone ?? null,
+        deliveryServiceId: data.deliveryServiceId ?? null,
+        goodsTypeId: data.goodsTypeId ?? null,
+        transportModeId: data.transportModeId ?? null,
+        costTypeId: data.costTypeId ?? null,
+        description: data.description ?? null,
+        remarks: data.remarks ?? null,
         koli: data.koli ?? null,
         kilo: data.kilo ?? null,
         volume: data.volume ?? null,
-        biaya: data.biaya ?? null,
+        chargeableWeight: priced.chargeableWeight,
+        pricePerKg: data.pricePerKg ?? null,
+        minWeight: data.minWeight ?? null,
+        totalCost: priced.totalCost,
+        biaya: priced.biaya,
+        ...(data.courierId
+          ? {
+              courierId: data.courierId,
+              assignedAt: new Date(),
+              assignedById: actor.id,
+            }
+          : {}),
         createdById: actor.id,
       },
     });

@@ -55,7 +55,12 @@ const QUICK_ACTIONS = [
     action: "create",
     resource: "transaction",
   },
-  { label: "Manifest", href: "/manifest", action: "view", resource: "manifest" },
+  {
+    label: "Manifest",
+    href: "/manifest",
+    action: "view",
+    resource: "manifest",
+  },
   {
     label: "Transit",
     href: "/manifest?type=Transit",

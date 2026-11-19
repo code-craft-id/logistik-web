@@ -40,6 +40,10 @@ export default async function Page({
         },
         include: {
           customer: { select: { name: true } },
+          courier: { select: { name: true } },
+          deliveryService: { select: { name: true } },
+          transportMode: { select: { name: true } },
+          costType: { select: { name: true } },
           branch: {
             select: {
               name: true,
@@ -116,8 +120,29 @@ export default async function Page({
                   [
                     ["Customer", b.customer?.name],
                     ["Pengirim", b.senderName],
+                    [
+                      "Alamat / Telp Pengirim",
+                      [b.senderAddress, b.senderPhone]
+                        .filter(Boolean)
+                        .join(" · ") || null,
+                    ],
                     ["Penerima", b.receiverName],
+                    [
+                      "Alamat / Telp Penerima",
+                      [b.receiverAddress, b.receiverPhone]
+                        .filter(Boolean)
+                        .join(" · ") || null,
+                    ],
                     ["Tujuan", b.destination],
+                    [
+                      "Layanan / Moda",
+                      [b.deliveryService?.name, b.transportMode?.name]
+                        .filter(Boolean)
+                        .join(" · ") || null,
+                    ],
+                    ["Pembayaran", b.costType?.name],
+                    ["Kurir", b.courier?.name],
+                    ["Isi Barang", b.description],
                     ["DO / Reff", b.doNo],
                     ["Koli", b.koli],
                     ["Berat (kg)", b.kilo?.toString()],

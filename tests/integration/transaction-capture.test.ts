@@ -266,8 +266,8 @@ describe("Entry AWB capture fields", () => {
       .replace(/[^A-Z0-9]/g, "")
       .slice(0, 10);
     expect(made.map((b) => b.bookingNo).sort()).toEqual([
-      `BK${code}261100001`,
-      `BK${code}261100002`,
+      `B-${code}261100001`,
+      `B-${code}261100002`,
     ]);
     const typed = await service.createBooking(
       { branchId: ids.branch, bookingNo: `${tag}-BOOK` },
@@ -281,6 +281,69 @@ describe("Entry AWB capture fields", () => {
     ).rejects.toThrow("BOOKING_NO_CONFLICT");
     await db.booking.deleteMany({
       where: { id: { in: [...made.map((b) => b.id), typed.id] } },
+    });
+  });
+
+  it("saves the booking form like the provider: route, masters, price and courier", async () => {
+    const courier = await db.courier.create({
+      data: {
+        name: `${tag} kurir`,
+        address: "-",
+        nationalIdNumber: "1",
+        phone: "1",
+        branchId: ids.branch,
+      },
+    });
+    const otherCourier = await db.courier.create({
+      data: {
+        name: `${tag} kurir lain`,
+        address: "-",
+        nationalIdNumber: "2",
+        phone: "2",
+        branchId: ids.other,
+      },
+    });
+    const destination = await db.branch.findUniqueOrThrow({
+      where: { id: ids.other },
+    });
+    const booking = await service.createBooking(
+      {
+        branchId: ids.branch,
+        autoBookingNo: true,
+        destinationBranchId: ids.other,
+        transportModeId: ids.mode,
+
+        courierId: courier.id,
+        senderAddress: "Jl. Uji 1",
+        receiverPhone: "0812",
+        kilo: "3",
+        volume: "4.5",
+        pricePerKg: "10000",
+        minWeight: "5",
+      },
+      actor([ids.branch]),
+    );
+    expect(booking).toMatchObject({
+      destinationBranchId: ids.other,
+      destination: destination.name,
+      courierId: courier.id,
+      status: "WAITING TO PICKUP",
+      senderAddress: "Jl. Uji 1",
+    });
+    expect(booking.assignedAt).not.toBeNull();
+    // max(4.5, min 5) x 10.000
+    expect(booking.chargeableWeight?.toString()).toBe("4.5");
+    expect(booking.biaya?.toString()).toBe("50000");
+    // Kurir must belong to the booking's origin branch.
+    await expect(
+      service.createBooking(
+        { branchId: ids.branch, courierId: otherCourier.id },
+        actor([ids.branch]),
+      ),
+    ).rejects.toThrow("VALIDATION_COURIER_BRANCH");
+    await db.booking.deleteMany({ where: { id: booking.id } });
+    await db.courier.deleteMany({
+      where: { id: { in: [courier.id, otherCourier.id] } },
     });
   });
 });
