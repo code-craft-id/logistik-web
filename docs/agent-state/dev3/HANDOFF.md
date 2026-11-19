@@ -1,3 +1,9 @@
+## Latest checkpoint: remaining Modul items, Entry AWB parity (2026-11-19, later)
+
+At owner direction: Persetujuan Edit/delete AWB, Cek Ongkir (tariffs), Inbound Booking, Cek Inbound Agen, POD Kembali + approval, Pembayaran Hutang (register only, no journal), Tambah AWB with legacy inputs, automatic AWB numbering and server pricing, tabs for identical lists, header approval bell, realistic demo seed (JKT/BDG, 2 per feature). Two new migrations (audit §16) need migration coordinator and Dev 2 review; pricing formula and debt-payment accounting need finance confirmation; Tujuan by area waits on D-27. Release NOT READY.
+
+---
+
 ## Latest checkpoint: Modul parity, printing, UX (2026-11-19)
 
 At user direction (pushed to PR #11): Modul menu mirrors the reference (audit §15) with Pendapatan Pelanggan, Void AWB, Histori Resi, manifest type filters; print tab without shell (AWB barcode + QR via pinned qrcode 1.5.4, bulk select print for AWB/manifest/DRS); searchable dropdowns; finance branch/account pickers; popover token fix; row numbers; info tips; clearer messages; branch ID in personnel import; help chat 10-minute history. Six reference items remain unbuilt (approvals, Cek Ongkir, Inbound Booking, Cek Inbound Agen, Pembayaran Hutang) pending decisions. Gates: lint 479, typecheck, unit 699, integration 163, build PASS. Release NOT READY (same blockers).

@@ -928,3 +928,29 @@ Legacy observed read-only: Pendapatan Pelanggan (`revenue-customer`: No., List P
 | Pembayaran Hutang | not built | Supplier settlement out of scope (owner NOT NEEDED) |
 
 Also: searchable dropdowns (ComboSelect over a native select), branch pickers instead of raw IDs in finance, popover token fix, print route group without shell (auto print dialog, `?preview=1`), QR backup (qrcode 1.5.4), bulk print, row numbers, info tips for long explanations, clearer messages, personnel import accepts branch ID. Gates (Node 24.15.0): lint 479, typecheck, unit 699, integration 163, build PASS.
+
+### 16. Remaining Modul items, Entry AWB parity, tabs — 2026-11-19 (later)
+
+Built at the owner's direction ("kerjakan aja semua, aku setuju"). Legacy pages observed read-only (no form submitted): `approve-modified-awb`, `cek-ongkir`, `inbound-booking`, `cek-inbound-agen`, `stt-kembali-operational`, `approval-pod-kembali`, `debt-payments`, `on-site-add`, `on-site-inbound`, `on-site-add/tambah` (form opened, closed without saving), `destination-branch`.
+
+| Reference item | LMS | Notes / simplification |
+|---|---|---|
+| Persetujuan Edit/delete AWB | `/transactions/approvals` + panel on AWB detail | Request with reason; approver may not approve own request (admin may). Approved DELETE soft-deletes the AWB, refused while it is on an active manifest, DRS, invoice, journal, POD Kembali or vendor invoice. Approved EDIT opens a one-time edit (names, address, phone, DO, koli, berat, volume, biaya, isi, keterangan); koli/berat/volume/biaya locked once invoiced or journaled. Diff kept and shown in Histori Edit Resi. |
+| Cek Ongkir | `/customer-service/cek-ongkir` | New `tariffs` table (route, service, Berat Min., Tarif/Kg, Estimasi). Tarif = max(berat, min) x Tarif/Kg. Legacy origin/destination are area-level (kecamatan); LMS uses branches until the D-27 area hierarchy exists. |
+| Inbound Booking | `/bookings?tab=inbound` | Booking destination is free text: matched to a branch name, or via an AWB of the booking. |
+| Cek Inbound Agen | `/manifest?view=agent` | Manifests with an agent/vendor, filter Tujuan. Biaya total column not shown. |
+| POD Kembali / Approval Pod Kembali | `/pod-returns` (tabs) | New `pod_returns` + items. Only Delivered AWBs; one AWB per non-rejected document; number POD-YYYYMMDD-NNNN; only the destination branch decides. Legacy "Shipment Status" filter in the form not built. |
+| Pembayaran Hutang | `/finance/debt-payments` | New `vendor_bills` + items register (Kategori Vendor/Agen/Lainnya, term, reminder, Tandai Lunas). **No journal posting**; accounting treatment remains a finance decision. Owner earlier said NOT NEEDED; built now at owner's direction. |
+| On Site Outbound / Inbound | `/transactions` tabs | AWB list by origin / destination branch, search AWB/DO. |
+| Tambah AWB | `/transactions/new` | Mirrors legacy inputs: automatic AWB number (branch code + YYMM + 5-digit sequence, "Manual AWB" switch), Pricing Type (Harga/Kg, Harga/Koli, Trucking), Pickup By (courier "Nama \| Kota"), Asal/Tujuan "Kode \| Nama", Marketing, sender/receiver address and phone, Penerima picker, Terberat, Harga/Min KG (prefilled from tariff), Asuransi Y/N (stored only), Biaya Lain/Packing/Pickup, Discount, PPN, Grand Total, Ganti Harga. Server recomputes with Decimal: freight + fees, minus discount, plus PPN on the discounted amount, half-up to 2 dp; Grand Total stored as `biaya`. **Formula is OBSERVED, needs finance confirmation.** Tujuan in legacy is an area (kecamatan, kota) filtered by origin; LMS uses branches (D-27). Per-koli "Detail" dimensions not built. |
+
+Menu: Modul labels now match the reference text (e.g. "Persetujuan Edit/delete AWB", "Void Awb", "Approval Pod Kembali", "Invoice (New)"); identical list pages are merged into one page with tabs (Transaksi, Booking, Manifest, POD Kembali). Header bell shows pending approval counts (refresh on navigation and every 60 s; no websocket).
+
+Migrations: `20261119000100_modul_workflows` (6 tables + CHECKs), `20261119000200_awb_entry_detail` (nullable transaction columns + CHECKs). Verified by deploying all migrations to an empty database and diffing against the schema: only the known Dev 2 `updated_at` default drift remains. New permissions: `awb_change` (view/request/approve), `tariff` (view/manage), `pod_return` (view/create/approve), `debt_payment` (view/create/close).
+
+Follow-ups in the same pass:
+
+- AWB No. is one editable input pre-filled with the origin branch's next number; unchanged = number assigned under a branch lock at save (two users never get the same number), changed = manual number.
+- Concurrency (several administrators): decisions lock the request row and require PENDING (second decision gets "sudah diputuskan"); tariff save, POD and vendor-invoice numbering use transaction-scoped advisory locks; AWB rows are locked in id order; manifest assignment and vendor invoices lock the AWB against an approved delete (finance already uses FOR SHARE). Covered by concurrent integration tests.
+- AWB detail shows the request and change history (before → after per field, who, when, reason).
+- AWB print header: company name/address/phone from the origin branch's company, title "RESI PENGIRIMAN (AWB)" instead of "AIR WAYBILL"; Biaya printed only when the company's "show price on print" flag is on. Legacy print layout not observed (opening it triggers the browser print dialog).

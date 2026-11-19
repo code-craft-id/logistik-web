@@ -683,3 +683,6 @@ Manifest/DRS UI, capture fields migration, Customer/Penerima, barcode, ten repor
 
 ## 2026-11-19 — Modul parity, printing, UX pass
 Pendapatan Pelanggan, Modul menu mirror, print tab with QR and bulk print, ComboSelect, finance pickers, row numbers, info tips, message review, import branch ID. Gates lint479/typecheck/unit699/integration163/build PASS. Pushed to PR #11.
+
+## 2026-11-19 — Remaining Modul items and Entry AWB parity
+Legacy observed read-only (forms opened, never submitted). Built approvals, tariffs/Cek Ongkir, Inbound Booking, Inbound Agen, POD Kembali, Pembayaran Hutang, Entry AWB inputs with auto numbering and Decimal pricing, list tabs, approval bell, realistic demo seed. Migrations 20261119000100/000200 applied to dev and test; fresh-database deploy verified. Fixed an auto-number bug (substring FROM param typed as text = regex) found by a concurrency test. A drift line was briefly included and applied locally, then removed and the default restored.
