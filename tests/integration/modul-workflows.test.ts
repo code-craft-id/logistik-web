@@ -41,7 +41,7 @@ const all = [
   ["booking", ["view"]],
   ["awb_scan", ["use"]],
   ["booking", ["view", "approve"]],
-  ["transaction", ["view"]],
+  ["transaction", ["view", "update"]],
   ["transaction_report", ["view", "export"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
@@ -859,5 +859,74 @@ describe("Rekap Transaksi", () => {
       data: { costTypeId: null },
     });
     await db.costType.deleteMany({ where: { id: { in: created } } });
+  });
+});
+
+describe("Import Status Excel", () => {
+  it("checks every row, applies DITERIMA/RETUR rows and skips the rest", async () => {
+    const imp = await import(
+      "../../src/features/shipments/server/status-import"
+    );
+    const XLSX = await import("xlsx");
+    const ok = await awb("IMP1");
+    const retur = await awb("IMP2", "In Transit");
+    const odd = await awb("IMP3");
+    const sheet = XLSX.utils.aoa_to_sheet([
+      imp.IMPORT_HEADERS,
+      [`${tag}-imp1`, "2026-11-18", "Ryan", 2, "Sudah diterima dengan baik"],
+      [`${tag}-IMP2`, "2026-11-18", "", "001", "Alamat tidak ditemukan"],
+      [`${tag}-IMP3`, "2026-11-18", "Budi", 7, ""],
+      [`${tag}-NOPE`, "2026-11-18", "Budi", 2, ""],
+      [`${tag}-IMP1`, "2026-11-18", "Ryan", 2, ""],
+      [`${tag}-IMP3`, "2999-01-01", "Budi", 2, ""],
+    ]);
+    const book = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book, sheet, "Import Status");
+    const bytes = new Uint8Array(
+      XLSX.write(book, { type: "buffer", bookType: "xlsx" }) as Buffer,
+    );
+    const parsed = imp.parseStatusFile(bytes, "status.xlsx");
+    const inA = actor(ids.approver, [ids.a]);
+    const preview = await imp.checkStatusRows(inA, parsed);
+    expect(preview.map((r) => r.error === null)).toEqual([
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect(preview[2].error).toContain("belum didukung");
+    expect(preview[3].error).toContain("tidak ditemukan");
+    expect(preview[4].error).toContain("baris sebelumnya");
+    // Preview writes nothing.
+    expect(
+      (await db.transaction.findUniqueOrThrow({ where: { id: ok.id } })).status,
+    ).toBe("Open");
+    const applied = await imp.applyStatusRows(inA, parsed);
+    expect(applied.filter((r) => r.applied).map((r) => r.line)).toEqual([2, 3]);
+    expect(
+      (await db.transaction.findUniqueOrThrow({ where: { id: ok.id } })).status,
+    ).toBe("Delivered");
+    const proof = await db.deliveryProof.findFirstOrThrow({
+      where: { transactionId: ok.id },
+    });
+    expect(proof).toMatchObject({ outcome: "DELIVERED", receiverName: "Ryan" });
+    expect(proof.createdAt.toISOString().slice(0, 10)).toBe("2026-11-18");
+    expect(
+      (await db.transaction.findUniqueOrThrow({ where: { id: retur.id } }))
+        .status,
+    ).toBe("In Transit");
+    expect(
+      (await db.transaction.findUniqueOrThrow({ where: { id: odd.id } }))
+        .status,
+    ).toBe("Open");
+    // Wrong header or file type is refused before any row is read.
+    expect(() =>
+      imp.parseStatusFile(new TextEncoder().encode("a,b\n1,2"), "x.csv"),
+    ).toThrow("Kolom harus persis");
+    expect(() =>
+      imp.parseStatusFile(new Uint8Array([1, 2, 3]), "x.png"),
+    ).toThrow("file Excel");
   });
 });

@@ -278,64 +278,86 @@ export async function recordProof(
     );
   const data = parsed.data;
   if (uploads.photos.length > 5) throw new ModulError("Maksimal 5 foto.");
-  return prisma.$transaction(async (tx) => {
-    await lockRow(tx, "transactions", data.transactionId);
-    const t = await tx.transaction.findFirst({
-      where: {
-        id: data.transactionId,
-        deletedAt: null,
-        ...transactionScope(actor),
-      },
-      select: { id: true, status: true },
-    });
-    if (!t)
-      throw new ModulError("AWB tidak ditemukan atau bukan milik cabang Anda.");
-    checkOutcome(t.status, data.outcome);
-    if (data.outcome === "DELIVERED") {
-      const steps =
-        t.status === "Open" ? ["In Transit", "Delivered"] : ["Delivered"];
-      let prior = t.status;
-      for (const next of steps) {
-        if (!(ALLOWED_TRANSITIONS[prior] ?? []).includes(next))
-          throw new ModulError(`Status ${prior} tidak bisa diubah ke ${next}.`);
-        await tx.transaction.update({
-          where: { id: t.id },
-          data: { status: next },
-        });
-        await tx.transactionStatusHistory.create({
-          data: {
-            transactionId: t.id,
-            priorStatus: prior,
-            newStatus: next,
-            reason: "Scan AWB",
-            actorId: actor.id,
-          },
-        });
-        prior = next;
-      }
-    }
-    const proof = await tx.deliveryProof.create({
-      data: {
-        transactionId: t.id,
-        outcome: data.outcome,
-        receiverName: data.receiverName || null,
-        notes: data.notes || null,
-        signatureUrl: uploads.signature?.url ?? null,
-        signaturePublicId: uploads.signature?.publicId ?? null,
-        createdById: actor.id,
-        photos: {
-          create: uploads.photos.map((p, index) => ({
-            position: index + 1,
-            url: p.url,
-            publicId: p.publicId,
-          })),
-        },
-      },
-      select: { id: true },
-    });
-    await syncDeliverySheet(tx, t.id, data);
-    return proof;
+  return prisma.$transaction((tx) =>
+    writeProof(tx, actor, data, uploads, { reason: "Scan AWB" }),
+  );
+}
+
+/**
+ * Shared by Scan & Konfirmasi and the status import: lock the AWB, check
+ * the outcome, move DITERIMA to Delivered (through In Transit when Open)
+ * with history, create the proof and mirror the open DRS line.
+ * `receivedAt` (import "Date") becomes the proof time.
+ */
+export async function writeProof(
+  tx: Prisma.TransactionClient,
+  actor: AccessActor,
+  data: {
+    transactionId: number;
+    outcome: "DELIVERED" | "RETURNED";
+    receiverName?: string;
+    notes?: string;
+  },
+  uploads: { photos: UploadedImage[]; signature?: UploadedImage },
+  meta: { reason: string; receivedAt?: Date },
+) {
+  await lockRow(tx, "transactions", data.transactionId);
+  const t = await tx.transaction.findFirst({
+    where: {
+      id: data.transactionId,
+      deletedAt: null,
+      ...transactionScope(actor),
+    },
+    select: { id: true, status: true },
   });
+  if (!t)
+    throw new ModulError("AWB tidak ditemukan atau bukan milik cabang Anda.");
+  checkOutcome(t.status, data.outcome);
+  if (data.outcome === "DELIVERED") {
+    const steps =
+      t.status === "Open" ? ["In Transit", "Delivered"] : ["Delivered"];
+    let prior = t.status;
+    for (const next of steps) {
+      if (!(ALLOWED_TRANSITIONS[prior] ?? []).includes(next))
+        throw new ModulError(`Status ${prior} tidak bisa diubah ke ${next}.`);
+      await tx.transaction.update({
+        where: { id: t.id },
+        data: { status: next },
+      });
+      await tx.transactionStatusHistory.create({
+        data: {
+          transactionId: t.id,
+          priorStatus: prior,
+          newStatus: next,
+          reason: meta.reason,
+          actorId: actor.id,
+        },
+      });
+      prior = next;
+    }
+  }
+  const proof = await tx.deliveryProof.create({
+    data: {
+      transactionId: t.id,
+      outcome: data.outcome,
+      receiverName: data.receiverName || null,
+      notes: data.notes || null,
+      signatureUrl: uploads.signature?.url ?? null,
+      signaturePublicId: uploads.signature?.publicId ?? null,
+      createdById: actor.id,
+      ...(meta.receivedAt ? { createdAt: meta.receivedAt } : {}),
+      photos: {
+        create: uploads.photos.map((p, index) => ({
+          position: index + 1,
+          url: p.url,
+          publicId: p.publicId,
+        })),
+      },
+    },
+    select: { id: true },
+  });
+  await syncDeliverySheet(tx, t.id, data, meta.receivedAt);
+  return proof;
 }
 
 /** Mirror the outcome on the AWB's open delivery sheet line, if any. */
@@ -347,6 +369,7 @@ async function syncDeliverySheet(
     receiverName?: string;
     notes?: string;
   },
+  receivedAt?: Date,
 ) {
   const active = await tx.manifestItem.findFirst({
     where: {
@@ -365,7 +388,8 @@ async function syncDeliverySheet(
     outcome: data.outcome,
     receivedBy: data.receiverName || null,
     notes: data.notes || null,
-    deliveredAt: data.outcome === "DELIVERED" ? new Date() : null,
+    deliveredAt:
+      data.outcome === "DELIVERED" ? (receivedAt ?? new Date()) : null,
   };
   const line = await tx.deliverySheetItem.findUnique({
     where: {

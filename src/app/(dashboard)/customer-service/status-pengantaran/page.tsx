@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
+import { StatusImportDialog } from "@/features/shipments/components/status-import-dialog";
 import { listShipmentStatus } from "@/features/shipments/server/status-list";
 import { requirePagePermission } from "@/lib/auth/page-access";
 
@@ -106,7 +107,19 @@ export default async function Page({
         className="min-w-0 rounded-lg border bg-background"
       >
         <div className="flex flex-wrap items-center justify-between gap-2 border-b p-3 text-sm">
-          <h2 className="font-medium">Daftar Status Pengiriman</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-medium">Daftar Status Pengiriman</h2>
+            {canUpdate && (
+              <>
+                <Button asChild variant="outline" className="min-h-11">
+                  <a href="/customer-service/status-pengantaran/template">
+                    Template Import
+                  </a>
+                </Button>
+                <StatusImportDialog />
+              </>
+            )}
+          </div>
           <span className="text-muted-foreground">
             {data.total.toLocaleString("id-ID")} AWB · halaman {data.page} dari{" "}
             {data.pages}
