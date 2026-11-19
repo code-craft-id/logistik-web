@@ -726,3 +726,10 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Migrations 20261119000800 (invoice handover) and 000900 (account structure) applied to dev and test.
 - Gates: lint 550 files, typecheck, unit 715, integration 189, build PASS.
 - Not done: Perkiraan Excel import/export, "Operator Rugi Laba" (replaced by kind sign), Acc. In / Transit Date, Dimensi (need provider screenshots).
+
+## 2026-11-20 — Dimensi and koli scans (HEAD f9575b7)
+- Provider observed read-only: Dimensi popup (per koli P/L/T/berat/packing), Master Moda dividers (DARAT 4000, UDARA 6000, LAUT 1000000), Cek Transit detail (scan AWB/Koli, Scan/Sisa Koli, Pindah Manifest).
+- Built (owner-approved): Dimensi on AWB and booking forms (D-26 DRAFT guard kept, Dev 2 review); koli scan pages for transit/inbound with User Transit, Transit Date, Acc. In (D-05, Dev 2 review); migration 20261119001000.
+- Pindah Manifest NOT built: ManifestItem unique per AWB (D-08, Dev 2 guard "Do not relax").
+- Process note: one push (7f23bee) went out with a failing SCH-01 unit test; fixed in 701379b. Commits now run only after the gates pass.
+- Gates: lint 556 files, typecheck, unit 717, integration 190, build PASS.
