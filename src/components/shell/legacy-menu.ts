@@ -157,6 +157,10 @@ export const legacyMenu = [
             href: "/branch-reports/transaction-details",
           },
           {
+            label: "Rekap Transaksi",
+            href: "/branch-reports/rekap-transaksi",
+          },
+          {
             label: "Manifest Outbound",
             href: "/branch-reports/manifest-outbound",
           },

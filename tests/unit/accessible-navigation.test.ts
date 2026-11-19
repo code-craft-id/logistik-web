@@ -99,6 +99,7 @@ describe("available navigation", () => {
     ]);
     expect(hrefs(["transaction_report"])).toEqual([
       "/branch-reports/transaction-details",
+      "/branch-reports/rekap-transaksi",
       "/branch-reports/awb",
       "/branch-reports/customer-monthly-summary",
       "/branch-reports/daily-turnover-summary",

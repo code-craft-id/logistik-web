@@ -109,6 +109,12 @@ const QUICK_ACTIONS = [
     action: "view",
     resource: "transaction_report",
   },
+  {
+    label: "Rekap Transaksi",
+    href: "/branch-reports/rekap-transaksi",
+    action: "view",
+    resource: "transaction_report",
+  },
 ] as const;
 function quickActions(actor: AccessActor) {
   return QUICK_ACTIONS.filter((item) =>

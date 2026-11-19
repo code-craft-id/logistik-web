@@ -42,6 +42,7 @@ const all = [
   ["awb_scan", ["use"]],
   ["booking", ["view", "approve"]],
   ["transaction", ["view"]],
+  ["transaction_report", ["view", "export"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -756,5 +757,107 @@ describe("Kelola Status Pengiriman", () => {
     ).toBe(0);
     await db.deliveryProof.deleteMany({ where: { transactionId: done.id } });
     await db.branch.delete({ where: { id: stranger.id } });
+  });
+});
+
+describe("Rekap Transaksi", () => {
+  it("groups a month per day and destination like the provider export", async () => {
+    const recap = await import("../../src/features/reports/recap/server/recap");
+    const XLSX = await import("xlsx");
+    const created: number[] = [];
+    const costType = async (name: string) => {
+      const found = await db.costType.findFirst({
+        where: { name, deletedAt: null },
+      });
+      if (found) return found.id;
+      const made = await db.costType.create({ data: { name } });
+      created.push(made.id);
+      return made.id;
+    };
+    const cash = await costType("CASH");
+    const cod = await costType("COD");
+    const make = async (suffix: string, day: string, data: object) => {
+      const t = await awb(suffix);
+      await db.transaction.update({
+        where: { id: t.id },
+        data: { transactionDate: new Date(`${day}T03:00:00Z`), ...data },
+      });
+      return t;
+    };
+    await make("RK1", "2026-03-02", {
+      costTypeId: cash,
+      biaya: "10000",
+      koli: 2,
+    });
+    await make("RK2", "2026-03-02", { costTypeId: cod, biaya: "5000" });
+    // Voided AWB: its day still gets a sheet, with zero totals.
+    await make("RK3", "2026-03-03", { deletedAt: new Date() });
+    await make("RK4", "2026-04-01", {});
+    const result = await recap.recapTransactions(actor(ids.approver, [ids.a]), {
+      month: "3",
+      year: "2026",
+      branchId: String(ids.a),
+    });
+    expect(result.days.map((d) => d.day)).toEqual(["2026-03-02", "2026-03-03"]);
+    expect(result.days[0].total).toMatchObject({
+      awb: 2,
+      koli: 3,
+      kilo: 4,
+      cash: 10000,
+      cod: 5000,
+      kredit: 0,
+    });
+    expect(result.days[1].total.awb).toBe(0);
+    // Another branch is refused.
+    await expect(
+      recap.recapTransactions(actor(ids.approver, [ids.b]), {
+        month: "3",
+        year: "2026",
+        branchId: String(ids.a),
+      }),
+    ).rejects.toThrow();
+    const book = XLSX.read(recap.recapWorkbook(result));
+    expect(book.SheetNames).toEqual(["2026-03-02", "2026-03-03"]);
+    const rows = XLSX.utils.sheet_to_json<string[]>(book.Sheets["2026-03-02"], {
+      header: 1,
+      defval: "",
+    });
+    expect(rows[1][1]).toBe("Rekap Transaksi");
+    expect(rows[2][1]).toBe(`Cabang : ${tag}A`);
+    expect(rows[4].slice(1)).toEqual([
+      "No.",
+      "Cabang Tujuan",
+      "Total AWB",
+      "Total Koli",
+      "Total Berat",
+      "Total Volume",
+      "CASH",
+      "KREDIT",
+      "COD",
+      "Total Penagihan",
+    ]);
+    expect(rows.at(-1)?.slice(2)).toEqual([
+      "TOTAL",
+      2,
+      3,
+      4,
+      0,
+      10000,
+      0,
+      5000,
+      15000,
+    ]);
+    const one = XLSX.read(
+      recap.recapWorkbook({
+        ...result,
+        input: { ...result.input, sheet: "one" },
+      }),
+    );
+    expect(one.SheetNames).toEqual(["Rekap Transaksi"]);
+    await db.transaction.updateMany({
+      where: { id: { in: ids.tx } },
+      data: { costTypeId: null },
+    });
+    await db.costType.deleteMany({ where: { id: { in: created } } });
   });
 });

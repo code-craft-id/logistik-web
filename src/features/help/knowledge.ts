@@ -25,7 +25,7 @@ export const helpEntries: HelpEntry[] = [
       "pending",
     ],
     answer:
-      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi) dan hanya menampilkan menu yang boleh Anda buka.",
+      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi, Rekap Transaksi) dan hanya menampilkan menu yang boleh Anda buka.",
     href: "/dashboard",
   },
   {
@@ -59,6 +59,22 @@ export const helpEntries: HelpEntry[] = [
     answer:
       "Modul > Layanan Pelanggan > Status Pengantaran (juga Quick Action Shipment Status) menampilkan semua AWB dari/ke cabang Anda: AWB, tanggal, asal, tujuan, pengirim, layanan, status, penerima, diterima oleh, tanggal diterima, lead time (L.Time, hari) dan SLA. Cari dengan AWB, DO, nama pengirim atau penerima dan saring per status; 50 baris per halaman. SLA berisi In Progress sampai kiriman diterima, lalu Selesai (aturan tepat waktu/terlambat belum ditetapkan). Tombol Ubah membuka detail AWB untuk mengubah status (hak Transaksi: ubah); bukti terima dari kurir masuk lewat Scan AWB. Data diterima diambil dari bukti terima Scan atau dari lembar pengantaran (DRS). Import status dari Excel belum tersedia.",
     href: "/customer-service/status-pengantaran",
+  },
+  {
+    id: "rekap-transaksi",
+    title: "Rekap Transaksi (Excel)",
+    keywords: [
+      "rekap transaksi",
+      "rekap",
+      "excel",
+      "ekspor",
+      "multiple sheet",
+      "one sheet",
+      "penagihan",
+    ],
+    answer:
+      "Laporan > Laporan Cabang > Rekap Transaksi (juga Quick Action). Pilih Bulan, Tahun, Cabang asal dan Jenis Lembar lalu Ekspor Excel. Multiple Sheet = satu sheet per tanggal (nama sheet YYYY-MM-DD), One Sheet = semua tanggal dalam satu sheet plus TOTAL BULAN. Tiap tanggal berisi baris per Cabang Tujuan: Total AWB, Total Koli, Total Berat, Total Volume, CASH, KREDIT, COD (Grand Total AWB menurut jenis pembayaran) dan Total Penagihan (CASH + KREDIT + COD), ditutup baris TOTAL. Tanggal yang AWB-nya semuanya di-void tetap punya sheet dengan total 0, seperti di aplikasi lama. Membuka halaman butuh hak Laporan Transaksi: lihat; mengunduh butuh hak ekspor.",
+    href: "/branch-reports/rekap-transaksi",
   },
   {
     id: "booking",

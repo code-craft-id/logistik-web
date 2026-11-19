@@ -40,6 +40,7 @@ const routeResources: Record<string, readonly string[]> = {
   "/transactions/scan": ["awb_scan"],
   "/customer-service/cek-ongkir": ["tariff"],
   "/customer-service/status-pengantaran": ["transaction"],
+  "/branch-reports/rekap-transaksi": ["transaction_report"],
   "/pod-returns": ["pod_return"],
   "/finance/debt-payments": ["debt_payment"],
   "/manifest": ["manifest"],
