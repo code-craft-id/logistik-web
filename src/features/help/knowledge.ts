@@ -265,7 +265,7 @@ export const helpEntries: HelpEntry[] = [
     title: "Tracking AWB",
     keywords: ["tracking", "lacak", "cek resi", "cari awb", "lookup"],
     answer:
-      "Gunakan Cek Resi (Quick Action di Dashboard atau /transactions/lookup). Masukkan nomor AWB untuk melihat status dan riwayatnya, sebatas cabang yang boleh Anda lihat. Tracking lebih lengkap (input transaksi, masuk manifest, perubahan status, DITERIMA/RETUR beserta foto dan tanda tangan) tampil di Scan AWB setelah AWB di-scan.",
+      "Gunakan Tracking AWB (Quick Action di Dashboard atau Cek Resi). Cari dengan No. AWB (label koli AWB-n juga bisa) atau No. DO; bila ada beberapa hasil, pilih salah satu. Hasilnya seperti di aplikasi lama: AWB, DO, pengirim/penerima dan alamatnya, asal/tujuan, layanan, moda, koli, kilo, No. Manifest, Driver (kurir manifest dan nopol), No. DRS, No. Invoice, tanggal diterima, diterima oleh, lead time (hari dari tanggal AWB sampai diterima), catatan AWB, Foto dan Foto II bukti terima, serta Tracking Details (input, masuk manifest, perubahan status, DITERIMA/RETUR). Hanya AWB dari/ke cabang Anda yang tampil.",
 
     href: "/transactions/lookup",
   },

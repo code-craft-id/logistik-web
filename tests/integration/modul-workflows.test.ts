@@ -41,6 +41,7 @@ const all = [
   ["booking", ["view"]],
   ["awb_scan", ["use"]],
   ["booking", ["view", "approve"]],
+  ["transaction", ["view"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -649,5 +650,56 @@ describe("Booking pickup (berdiri sendiri)", () => {
     expect((await pickup.scanBooking(adminA, `${tag}-BK2`))?.blocked).toBe(
       "Booking sudah dibatalkan.",
     );
+  });
+});
+
+describe("Tracking AWB", () => {
+  it("finds AWBs by AWB No., koli label or DO and builds the tracking card", async () => {
+    const tracking = await import(
+      "../../src/features/shipments/server/tracking"
+    );
+    const t = await awb("TRK1");
+    await db.transaction.update({
+      where: { id: t.id },
+      data: { doNo: `${tag}-DO1 ${tag}-DO2`, remarks: "Fragile" },
+    });
+    const inA = actor(ids.approver, [ids.a]);
+    const byAwb = await tracking.searchTracking(inA, {
+      awb: `${tag}-trk1`,
+    });
+    expect(byAwb.map((x) => x.id)).toEqual([t.id]);
+    expect(
+      (await tracking.searchTracking(inA, { awb: `${tag}-TRK1-1` })).map(
+        (x) => x.id,
+      ),
+    ).toEqual([t.id]);
+    expect(
+      (await tracking.searchTracking(inA, { doNo: `${tag}-DO2` })).map(
+        (x) => x.id,
+      ),
+    ).toEqual([t.id]);
+    // Outside the actor's branches: nothing.
+    const stranger = await db.branch.create({
+      data: {
+        officeId: ids.office,
+        name: `${tag}X`,
+        code: `${tag}X`,
+        status: "ACTIVE",
+      },
+    });
+    const other = actor(ids.approver, [stranger.id]);
+    expect(
+      await tracking.searchTracking(other, { awb: `${tag}-TRK1` }),
+    ).toEqual([]);
+    expect(await tracking.trackingDetail(other, t.id)).toBeNull();
+    const card = await tracking.trackingDetail(inA, t.id);
+    expect(card).toMatchObject({
+      awbNo: `${tag}-TRK1`,
+      remarks: "Fragile",
+      receivedAt: null,
+      leadTimeDays: null,
+      photos: [],
+    });
+    await db.branch.delete({ where: { id: stranger.id } });
   });
 });
