@@ -30,6 +30,7 @@ type Modules = {
   pod: typeof import("../../src/features/modul/server/pod-returns");
   bills: typeof import("../../src/features/modul/server/vendor-bills");
   inbound: typeof import("../../src/features/modul/server/inbound");
+  scan: typeof import("../../src/features/modul/server/scan");
 };
 let m: Modules;
 const all = [
@@ -38,6 +39,7 @@ const all = [
   ["pod_return", ["view", "create", "approve"]],
   ["debt_payment", ["view", "create", "close"]],
   ["booking", ["view"]],
+  ["awb_scan", ["use"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -76,6 +78,7 @@ beforeAll(async () => {
     pod: await import("../../src/features/modul/server/pod-returns"),
     bills: await import("../../src/features/modul/server/vendor-bills"),
     inbound: await import("../../src/features/modul/server/inbound"),
+    scan: await import("../../src/features/modul/server/scan"),
   };
   ids.company = (
     await db.company.create({
@@ -144,6 +147,9 @@ afterAll(async () => {
     where: { originBranchId: { in: [ids.a, ids.b] } },
   });
   await db.booking.deleteMany({ where: { bookingNo: { startsWith: tag } } });
+  await db.transactionStatusHistory.deleteMany({
+    where: { transactionId: { in: ids.tx } },
+  });
   await db.transaction.deleteMany({ where: { id: { in: ids.tx } } });
   await db.vendor.deleteMany({ where: { id: ids.vendor } });
   await db.user.deleteMany({
@@ -413,5 +419,68 @@ describe("Inbound Booking", () => {
       },
     );
     expect(rows.map((r) => r.booking_no)).toEqual([`${tag}-in`]);
+  });
+});
+
+describe("Scan AWB", () => {
+  it("updates status by scan within the branch and the allowed transitions", async () => {
+    const t = await awb("scan");
+    const courier = actor(ids.approver, [ids.a]);
+    const code = `${tag}-scan`.toLowerCase();
+    const first = await m.scan.scanAwb(courier, {
+      awbNo: code,
+      status: "In Transit",
+    });
+    expect(first).toMatchObject({ ok: true, message: "Open → In Transit" });
+    const again = await m.scan.scanAwb(courier, {
+      awbNo: code,
+      status: "In Transit",
+    });
+    expect(again).toMatchObject({
+      ok: true,
+      message: "Sudah berstatus In Transit.",
+    });
+    expect(
+      await m.scan.scanAwb(courier, { awbNo: code, status: "Delivered" }),
+    ).toMatchObject({ ok: true });
+    // Delivered is final.
+    expect(
+      await m.scan.scanAwb(courier, { awbNo: code, status: "In Transit" }),
+    ).toMatchObject({ ok: false });
+    const history = await db.transactionStatusHistory.findMany({
+      where: { transactionId: t.id },
+      orderBy: { id: "asc" },
+    });
+    expect(history.map((h) => [h.newStatus, h.reason])).toEqual([
+      ["In Transit", "Scan AWB"],
+      ["Delivered", "Scan AWB"],
+    ]);
+  });
+
+  it("refuses other branches, unknown numbers and users without the right", async () => {
+    await awb("scan2");
+    expect(
+      await m.scan.scanAwb(actor(ids.approver, [ids.vendor + 999_999]), {
+        awbNo: `${tag}-scan2`,
+        status: "In Transit",
+      }),
+    ).toMatchObject({
+      ok: false,
+      message: expect.stringContaining("tidak ditemukan"),
+    });
+    expect(
+      await m.scan.scanAwb(actor(ids.approver, [ids.a]), {
+        awbNo: "TIDAK-ADA-123",
+        status: "In Transit",
+      }),
+    ).toMatchObject({ ok: false });
+    const noRight = actor(ids.approver, [ids.a]);
+    if (noRight.group)
+      noRight.group.permissions = noRight.group.permissions.filter(
+        (p) => p.resource !== "awb_scan",
+      );
+    await expect(
+      m.scan.scanAwb(noRight, { awbNo: `${tag}-scan2`, status: "In Transit" }),
+    ).rejects.toMatchObject({ status: 403 });
   });
 });

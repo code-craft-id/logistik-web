@@ -860,6 +860,7 @@ try {
             group: "DEMO Admin Cabang",
             branches: ["JKT"],
             grants: {
+              awb_scan: ["use"],
               transaction: ["view", "create", "update"],
               booking: ["view", "create", "update"],
               manifest: ["view", "create", "update"],
@@ -901,6 +902,7 @@ try {
             group: "DEMO Kurir",
             branches: ["JKT"],
             grants: {
+              awb_scan: ["use"],
               transaction: ["view"],
               manifest: ["view"],
               delivery: ["view", "update"],
@@ -914,6 +916,7 @@ try {
             group: "DEMO Driver",
             branches: ["BDG"],
             grants: {
+              awb_scan: ["use"],
               transaction: ["view"],
               manifest: ["view"],
               pod_return: ["view", "create"],
@@ -926,6 +929,7 @@ try {
             group: "DEMO Staf Cabang",
             branches: ["JKT"],
             grants: {
+              awb_scan: ["use"],
               transaction: ["view", "create", "update"],
               booking: ["view", "create"],
               manifest: ["view", "create", "update"],
@@ -957,6 +961,17 @@ try {
               },
             },
           );
+          // Demo groups gain rights added later (e.g. awb_scan); never removed.
+          await tx.permission.createMany({
+            data: Object.entries(role.grants).flatMap(([resource, actions]) =>
+              actions.map((action) => ({
+                resource,
+                action,
+                groupId: group.id,
+              })),
+            ),
+            skipDuplicates: true,
+          });
           if (await tx.user.findFirst({ where: { username: role.username } }))
             continue;
           const user = await tx.user.create({

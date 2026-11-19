@@ -37,6 +37,7 @@ const routeResources: Record<string, readonly string[]> = {
   "/marketing/revenue": ["customer"],
   "/bookings": ["booking"],
   "/transactions/approvals": ["awb_change"],
+  "/transactions/scan": ["awb_scan"],
   "/customer-service/cek-ongkir": ["tariff"],
   "/pod-returns": ["pod_return"],
   "/finance/debt-payments": ["debt_payment"],

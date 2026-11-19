@@ -39,6 +39,16 @@ const actionLabels: Record<string, string> = {
   update: "Ubah",
   delete: "Hapus",
   manage: "Akses penuh",
+  export: "Ekspor",
+  approve: "Setujui",
+  request: "Ajukan",
+  issue: "Terbitkan",
+  void: "Batalkan",
+  reverse: "Balik",
+  post: "Posting",
+  finalize: "Finalisasi",
+  close: "Tutup",
+  use: "Pakai",
 };
 function fullAccess(group: GroupPermission) {
   return !!group.permissions.system_admin?.manage;
@@ -276,7 +286,7 @@ export function PermissionMatrixPageClient({
                 {["view", "create", "update", "delete", "manage"].map(
                   (action) => (
                     <TableHead key={action} className="text-center">
-                      {actionLabels[action]}
+                      {actionLabels[action] ?? action}
                     </TableHead>
                   ),
                 )}

@@ -16,8 +16,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { listTransactions } from "@/features/bookings/server/queries";
+import { permits } from "@/features/identity/permissions";
 import { one } from "@/features/modul/components/page-bits";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { awbScanEnabled } from "@/lib/features";
 
 export const metadata: Metadata = { title: "Kelola On Site" };
 
@@ -41,7 +43,9 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePagePermission("view", "transaction");
+  const current = await requirePagePermission("view", "transaction");
+  const scanEnabled =
+    awbScanEnabled() && permits(current.actor, "use", "awb_scan");
   const query = await searchParams;
   const direction = one(query.tab) === "inbound" ? "inbound" : "outbound";
   const search = one(query.search) ?? "";
@@ -74,6 +78,11 @@ export default async function Page({
           <Button asChild variant="outline" className="min-h-11">
             <Link href="/transactions/lookup">Lookup AWB</Link>
           </Button>
+          {scanEnabled && (
+            <Button asChild variant="outline" className="min-h-11">
+              <Link href="/transactions/scan">Scan AWB</Link>
+            </Button>
+          )}
           <Button asChild className="min-h-11">
             <Link href="/transactions/new">Tambah AWB</Link>
           </Button>
