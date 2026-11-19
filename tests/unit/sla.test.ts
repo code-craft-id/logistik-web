@@ -14,4 +14,5 @@ it("labels SLA: In Progress until received, then On Time / Late", () => {
   expect(slaLabel(2, 2, "Delivered")).toBe("On Time");
   expect(slaLabel(3, 2, "Delivered")).toBe("Late");
   expect(slaLabel(1, null, "Delivered")).toBe("-");
+  expect(slaLabel(null, 2, "Returned")).toBe("Retur");
 });

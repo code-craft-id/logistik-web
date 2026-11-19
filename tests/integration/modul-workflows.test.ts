@@ -509,7 +509,7 @@ describe("Scan & Konfirmasi (bukti terima)", () => {
     ).rejects.toThrow("sudah DITERIMA");
   });
 
-  it("records RETUR without changing the AWB status and enforces the rules", async () => {
+  it("records RETUR as Returned, allows a later delivery and enforces the rules", async () => {
     const t = await awb("pod2", "In Transit");
     const courier = actor(ids.approver, [ids.a]);
     await expect(
@@ -543,10 +543,25 @@ describe("Scan & Konfirmasi (bukti terima)", () => {
       { photos: [] },
     );
     const row = await db.transaction.findUniqueOrThrow({ where: { id: t.id } });
-    expect(row.status).toBe("In Transit");
+    expect(row.status).toBe("Returned");
     await expect(
-      m.proof.assertProofAllowed(courier, t.id, "DELIVERED"),
-    ).resolves.toBeUndefined();
+      m.proof.assertProofAllowed(courier, t.id, "RETURNED"),
+    ).rejects.toThrow("sudah RETUR");
+    // Resent and delivered later: Returned → In Transit → Delivered.
+    await m.proof.recordProof(
+      courier,
+      { transactionId: t.id, outcome: "DELIVERED", receiverName: "Sari" },
+      { photos: [] },
+    );
+    const history = await db.transactionStatusHistory.findMany({
+      where: { transactionId: t.id },
+      orderBy: { id: "asc" },
+    });
+    expect(history.map((h) => `${h.priorStatus}>${h.newStatus}`)).toEqual([
+      "In Transit>Returned",
+      "Returned>In Transit",
+      "In Transit>Delivered",
+    ]);
   });
 
   it("resolves a koli label AWB-n to its AWB when n is within the koli", async () => {
@@ -925,7 +940,7 @@ describe("Import Status Excel", () => {
     expect(
       (await db.transaction.findUniqueOrThrow({ where: { id: retur.id } }))
         .status,
-    ).toBe("In Transit");
+    ).toBe("Returned");
     expect(
       (await db.transaction.findUniqueOrThrow({ where: { id: odd.id } }))
         .status,

@@ -13,6 +13,7 @@ export function slaLabel(
   targetDays: number | null,
   status: string,
 ) {
+  if (status === "Returned") return "Retur";
   if (leadTimeDays === null && status !== "Delivered") return "In Progress";
   if (leadTimeDays === null || targetDays === null) return "-";
   return leadTimeDays <= targetDays ? "On Time" : "Late";

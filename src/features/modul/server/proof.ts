@@ -226,8 +226,10 @@ export async function scanLookup(actor: AccessActor, awbNo: string) {
 function checkOutcome(status: string, outcome: "DELIVERED" | "RETURNED") {
   if (status === "Delivered") throw new ModulError("AWB ini sudah DITERIMA.");
   if (status === "Cancelled") throw new ModulError("AWB ini sudah dibatalkan.");
-  if (outcome === "DELIVERED" && status !== "Open" && status !== "In Transit")
-    throw new ModulError(`Status ${status} tidak bisa dikonfirmasi DITERIMA.`);
+  if (outcome === "RETURNED" && status === "Returned")
+    throw new ModulError("AWB ini sudah RETUR.");
+  if (!["Open", "In Transit", "Returned"].includes(status))
+    throw new ModulError(`Status ${status} tidak bisa dikonfirmasi.`);
 }
 
 export async function assertProofAllowed(
@@ -260,10 +262,10 @@ const proofSchema = z
 export type UploadedImage = { url: string; publicId: string };
 
 /**
- * Record a bukti terima. DITERIMA moves the AWB to Delivered (through In
- * Transit when still Open), each step in the status history with reason
- * "Scan AWB"; RETUR keeps the AWB status (D-09 open). An open delivery
- * sheet line of the AWB gets the same outcome.
+ * Record a bukti terima. DITERIMA moves the AWB to Delivered and RETUR to
+ * Returned (through In Transit when Open or Returned), each step in the
+ * status history with reason "Scan AWB". An open delivery sheet line of
+ * the AWB gets the same outcome.
  */
 export async function recordProof(
   actor: AccessActor,
@@ -313,9 +315,12 @@ export async function writeProof(
   if (!t)
     throw new ModulError("AWB tidak ditemukan atau bukan milik cabang Anda.");
   checkOutcome(t.status, data.outcome);
-  if (data.outcome === "DELIVERED") {
-    const steps =
-      t.status === "Open" ? ["In Transit", "Delivered"] : ["Delivered"];
+  {
+    // DITERIMA → Delivered, RETUR → Returned (D-09, owner decision
+    // 2026-11-19); Open and Returned go through In Transit first, so a
+    // returned AWB that is delivered later is a recorded resend.
+    const target = data.outcome === "DELIVERED" ? "Delivered" : "Returned";
+    const steps = t.status === "In Transit" ? [target] : ["In Transit", target];
     let prior = t.status;
     for (const next of steps) {
       if (!(ALLOWED_TRANSITIONS[prior] ?? []).includes(next))

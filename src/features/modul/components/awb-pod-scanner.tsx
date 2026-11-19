@@ -80,6 +80,7 @@ export function AwbPodScanner() {
   );
 
   const latest = awb?.proofs[0];
+  // Returned may be delivered later (resend); Delivered/Cancelled are final.
   const final = awb?.status === "Delivered" || awb?.status === "Cancelled";
   return (
     <div className="space-y-5">

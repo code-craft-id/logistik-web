@@ -169,9 +169,12 @@ export async function checkStatusRows(
                     ? "Received (nama penerima) wajib untuk status 2."
                     : matches[0].status === "Delivered"
                       ? "AWB sudah DITERIMA."
-                      : matches[0].status === "Cancelled"
-                        ? "AWB sudah dibatalkan."
-                        : null;
+                      : matches[0].status === "Returned" &&
+                          code.outcome === "RETURNED"
+                        ? "AWB sudah RETUR."
+                        : matches[0].status === "Cancelled"
+                          ? "AWB sudah dibatalkan."
+                          : null;
     seen.add(key);
     return {
       line: p.line,
@@ -249,7 +252,7 @@ export function statusTemplate() {
   const guide = XLSX.utils.aoa_to_sheet([
     ["Kode Status", "Arti"],
     [2, "ACCEPTED / DITERIMA (AWB menjadi Delivered, Received wajib)"],
-    [1, "BACK TO OFFICE / RETUR (status AWB tetap)"],
+    [1, "BACK TO OFFICE / RETUR (AWB menjadi Returned)"],
     [
       "",
       "Date = tanggal diterima, format YYYY-MM-DD. Hapus baris contoh sebelum import.",
