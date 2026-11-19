@@ -25,7 +25,7 @@ export const helpEntries: HelpEntry[] = [
       "pending",
     ],
     answer:
-      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Invoice, Tracking AWB, Report Detail Transaksi) dan hanya menampilkan menu yang boleh Anda buka.",
+      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Shipment Status, Invoice, Invoice Paid, Tracking AWB, Report Detail Transaksi) dan hanya menampilkan menu yang boleh Anda buka.",
     href: "/dashboard",
   },
   {
@@ -43,6 +43,22 @@ export const helpEntries: HelpEntry[] = [
     answer:
       "Semua tindakan hapus, nonaktifkan, batal dan void selalu menampilkan jendela konfirmasi dulu; data baru diproses setelah Anda menekan tombol Ya. Tekan Batal atau Escape untuk membatalkan. Berlaku untuk master data, perusahaan/kantor, konfigurasi, customer/penerima, user, grup user, tarif, batal booking, pengajuan hapus AWB dan persetujuannya, serta void invoice/balik jurnal/pembayaran dan tutup periode. Hapus baris di form yang belum disimpan (misalnya baris invoice atau foto sebelum Simpan) tidak perlu konfirmasi.",
     href: "/dashboard",
+  },
+  {
+    id: "shipment-status-list",
+    title: "Status Pengantaran (Kelola Status Pengiriman)",
+    keywords: [
+      "status pengantaran",
+      "shipment status",
+      "status pengiriman",
+      "sla",
+      "lead time",
+      "diterima oleh",
+      "kelola status",
+    ],
+    answer:
+      "Modul > Layanan Pelanggan > Status Pengantaran (juga Quick Action Shipment Status) menampilkan semua AWB dari/ke cabang Anda: AWB, tanggal, asal, tujuan, pengirim, layanan, status, penerima, diterima oleh, tanggal diterima, lead time (L.Time, hari) dan SLA. Cari dengan AWB, DO, nama pengirim atau penerima dan saring per status; 50 baris per halaman. SLA berisi In Progress sampai kiriman diterima, lalu Selesai (aturan tepat waktu/terlambat belum ditetapkan). Tombol Ubah membuka detail AWB untuk mengubah status (hak Transaksi: ubah); bukti terima dari kurir masuk lewat Scan AWB. Data diterima diambil dari bukti terima Scan atau dari lembar pengantaran (DRS). Import status dari Excel belum tersedia.",
+    href: "/customer-service/status-pengantaran",
   },
   {
     id: "booking",
@@ -282,7 +298,7 @@ export const helpEntries: HelpEntry[] = [
       "tambah manifest",
     ],
     answer:
-      "Modul > Operasional > Manifest. Tambah Manifest: isi nomor, tanggal, jenis, cabang pemilik, asal, tujuan, kendaraan, kurir dan vendor. Manifest dibuat berstatus Draft. Di detail manifest, ketik nomor AWB lalu Tambahkan. Satu AWB hanya boleh di satu manifest aktif; total koli/berat/volume dihitung otomatis.",
+      "Modul > Operasional > Manifest. Tambah Manifest: isi nomor, tanggal, jenis, cabang pemilik, asal, tujuan, kendaraan, kurir dan vendor. Manifest dibuat berstatus Draft. Di detail manifest, ketik nomor AWB lalu Tambahkan. Satu AWB hanya boleh di satu manifest aktif; total koli/berat/volume dihitung otomatis. Tab Transit (Cek Transit) menampilkan kolom Transit1 sampai Transit5, tab Inbound (Cek Inbound) satu kolom Transit berisi rute transit; kolom Kendaraan dan Driver (kurir manifest) tampil di semua tab.",
     href: "/manifest",
   },
   {
@@ -337,7 +353,7 @@ export const helpEntries: HelpEntry[] = [
       "piutang",
     ],
     answer:
-      "Akunting > Invoice. Buat draft dengan memilih customer dan AWB (satu AWB hanya di satu invoice aktif), lalu Terbitkan (nomor INV-…). Catat pembayaran sebagian atau penuh; status Belum dibayar/Sebagian/Lunas dihitung otomatis. Koreksi: balik pembayaran, lalu VOID dengan alasan dan buat invoice baru.",
+      "Akunting > Invoice. Buat draft dengan memilih customer dan AWB (satu AWB hanya di satu invoice aktif), lalu Terbitkan (nomor INV-…). Catat pembayaran sebagian atau penuh; status Belum dibayar/Sebagian/Lunas dihitung otomatis. Di daftar invoice, filter Status bayar: Lunas (Invoice Paid, juga dari Quick Action) atau Belum lunas (terbit tapi belum dibayar penuh). Koreksi: balik pembayaran, lalu VOID dengan alasan dan buat invoice baru.",
     href: "/finance/invoices",
   },
   {

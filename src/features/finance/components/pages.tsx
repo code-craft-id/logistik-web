@@ -17,7 +17,7 @@ import { permits } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { formatRupiah } from "@/lib/format/rupiah";
-import { id, listInput } from "../contracts";
+import { id, invoiceListInput } from "../contracts";
 import { accountingQueries, financeService } from "../server/context";
 import { FinanceBranchField } from "./branch-field";
 import { CommandForm } from "./command-form";
@@ -51,12 +51,12 @@ export async function InvoiceListPage({
 }) {
   const actor = await financeEntry();
   if (!actor) return denied;
-  const input = listInput.safeParse(query);
+  const input = invoiceListInput.safeParse(query);
   if (!input.success)
     return (
       <ErrorState
         title="Filter tidak valid"
-        description="Periksa cabang dan nomor halaman."
+        description="Periksa cabang, status bayar dan nomor halaman."
       />
     );
   const result = await financeService.list(input.data);
@@ -79,6 +79,24 @@ export async function InvoiceListPage({
           optional
           value={input.data.branchId ? String(input.data.branchId) : undefined}
         />
+        <div className="min-w-0 space-y-2">
+          <label
+            htmlFor="invoice-filter-payment"
+            className="block text-sm font-medium"
+          >
+            Status bayar
+          </label>
+          <select
+            id="invoice-filter-payment"
+            name="payment"
+            defaultValue={input.data.payment ?? ""}
+            className="min-h-11 w-full rounded-md border bg-background px-2 text-sm sm:w-48"
+          >
+            <option value="">Semua</option>
+            <option value="PAID">Lunas (Invoice Paid)</option>
+            <option value="OUTSTANDING">Belum lunas</option>
+          </select>
+        </div>
         <Button className="min-h-11" variant="outline" type="submit">
           Terapkan
         </Button>

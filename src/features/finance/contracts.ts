@@ -72,6 +72,17 @@ export const listInput = z.object({
   page: z.coerce.number().int().min(1).max(100000).default(1),
   branchId: z.preprocess((v) => (v === "" ? undefined : v), id.optional()),
 });
+/**
+ * Invoice list: optional payment filter. PAID = issued and fully received
+ * (provider Quick Action "Invoice Paid"); OUTSTANDING = issued, not fully
+ * received. Uses the same net-receipts rule as the invoice detail.
+ */
+export const invoiceListInput = listInput.extend({
+  payment: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["PAID", "OUTSTANDING"]).optional(),
+  ),
+});
 /** Costs page lists sources and events independently, so each has its own page. */
 export const costListInput = listInput.extend({
   eventPage: z.coerce.number().int().min(1).max(100000).default(1),

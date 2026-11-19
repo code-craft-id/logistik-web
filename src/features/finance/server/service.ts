@@ -13,7 +13,14 @@ import {
 } from "@/features/identity/server/access";
 import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
 import { accountingCommand } from "../accounting-contracts";
-import { asDate, day, id, invoiceCommand, listInput, sum } from "../contracts";
+import {
+  asDate,
+  day,
+  id,
+  invoiceCommand,
+  invoiceListInput,
+  sum,
+} from "../contracts";
 import {
   accountingWrite,
   invoicePosting,
@@ -429,7 +436,7 @@ export function createFinanceService(
       );
     },
     async list(input: unknown = {}) {
-      const data = listInput.parse(input);
+      const data = invoiceListInput.parse(input);
       return db.$transaction(
         async (tx) => {
           const current = await actor(tx, "invoice", "view");
@@ -439,6 +446,22 @@ export function createFinanceService(
               ? {}
               : { branchId: { in: current.branchIds } }),
             ...(data.branchId ? { branchId: data.branchId } : {}),
+            ...(data.payment
+              ? {
+                  status: "ISSUED",
+                  id: {
+                    [data.payment === "PAID" ? "in" : "notIn"]: (
+                      await tx.$queryRaw<{ id: number }[]>`
+                        SELECT i.id FROM fin_invoices i
+                        LEFT JOIN fin_receipts r ON r."invoiceId" = i.id
+                        WHERE i.status = 'ISSUED'
+                        GROUP BY i.id, i.total
+                        HAVING COALESCE(SUM(CASE WHEN r."reversalOfId" IS NULL
+                                                 THEN r.amount ELSE -r.amount END), 0) = i.total`
+                    ).map((r) => r.id),
+                  },
+                }
+              : {}),
           };
           const rows = await tx.finInvoice.findMany({
             where,

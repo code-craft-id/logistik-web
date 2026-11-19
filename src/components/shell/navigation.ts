@@ -258,6 +258,7 @@ export const liveRoutes = [
   "/finance/debt-payments",
   "/transactions/void",
   "/branch-reports/delivery?view=items",
+  "/customer-service/status-pengantaran",
   "/transactions/lookup",
   "/transactions/history",
   "/transactions/void?view=deleted",

@@ -396,6 +396,29 @@ describe("FIN-01 guarded persistence", () => {
       awbCount: row.items.length,
     });
     expect(listed?.termDays).toBeGreaterThanOrEqual(0);
+    // Invoice Paid filter: partly paid is outstanding, fully paid is paid.
+    const ids = async (payment: "PAID" | "OUTSTANDING") =>
+      (await service().list({ branchId: branch, payment })).items.map(
+        (x) => x.id,
+      );
+    expect(await ids("OUTSTANDING")).toContain(id);
+    expect(await ids("PAID")).not.toContain(id);
+    const rest = { ...receipt(id, "20000.00") };
+    await service().execute(rest);
+    expect((await service().detail(id)).paymentStatus).toBe("PAID");
+    expect(await ids("PAID")).toContain(id);
+    expect(await ids("OUTSTANDING")).not.toContain(id);
+    const paid = await service().detail(id);
+    const undo = paid.receipts.find((r) => r.amount === "20000.00");
+    if (!undo) throw new Error("second receipt not found");
+    await service().execute({
+      action: "payment.reverse",
+      key: randomUUID(),
+      id: undo.id,
+      reason: "FAKE undo full payment",
+      accountingDate: "2026-11-15",
+    });
+    expect(await ids("OUTSTANDING")).toContain(id);
     await expect(
       service().execute({
         action: "invoice.void",

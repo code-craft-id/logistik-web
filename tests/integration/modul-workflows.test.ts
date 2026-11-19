@@ -703,3 +703,58 @@ describe("Tracking AWB", () => {
     await db.branch.delete({ where: { id: stranger.id } });
   });
 });
+
+describe("Kelola Status Pengiriman", () => {
+  it("lists AWBs of the actor's branches with receipt data and SLA", async () => {
+    const list = await import(
+      "../../src/features/shipments/server/status-list"
+    );
+    const open = await awb("STS1");
+    const done = await awb("STS2", "Delivered");
+    await db.deliveryProof.create({
+      data: {
+        transactionId: done.id,
+        outcome: "DELIVERED",
+        receiverName: "Pak Penerima",
+      },
+    });
+    const inA = actor(ids.approver, [ids.a]);
+    const result = await list.listShipmentStatus(inA, { search: `${tag}-STS` });
+    const byId = new Map(result.rows.map((r) => [r.id, r]));
+    expect(byId.get(open.id)).toMatchObject({
+      sla: "In Progress",
+      receivedBy: null,
+    });
+    expect(byId.get(done.id)).toMatchObject({
+      sla: "Selesai",
+      receivedBy: "Pak Penerima",
+      leadTimeDays: 0,
+    });
+    expect(
+      (
+        await list.listShipmentStatus(inA, {
+          search: `${tag}-STS`,
+          status: "Delivered",
+        })
+      ).rows.map((r) => r.id),
+    ).toEqual([done.id]);
+    // Another branch sees none of them.
+    const stranger = await db.branch.create({
+      data: {
+        officeId: ids.office,
+        name: `${tag}Y`,
+        code: `${tag}Y`,
+        status: "ACTIVE",
+      },
+    });
+    expect(
+      (
+        await list.listShipmentStatus(actor(ids.approver, [stranger.id]), {
+          search: `${tag}-STS`,
+        })
+      ).total,
+    ).toBe(0);
+    await db.deliveryProof.deleteMany({ where: { transactionId: done.id } });
+    await db.branch.delete({ where: { id: stranger.id } });
+  });
+});

@@ -73,17 +73,25 @@ export default async function Page({
     { key: "Inbound", label: "Inbound", href: "/manifest?type=Inbound" },
     { key: "agent", label: "Inbound Agen", href: "/manifest?view=agent" },
   ];
+  // Provider Cek Transit shows Transit1..5; Cek Inbound one Transit column.
+  const transitHeaders =
+    type === "Transit"
+      ? ["Transit1", "Transit2", "Transit3", "Transit4", "Transit5"]
+      : type === "Inbound"
+        ? ["Transit"]
+        : [];
   const headers = [
     "Manifes No.",
     "Tanggal",
     "Asal",
+    ...transitHeaders,
     "Tujuan",
     "Tot. AWB",
     "Tot. Koli",
     "Tot. Berat (kg)",
     "Tot. Volume",
     "Kendaraan",
-    "Kurir",
+    "Driver",
     ...(agent ? ["Agen / Vendor"] : []),
     "Status",
   ];
@@ -181,7 +189,11 @@ export default async function Page({
               </div>
             </div>
             <div className="overflow-x-auto">
-              <Table className="min-w-[64rem]">
+              <Table
+                className={
+                  type === "Transit" ? "min-w-[88rem]" : "min-w-[64rem]"
+                }
+              >
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-10">
@@ -220,6 +232,16 @@ export default async function Page({
                       </TableCell>
                       <TableCell>{row.date}</TableCell>
                       <TableCell>{row.origin ?? "—"}</TableCell>
+                      {type === "Transit" &&
+                        row.transits.map((t, i) => (
+                          // biome-ignore lint/suspicious/noArrayIndexKey: fixed Transit1..5 positions
+                          <TableCell key={i}>{t || "-"}</TableCell>
+                        ))}
+                      {type === "Inbound" && (
+                        <TableCell>
+                          {row.transits.filter(Boolean).join(" → ") || "-"}
+                        </TableCell>
+                      )}
                       <TableCell>{row.destination ?? "—"}</TableCell>
                       <TableCell className="text-right tabular-nums">
                         {row.awb}

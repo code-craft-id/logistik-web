@@ -136,6 +136,11 @@ export async function listManifests(
         vehicle: { select: { name: true, licensePlate: true } },
         courier: { select: { name: true } },
         vendor: { select: { name: true } },
+        transit1: true,
+        transit2: true,
+        transit3: true,
+        transit4: true,
+        transit5: true,
       },
     }),
     prisma.manifest.count({ where }),
@@ -174,6 +179,14 @@ export async function listManifests(
         : null,
       courier: row.courier?.name ?? null,
       vendor: row.vendor?.name ?? null,
+      /** Transit1..Transit5 as on the provider's Cek Transit list. */
+      transits: [
+        row.transit1,
+        row.transit2,
+        row.transit3,
+        row.transit4,
+        row.transit5,
+      ],
       ...(() => {
         const sum = sums.get(row.id);
         return sum

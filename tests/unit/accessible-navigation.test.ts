@@ -85,6 +85,8 @@ describe("available navigation", () => {
       "/transactions?tab=inbound",
       "/transactions?print=1",
       "/transactions/void",
+      // Status Pengantaran = Kelola Status Pengiriman (provider /shipment-status).
+      "/customer-service/status-pengantaran",
       "/transactions/lookup",
       "/transactions/history",
       "/transactions/void?view=deleted",

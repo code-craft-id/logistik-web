@@ -96,7 +96,7 @@ export const legacyMenu = [
         children: [
           {
             label: "Status Pengantaran",
-            href: "/branch-reports/delivery?view=items",
+            href: "/customer-service/status-pengantaran",
           },
           { label: "Cek Ongkir", href: "/customer-service/cek-ongkir" },
           { label: "Cek Resi", href: "/transactions/lookup" },

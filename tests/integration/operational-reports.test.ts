@@ -425,10 +425,9 @@ describe("guarded operational report real sources", () => {
     expect(insights?.awbPending).toBeLessThanOrEqual(2);
     expect(insights?.recent).toBeNull();
     expect(insights?.invoices).toBeNull();
-    expect(insights?.actions.map((x) => x.label)).toEqual([
-      "Manifest",
-      "Delivery Sheet",
-    ]);
+    // Report grants only: Quick Action "Manifest" opens the manifest
+    // workspace (needs Manifest: view), so only Delivery Sheet shows.
+    expect(insights?.actions.map((x) => x.label)).toEqual(["Delivery Sheet"]);
     expect(dashOnly.insights?.actions).toEqual([]);
     const admin = await read(userIds[0]).read("dashboard", {
       startDate: period.startDate,

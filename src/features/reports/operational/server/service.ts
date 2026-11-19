@@ -80,8 +80,20 @@ const QUICK_ACTIONS = [
     resource: "delivery_report",
   },
   {
+    label: "Shipment Status",
+    href: "/customer-service/status-pengantaran",
+    action: "view",
+    resource: "transaction",
+  },
+  {
     label: "Invoice",
     href: "/finance/invoices",
+    action: "view",
+    resource: "invoice",
+  },
+  {
+    label: "Invoice Paid",
+    href: "/finance/invoices?payment=PAID",
     action: "view",
     resource: "invoice",
   },
