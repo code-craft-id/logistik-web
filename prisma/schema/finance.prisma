@@ -13,6 +13,10 @@ model FinInvoice {
   total        Decimal          @db.Decimal(15, 2)
   number       String?          @unique
   snapshot     Json?
+  /// Serah terima faktur (owner decision 2026-11-19): when and to whom the
+  /// customer received the invoice; feeds Report AR. Not a financial field.
+  handoverDate DateTime?        @db.Date
+  handoverTo   String?          @db.VarChar(150)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   items        FinInvoiceItem[]

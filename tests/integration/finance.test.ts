@@ -409,6 +409,39 @@ describe("FIN-01 guarded persistence", () => {
       (line?.b0_21 ?? 0) + (line?.b21_30 ?? 0) + (line?.b30plus ?? 0),
     ).toBe(20000);
     expect(aging.end).toBe("30-11-2026");
+    // Serah terima faktur: recorded on the issued invoice, shown in AR.
+    await expect(
+      service().execute({
+        action: "invoice.handover",
+        key: randomUUID(),
+        id,
+        revision: row.revision,
+        handoverDate: "2999-01-01",
+        handoverTo: "Bu Sari",
+      }),
+    ).rejects.toThrow("masa depan");
+    await service().execute({
+      action: "invoice.handover",
+      key: randomUUID(),
+      id,
+      revision: row.revision,
+      handoverDate: "2026-11-16",
+      handoverTo: "Bu Sari",
+    });
+    const handed = await service().detail(id);
+    expect(handed).toMatchObject({
+      handoverDate: "2026-11-16",
+      handoverTo: "Bu Sari",
+    });
+    const agingAfter = await agingReport(agingActor, {
+      month: "11",
+      year: "2026",
+    });
+    expect(agingAfter.items.find((x) => x.number === row.number)).toMatchObject(
+      { handoverDate: "16-11-2026", handoverTo: "Bu Sari" },
+    );
+    // Later commands use the new revision.
+    row.revision = handed.revision;
     expect(agingWorkbook(aging).length).toBeGreaterThan(0);
     // Legacy list columns: snapshot customer/branch, term in days, AWB count.
     const listed = (await service().list({ branchId: branch })).items.find(

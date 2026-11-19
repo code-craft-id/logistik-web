@@ -301,6 +301,52 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
           <p>Tagihan dan sumber akan dikunci. Pastikan AWB layak ditagihkan.</p>
         </CommandForm>
       )}
+      {row.status === "ISSUED" && (
+        <section
+          aria-label="Serah terima faktur"
+          className="space-y-3 rounded-lg border bg-background p-4"
+        >
+          <h2 className="font-medium">Serah Terima Faktur</h2>
+          <p className="text-sm">
+            {row.handoverDate
+              ? `Diterima ${row.handoverDate} oleh ${row.handoverTo}.`
+              : "Belum dicatat. Isi setelah faktur diterima pelanggan; tampil di Report AR."}
+          </p>
+          {permits(actor, "update", "invoice") && (
+            <CommandForm
+              label={
+                row.handoverDate ? "Ubah serah terima" : "Simpan serah terima"
+              }
+              values={{
+                action: "invoice.handover",
+                id: row.id,
+                revision: row.revision,
+              }}
+            >
+              <FormField id="handoverDate" label="Tanggal terima faktur">
+                <Input
+                  className="min-h-11"
+                  required
+                  type="date"
+                  name="handoverDate"
+                  id="handoverDate"
+                  defaultValue={row.handoverDate ?? undefined}
+                />
+              </FormField>
+              <FormField id="handoverTo" label="Nama penerima faktur">
+                <Input
+                  className="min-h-11"
+                  required
+                  name="handoverTo"
+                  id="handoverTo"
+                  maxLength={150}
+                  defaultValue={row.handoverTo ?? undefined}
+                />
+              </FormField>
+            </CommandForm>
+          )}
+        </section>
+      )}
       {row.status !== "VOID" && permits(actor, "void", "invoice") && (
         <CommandForm
           label="Batalkan invoice"

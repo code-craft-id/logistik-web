@@ -51,6 +51,7 @@ export function invoiceDTO(row: Invoice, payments = true) {
     total: row.total.toFixed(2),
     invoiceDate: day(row.invoiceDate),
     dueDate: day(row.dueDate),
+    handoverDate: row.handoverDate ? day(row.handoverDate) : null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     items: row.items.map((i) => ({ ...i, amount: i.amount.toFixed(2) })),
@@ -174,7 +175,9 @@ export function createFinanceService(
       const permission =
         resource === "journal" && ["expense", "transfer"].includes(action)
           ? "post"
-          : action;
+          : data.action === "invoice.handover"
+            ? "update"
+            : action;
       const initial = await actor(db, resource, permission);
       return db.$transaction(
         async (tx) => {
@@ -348,6 +351,27 @@ export function createFinanceService(
                 where: { invoiceId: row.id },
               });
             }
+            branchId = row.branchId;
+            resultId = row.id;
+          } else if (data.action === "invoice.handover") {
+            // Delivery fact only: no amounts, postings or snapshot change.
+            const row = await invoice(tx, current, data.id);
+            if (row.revision !== data.revision)
+              fail("Invoice telah berubah. Muat ulang.");
+            if (row.status !== "ISSUED")
+              fail("Serah terima hanya untuk invoice yang sudah terbit.");
+            if (data.handoverDate < day(row.invoiceDate))
+              fail("Tanggal terima tidak boleh sebelum tanggal invoice.");
+            if (data.handoverDate > new Date().toISOString().slice(0, 10))
+              fail("Tanggal terima tidak boleh di masa depan.");
+            await tx.finInvoice.update({
+              where: { id: row.id },
+              data: {
+                handoverDate: asDate(data.handoverDate),
+                handoverTo: data.handoverTo,
+                revision: { increment: 1 },
+              },
+            });
             branchId = row.branchId;
             resultId = row.id;
           } else if (data.action === "payment.create") {

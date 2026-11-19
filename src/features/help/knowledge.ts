@@ -89,7 +89,7 @@ export const helpEntries: HelpEntry[] = [
       "usia faktur",
     ],
     answer:
-      "Quick Action Report AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (Termin pelanggan dari master Termin, misalnya 21 Hari; bila pelanggan tidak punya termin dipakai jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total tiap kolom dan persentasenya terhadap total Jumlah Tagihan (NAN% bila tidak ada tagihan, seperti di aplikasi lama). Tanggal dan nama penerima faktur belum dicatat sehingga tampil '-'. Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
+      "Quick Action Report AR (/financial-reports/aging). Pilih Bulan, Tahun dan Pelanggan (atau Semua) lalu Menampilkan untuk melihat tabel, atau Ekspor Excel. Isinya invoice terbit pada bulan itu yang belum lunas: tanggal faktur, No. KWT/INV, nama perusahaan, jumlah tagihan, KETENTUAN (Termin pelanggan dari master Termin, misalnya 21 Hari; bila pelanggan tidak punya termin dipakai jatuh tempo - tanggal invoice), USIA FAKTUR (hari sejak tanggal invoice) dan sisa tagihan pada kolom 0 s/d 21 hari, > 21 = 30 hari atau > 30 hari; HASIL AKHIR berisi total tiap kolom dan persentasenya terhadap total Jumlah Tagihan (NAN% bila tidak ada tagihan, seperti di aplikasi lama). Tanggal dan nama penerima faktur diambil dari Serah Terima Faktur di detail invoice ('-' bila belum dicatat). Aturan umur dan isi kolom menunggu konfirmasi bagian keuangan. Laporan umur piutang per customer (lewat jatuh tempo) tetap ada di Laporan Keuangan.",
     href: "/financial-reports/aging",
   },
   {
@@ -385,7 +385,7 @@ export const helpEntries: HelpEntry[] = [
       "piutang",
     ],
     answer:
-      "Akunting > Invoice. Buat draft dengan memilih customer dan AWB (satu AWB hanya di satu invoice aktif), lalu Terbitkan (nomor INV-…). Catat pembayaran sebagian atau penuh; status Belum dibayar/Sebagian/Lunas dihitung otomatis. Di daftar invoice, filter Status bayar: Lunas (Invoice Paid, juga dari Quick Action) atau Belum lunas (terbit tapi belum dibayar penuh). Koreksi: balik pembayaran, lalu VOID dengan alasan dan buat invoice baru.",
+      "Akunting > Invoice. Buat draft dengan memilih customer dan AWB (satu AWB hanya di satu invoice aktif), lalu Terbitkan (nomor INV-…). Catat pembayaran sebagian atau penuh; status Belum dibayar/Sebagian/Lunas dihitung otomatis. Setelah faktur diterima pelanggan, isi Serah Terima Faktur di detail invoice (tanggal terima dan nama penerima, hak Invoice: ubah; tanggal tidak boleh sebelum tanggal invoice atau di masa depan); datanya tampil di Report AR. Di daftar invoice, filter Status bayar: Lunas (Invoice Paid, juga dari Quick Action) atau Belum lunas (terbit tapi belum dibayar penuh). Koreksi: balik pembayaran, lalu VOID dengan alasan dan buat invoice baru.",
     href: "/finance/invoices",
   },
   {

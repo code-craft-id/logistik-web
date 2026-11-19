@@ -206,8 +206,10 @@ export default async function Page({
                         {r.invoiceDate}
                       </TableCell>
                       <TableCell className="font-mono">{r.number}</TableCell>
-                      <TableCell>-</TableCell>
-                      <TableCell>-</TableCell>
+                      <TableCell className="tabular-nums">
+                        {r.handoverDate ?? "-"}
+                      </TableCell>
+                      <TableCell>{r.handoverTo ?? "-"}</TableCell>
                       <TableCell className="whitespace-normal">
                         {r.company}
                       </TableCell>

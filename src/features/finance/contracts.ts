@@ -50,6 +50,14 @@ export const invoiceCommand = z.discriminatedUnion("action", [
   }),
   z.object({
     ...base,
+    ...invoice,
+    /** Serah terima faktur: date and receiver at the customer. */
+    action: z.literal("invoice.handover"),
+    handoverDate: date,
+    handoverTo: z.string().trim().min(1).max(150),
+  }),
+  z.object({
+    ...base,
     action: z.literal("payment.create"),
     invoiceId: id,
     amount: money,

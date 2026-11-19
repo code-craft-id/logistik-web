@@ -29,7 +29,8 @@ import { Prisma } from "@/lib/db/generated/client";
  *   the prototype), else the invoice term (due date - invoice date);
  * - USIA FAKTUR = days from the invoice date to today; buckets 0-21,
  *   >21-30 and >30 days as labelled by the provider;
- * - TANGGAL / NAMA PENERIMA FAKTUR are not recorded yet, shown as "-".
+ * - TANGGAL / NAMA PENERIMA FAKTUR come from Serah Terima Faktur on the
+ *   invoice ("-" until recorded).
  */
 export const agingInput = z.object({
   month: z.coerce.number().int().min(1).max(12),
@@ -43,6 +44,8 @@ export const agingInput = z.object({
 export type AgingRow = {
   invoiceDate: string;
   number: string;
+  handoverDate: string | null;
+  handoverTo: string | null;
   company: string;
   total: number;
   termDays: number;
@@ -72,6 +75,8 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
       invoiceDate: string;
       number: string | null;
       id: number;
+      handoverDate: string | null;
+      handoverTo: string | null;
       company: string;
       total: string;
       termName: string | null;
@@ -82,6 +87,7 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
   >`
     WITH b AS (
       SELECT i.id, i.number, i."invoiceDate", i."dueDate", i.total, i."customerId",
+             i."handoverDate", i."handoverTo",
              i.total - COALESCE(sum(CASE WHEN r."reversalOfId" IS NULL
                                          THEN r.amount ELSE -r.amount END), 0) AS sisa
       FROM fin_invoices i
@@ -91,6 +97,7 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
         ${input.customerId ? Prisma.sql`AND i."customerId" = ${input.customerId}` : Prisma.empty}
       GROUP BY i.id)
     SELECT to_char(b."invoiceDate", 'DD-MM-YYYY') AS "invoiceDate", b.number, b.id,
+           to_char(b."handoverDate", 'DD-MM-YYYY') AS "handoverDate", b."handoverTo",
            c.name AS company, b.total::text AS total, tm.name AS "termName",
            (b."dueDate" - b."invoiceDate")::int AS "termDays",
            GREATEST(current_date - b."invoiceDate", 0)::int AS "ageDays",
@@ -105,6 +112,8 @@ export async function agingReport(actor: AccessActor, raw: unknown) {
     return {
       invoiceDate: r.invoiceDate,
       number: r.number ?? `Draft #${r.id}`,
+      handoverDate: r.handoverDate,
+      handoverTo: r.handoverTo,
       company: r.company,
       total: Number(r.total),
       termDays: r.termDays,
@@ -197,8 +206,8 @@ export function agingWorkbook(report: Awaited<ReturnType<typeof agingReport>>) {
       i + 1,
       r.invoiceDate,
       r.number,
-      "-",
-      "-",
+      r.handoverDate ?? "-",
+      r.handoverTo ?? "-",
       r.company,
       r.total,
       r.term,
