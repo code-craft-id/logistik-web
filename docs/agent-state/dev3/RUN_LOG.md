@@ -689,3 +689,6 @@ Legacy observed read-only (forms opened, never submitted). Built approvals, tari
 
 ## 2026-11-19 — Proof-of-delivery photo (Cloudinary, WebP)
 Optional photo on delivery outcome; browser WebP compression, server magic-byte check and signed Cloudinary upload, orphan cleanup, add-later for final outcomes. Migration 20261119000300 applied to dev and test. Verified in the local app without Cloudinary env (clear message); live upload not tested (no credentials).
+
+## 2026-11-19 — Security dependency upgrade (owner approved)
+next 16.4.2 -> 16.4.6, better-auth 1.6.23 -> 1.7.25 (exact pins), npm audit fix (happy-dom 21.0.4, fast-uri 3.1.9). `npm audit --omit=dev`: 0 vulnerabilities. Auth integration suites (identity, session, profile, admin seed, SCH-01) pass unchanged; no schema change needed. Better Auth is Dev 1's contract: needs Dev 1 review.
