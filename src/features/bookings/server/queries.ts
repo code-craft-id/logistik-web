@@ -371,7 +371,7 @@ export async function transactionFormOptions(actor: AccessActor) {
   ]);
   // Suggested next AWB number per own branch (display only; the number is
   // assigned under a lock when the form is saved).
-  const { nextAwbNo } = await import("./service");
+  const { nextAwbNo, nextBookingNo } = await import("./service");
   const today = new Date();
   const nextAwb = Object.fromEntries(
     await Promise.all(
@@ -383,8 +383,19 @@ export async function transactionFormOptions(actor: AccessActor) {
         ]),
     ),
   ) as Record<number, string>;
+  const nextBooking = Object.fromEntries(
+    await Promise.all(
+      branches
+        .slice(0, 50)
+        .map(async (b) => [
+          b.id,
+          await nextBookingNo(prisma as never, b.id, today, { lock: false }),
+        ]),
+    ),
+  ) as Record<number, string>;
   return {
     nextAwb,
+    nextBooking,
     branches: branches.map((b) => ({ id: b.id, name: branchLabel(b) })),
     destinations: destinations.map((b) => ({
       id: b.id,

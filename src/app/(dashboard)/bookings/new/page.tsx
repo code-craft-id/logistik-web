@@ -14,7 +14,9 @@ export default async function Page() {
   await requirePagePermission("create", "booking");
   const current = await currentIdentity();
   if (!current) redirect("/login");
-  const { branches, customers } = await transactionFormOptions(current.actor);
+  const { branches, customers, nextBooking } = await transactionFormOptions(
+    current.actor,
+  );
   return (
     <div className="space-y-6">
       <div>
@@ -22,11 +24,10 @@ export default async function Page() {
           Tambah Booking
         </h1>
         <p className="text-sm text-muted-foreground">
-          Buat booking baru. Relasi booking-AWB mengikuti aturan yang diamati
-          (opsional).
+          Nomor booking terisi otomatis setelah Cabang dipilih dan boleh diubah.
         </p>
       </div>
-      <BookingForm options={{ branches, customers }} />
+      <BookingForm options={{ branches, customers, nextBooking }} />
     </div>
   );
 }

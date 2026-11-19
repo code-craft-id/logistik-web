@@ -248,4 +248,39 @@ describe("Entry AWB capture fields", () => {
     expect(manual.transaction.biaya?.toString()).toBe("75000");
     expect(manual.transaction.totalCost).toBeNull();
   });
+
+  it("numbers bookings like AWBs and refuses a duplicate typed number", async () => {
+    const date = new Date("2026-11-07T00:00:00.000Z");
+    const made = await Promise.all(
+      [1, 2].map(() =>
+        service.createBooking(
+          { branchId: ids.branch, autoBookingNo: true, bookingDate: date },
+          actor([ids.branch]),
+        ),
+      ),
+    );
+    const code = (
+      await db.branch.findUniqueOrThrow({ where: { id: ids.branch } })
+    ).code
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 10);
+    expect(made.map((b) => b.bookingNo).sort()).toEqual([
+      `BK${code}261100001`,
+      `BK${code}261100002`,
+    ]);
+    const typed = await service.createBooking(
+      { branchId: ids.branch, bookingNo: `${tag}-BOOK` },
+      actor([ids.branch]),
+    );
+    await expect(
+      service.createBooking(
+        { branchId: ids.branch, bookingNo: `${tag}-BOOK` },
+        actor([ids.branch]),
+      ),
+    ).rejects.toThrow("BOOKING_NO_CONFLICT");
+    await db.booking.deleteMany({
+      where: { id: { in: [...made.map((b) => b.id), typed.id] } },
+    });
+  });
 });

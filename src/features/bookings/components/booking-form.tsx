@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { createBookingAction } from "../actions";
@@ -32,22 +33,45 @@ const selectClass = "w-full border rounded px-2 py-1 min-h-11 bg-background";
 export function BookingForm({
   options,
 }: {
-  options?: { branches: Option[]; customers: Option[] };
+  options?: {
+    branches: Option[];
+    customers: Option[];
+    nextBooking?: Record<number, string>;
+  };
 } = {}) {
   const [isPending, startTransition] = useTransition();
+  const [bookingNo, setBookingNo] = useState("");
+  const [branch, setBranch] = useState("");
+  const suggested = options?.nextBooking?.[Number(branch)] ?? "";
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     formData.delete("status");
+    // Unchanged suggestion or empty: the server assigns the number under a lock.
+    const typed = String(formData.get("bookingNo") ?? "").trim();
+    if (!typed || typed === suggested) {
+      formData.delete("bookingNo");
+      formData.set("autoBookingNo", "true");
+    }
     setErrorMessage(null);
     setSuccessMessage(null);
     startTransition(async () => {
       const result = await createBookingAction(formData);
       if (result.ok) {
-        setSuccessMessage("Booking berhasil disimpan.");
+        setSuccessMessage(
+          result.bookingNo
+            ? `Booking ${result.bookingNo} berhasil disimpan.`
+            : "Booking berhasil disimpan.",
+        );
+        form.reset();
+        setBookingNo("");
+        setBranch("");
+        router.refresh();
         return;
       }
       setErrorMessage(getErrorMessage(result.error));
@@ -64,8 +88,20 @@ export function BookingForm({
           <input
             id="bookingNo"
             name="bookingNo"
-            className="w-full border rounded px-2 py-1"
+            maxLength={50}
+            value={bookingNo}
+            onChange={(e) => setBookingNo(e.target.value)}
+            placeholder="Pilih Cabang untuk nomor otomatis"
+            aria-describedby="bookingNo-hint"
+            className="w-full border rounded px-2 py-1 min-h-11"
           />
+          <p id="bookingNo-hint" className="text-xs text-muted-foreground">
+            {bookingNo && bookingNo === suggested
+              ? "Nomor otomatis (dikunci saat disimpan). Ubah bila ingin nomor manual."
+              : bookingNo
+                ? "Nomor manual."
+                : "Kosongkan untuk nomor otomatis."}
+          </p>
         </div>
         <div>
           <label htmlFor="doNo" className="text-sm font-medium">
@@ -89,6 +125,13 @@ export function BookingForm({
                 required
                 defaultValue=""
                 className={selectClass}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  // Follow the branch's suggested number unless typed manually.
+                  if (bookingNo === "" || bookingNo === suggested)
+                    setBookingNo(options?.nextBooking?.[Number(next)] ?? "");
+                  setBranch(next);
+                }}
               >
                 <option value="">Pilih…</option>
                 {options.branches.map((o) => (

@@ -1,3 +1,4 @@
+import { Barcode } from "@/components/patterns/barcode";
 import { QrCode } from "@/components/patterns/qr-code";
 import type { getManifest } from "@/features/shipments/server/manifests-queries";
 
@@ -37,14 +38,25 @@ export function ManifestDocument({
             {manifest.vendor ? ` · Vendor ${manifest.vendor}` : ""}
           </p>
         </div>
-        <QrCode
-          value={
-            drs
-              ? (manifest.deliverySheet?.sheetNo ?? manifest.manifestNo)
-              : manifest.manifestNo
-          }
-          size={80}
-        />
+        {/* Barcode and QR carry the DRS or manifest number for scanning. */}
+        <div className="flex items-end gap-3">
+          <Barcode
+            value={
+              drs
+                ? (manifest.deliverySheet?.sheetNo ?? manifest.manifestNo)
+                : manifest.manifestNo
+            }
+            className="w-56"
+          />
+          <QrCode
+            value={
+              drs
+                ? (manifest.deliverySheet?.sheetNo ?? manifest.manifestNo)
+                : manifest.manifestNo
+            }
+            size={80}
+          />
+        </div>
       </header>
       <table className="w-full border-collapse text-sm">
         <thead>

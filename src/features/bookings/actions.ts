@@ -26,7 +26,7 @@ type CreateTransactionResult =
     };
 
 export type CreateBookingActionResult =
-  | { ok: true; id: number }
+  | { ok: true; id: number; bookingNo?: string | null }
   | {
       ok: false;
       error:
@@ -69,7 +69,7 @@ export async function createBookingAction(
     const parsed = createBookingSchema.parse(raw);
     const result = await createBooking(parsed, current.actor);
     revalidatePath("/bookings");
-    return { ok: true, id: result.id };
+    return { ok: true, id: result.id, bookingNo: result.bookingNo };
   } catch (e: unknown) {
     if (e instanceof IdentityError) {
       if (e.code === "UNAUTHENTICATED")

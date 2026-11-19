@@ -91,6 +91,55 @@ export function priceAwb(input: {
 }
 
 /**
+ * Next document number for a branch: prefix + YYMM (UTC) + a 5-digit running
+ * number. The branch row lock serializes concurrent numbering.
+ */
+async function nextNumber(
+  tx: TxClient,
+  kind: "awb" | "booking",
+  branchId: number,
+  date: Date,
+  lock: boolean,
+) {
+  const rows = lock
+    ? await tx.$queryRaw<{ code: string }[]>`
+        SELECT code FROM branches WHERE id = ${branchId} FOR UPDATE`
+    : await tx.$queryRaw<{ code: string }[]>`
+        SELECT code FROM branches WHERE id = ${branchId}`;
+  const code =
+    (rows[0]?.code ?? "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 10) || `C${branchId}`;
+  const yymm = `${String(date.getUTCFullYear()).slice(2)}${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+  const prefix = kind === "booking" ? `BK${code}${yymm}` : `${code}${yymm}`;
+  const start = prefix.length + 1;
+  const found =
+    kind === "booking"
+      ? await tx.$queryRaw<{ max: number | null }[]>`
+          SELECT max(CASE WHEN substring(booking_no FROM ${start}::int) ~ '^[0-9]{1,9}$'
+                          THEN substring(booking_no FROM ${start}::int)::int END) AS max
+          FROM bookings
+          WHERE branch_id = ${branchId} AND booking_no LIKE ${`${prefix}%`}`
+      : await tx.$queryRaw<{ max: number | null }[]>`
+          SELECT max(CASE WHEN substring(awb_no FROM ${start}::int) ~ '^[0-9]{1,9}$'
+                          THEN substring(awb_no FROM ${start}::int)::int END) AS max
+          FROM transactions
+          WHERE origin_branch_id = ${branchId} AND awb_no LIKE ${`${prefix}%`}`;
+  return `${prefix}${String((found[0]?.max ?? 0) + 1).padStart(5, "0")}`;
+}
+
+/** Next automatic booking number, e.g. BKJKT261100001. */
+export function nextBookingNo(
+  tx: TxClient,
+  branchId: number,
+  date: Date,
+  { lock = true }: { lock?: boolean } = {},
+) {
+  return nextNumber(tx, "booking", branchId, date, lock);
+}
+
+/**
  * Next automatic AWB number for a branch, as observed in the legacy app:
  * branch code + YYMM (UTC) + a 5-digit running number, e.g. JKT261100001.
  * The branch row lock serializes concurrent numbering for one branch.
@@ -101,25 +150,7 @@ export async function nextAwbNo(
   date: Date,
   { lock = true }: { lock?: boolean } = {},
 ) {
-  const locked = lock
-    ? await tx.$queryRaw<{ code: string }[]>`
-        SELECT code FROM branches WHERE id = ${branchId} FOR UPDATE`
-    : await tx.$queryRaw<{ code: string }[]>`
-        SELECT code FROM branches WHERE id = ${branchId}`;
-  const code =
-    (locked[0]?.code ?? "")
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, "")
-      .slice(0, 10) || `C${branchId}`;
-  const yymm = `${String(date.getUTCFullYear()).slice(2)}${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
-  const prefix = `${code}${yymm}`;
-  const start = prefix.length + 1;
-  const rows = await tx.$queryRaw<{ max: number | null }[]>`
-    SELECT max(CASE WHEN substring(awb_no FROM ${start}::int) ~ '^[0-9]{1,9}$'
-                    THEN substring(awb_no FROM ${start}::int)::int END) AS max
-    FROM transactions
-    WHERE origin_branch_id = ${branchId} AND awb_no LIKE ${`${prefix}%`}`;
-  return `${prefix}${String((rows[0]?.max ?? 0) + 1).padStart(5, "0")}`;
+  return nextNumber(tx, "awb", branchId, date, lock);
 }
 
 export async function createBooking(
@@ -171,9 +202,24 @@ export async function createBooking(
       }
     }
 
+    let bookingNo = data.bookingNo?.trim() || null;
+    if (!bookingNo && data.autoBookingNo)
+      bookingNo = await nextBookingNo(
+        tx,
+        branchId,
+        data.bookingDate ?? new Date(),
+      );
+    else if (bookingNo) {
+      // Typed numbers must be unique within the branch.
+      await tx.$queryRaw`SELECT id FROM branches WHERE id = ${branchId} FOR UPDATE`;
+      const used = await tx.booking.count({
+        where: { branchId, bookingNo, deletedAt: null },
+      });
+      if (used) throw new Error("BOOKING_NO_CONFLICT");
+    }
     return tx.booking.create({
       data: {
-        bookingNo: data.bookingNo ?? null,
+        bookingNo,
         bookingDate: data.bookingDate,
         branchId,
         customerId: data.customerId ?? null,

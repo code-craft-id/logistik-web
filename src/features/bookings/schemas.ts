@@ -70,6 +70,11 @@ export const createBookingSchema = z
     kilo: decimalField(8, 2),
     volume: decimalField(7, 3),
     biaya: decimalField(13, 2),
+    /** Generate the booking number when none is typed (like the AWB). */
+    autoBookingNo: z.preprocess(
+      (v) => v === true || v === "on" || v === "true",
+      z.boolean().optional(),
+    ),
     status: z.never().optional(),
   })
   .strict();
