@@ -25,7 +25,7 @@ export const helpEntries: HelpEntry[] = [
       "pending",
     ],
     answer:
-      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action hanya menampilkan menu yang boleh Anda buka.",
+      "Dashboard menampilkan ringkasan bulan berjalan: jumlah transaksi, manifest, lembar pengantaran, AWB Pending (AWB tanpa manifest aktif), invoice outstanding dan piutang, grafik jumlah AWB per hari, status kiriman dan aktivitas AWB terbaru. Ubah periode dan cabang lalu klik Tampilkan laporan. Quick Action mengikuti urutan aplikasi lama (Booking, Entry AWB, Manifest, Transit, Inbound Manifest, Delivery Sheet, Invoice, Tracking AWB, Report Detail Transaksi) dan hanya menampilkan menu yang boleh Anda buka.",
     href: "/dashboard",
   },
   {

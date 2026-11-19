@@ -55,11 +55,18 @@ const QUICK_ACTIONS = [
     action: "create",
     resource: "transaction",
   },
+  { label: "Manifest", href: "/manifest", action: "view", resource: "manifest" },
   {
-    label: "Manifest",
-    href: "/branch-reports/manifest-outbound",
+    label: "Transit",
+    href: "/manifest?type=Transit",
     action: "view",
-    resource: "manifest_report",
+    resource: "manifest",
+  },
+  {
+    label: "Inbound Manifest",
+    href: "/manifest?type=Inbound",
+    action: "view",
+    resource: "manifest",
   },
   {
     label: "Delivery Sheet",
