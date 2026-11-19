@@ -718,3 +718,11 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Built: Rekap Transaksi Excel (multi/one sheet), Report AR on screen + Excel, Import Status (preview then apply valid rows; codes 2/1), shared writeProof for scan and import.
 - Pending confirmation: CASH/KREDIT/COD amounts and day inclusion in the recap, One Sheet layout, AR rules (balance in buckets, age from invoice date to today, invoice receipt date/receiver not recorded), import of codes 003-012.
 - Gates: lint 544 files, typecheck, unit 713, integration 187, build PASS.
+
+## 2026-11-19 — Owner decisions applied; accounting parity (HEAD b295b13)
+- Owner approved: SLA from Cek Ongkir Estimasi (On Time/Late), AR buckets = remaining balance by invoice age, Serah Terima Faktur, recap money columns as built, Returned status (D-09; needs Dev 2 review), import codes 2/1 only.
+- Prototype folder (outside repo) checked: Termin master + AR percent of billed applied.
+- Hidden provider accounting pages observed read-only (/perkiraan, Edit Perkiraan, /rugi-laba). Built, simplified by owner decision: account Induk/Inisial/Tampil/Kategori Rugi Laba/Cabang, Kategori Rugi Laba master, Opening Balance journal, Hitung Rugi Laba, Laporan AP (Rekap Aging Pemasok).
+- Migrations 20261119000800 (invoice handover) and 000900 (account structure) applied to dev and test.
+- Gates: lint 550 files, typecheck, unit 715, integration 189, build PASS.
+- Not done: Perkiraan Excel import/export, "Operator Rugi Laba" (replaced by kind sign), Acc. In / Transit Date, Dimensi (need provider screenshots).
