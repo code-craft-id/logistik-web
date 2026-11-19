@@ -48,6 +48,10 @@ model Office {
 }
 
 model Branch {
+  tariffOrigins Tariff[] @relation("TariffOrigin")
+  tariffDestinations Tariff[] @relation("TariffDestination")
+  podReturnOrigins PodReturn[] @relation("PodReturnOrigin")
+  podReturnDestinations PodReturn[] @relation("PodReturnDestination")
   finMappings FinMapping[]
   finJournals FinJournal[]
   finCostStates FinCostState[]

@@ -71,6 +71,7 @@ model PostalCode {
 }
 
 model Driver {
+  podReturns PodReturn[]
   deletedAt           DateTime?    @map("deleted_at")
   updatedAt           DateTime     @updatedAt @map("updated_at")
   createdAt           DateTime     @default(now()) @map("created_at")
@@ -90,6 +91,7 @@ model Driver {
 }
 
 model Courier {
+  pickupTransactions Transaction[] @relation("TransactionPickupCourier")
   deletedAt        DateTime?    @map("deleted_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
   createdAt        DateTime     @default(now()) @map("created_at")
@@ -140,6 +142,7 @@ model ServiceCategory {
 
 /// Service dictionary only; this is not an operational delivery model.
 model DeliveryService {
+  tariffs Tariff[]
   deletedAt         DateTime?        @map("deleted_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
   createdAt         DateTime         @default(now()) @map("created_at")
@@ -272,6 +275,7 @@ model ShipmentStatus {
 }
 
 model Vendor {
+  vendorBills VendorBill[]
   manifests   Manifest[]
   deletedAt   DateTime?         @map("deleted_at")
   id          Int               @id @default(autoincrement())

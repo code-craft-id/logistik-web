@@ -1,5 +1,6 @@
 /// Personnel fields only. Sales workflows remain TBD, D-10.
 model MarketingPerson {
+  transactions Transaction[]
   customers        Customer[]
   deletedAt        DateTime?    @map("deleted_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
@@ -62,6 +63,7 @@ model Customer {
 
 /// Approved provider form inventory; branch authorization is PLT-01.
 model Consignee {
+  transactions Transaction[]
   id         Int          @id @default(autoincrement())
   name       String
   address1   String?
@@ -141,6 +143,9 @@ model Booking {
 
 /// Transaction/AWB - operational document. Idempotent creation required (AC-02).
 model Transaction {
+  awbChangeRequests AwbChangeRequest[]
+  podReturnItems PodReturnItem[]
+  vendorBillItems VendorBillItem[]
   finLines FinLine[]
   finCostState FinCostState?
   finInvoiceItems FinInvoiceItem[]
@@ -178,6 +183,29 @@ model Transaction {
   costType              CostType?                  @relation(fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   description           String?                    @db.VarChar(500)
   remarks               String?                    @db.VarChar(500)
+  /// Legacy Entry AWB detail (OBSERVED on-site-add/tambah, 2026-11-19). Nullable: historical rows unknown.
+  pickupCourierId       Int?                       @map("pickup_courier_id")
+  pickupCourier         Courier?                   @relation("TransactionPickupCourier", fields: [pickupCourierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  marketingPersonId     Int?                       @map("marketing_person_id")
+  marketingPerson       MarketingPerson?           @relation(fields: [marketingPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  senderAddress         String?                    @map("sender_address") @db.VarChar(500)
+  senderPhone           String?                    @map("sender_phone") @db.VarChar(30)
+  consigneeId           Int?                       @map("consignee_id")
+  consignee             Consignee?                 @relation(fields: [consigneeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  receiverAddress       String?                    @map("receiver_address") @db.VarChar(500)
+  receiverPhone         String?                    @map("receiver_phone") @db.VarChar(30)
+  chargeableWeight      Decimal?                   @map("chargeable_weight") @db.Decimal(10, 2)
+  /// KG (Harga/Kg), KOLI (Harga/Koli) or TRUCKING (flat), as in the legacy Pricing Type.
+  pricingType           String?                    @map("pricing_type") @db.VarChar(10)
+  pricePerKg            Decimal?                   @map("price_per_kg") @db.Decimal(15, 2)
+  minWeight             Decimal?                   @map("min_weight") @db.Decimal(10, 2)
+  insured               Boolean?
+  otherFee              Decimal?                   @map("other_fee") @db.Decimal(15, 2)
+  packingFee            Decimal?                   @map("packing_fee") @db.Decimal(15, 2)
+  pickupFee             Decimal?                   @map("pickup_fee") @db.Decimal(15, 2)
+  totalCost             Decimal?                   @map("total_cost") @db.Decimal(15, 2)
+  discountPercent       Decimal?                   @map("discount_percent") @db.Decimal(5, 2)
+  ppnPercent            Decimal?                   @map("ppn_percent") @db.Decimal(5, 2)
   createdById           Int?                       @map("created_by_id")
   createdBy             User?                      @relation("TransactionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt             DateTime                   @default(now()) @map("created_at")
@@ -198,6 +226,9 @@ model Transaction {
   @@index([deliveryServiceId])
   @@index([goodsTypeId])
   @@index([costTypeId])
+  @@index([pickupCourierId])
+  @@index([marketingPersonId])
+  @@index([consigneeId])
   @@map("transactions")
 }
 
