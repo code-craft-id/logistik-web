@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
+import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { id, listInput } from "../contracts";
@@ -197,7 +198,16 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
   if (!actor) return denied;
   const parsed = id.safeParse(invoiceId);
   if (!parsed.success) notFound();
-  const row = await financeService.detail(parsed.data);
+  // Another branch's invoice or a missing one: same "Data tidak ditemukan"
+  // page as the other detail pages (no hint that the record exists).
+  const row = await financeService.detail(parsed.data).catch((error) => {
+    if (
+      error instanceof IdentityError &&
+      (error.code === "FORBIDDEN_BRANCH" || error.code === "NOT_FOUND")
+    )
+      notFound();
+    throw error;
+  });
   const paymentChoices =
     row.status === "ISSUED" && permits(actor, "create", "payment")
       ? await accountingQueries.paymentChoices()
