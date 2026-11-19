@@ -512,6 +512,7 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       (prisma.$transaction as Mock).mockImplementation(
         async (fn: (tx: MockTxClient) => Promise<unknown>) => {
           const tx = {
+            $queryRaw: vi.fn().mockResolvedValue([]),
             manifest: {
               findFirst: vi.fn().mockResolvedValue({
                 id: 1,
@@ -546,6 +547,7 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       (prisma.$transaction as Mock).mockImplementation(
         async (fn: (tx: MockTxClient) => Promise<unknown>) => {
           const tx = {
+            $queryRaw: vi.fn().mockResolvedValue([]),
             manifest: {
               findFirst: vi.fn().mockResolvedValue({
                 id: 1,
@@ -577,6 +579,7 @@ describe("Authorization regression - Booking/Transaction/Manifest/Delivery", () 
       (prisma.$transaction as Mock).mockImplementation(
         async (fn: (tx: MockTxClient) => Promise<unknown>) => {
           const tx = {
+            $queryRaw: vi.fn().mockResolvedValue([]),
             manifest: {
               findFirst: vi.fn().mockResolvedValue({
                 id: 1,

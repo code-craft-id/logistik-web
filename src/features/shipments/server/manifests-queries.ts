@@ -17,6 +17,18 @@ function visible(actor: AccessActor): Prisma.ManifestWhereInput {
   return { deletedAt: null, branchId: { in: actor.branchIds } };
 }
 
+/** Read access also covers manifests headed to the actor's branches. */
+function readable(actor: AccessActor): Prisma.ManifestWhereInput {
+  if (isAdministrator(actor)) return { deletedAt: null };
+  return {
+    deletedAt: null,
+    OR: [
+      { branchId: { in: actor.branchIds } },
+      { destinationBranchId: { in: actor.branchIds } },
+    ],
+  };
+}
+
 type TotalRow = {
   manifestId: number;
   awb: number;
@@ -76,16 +88,32 @@ function totals(
 
 export async function listManifests(
   actor: AccessActor,
-  params: { page?: number; search?: string; type?: string } = {},
+  params: {
+    page?: number;
+    search?: string;
+    type?: string;
+    /** Cek Inbound Agen: manifests handed to an agent/vendor. */
+    agent?: boolean;
+    destination?: number;
+  } = {},
 ) {
   const page = Math.max(1, Math.floor(params.page ?? 1));
   const search = params.search?.trim().slice(0, 50);
   const type = ["Outbound", "Transit", "Inbound"].includes(params.type ?? "")
     ? params.type
     : undefined;
+  const destination =
+    params.destination && Number.isSafeInteger(params.destination)
+      ? params.destination
+      : undefined;
+  // Inbound views also show manifests headed to the actor's branches.
+  const scope =
+    params.agent || type === "Inbound" ? readable(actor) : visible(actor);
   const where: Prisma.ManifestWhereInput = {
-    ...visible(actor),
+    ...scope,
     ...(type ? { type } : {}),
+    ...(params.agent ? { vendorId: { not: null } } : {}),
+    ...(destination ? { destinationBranchId: destination } : {}),
     ...(search
       ? { manifestNo: { contains: search, mode: "insensitive" as const } }
       : {}),
@@ -107,6 +135,7 @@ export async function listManifests(
         branch: { select: { name: true } },
         vehicle: { select: { name: true, licensePlate: true } },
         courier: { select: { name: true } },
+        vendor: { select: { name: true } },
       },
     }),
     prisma.manifest.count({ where }),
@@ -144,6 +173,7 @@ export async function listManifests(
         ? `${row.vehicle.licensePlate} · ${row.vehicle.name}`
         : null,
       courier: row.courier?.name ?? null,
+      vendor: row.vendor?.name ?? null,
       ...(() => {
         const sum = sums.get(row.id);
         return sum
@@ -161,7 +191,7 @@ export async function listManifests(
 
 export async function getManifest(actor: AccessActor, id: number) {
   const row = await prisma.manifest.findFirst({
-    where: { ...visible(actor), id },
+    where: { ...readable(actor), id },
     include: {
       branch: { select: { name: true } },
       vehicle: { select: { name: true, licensePlate: true } },

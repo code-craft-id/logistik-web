@@ -4,6 +4,8 @@ import { z } from "zod";
 import { Barcode } from "@/components/patterns/barcode";
 import { StatusUpdateForm } from "@/features/bookings/components/status-update-form";
 import { getTransactionById } from "@/features/bookings/server/queries";
+import { currentIdentity } from "@/features/identity/server/context";
+import { AwbChangePanel } from "@/features/modul/components/awb-change-panel";
 import { requirePermission } from "@/lib/auth/session";
 import type { TransactionStatusHistory } from "@/lib/db/generated/client";
 
@@ -25,7 +27,10 @@ export default async function Page({
     notFound();
   }
   const parsedId = parsed.data;
-  const tx = await getTransactionById(parsedId);
+  const [tx, current] = await Promise.all([
+    getTransactionById(parsedId),
+    currentIdentity(),
+  ]);
   if (!tx) notFound();
 
   return (
@@ -62,10 +67,37 @@ export default async function Page({
             ["DOC / PAC", tx.goodsType?.name],
             ["Via Moda", tx.transportMode?.name],
             ["Pembayaran", tx.costType?.name],
+            [
+              "Pricing Type",
+              tx.pricingType === "KOLI"
+                ? "Harga/Koli"
+                : tx.pricingType === "TRUCKING"
+                  ? "Trucking"
+                  : tx.pricingType === "KG"
+                    ? "Harga/Kg"
+                    : null,
+            ],
+            ["Pickup By", tx.pickupCourier?.name],
+            ["Marketing", tx.marketingPerson?.name],
+            ["Alamat Pengirim", tx.senderAddress],
+            ["No. Telp Pengirim", tx.senderPhone],
+            ["Penerima (master)", tx.consignee?.name],
+            ["Alamat Penerima", tx.receiverAddress],
+            ["No. Telp Penerima", tx.receiverPhone],
             ["Koli", tx.koli],
             ["Berat (kg)", tx.kilo?.toString()],
             ["Volume", tx.volume?.toString()],
-            ["Biaya (Rp.)", tx.biaya?.toString()],
+            ["Terberat (Kg)", tx.chargeableWeight?.toString()],
+            ["Harga", tx.pricePerKg?.toString()],
+            ["Min KG", tx.minWeight?.toString()],
+            ["Asuransi", tx.insured === null ? null : tx.insured ? "Y" : "N"],
+            ["Biaya Lain", tx.otherFee?.toString()],
+            ["Biaya Packing", tx.packingFee?.toString()],
+            ["Biaya Pickup", tx.pickupFee?.toString()],
+            ["Total Biaya", tx.totalCost?.toString()],
+            ["Discount (%)", tx.discountPercent?.toString()],
+            ["PPN (%)", tx.ppnPercent?.toString()],
+            ["Grand Total / Biaya (Rp.)", tx.biaya?.toString()],
             ["Isi Barang", tx.description],
             ["Keterangan", tx.remarks],
             ["Kurir", tx.courier?.name],
@@ -81,6 +113,7 @@ export default async function Page({
           </div>
         ))}
       </dl>
+      {current && <AwbChangePanel actor={current.actor} transaction={tx} />}
       <div className="border rounded p-4 space-y-3">
         <h2 className="font-medium">Ubah Status</h2>
         <div>

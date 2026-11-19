@@ -4,8 +4,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
 import { InfoTip } from "@/components/patterns/info-tip";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { SelectAllCheckbox } from "@/components/patterns/select-all";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -17,6 +19,8 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
+import { selectClass } from "@/features/modul/components/page-bits";
+import { branchChoices } from "@/features/modul/server/inbound";
 import { listManifests } from "@/features/shipments/server/manifests-queries";
 import { requirePermission } from "@/lib/auth/session";
 
@@ -40,16 +44,35 @@ export default async function Page({
   const one = (v: string | string[] | undefined) =>
     typeof v === "string" ? v : undefined;
   const search = one(query.search) ?? "";
-  const type = one(query.type) ?? "";
+  const agent = one(query.view) === "agent";
+  const type = agent ? "" : (one(query.type) ?? "");
+  const destination = Number(one(query.destination)) || undefined;
   const titles: Record<string, string> = {
     Transit: "Cek Transit",
     Inbound: "Cek Inbound",
     Outbound: "Manifest Outbound",
   };
   const page = Number(one(query.page) ?? 1) || 1;
-  const result = await listManifests(current.actor, { page, search, type });
+  const [result, branches] = await Promise.all([
+    listManifests(current.actor, { page, search, type, agent, destination }),
+    branchChoices(),
+  ]);
+  const keep = {
+    ...(agent ? { view: "agent" } : {}),
+    ...(type ? { type } : {}),
+    ...(search ? { search } : {}),
+    ...(destination ? { destination: String(destination) } : {}),
+  };
   const href = (p: number) =>
-    `/manifest?${new URLSearchParams({ ...(type ? { type } : {}), ...(search ? { search } : {}), page: String(p) })}`;
+    `/manifest?${new URLSearchParams({ ...keep, page: String(p) })}`;
+  const activeTab = agent ? "agent" : type || "all";
+  const tabs = [
+    { key: "all", label: "Semua", href: "/manifest" },
+    { key: "Outbound", label: "Outbound", href: "/manifest?type=Outbound" },
+    { key: "Transit", label: "Transit", href: "/manifest?type=Transit" },
+    { key: "Inbound", label: "Inbound", href: "/manifest?type=Inbound" },
+    { key: "agent", label: "Inbound Agen", href: "/manifest?view=agent" },
+  ];
   const headers = [
     "Manifes No.",
     "Tanggal",
@@ -61,6 +84,7 @@ export default async function Page({
     "Tot. Volume",
     "Kendaraan",
     "Kurir",
+    ...(agent ? ["Agen / Vendor"] : []),
     "Status",
   ];
   const numeric = new Set(headers.filter((h) => h.startsWith("Tot.")));
@@ -70,11 +94,13 @@ export default async function Page({
         <div className="space-y-1">
           <div className="flex items-center gap-1">
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-              {titles[type] ?? "Daftar Manifest"}
+              {agent ? "Cek Inbound Agen" : (titles[type] ?? "Daftar Manifest")}
             </h1>
             <InfoTip
               text={
-                "Manifest dalam cakupan cabang Anda. Total dihitung dari AWB yang masih aktif di manifest."
+                agent
+                  ? "Manifest yang diteruskan ke agen/vendor. Pilih Tujuan untuk melihat manifest ke kota tertentu. Total dihitung dari AWB yang masih aktif."
+                  : "Manifest dalam cakupan cabang Anda; tab Inbound juga menampilkan manifest yang menuju cabang Anda. Total dihitung dari AWB yang masih aktif di manifest."
               }
             />
           </div>
@@ -85,11 +111,31 @@ export default async function Page({
           </Button>
         )}
       </header>
+      <PageTabs label="Jenis manifest" tabs={tabs} active={activeTab} />
       <Form
         action="/manifest"
         className="flex flex-col gap-2 rounded-lg border bg-background p-4 sm:flex-row sm:items-end"
       >
         {type && <input type="hidden" name="type" value={type} />}
+        {agent && <input type="hidden" name="view" value="agent" />}
+        <div className="min-w-0 space-y-2 sm:w-64">
+          <label htmlFor="manifest-destination" className="text-sm font-medium">
+            Tujuan
+          </label>
+          <ComboSelect
+            id="manifest-destination"
+            name="destination"
+            defaultValue={destination ? String(destination) : ""}
+            className={selectClass}
+          >
+            <option value="">Semua tujuan</option>
+            {branches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </ComboSelect>
+        </div>
         <div className="min-w-0 flex-1 space-y-2">
           <label htmlFor="manifest-search" className="text-sm font-medium">
             Cari nomor manifest
@@ -189,6 +235,7 @@ export default async function Page({
                       </TableCell>
                       <TableCell>{row.vehicle ?? "—"}</TableCell>
                       <TableCell>{row.courier ?? "—"}</TableCell>
+                      {agent && <TableCell>{row.vendor ?? "—"}</TableCell>}
                       <TableCell>{row.status}</TableCell>
                     </TableRow>
                   ))}

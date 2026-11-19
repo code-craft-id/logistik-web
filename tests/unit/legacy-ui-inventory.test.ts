@@ -41,8 +41,9 @@ describe("legacy inventory coverage and presentation routing", () => {
     const finance = navigationDestinations().filter(({ item }) =>
       item.href?.startsWith("/finance/"),
     );
-    // Seven Akunting entries, Master Data > Perkiraan and Modul > Invoice (new).
-    expect(finance).toHaveLength(9);
+    // Seven Akunting entries, Master Data > Perkiraan and Modul > Invoice (New)
+    // and Pembayaran Hutang.
+    expect(finance).toHaveLength(10);
     for (const { item } of finance) {
       expect(
         existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),

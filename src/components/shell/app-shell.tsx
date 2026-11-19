@@ -175,9 +175,12 @@ function DesktopNavigation({
 // navigation. Pages and the dashboard layout retain their server boundaries.
 function ShellHeader({
   accountContent,
+  headerActions,
   groups,
 }: {
   accountContent?: ReactNode;
+  /** Optional controls shown before the account menu (e.g. notifications). */
+  headerActions?: ReactNode;
   groups: readonly NavigationGroup[];
 }) {
   const [openMenu, setOpenMenu] = useState("");
@@ -284,6 +287,7 @@ function ShellHeader({
               />
             </SheetContent>
           </Sheet>
+          {headerActions}
           <DropdownMenu
             open={account}
             onOpenChange={(value) => {
@@ -349,10 +353,12 @@ function ShellHeader({
 export function AppShell({
   children,
   accountContent,
+  headerActions,
   groups = navigation,
 }: {
   children?: ReactNode;
   accountContent?: ReactNode;
+  headerActions?: ReactNode;
   groups?: readonly NavigationGroup[];
 }) {
   const pathname = usePathname();
@@ -369,6 +375,7 @@ export function AppShell({
       <ShellHeader
         key={pathname}
         accountContent={accountContent}
+        headerActions={headerActions}
         groups={groups}
       />
       <nav

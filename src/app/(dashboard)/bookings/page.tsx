@@ -1,16 +1,52 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { listBookings } from "@/features/bookings/server/queries";
+import { currentIdentity } from "@/features/identity/server/context";
+import { InboundBookings } from "@/features/modul/components/inbound-bookings";
+import { one } from "@/features/modul/components/page-bits";
 import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Kelola Booking" };
 
-export default async function Page() {
+// Session- and query-dependent page; blocking render.
+export const instant = false;
+
+const tabs = [
+  { key: "booking", label: "Booking", href: "/bookings" },
+  { key: "inbound", label: "Inbound Booking", href: "/bookings?tab=inbound" },
+];
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   await requirePermission("view", "booking");
+  const query = await searchParams;
+  if (one(query.tab) === "inbound") {
+    const current = await currentIdentity();
+    if (!current) redirect("/login");
+    return (
+      <div className="min-w-0 space-y-5">
+        <PageTabs label="Jenis booking" tabs={tabs} active="inbound" />
+        <InboundBookings
+          actor={current.actor}
+          values={{
+            search: one(query.search),
+            from: one(query.from),
+            to: one(query.to),
+          }}
+        />
+      </div>
+    );
+  }
   const bookings = await listBookings({ limit: 50 });
 
   return (
     <div className="space-y-6">
+      <PageTabs label="Jenis booking" tabs={tabs} active="booking" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">

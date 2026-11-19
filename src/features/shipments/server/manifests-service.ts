@@ -182,6 +182,9 @@ export async function assignTransactionToManifest(
       throw new Error("MANIFEST_NOT_ASSIGNABLE");
     }
 
+    // Serialize with an approved AWB delete (Persetujuan Edit/delete AWB),
+    // which locks the same row before checking manifest membership.
+    await tx.$queryRaw`SELECT id FROM transactions WHERE id = ${data.transactionId} FOR UPDATE`;
     const transaction = await tx.transaction.findFirst({
       where: {
         id: data.transactionId,

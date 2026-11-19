@@ -51,8 +51,83 @@ export const helpEntries: HelpEntry[] = [
       "kirim",
     ],
     answer:
-      "Modul > Layanan Pelanggan > Transaksi, lalu Tambah. Pilih Asal (wajib) dan Tujuan, isi pengirim/penerima, koli, berat, volume, Biaya, Customer, Layanan, DOC/PAC, Via Moda, Pembayaran, Isi Barang dan Keterangan. Nomor AWB boleh dikosongkan. Kirim ulang form yang sama tidak membuat AWB ganda. Biaya diisi manual; hitungan harga otomatis belum tersedia.",
+      "Modul > Layanan Pelanggan > Transaksi > On Site Outbound, lalu Tambah AWB. Kolom AWB No. terisi otomatis setelah Asal dipilih (kode cabang asal + tahun bulan + nomor urut, contoh JKT261100001) dan boleh diubah; bila tidak diubah, nomor dikunci saat disimpan sehingga tidak bentrok dengan pengguna lain. Pilih Pricing Type (Harga/Kg, Harga/Koli, Trucking), Pickup By, Asal (wajib), Tujuan, Customer, Marketing, data pengirim dan penerima (pilih Penerima untuk mengisi otomatis), Layanan, DOC/PAC, Via Moda, Pembayaran, koli, volume dan berat. Harga/Kg dan Min KG terisi dari tarif Cek Ongkir bila ada. Grand Total = harga x Terberat (minimal Min KG) / koli / tarif tetap + biaya lain, packing, pickup - discount + PPN, dihitung ulang oleh server. Ganti Harga = isi Grand Total manual. Kirim ulang form yang sama tidak membuat AWB ganda. Tab On Site Inbound menampilkan AWB yang menuju cabang Anda.",
     href: "/transactions/new",
+  },
+  {
+    id: "awb-approval",
+    title: "Persetujuan Edit/delete AWB",
+    keywords: [
+      "edit awb",
+      "hapus awb",
+      "delete awb",
+      "persetujuan",
+      "approval awb",
+      "ubah awb",
+      "modified",
+    ],
+    answer:
+      "Buka detail AWB, pilih Ajukan Edit atau Ajukan Hapus dan isi alasan. Penyetuju membuka Modul > Layanan Pelanggan > Transaksi > Persetujuan Edit/delete AWB lalu klik Setujui atau Tolak (pengaju tidak boleh menyetujui sendiri, kecuali admin). Hapus yang disetujui langsung menghapus AWB, kecuali AWB masih ada di manifest, lembar pengantaran, invoice, jurnal, POD Kembali atau hutang. Edit yang disetujui membuka form edit sekali di detail AWB; koli, berat, volume dan biaya tidak bisa diubah bila AWB sudah diinvoice atau dijurnal. Riwayatnya tampil di Histori Edit Resi dan History Delete Resi.",
+    href: "/transactions/approvals",
+  },
+  {
+    id: "cek-ongkir",
+    title: "Cek Ongkir dan tarif",
+    keywords: [
+      "ongkir",
+      "tarif",
+      "harga",
+      "cek ongkir",
+      "biaya kirim",
+      "estimasi",
+    ],
+    answer:
+      "Modul > Layanan Pelanggan > Cek Ongkir. Pilih Dari, Ke dan isi berat, lalu Cek. Tarif = Tarif per Kg x berat (minimal Berat Min.). Pengguna dengan hak kelola tarif bisa menambah atau menghapus tarif di bagian Kelola Tarif. Tarif ini juga mengisi otomatis Harga/Kg dan Min KG saat Tambah AWB.",
+    href: "/customer-service/cek-ongkir",
+  },
+  {
+    id: "inbound-booking",
+    title: "Inbound Booking",
+    keywords: ["inbound booking", "booking masuk", "booking tujuan"],
+    answer:
+      "Modul > Layanan Pelanggan > Inbound Booking (tab di halaman Booking) menampilkan booking yang menuju cabang Anda: tujuan booking sama dengan nama cabang, atau AWB-nya menuju cabang Anda.",
+    href: "/bookings?tab=inbound",
+  },
+  {
+    id: "inbound-agen",
+    title: "Cek Inbound Agen",
+    keywords: ["inbound agen", "agen", "manifest agen", "vendor"],
+    answer:
+      "Modul > Operasional > Manifest > Cek Inbound Agen (tab di halaman Manifest) menampilkan manifest yang diteruskan ke agen/vendor. Pilih Tujuan untuk menyaring per kota cabang.",
+    href: "/manifest?view=agent",
+  },
+  {
+    id: "pod-return",
+    title: "POD Kembali dan Approval Pod Kembali",
+    keywords: [
+      "pod kembali",
+      "pod",
+      "bukti terima",
+      "approval pod",
+      "stt kembali",
+    ],
+    answer:
+      "Modul > Operasional > POD Kembali: klik Tambah POD Kembali, pilih tanggal, cabang asal, Tujuan POD, driver, keterangan dan tempel nomor AWB berstatus Delivered. Nomor dokumen dibuat otomatis (POD-YYYYMMDD-urut). Cabang tujuan menyetujui atau menolak di tab Approval Pod Kembali. Satu AWB hanya boleh ada di satu dokumen yang tidak ditolak.",
+    href: "/pod-returns",
+  },
+  {
+    id: "debt-payment",
+    title: "Pembayaran Hutang",
+    keywords: [
+      "hutang",
+      "pembayaran hutang",
+      "invoice vendor",
+      "ap",
+      "tagihan vendor",
+    ],
+    answer:
+      "Modul > Keuangan > Hutang Dagang > Pembayaran Hutang. Klik Tambah Pembayaran Hutang, pilih Kategori dan Vendor, tanggal, nomor invoice (kosongkan untuk otomatis), tanggal diterima, term, nominal dan AWB terkait. Tgl. Pengingat = tanggal diterima (atau dibuat) + term. Klik Tandai Lunas saat sudah dibayar. Belum membuat jurnal akuntansi.",
+    href: "/finance/debt-payments",
   },
   {
     id: "awb-detail",

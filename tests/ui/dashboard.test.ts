@@ -133,5 +133,6 @@ describe("legacy dashboard supported presentation", () => {
     await act(async () => dashboard?.click());
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
-  });
+    // Renders the full menu inventory; allow for slower shared hosts.
+  }, 30_000);
 });

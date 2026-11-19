@@ -4,6 +4,7 @@ import { AppShell } from "@/components/shell/app-shell";
 import { HelpChat } from "@/features/help/components/help-chat";
 import { WorkspaceAccount } from "@/features/identity/components/workspace-account";
 import { currentIdentity } from "@/features/identity/server/context";
+import { NotificationBell } from "@/features/modul/components/notification-bell";
 
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   return (
@@ -24,6 +25,7 @@ async function AuthorizedShell({ children }: { children: ReactNode }) {
     <>
       <AppShell
         groups={accessibleNavigation(current?.actor ?? null)}
+        headerActions={current ? <NotificationBell /> : null}
         accountContent={
           <Suspense
             fallback={

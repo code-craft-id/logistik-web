@@ -81,14 +81,14 @@ export const legacyMenu = [
       {
         label: "Layanan Pelanggan / Transaksi",
         children: [
-          { label: "Onsite Outbound", href: "/transactions/new" },
+          { label: "On Site Outbound", href: "/transactions" },
+          { label: "On Site Inbound", href: "/transactions?tab=inbound" },
+          { label: "Print AWB", href: "/transactions?print=1" },
           {
-            label: "Onsite Inbound",
-            href: "/branch-reports/inbound-transaction-details?view=onsite",
+            label: "Persetujuan Edit/delete AWB",
+            href: "/transactions/approvals",
           },
-          { label: "Print AWB", href: "/transactions" },
-          { label: "Persetujuaan Edit/Delete AWB" },
-          { label: "Void AWB", href: "/transactions/void" },
+          { label: "Void Awb", href: "/transactions/void" },
         ],
       },
       {
@@ -98,11 +98,11 @@ export const legacyMenu = [
             label: "Status Pengantaran",
             href: "/branch-reports/delivery?view=items",
           },
-          { label: "Cek Ongkir" },
+          { label: "Cek Ongkir", href: "/customer-service/cek-ongkir" },
           { label: "Cek Resi", href: "/transactions/lookup" },
           { label: "Histori Edit Resi", href: "/transactions/history" },
           { label: "Booking", href: "/bookings" },
-          { label: "Inbound Booking" },
+          { label: "Inbound Booking", href: "/bookings?tab=inbound" },
           {
             label: "History Delete Resi",
             href: "/transactions/void?view=deleted",
@@ -115,7 +115,7 @@ export const legacyMenu = [
           { label: "Manifest", href: "/manifest" },
           { label: "Cek Transit", href: "/manifest?type=Transit" },
           { label: "Cek Inbound", href: "/manifest?type=Inbound" },
-          { label: "Cek Inbound Agen" },
+          { label: "Cek Inbound Agen", href: "/manifest?view=agent" },
           { label: "Print Manifest", href: "/manifest?type=Outbound" },
         ],
       },
@@ -129,8 +129,8 @@ export const legacyMenu = [
       {
         label: "Operasional",
         children: [
-          { label: "POD Kembali", href: "/customer-reports/pod?view=ops" },
-          { label: "Approval POD Kembali" },
+          { label: "POD Kembali", href: "/pod-returns" },
+          { label: "Approval Pod Kembali", href: "/pod-returns?tab=approval" },
           {
             label: "Proses Vendor",
             href: "/branch-reports/manifest-vendor?view=process",
@@ -140,8 +140,8 @@ export const legacyMenu = [
       {
         label: "Keuangan",
         children: [
-          { label: "Invoice (new)", href: "/finance/invoices?from=modul" },
-          { label: "Pembayaran Hutang" },
+          { label: "Invoice (New)", href: "/finance/invoices?from=modul" },
+          { label: "Pembayaran Hutang", href: "/finance/debt-payments" },
         ],
       },
     ],

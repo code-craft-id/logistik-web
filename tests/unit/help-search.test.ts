@@ -27,7 +27,9 @@ describe("feature help chat", () => {
     expect(new Set(helpEntries.map((e) => e.id)).size).toBe(helpEntries.length);
     for (const { href } of helpEntries)
       if (href)
-        expect(existsSync(`src/app/(dashboard)${href}/page.tsx`)).toBe(true);
+        expect(
+          existsSync(`src/app/(dashboard)${href.split("?")[0]}/page.tsx`),
+        ).toBe(true);
   });
   it("drops chat history older than ten minutes", () => {
     const now = 10 * HISTORY_TTL_MS;

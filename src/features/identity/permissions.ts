@@ -255,6 +255,26 @@ export const permissionResources = [
     label: "Laporan keuangan",
     actions: ["view"],
   },
+  {
+    resource: "awb_change",
+    label: "Persetujuan Edit/Delete AWB",
+    actions: ["view", "request", "approve"],
+  },
+  {
+    resource: "tariff",
+    label: "Tarif / Cek Ongkir",
+    actions: ["view", "manage"],
+  },
+  {
+    resource: "pod_return",
+    label: "POD Kembali",
+    actions: ["view", "create", "approve"],
+  },
+  {
+    resource: "debt_payment",
+    label: "Pembayaran Hutang",
+    actions: ["view", "create", "close"],
+  },
 ] as const;
 
 export const permissionGrantCount = permissionResources.reduce(
@@ -283,6 +303,10 @@ export function permissionRestriction(resource: string): string | undefined {
       "consignee",
       "manifest",
       "delivery",
+      "awb_change",
+      "tariff",
+      "pod_return",
+      "debt_payment",
       "ticket",
       "transaction_report",
       "manifest_report",

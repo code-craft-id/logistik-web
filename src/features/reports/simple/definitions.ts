@@ -427,7 +427,7 @@ export const simpleReports: Record<string, ReportDef> = {
     title: "Void AWB",
     resource: "transaction",
     definition:
-      "AWB berstatus Cancelled atau sudah dihapus, menurut tanggal transaksi dalam periode. Belum ada persetujuan void terpisah; pembatalan tercatat di riwayat status.",
+      "AWB berstatus Cancelled atau sudah dihapus, menurut tanggal transaksi dalam periode. Hapus AWB lewat Persetujuan Edit/delete AWB; pembatalan tercatat di riwayat status.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
         SELECT t.awb_no AS awb, to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
@@ -436,7 +436,8 @@ export const simpleReports: Record<string, ReportDef> = {
                t.biaya::text AS biaya,
                CASE WHEN t.deleted_at IS NOT NULL THEN 'Dihapus' ELSE t.status END AS keterangan,
                to_char(COALESCE(t.deleted_at, h.changed_at), 'YYYY-MM-DD HH24:MI') AS waktu,
-               u.name AS oleh
+               COALESCE(CASE WHEN t.deleted_at IS NOT NULL THEN da.name END, u.name) AS oleh,
+               d.reason AS alasan
         FROM transactions t
         LEFT JOIN branches db ON db.id = t.destination_branch_id
         LEFT JOIN LATERAL (
@@ -444,6 +445,11 @@ export const simpleReports: Record<string, ReportDef> = {
           WHERE sh.transaction_id = t.id AND sh.new_status = 'Cancelled'
           ORDER BY sh.changed_at DESC LIMIT 1) h ON TRUE
         LEFT JOIN auth_users u ON u.id = h.actor_id
+        LEFT JOIN LATERAL (
+          SELECT r.reason, r.decided_by_id FROM awb_change_requests r
+          WHERE r.transaction_id = t.id AND r.kind = 'DELETE' AND r.status = 'APPROVED'
+          ORDER BY r.decided_at DESC LIMIT 1) d ON TRUE
+        LEFT JOIN auth_users da ON da.id = d.decided_by_id
         WHERE (t.deleted_at IS NOT NULL OR t.status = 'Cancelled')
           AND ${branchScopeAny(actor, f)}
           AND t.transaction_date >= ${f.from} AND t.transaction_date < ${f.toExclusive}
@@ -460,7 +466,8 @@ export const simpleReports: Record<string, ReportDef> = {
           count("Berat (kg)", "kilo"),
           money("Biaya (Rp)", "biaya"),
           { key: "keterangan", label: "Keterangan" },
-          { key: "oleh", label: "Dibatalkan oleh" },
+          { key: "oleh", label: "Dibatalkan/disetujui oleh" },
+          { key: "alasan", label: "Alasan hapus" },
           { key: "waktu", label: "Waktu (UTC)" },
         ],
         ...capped(rows),
@@ -471,25 +478,39 @@ export const simpleReports: Record<string, ReportDef> = {
     title: "Histori Resi",
     resource: "transaction",
     definition:
-      "Riwayat perubahan status AWB (siapa, kapan, dari status apa ke status apa, alasan) menurut waktu perubahan dalam periode. Perubahan data AWB selain status belum dicatat terpisah.",
+      "Riwayat perubahan AWB menurut waktu perubahan dalam periode: perubahan status (dari, ke, alasan, oleh) dan edit data yang disetujui lewat Persetujuan Edit/delete AWB (nilai sebelum dan sesudah).",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT t.awb_no AS awb,
-               to_char(h.changed_at, 'YYYY-MM-DD HH24:MI') AS waktu,
-               COALESCE(h.prior_status, '-') AS dari, h.new_status AS ke,
-               h.reason AS alasan, u.name AS oleh
-        FROM transaction_status_history h
-        JOIN transactions t ON t.id = h.transaction_id
-        LEFT JOIN auth_users u ON u.id = h.actor_id
-        WHERE ${branchScopeAny(actor, f)}
-          AND h.changed_at >= ${f.from} AND h.changed_at < ${f.toExclusive}
-        ORDER BY h.changed_at DESC, h.id DESC LIMIT ${ROW_LIMIT + 1}`;
+        SELECT awb, to_char(at, 'YYYY-MM-DD HH24:MI') AS waktu, jenis, dari, ke, alasan, oleh
+        FROM (
+          SELECT t.awb_no AS awb, h.changed_at AS at, 'Status' AS jenis,
+                 COALESCE(h.prior_status, '-') AS dari, h.new_status AS ke,
+                 h.reason AS alasan, u.name AS oleh, h.id AS sort_id
+          FROM transaction_status_history h
+          JOIN transactions t ON t.id = h.transaction_id
+          LEFT JOIN auth_users u ON u.id = h.actor_id
+          WHERE ${branchScopeAny(actor, f)}
+            AND h.changed_at >= ${f.from} AND h.changed_at < ${f.toExclusive}
+          UNION ALL
+          SELECT t.awb_no, r.used_at, 'Edit data',
+                 (SELECT string_agg(c.key || ': ' || COALESCE(c.value->>0, '-'), '; ' ORDER BY c.key) FROM jsonb_each(r.changes) c),
+                 (SELECT string_agg(c.key || ': ' || COALESCE(c.value->>1, '-'), '; ' ORDER BY c.key) FROM jsonb_each(r.changes) c),
+                 r.reason, u.name, r.id
+          FROM awb_change_requests r
+          JOIN transactions t ON t.id = r.transaction_id
+          LEFT JOIN auth_users u ON u.id = r.requested_by_id
+          WHERE r.status = 'USED' AND r.changes IS NOT NULL
+            AND ${branchScopeAny(actor, f)}
+            AND r.used_at >= ${f.from} AND r.used_at < ${f.toExclusive}
+        ) x
+        ORDER BY at DESC, sort_id DESC LIMIT ${ROW_LIMIT + 1}`;
       return {
         columns: [
           { key: "awb", label: "AWB No." },
           { key: "waktu", label: "Waktu (UTC)" },
-          { key: "dari", label: "Dari status" },
-          { key: "ke", label: "Ke status" },
+          { key: "jenis", label: "Jenis" },
+          { key: "dari", label: "Sebelum" },
+          { key: "ke", label: "Sesudah" },
           { key: "alasan", label: "Alasan" },
           { key: "oleh", label: "Oleh" },
         ],
