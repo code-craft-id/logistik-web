@@ -9,6 +9,7 @@ import {
   checkStatusRows,
   type ImportRow,
   parseStatusFile,
+  STATUS_IMPORT_MAX_BYTES,
 } from "./server/status-import";
 
 export type StatusImportResult =
@@ -29,6 +30,8 @@ export async function statusImportAction(
     if (!current) throw new IdentityError("UNAUTHENTICATED", 401);
     const file = formData.get("file");
     if (!(file instanceof File)) return { ok: false, message: "Pilih file." };
+    if (file.size > STATUS_IMPORT_MAX_BYTES)
+      throw new ModulError("File maksimal 2 MB.");
     const parsed = parseStatusFile(
       new Uint8Array(await file.arrayBuffer()),
       file.name,

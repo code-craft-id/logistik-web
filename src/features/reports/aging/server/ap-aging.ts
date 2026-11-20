@@ -2,19 +2,19 @@ import "server-only";
 
 import * as XLSX from "xlsx";
 import { z } from "zod";
-import {
-  type AccessActor,
-  isAdministrator,
-} from "@/features/identity/permissions";
+import type { AccessActor } from "@/features/identity/permissions";
 import {
   assertPermission,
   IdentityError,
 } from "@/features/identity/server/access";
+import { vendorBillScope } from "@/features/modul/server/vendor-bills";
+import { jakartaMonthStartUtc } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@/lib/db/generated/client";
 
 /**
  * Rekap Aging Pemasok (Laporan AP; layout from the earlier prototype of
- * the provider's hidden menu): unpaid vendor bills (Proses Vendor /
+ * the provider's hidden menu): bills still open at month end (Proses Vendor /
  * Pembayaran Hutang) dated in the chosen month, with NAMA PERUSAHAAN, NO
  * KWT/INV, TANGGAL FAKTUR, ATAS (bill category Vendor/Agen/Lainnya), BATAS WAKTU (received or
  * bill date + term), JUMLAH TAGIHAN, buckets 0-30 / 31-60 / 61-90 / > 90
@@ -54,32 +54,20 @@ export async function apAgingReport(actor: AccessActor, raw: unknown) {
   const parsed = apAgingInput.safeParse(raw);
   if (!parsed.success) throw new IdentityError("VALIDATION", 400);
   const input = parsed.data;
-  const from = new Date(Date.UTC(input.year, input.month - 1, 1));
-  const to = new Date(Date.UTC(input.year, input.month, 1));
+  const billDateBefore = new Date(Date.UTC(input.year, input.month, 1));
+  const cutoff = jakartaMonthStartUtc(input.year, input.month + 1);
+  const monthEnd = new Date(billDateBefore.getTime() - 86_400_000);
   const rows = await prisma.vendorBill.findMany({
     where: {
       deletedAt: null,
-      status: "OPEN",
-      billDate: { gte: from, lt: to },
+      createdAt: { lt: cutoff },
+      billDate: { lt: billDateBefore },
+      OR: [{ status: "OPEN" }, { status: "PAID", closedAt: { gt: cutoff } }],
       ...(input.vendorId ? { vendorId: input.vendorId } : {}),
-      // Same visibility as Pembayaran Hutang.
-      ...(isAdministrator(actor)
-        ? {}
-        : {
-            OR: [
-              { createdById: actor.id },
-              {
-                items: {
-                  some: {
-                    transaction: { originBranchId: { in: actor.branchIds } },
-                  },
-                },
-              },
-            ],
-          }),
+      ...vendorBillScope(actor),
     },
     orderBy: [{ billDate: "asc" }, { id: "asc" }],
-    take: 5000,
+    take: 5001,
     select: {
       invoiceNo: true,
       category: true,
@@ -90,12 +78,18 @@ export async function apAgingReport(actor: AccessActor, raw: unknown) {
       vendor: { select: { name: true } },
     },
   });
-  const today = startOfDay(new Date());
+  if (rows.length > 5000)
+    throw new IdentityError(
+      "EXPORT_LIMIT",
+      422,
+      "Hasil melebihi 5000 baris. Persempit filter laporan.",
+    );
+  const reportDay = startOfDay(monthEnd);
   const items = rows.map((r) => {
-    const amount = Number(r.amount);
+    const amount = new Prisma.Decimal(r.amount.toString());
     const age = Math.max(
       0,
-      Math.round((today - startOfDay(r.billDate)) / 86_400_000),
+      Math.round((reportDay - startOfDay(r.billDate)) / 86_400_000),
     );
     const due = new Date(r.receivedDate ?? r.billDate);
     due.setUTCDate(due.getUTCDate() + r.termDays);
@@ -105,17 +99,19 @@ export async function apAgingReport(actor: AccessActor, raw: unknown) {
       billDate: dmy(r.billDate),
       category: r.category,
       dueDate: dmy(due),
-      total: amount,
+      total: amount.toFixed(2),
       ageDays: age,
-      b0_30: age <= 30 ? amount : 0,
-      b31_60: age > 30 && age <= 60 ? amount : 0,
-      b61_90: age > 60 && age <= 90 ? amount : 0,
-      b90plus: age > 90 ? amount : 0,
-      note: today > startOfDay(due) ? "Lewat batas waktu" : "",
+      b0_30: age <= 30 ? amount.toFixed(2) : "0.00",
+      b31_60: age > 30 && age <= 60 ? amount.toFixed(2) : "0.00",
+      b61_90: age > 60 && age <= 90 ? amount.toFixed(2) : "0.00",
+      b90plus: age > 90 ? amount.toFixed(2) : "0.00",
+      note: reportDay > startOfDay(due) ? "Lewat batas waktu" : "",
     };
   });
   const sum = (k: "total" | "b0_30" | "b31_60" | "b61_90" | "b90plus") =>
-    items.reduce((t, r) => t + r[k], 0);
+    items
+      .reduce((total, row) => total.plus(row[k]), new Prisma.Decimal(0))
+      .toFixed(2);
   const totals = {
     total: sum("total"),
     b0_30: sum("b0_30"),
@@ -123,8 +119,16 @@ export async function apAgingReport(actor: AccessActor, raw: unknown) {
     b61_90: sum("b61_90"),
     b90plus: sum("b90plus"),
   };
-  const pct = (v: number) =>
-    totals.total ? Math.round((v / totals.total) * 10000) / 100 : null;
+  const pct = (v: string) => {
+    const total = new Prisma.Decimal(totals.total);
+    return total.isZero()
+      ? null
+      : new Prisma.Decimal(v)
+          .div(total)
+          .times(100)
+          .toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP)
+          .toNumber();
+  };
   const vendor = input.vendorId
     ? await prisma.vendor.findFirst({
         where: { id: input.vendorId },
@@ -134,8 +138,8 @@ export async function apAgingReport(actor: AccessActor, raw: unknown) {
   return {
     input,
     vendor: vendor?.name ?? "Semua Pemasok",
-    start: dmy(from),
-    end: dmy(new Date(to.getTime() - 86_400_000)),
+    start: dmy(new Date(Date.UTC(input.year, input.month - 1, 1))),
+    end: dmy(monthEnd),
     items,
     totals,
     percent: {

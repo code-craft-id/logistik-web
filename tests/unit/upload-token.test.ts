@@ -22,6 +22,13 @@ describe("upload tokens", () => {
     const now = 1_700_000_000_000;
     const token = signUpload(claim, now);
     expect(verifyUpload(claim, token, now + 1000)).toBe(true);
+    expect(
+      verifyUpload({ ...claim, outcome: "RETURNED" }, token, now + 1000),
+    ).toBe(false);
+    const returnedToken = signUpload({ ...claim, outcome: "RETURNED" }, now);
+    expect(
+      verifyUpload({ ...claim, outcome: "RETURNED" }, returnedToken, now),
+    ).toBe(true);
     expect(verifyUpload({ ...claim, actorId: 8 }, token, now)).toBe(false);
     expect(verifyUpload({ ...claim, transactionId: 43 }, token, now)).toBe(
       false,

@@ -355,6 +355,23 @@ describe("Entry AWB capture fields", () => {
       koli: 2,
       pricingType: "KG" as const,
       pricePerKg: "1000",
+      transportModeId: ids.mode,
+      dimensionRows: [
+        {
+          length: "100",
+          width: "50",
+          height: "40",
+          kilo: "5",
+          packed: false,
+        },
+        {
+          length: "20",
+          width: "20",
+          height: "10",
+          kilo: "2",
+          packed: false,
+        },
+      ],
     };
     // Koli 1: volume 50 / berat 5, koli 2: volume 1 / berat 2 -> 50 + 2.
     const dims = await service.createTransaction(
@@ -364,13 +381,27 @@ describe("Entry AWB capture fields", () => {
     ids.tx.push(dims.transaction.id);
     expect(dims.transaction.chargeableWeight?.toString()).toBe("52");
     expect(dims.transaction.biaya?.toString()).toBe("52000");
-    // Below max(total volume, total berat) or above their sum: refused.
-    for (const bad of ["50", "59"])
-      await expect(
-        service.createTransaction(
-          { ...base, awbNo: `${tag}-dim-${bad}`, chargeableWeight: bad },
-          actor([ids.branch]),
-        ),
-      ).rejects.toThrow("VALIDATION_CHARGEABLE_WEIGHT");
+    // Client summaries are ignored; the server recalculates from each koli.
+    for (const claimed of ["50", "59"]) {
+      const recalculated = await service.createTransaction(
+        { ...base, awbNo: `${tag}-dim-${claimed}`, chargeableWeight: claimed },
+        actor([ids.branch]),
+      );
+      ids.tx.push(recalculated.transaction.id);
+      expect(recalculated.transaction.chargeableWeight?.toString()).toBe("52");
+      expect(recalculated.transaction.kilo?.toString()).toBe("7");
+      expect(recalculated.transaction.volume?.toString()).toBe("51");
+    }
+    await expect(
+      service.createTransaction(
+        {
+          ...base,
+          awbNo: `${tag}-dim-no-source`,
+          dimensionRows: undefined,
+          chargeableWeight: "10",
+        },
+        actor([ids.branch]),
+      ),
+    ).rejects.toThrow("Berat terberat harus dihitung dari dimensi per koli.");
   });
 });

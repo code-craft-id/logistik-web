@@ -163,48 +163,50 @@ export async function listManifests(
     page,
     total,
     pages: Math.max(1, Math.ceil(total / MANIFEST_PAGE_SIZE)),
-    items: rows.map((row) => ({
-      id: row.id,
-      manifestNo: row.manifestNo,
-      date: row.manifestDate.toISOString().slice(0, 10),
-      type: row.type,
-      status: row.status,
-      branch: row.branch?.name ?? null,
-      origin: row.originBranchId
-        ? (branchName.get(row.originBranchId) ?? null)
-        : null,
-      destination: row.destinationBranchId
-        ? (branchName.get(row.destinationBranchId) ?? null)
-        : null,
-      vehicle: row.vehicle
-        ? `${row.vehicle.licensePlate} · ${row.vehicle.name}`
-        : null,
-      courier: row.courier?.name ?? null,
-      vendor: row.vendor?.name ?? null,
-      /** First transit koli scan (provider User Transit / Transit Date). */
-      transitUser: transitScans.get(row.id)?.user ?? null,
-      transitDate:
-        transitScans.get(row.id)?.at.toISOString().slice(0, 10) ?? null,
-      /** Transit1..Transit5 as on the provider's Cek Transit list. */
-      transits: [
-        row.transit1,
-        row.transit2,
-        row.transit3,
-        row.transit4,
-        row.transit5,
-      ],
-      ...(() => {
-        const sum = sums.get(row.id);
-        return sum
-          ? {
-              awb: sum.awb,
-              koli: sum.koli,
-              kilo: trim(sum.kilo),
-              volume: trim(sum.volume),
-            }
-          : noItems;
-      })(),
-    })),
+    items: rows.map((row) => {
+      const firstTransit = transitScans.get(row.id);
+      return {
+        id: row.id,
+        manifestNo: row.manifestNo,
+        date: row.manifestDate.toISOString().slice(0, 10),
+        type: row.type,
+        status: row.status,
+        branch: row.branch?.name ?? null,
+        origin: row.originBranchId
+          ? (branchName.get(row.originBranchId) ?? null)
+          : null,
+        destination: row.destinationBranchId
+          ? (branchName.get(row.destinationBranchId) ?? null)
+          : null,
+        vehicle: row.vehicle
+          ? `${row.vehicle.licensePlate} · ${row.vehicle.name}`
+          : null,
+        courier: row.courier?.name ?? null,
+        vendor: row.vendor?.name ?? null,
+        /** First transit koli scan (provider User Transit / Transit Date). */
+        transitUser: transitScans.get(row.id)?.user ?? null,
+        transitDate: firstTransit?.at.toISOString().slice(0, 10) ?? null,
+        /** Transit1..Transit5 as on the provider's Cek Transit list. */
+        transits: [
+          row.transit1,
+          row.transit2,
+          row.transit3,
+          row.transit4,
+          row.transit5,
+        ],
+        ...(() => {
+          const sum = sums.get(row.id);
+          return sum
+            ? {
+                awb: sum.awb,
+                koli: sum.koli,
+                kilo: trim(sum.kilo),
+                volume: trim(sum.volume),
+              }
+            : noItems;
+        })(),
+      };
+    }),
   };
 }
 

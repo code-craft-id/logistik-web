@@ -210,6 +210,18 @@ export async function scanKoli(
     let target = byAwb(code);
     let piece: number | null = null;
     const label = /^(.+)-(\d{1,3})$/.exec(code);
+    if (target && label) {
+      const parent = byAwb(label[1]);
+      const requestedPiece = Number(label[2]);
+      if (
+        parent &&
+        requestedPiece >= 1 &&
+        requestedPiece <= Math.max(1, parent.koli ?? 1)
+      )
+        throw new ModulError(
+          `Kode ${code} cocok sebagai AWB dan sebagai koli. Gunakan barcode AWB atau label koli yang tidak ambigu.`,
+        );
+    }
     if (!target && label) {
       target = byAwb(label[1]);
       piece = Number(label[2]);

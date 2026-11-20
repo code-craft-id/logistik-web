@@ -101,6 +101,8 @@ model PodReturnItem {
 /// Status: OPEN, PAID.
 model VendorBill {
   id           Int              @id @default(autoincrement())
+  branchId     Int?             @map("branch_id")
+  branch       Branch?          @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   category     String           @db.VarChar(30)
   vendorId     Int              @map("vendor_id")
   vendor       Vendor           @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)

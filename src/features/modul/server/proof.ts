@@ -74,6 +74,14 @@ async function findScanned(actor: AccessActor, awbNo: string) {
   if (!code) throw new ModulError("Nomor AWB kosong.");
   let matches = await matching(actor, code);
   const koli = /^(.+)-(\d{1,3})$/.exec(code);
+  if (matches.length && koli) {
+    const parent = await matching(actor, koli[1]);
+    const piece = Number(koli[2]);
+    if (parent.some((t) => piece >= 1 && piece <= Math.max(1, t.koli ?? 1)))
+      throw new ModulError(
+        "Kode cocok sebagai AWB dan sebagai koli. Gunakan barcode AWB atau label koli yang tidak ambigu.",
+      );
+  }
   if (!matches.length && koli) {
     const parent = await matching(actor, koli[1]);
     const piece = Number(koli[2]);

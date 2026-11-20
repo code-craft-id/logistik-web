@@ -1,6 +1,6 @@
 # Dev 3 backlog: not done, waiting for a decision, waiting for review
 
-Updated 2026-11-20 (branch `dev3/ready-for-review`, PR #11, HEAD 8ebb283).
+Updated 2026-11-20 (branch `dev3/ready-for-review`, PR #11, review follow-up at 13ea2e3 plus local uncommitted changes).
 Source of each item: comparison with the provider app (read-only), the
 earlier Go + React prototype and owner instructions in the Dev 3 session.
 Keep this file current: move items to "Done" with the commit when finished.
@@ -60,3 +60,19 @@ Keep this file current: move items to "Done" with the commit when finished.
 | # | Item | Instruction |
 |---|---|---|
 | E1 | Courier points and courier withdraw (Progi "Tukar Poin" / "Withdraw Bank") | "yang poin kurir dan withdraw kurir jangan dulu" |
+
+## F. PR #11 latest review (2026-11-20)
+
+| Finding | Disposition |
+|---|---|
+| Approved AWB edit could change arbitrary fields after approval | Patched locally: request stores before/after proposal in existing JSON; approval UI shows it; only requester may apply exact approved values; stale AWB values fail; size/weight edits are refused because per-koli detail is not retained by the edit workflow. Needs feature-owner review and verification. |
+| UTC “today” / date rendering vs WIB | D-19 remains open globally. Asia/Jakarta is approved only for status-import, invoice-handover future-date validation, and AP Aging month-end cutoff. |
+| Vendor bill visible/closable across branches | Explicit owning branch is stored on each bill, checked at create/list/close, and backfilled only from unambiguous same-branch AWBs. Ambiguous legacy bills remain admin-only; migration and verification pending. |
+| Client-supplied chargeable weight | Server recalculates from per-koli dimensions under owner approval (2026-11-20); Dev 2 / D-26 review pending. |
+| Upload token does not bind outcome | Patched locally: outcome participates in the signed payload and must match when saving proof. |
+| AWB code can be both AWB and koli label | Patched locally: ambiguous exact-AWB / parent-piece codes are refused in manifest and proof scans. |
+| Import size checked after reading file | Patched locally: reject File.size before arrayBuffer; parser and action share one byte limit. |
+| AP aging date/month scope | Owner approved all bills open at selected month end; age through month end, Asia/Jakarta cutoff, owning-branch scope. |
+| Agent notes in PR | Retain required Dev3 checkpoint files and governance records per repo instructions. No cleanup or broad PR split performed in this fix. |
+
+Verification status (2026-11-20 12:09 UTC): Prisma validate/generate PASS; test DB migration PASS; full unit suite 723/723 PASS before final narrow follow-up, then focused 23/23 PASS; focused integration 29/29 PASS after latest changes; lint 558 files PASS; typecheck PASS. Full and route-limited Webpack builds failed during compile after 126–140s with only generic webpack error output; Turbopack attempt was interrupted after prolonged no-output compile. Final diff/identity review and commit/push pending. Build blocker must be stated truthfully.

@@ -18,6 +18,7 @@ export const VENDOR_BILL_STATUS = {
 } as const;
 
 const createSchema = z.object({
+  branchId: z.coerce.number().int().positive(),
   category: z.enum(VENDOR_BILL_CATEGORIES),
   vendorId: z.coerce.number().int().positive(),
   invoiceNo: z.string().trim().max(50).optional(),
@@ -44,18 +45,26 @@ export async function createVendorBill(actor: AccessActor, input: unknown) {
   const awbNos = parseAwbList(data.awbs ?? "");
   if (awbNos.length > 500)
     throw new ModulError("Maksimal 500 AWB per invoice.");
+  if (!isAdministrator(actor) && !actor.branchIds.includes(data.branchId))
+    throw new ModulError(
+      "Cabang invoice tidak termasuk cabang yang diizinkan.",
+    );
   return prisma.$transaction(async (tx) => {
+    const branch = await tx.branch.findFirst({
+      where: { id: data.branchId, deletedAt: null, status: "ACTIVE" },
+      select: { id: true },
+    });
+    if (!branch) throw new ModulError("Cabang invoice tidak ditemukan/aktif.");
     const vendor = await tx.vendor.count({
       where: { id: data.vendorId, deletedAt: null },
     });
     if (!vendor) throw new ModulError("Vendor tidak ditemukan.");
-    const admin = isAdministrator(actor);
     const found = awbNos.length
       ? await tx.transaction.findMany({
           where: {
             awbNo: { in: awbNos },
             deletedAt: null,
-            ...(admin ? {} : { originBranchId: { in: actor.branchIds } }),
+            originBranchId: data.branchId,
           },
           select: { id: true, awbNo: true },
         })
@@ -95,6 +104,7 @@ export async function createVendorBill(actor: AccessActor, input: unknown) {
       );
     return tx.vendorBill.create({
       data: {
+        branchId: data.branchId,
         category: data.category,
         vendorId: data.vendorId,
         invoiceNo,
@@ -118,7 +128,7 @@ export async function closeVendorBill(actor: AccessActor, id: number) {
   return prisma.$transaction(async (tx) => {
     await lockRow(tx, "vendor_bills", id);
     const bill = await tx.vendorBill.findFirst({
-      where: { id, deletedAt: null, ...visible(actor) },
+      where: { id, deletedAt: null, ...vendorBillScope(actor) },
       select: { status: true },
     });
     if (!bill) throw new ModulError("Invoice hutang tidak ditemukan.");
@@ -132,19 +142,10 @@ export async function closeVendorBill(actor: AccessActor, id: number) {
   });
 }
 
-/** Non-admins see bills they created or that hold AWBs of their branches. */
-function visible(actor: AccessActor) {
+/** Current membership in the bill's owning branch controls all access. */
+export function vendorBillScope(actor: AccessActor) {
   if (isAdministrator(actor)) return {};
-  return {
-    OR: [
-      { createdById: actor.id },
-      {
-        items: {
-          some: { transaction: { originBranchId: { in: actor.branchIds } } },
-        },
-      },
-    ],
-  };
+  return { branchId: { in: actor.branchIds } };
 }
 
 export async function listVendorBills(
@@ -162,7 +163,7 @@ export async function listVendorBills(
   const rows = await prisma.vendorBill.findMany({
     where: {
       deletedAt: null,
-      ...visible(actor),
+      ...vendorBillScope(actor),
       ...(status ? { status } : {}),
       ...(search
         ? { invoiceNo: { contains: search, mode: "insensitive" as const } }
@@ -189,6 +190,7 @@ export async function listVendorBills(
       status: true,
       closedAt: true,
       vendor: { select: { name: true } },
+      branch: { select: { name: true } },
       _count: { select: { items: true } },
     },
   });

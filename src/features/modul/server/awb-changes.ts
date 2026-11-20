@@ -24,31 +24,102 @@ export const AWB_CHANGE_STATUS = {
   USED: "Sudah diedit",
 } as const;
 
-const requestSchema = z.object({
-  transactionId: z.coerce.number().int().positive(),
-  kind: z.enum(["EDIT", "DELETE"]),
-  reason: z.string().trim().min(5, "Alasan minimal 5 karakter.").max(500),
+const decimal = (scale: number) =>
+  z
+    .string()
+    .trim()
+    .regex(
+      new RegExp(`^(0|[1-9]\\d{0,12})(\\.\\d{1,${scale}})?$`),
+      "Angka tidak valid.",
+    )
+    .optional()
+    .or(z.literal("").transform(() => undefined));
+const text = (max: number) => z.string().trim().max(max).optional();
+const editFieldsSchema = z.object({
+  senderName: text(255),
+  receiverName: text(255),
+  senderAddress: text(500),
+  senderPhone: text(30),
+  receiverAddress: text(500),
+  receiverPhone: text(30),
+  doNo: text(255),
+  koli: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z.coerce.number().int().min(0).max(1_000_000).optional(),
+  ),
+  kilo: decimal(2),
+  volume: decimal(3),
+  biaya: decimal(2),
+  description: text(500),
+  remarks: text(500),
 });
+const requestSchema = z
+  .object({
+    transactionId: z.coerce.number().int().positive(),
+    kind: z.enum(["EDIT", "DELETE"]),
+    reason: z.string().trim().min(5, "Alasan minimal 5 karakter.").max(500),
+  })
+  .extend(editFieldsSchema.shape);
+
+type EditFields = z.infer<typeof editFieldsSchema>;
+type ChangeMap = Record<string, [string | null, string | null]>;
+
+function changeMap(current: object, fields: EditFields) {
+  const changes: ChangeMap = {};
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === undefined) continue;
+    const before = (current as Record<string, unknown>)[key];
+    const beforeText = before == null ? null : String(before);
+    const afterText = String(value);
+    const same =
+      before instanceof Prisma.Decimal
+        ? before.equals(new Prisma.Decimal(afterText))
+        : beforeText === afterText;
+    if (!same) changes[key] = [beforeText, afterText];
+  }
+  return changes;
+}
 
 export async function requestAwbChange(actor: AccessActor, input: unknown) {
   assertPermission(actor, "request", "awb_change");
   const data = requestSchema.parse(input);
+  const { transactionId, kind, reason, ...fields } = data;
+  const hasRequestedFields = Object.values(fields).some(
+    (value) => value !== undefined,
+  );
+  if (kind === "EDIT" && !hasRequestedFields)
+    throw new ModulError("Isi minimal satu nilai yang akan diubah.");
   return prisma.$transaction(async (tx) => {
-    await lockRow(tx, "transactions", data.transactionId);
+    await lockRow(tx, "transactions", transactionId);
     const awb = await tx.transaction.findFirst({
       where: {
-        id: data.transactionId,
+        id: transactionId,
         deletedAt: null,
         ...transactionScope(actor),
       },
-      select: { id: true },
+      select: {
+        id: true,
+        senderName: true,
+        senderAddress: true,
+        senderPhone: true,
+        receiverAddress: true,
+        receiverPhone: true,
+        receiverName: true,
+        doNo: true,
+        koli: true,
+        kilo: true,
+        volume: true,
+        biaya: true,
+        description: true,
+        remarks: true,
+      },
     });
     if (!awb)
       throw new ModulError("AWB tidak ditemukan atau di luar cabang Anda.");
     const open = await tx.awbChangeRequest.findFirst({
       where: {
         transactionId: awb.id,
-        kind: data.kind,
+        kind,
         status: { in: ["PENDING", "APPROVED"] },
       },
       select: { status: true },
@@ -59,8 +130,21 @@ export async function requestAwbChange(actor: AccessActor, input: unknown) {
           ? "Sudah ada pengajuan yang sama dan masih menunggu persetujuan."
           : "Pengajuan edit sebelumnya sudah disetujui dan belum dipakai. Lakukan edit terlebih dahulu.",
       );
+    const changes = kind === "EDIT" ? changeMap(awb, fields) : undefined;
+    if (kind === "EDIT" && !Object.keys(changes ?? {}).length)
+      throw new ModulError("Tidak ada data yang berubah.");
+    if (changes && ["koli", "kilo", "volume"].some((key) => key in changes))
+      throw new ModulError(
+        "Perubahan koli, berat, atau volume belum bisa diajukan karena detail dimensi per koli tidak tersedia pada proses edit.",
+      );
     return tx.awbChangeRequest.create({
-      data: { ...data, requestedById: actor.id },
+      data: {
+        transactionId: awb.id,
+        kind,
+        reason,
+        requestedById: actor.id,
+        ...(changes ? { changes } : {}),
+      },
       select: { id: true },
     });
   });
@@ -117,6 +201,7 @@ export async function decideAwbChange(actor: AccessActor, input: unknown) {
         status: true,
         requestedById: true,
         transactionId: true,
+        changes: true,
       },
     });
     if (!request)
@@ -129,6 +214,18 @@ export async function decideAwbChange(actor: AccessActor, input: unknown) {
       throw new ModulError(
         "Pengajuan tidak boleh disetujui oleh pengaju sendiri.",
       );
+    if (data.decision === "APPROVE" && request.kind === "EDIT") {
+      const changes = request.changes;
+      if (
+        !changes ||
+        typeof changes !== "object" ||
+        Array.isArray(changes) ||
+        !Object.keys(changes).length
+      )
+        throw new ModulError(
+          "Pengajuan edit ini belum memuat nilai perubahan. Minta pengaju mengirim pengajuan baru.",
+        );
+    }
     const now = new Date();
     if (data.decision === "APPROVE" && request.kind === "DELETE") {
       await lockRow(tx, "transactions", request.transactionId);
@@ -157,39 +254,15 @@ export async function decideAwbChange(actor: AccessActor, input: unknown) {
   });
 }
 
-const decimal = (scale: number) =>
-  z
-    .string()
-    .trim()
-    .regex(
-      new RegExp(`^(0|[1-9]\\d{0,12})(\\.\\d{1,${scale}})?$`),
-      "Angka tidak valid.",
-    )
-    .optional()
-    .or(z.literal("").transform(() => undefined));
-const text = (max: number) => z.string().trim().max(max).optional();
-const editSchema = z.object({
+const applySchema = z.object({
   requestId: z.coerce.number().int().positive(),
-  senderName: text(255),
-  receiverName: text(255),
-  senderAddress: text(500),
-  senderPhone: text(30),
-  receiverAddress: text(500),
-  receiverPhone: text(30),
-  doNo: text(255),
-  koli: z.coerce.number().int().min(0).max(1_000_000).optional(),
-  kilo: decimal(2),
-  volume: decimal(3),
-  biaya: decimal(2),
-  description: text(500),
-  remarks: text(500),
 });
 const MONEY_FIELDS = ["koli", "kilo", "volume", "biaya"] as const;
 
 /** Apply an approved EDIT request once; the diff is kept on the request. */
 export async function applyApprovedEdit(actor: AccessActor, input: unknown) {
   assertPermission(actor, "request", "awb_change");
-  const { requestId, ...fields } = editSchema.parse(input);
+  const { requestId } = applySchema.parse(input);
   return prisma.$transaction(async (tx) => {
     await lockRow(tx, "awb_change_requests", requestId);
     const request = await tx.awbChangeRequest.findFirst({
@@ -198,7 +271,13 @@ export async function applyApprovedEdit(actor: AccessActor, input: unknown) {
         kind: "EDIT",
         transaction: { deletedAt: null, ...transactionScope(actor) },
       },
-      select: { id: true, status: true, transactionId: true },
+      select: {
+        id: true,
+        status: true,
+        transactionId: true,
+        requestedById: true,
+        changes: true,
+      },
     });
     if (!request)
       throw new ModulError(
@@ -208,6 +287,10 @@ export async function applyApprovedEdit(actor: AccessActor, input: unknown) {
       throw new ModulError(
         "Edit hanya bisa dilakukan setelah pengajuan disetujui, dan hanya sekali.",
       );
+    if (request.requestedById !== actor.id)
+      throw new ModulError("Hanya pengaju yang dapat menerapkan edit ini.");
+    if (!request.changes || typeof request.changes !== "object")
+      throw new ModulError("Nilai usulan edit tidak ditemukan. Ajukan ulang.");
     await lockRow(tx, "transactions", request.transactionId);
     const current = await tx.transaction.findUniqueOrThrow({
       where: { id: request.transactionId },
@@ -227,19 +310,38 @@ export async function applyApprovedEdit(actor: AccessActor, input: unknown) {
         remarks: true,
       },
     });
-    const changes: Record<string, [string | null, string | null]> = {};
+    const proposed = request.changes as unknown as Record<string, unknown>;
+    const submittedFields: Record<string, unknown> = {};
+    for (const [key, pair] of Object.entries(proposed)) {
+      if (
+        !Array.isArray(pair) ||
+        pair.length !== 2 ||
+        typeof pair[1] !== "string"
+      )
+        throw new ModulError("Nilai usulan edit tidak valid. Ajukan ulang.");
+      submittedFields[key] = pair[1];
+    }
+    const fields = editFieldsSchema.partial().safeParse(submittedFields);
+    if (!fields.success || !Object.keys(submittedFields).length)
+      throw new ModulError("Nilai usulan edit tidak valid. Ajukan ulang.");
+    const changes = proposed as ChangeMap;
     const update: Prisma.TransactionUpdateInput = {};
-    for (const [key, value] of Object.entries(fields)) {
-      if (value === undefined) continue;
+    for (const [key, value] of Object.entries(fields.data)) {
+      const approved = changes[key];
+      if (!approved || value === undefined)
+        throw new ModulError("Nilai usulan berubah. Ajukan ulang.");
       const before = current[key as keyof typeof current];
       const beforeText = before === null ? null : String(before);
       const afterText = String(value);
+      if (beforeText !== approved[0] || afterText !== approved[1])
+        throw new ModulError(
+          "AWB berubah setelah pengajuan. Ajukan edit baru untuk nilai terkini.",
+        );
       const same =
         before instanceof Prisma.Decimal
           ? before.equals(new Prisma.Decimal(afterText))
           : beforeText === afterText;
       if (same) continue;
-      changes[key] = [beforeText, afterText];
       (update as Record<string, unknown>)[key] = value;
     }
     if (!Object.keys(changes).length)

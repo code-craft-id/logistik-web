@@ -29,6 +29,7 @@ type Modules = {
   tariffs: typeof import("../../src/features/modul/server/tariffs");
   pod: typeof import("../../src/features/modul/server/pod-returns");
   bills: typeof import("../../src/features/modul/server/vendor-bills");
+  apAging: typeof import("../../src/features/reports/aging/server/ap-aging");
   inbound: typeof import("../../src/features/modul/server/inbound");
   proof: typeof import("../../src/features/modul/server/proof");
 };
@@ -81,6 +82,7 @@ beforeAll(async () => {
     tariffs: await import("../../src/features/modul/server/tariffs"),
     pod: await import("../../src/features/modul/server/pod-returns"),
     bills: await import("../../src/features/modul/server/vendor-bills"),
+    apAging: await import("../../src/features/reports/aging/server/ap-aging"),
     inbound: await import("../../src/features/modul/server/inbound"),
     proof: await import("../../src/features/modul/server/proof"),
   };
@@ -288,6 +290,7 @@ describe("Persetujuan Edit/delete AWB", () => {
       transactionId: t.id,
       kind: "EDIT",
       reason: "Penerima salah",
+      receiverName: "Budi Santoso",
     });
     await expect(
       m.awb.applyApprovedEdit(requester, { requestId: id, receiverName: "X" }),
@@ -296,11 +299,7 @@ describe("Persetujuan Edit/delete AWB", () => {
       id,
       decision: "APPROVE",
     });
-    await m.awb.applyApprovedEdit(requester, {
-      requestId: id,
-      receiverName: "Budi Santoso",
-      kilo: "2.00",
-    });
+    await m.awb.applyApprovedEdit(requester, { requestId: id });
     const request = await db.awbChangeRequest.findUniqueOrThrow({
       where: { id },
     });
@@ -394,6 +393,7 @@ describe("Pembayaran Hutang", () => {
     const t = await awb("bill");
     const user = actor(ids.requester, [ids.a]);
     const { id } = await m.bills.createVendorBill(user, {
+      branchId: ids.a,
       category: "Vendor",
       vendorId: ids.vendor,
       billDate: "2026-11-10",
@@ -404,6 +404,7 @@ describe("Pembayaran Hutang", () => {
     });
     await expect(
       m.bills.createVendorBill(user, {
+        branchId: ids.a,
         category: "Vendor",
         vendorId: ids.vendor,
         billDate: "2026-11-10",
@@ -421,6 +422,77 @@ describe("Pembayaran Hutang", () => {
     await expect(m.bills.closeVendorBill(user, id)).rejects.toThrow(
       "sudah lunas",
     );
+  });
+
+  it("reports all bills open at Jakarta month end within owning branches", async () => {
+    const month = 6;
+    const year = 2025;
+    const records = await Promise.all([
+      db.vendorBill.create({
+        data: {
+          branchId: ids.a,
+          vendorId: ids.vendor,
+          invoiceNo: `${tag}-aging-open`,
+          category: "Vendor",
+          billDate: new Date("2025-04-15T00:00:00.000Z"),
+          createdAt: new Date("2025-04-15T00:00:00.000Z"),
+          amount: "0.10",
+        },
+      }),
+      db.vendorBill.create({
+        data: {
+          branchId: ids.a,
+          vendorId: ids.vendor,
+          invoiceNo: `${tag}-aging-paid-after`,
+          category: "Vendor",
+          billDate: new Date("2025-06-30T00:00:00.000Z"),
+          createdAt: new Date("2025-06-30T00:00:00.000Z"),
+          amount: "0.20",
+          status: "PAID",
+          closedAt: new Date("2025-07-01T00:00:00.001+07:00"),
+        },
+      }),
+      db.vendorBill.create({
+        data: {
+          branchId: ids.a,
+          vendorId: ids.vendor,
+          invoiceNo: `${tag}-aging-paid-before`,
+          category: "Vendor",
+          billDate: new Date("2025-06-30T00:00:00.000Z"),
+          createdAt: new Date("2025-06-30T00:00:00.000Z"),
+          amount: "4.00",
+          status: "PAID",
+          closedAt: new Date("2025-06-30T23:59:59.999+07:00"),
+        },
+      }),
+      db.vendorBill.create({
+        data: {
+          branchId: ids.b,
+          vendorId: ids.vendor,
+          invoiceNo: `${tag}-aging-other-branch`,
+          category: "Vendor",
+          billDate: new Date("2025-06-30T00:00:00.000Z"),
+          createdAt: new Date("2025-06-30T00:00:00.000Z"),
+          amount: "8.00",
+        },
+      }),
+    ]);
+    const report = await m.apAging.apAgingReport(
+      actor(ids.requester, [ids.a]),
+      { month, year, vendorId: ids.vendor },
+    );
+    expect(report.items.map((row) => row.number)).toEqual([
+      `${tag}-aging-open`,
+      `${tag}-aging-paid-after`,
+    ]);
+    expect(report.totals.total).toBe("0.30");
+    expect(report.totals.b61_90).toBe("0.10");
+    expect(report.totals.b0_30).toBe("0.20");
+    expect(report.end).toBe("30-06-2025");
+    expect(records).toHaveLength(4);
+    await db.vendorBill.deleteMany({
+      where: { id: { in: records.map((r) => r.id) } },
+    });
   });
 });
 
@@ -960,13 +1032,16 @@ describe("Import Status Excel", () => {
 });
 
 describe("Laporan AP (Rekap Aging Pemasok)", () => {
-  it("lists unpaid vendor bills of the month with age buckets", async () => {
+  it("lists bills still open at Jakarta month end with exact amounts", async () => {
     const ap = await import("../../src/features/reports/aging/server/ap-aging");
-    const now = new Date();
-    const day = (n: number) =>
-      new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), n));
+    const { businessDateString } = await import(
+      "../../src/lib/date/business-date"
+    );
+    const [year, month, today] = businessDateString().split("-").map(Number);
+    const day = (n: number) => new Date(Date.UTC(year, month - 1, n));
     const open = await db.vendorBill.create({
       data: {
+        branchId: ids.a,
         category: "Vendor",
         vendorId: ids.vendor,
         invoiceNo: `${tag}-AP1`,
@@ -978,31 +1053,33 @@ describe("Laporan AP (Rekap Aging Pemasok)", () => {
     });
     const paid = await db.vendorBill.create({
       data: {
+        branchId: ids.a,
         category: "Agen",
         vendorId: ids.vendor,
         invoiceNo: `${tag}-AP2`,
-        billDate: day(1),
+        billDate: day(Math.max(1, today - 1)),
         amount: "90000",
         status: "PAID",
+        closedAt: new Date("2020-01-01T00:00:00Z"),
         createdById: ids.approver,
       },
     });
     const report = await ap.apAgingReport(actor(ids.approver, [ids.a]), {
-      month: String(now.getUTCMonth() + 1),
-      year: String(now.getUTCFullYear()),
+      month: String(month),
+      year: String(year),
       vendorId: String(ids.vendor),
     });
     expect(report.items.map((r) => r.number)).toEqual([`${tag}-AP1`]);
     expect(report.items[0]).toMatchObject({
       category: "Vendor",
-      total: 250000,
-      b0_30: 250000,
+      total: "250000.00",
+      b0_30: "250000.00",
     });
     expect(report.percent.b0_30).toBe(100);
     // Another user without the bill's branch or authorship sees nothing.
     const other = await ap.apAgingReport(actor(ids.requester, [ids.b]), {
-      month: String(now.getUTCMonth() + 1),
-      year: String(now.getUTCFullYear()),
+      month: String(month),
+      year: String(year),
       vendorId: String(ids.vendor),
     });
     expect(other.items).toEqual([]);

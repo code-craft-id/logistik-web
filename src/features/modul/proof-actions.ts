@@ -75,7 +75,12 @@ export async function uploadProofImageAction(
     return {
       ...image,
       ok: true,
-      token: signUpload({ actorId: current.id, transactionId, ...image }),
+      token: signUpload({
+        actorId: current.id,
+        transactionId,
+        outcome,
+        ...image,
+      }),
     };
   } catch (e) {
     return fail(e);
@@ -111,6 +116,7 @@ export async function recordProofAction(input: {
           {
             actorId: current.id,
             transactionId,
+            outcome: input.outcome === "RETURNED" ? "RETURNED" : "DELIVERED",
             url: image.url,
             publicId: image.publicId,
           },

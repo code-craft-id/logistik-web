@@ -5,6 +5,7 @@ import type { AccessActor } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
 import { ModulError, transactionScope } from "@/features/modul/server/common";
 import { writeProof } from "@/features/modul/server/proof";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 /**
@@ -22,7 +23,7 @@ export const IMPORT_HEADERS = [
   "Status",
   "Remarks",
 ];
-const MAX_BYTES = 2 * 1024 * 1024;
+export const STATUS_IMPORT_MAX_BYTES = 2 * 1024 * 1024;
 const MAX_ROWS = 1000;
 const CODES: Record<
   string,
@@ -65,7 +66,8 @@ function cellDate(v: unknown): string | null {
 /** Spreadsheet bytes → template rows (no database access). */
 export function parseStatusFile(bytes: Uint8Array, name: string) {
   if (bytes.length === 0) throw new ModulError("File kosong.");
-  if (bytes.length > MAX_BYTES) throw new ModulError("File maksimal 2 MB.");
+  if (bytes.length > STATUS_IMPORT_MAX_BYTES)
+    throw new ModulError("File maksimal 2 MB.");
   const zip = bytes[0] === 0x50 && bytes[1] === 0x4b;
   const ole = bytes[0] === 0xd0 && bytes[1] === 0xcf;
   const csv = /\.csv$/i.test(name);
@@ -145,7 +147,7 @@ export async function checkStatusRows(
     const key = (t.awbNo ?? "").toUpperCase();
     byNo.set(key, [...(byNo.get(key) ?? []), t]);
   }
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessDateString();
   const seen = new Set<string>();
   return parsed.map((p) => {
     const matches = byNo.get(p.awbNo.toUpperCase()) ?? [];

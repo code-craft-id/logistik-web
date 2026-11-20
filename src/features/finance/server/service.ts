@@ -11,6 +11,7 @@ import {
   IdentityError,
   loadAccessActor,
 } from "@/features/identity/server/access";
+import { businessDateString } from "@/lib/date/business-date";
 import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
 import { accountingCommand } from "../accounting-contracts";
 import {
@@ -363,7 +364,7 @@ export function createFinanceService(
               fail("Serah terima hanya untuk invoice yang sudah terbit.");
             if (data.handoverDate < day(row.invoiceDate))
               fail("Tanggal terima tidak boleh sebelum tanggal invoice.");
-            if (data.handoverDate > new Date().toISOString().slice(0, 10))
+            if (data.handoverDate > businessDateString())
               fail("Tanggal terima tidak boleh di masa depan.");
             await tx.finInvoice.update({
               where: { id: row.id },

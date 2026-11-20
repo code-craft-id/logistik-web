@@ -67,6 +67,7 @@ model Branch {
   manifests           Manifest[]
   transactionsOrigin  Transaction[]       @relation("TransactionOriginBranch")
   transactionsDest    Transaction[]       @relation("TransactionDestinationBranch")
+  vendorBills         VendorBill[]
   id                  Int                 @id @default(autoincrement())
   officeId            Int                 @map("office_id")
   code                String

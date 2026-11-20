@@ -50,5 +50,8 @@ Recorded from chat; business owner approval, not Dev 2 / finance review.
 - Import status: codes 2 and 1 only.
 - Accounting simplified: Induk instead of Ledger + Parent/Child; Posisi and Rugi Laba sign follow kind; Opening Balance as a balanced journal against equity.
 - Dimensi (D-26) and koli scan (D-05) approved; Pindah Manifest waits for D-08.
+- 2026-11-20: Asia/Jakarta approved for status-import date validation, invoice-handover future-date validation, and AP Aging month-end status cutoff. Broader D-19 timezone policy remains TBD.
+- 2026-11-20: AP Aging includes all vendor bills open at the selected month end, with age calculated through month end; ownership scope follows explicit VendorBill.branchId.
+- 2026-11-20: Server recalculates kilo, volume, per-piece chargeable weight, packing fee, and price from each koli's dimensions under D-26; Dev 2 review remains pending.
 Open items: BACKLOG.md.
 

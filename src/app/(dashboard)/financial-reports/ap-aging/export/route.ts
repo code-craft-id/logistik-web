@@ -28,13 +28,15 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     const status =
-      error instanceof IdentityError && [400, 401, 403].includes(error.status)
+      error instanceof IdentityError &&
+      [400, 401, 403, 422].includes(error.status)
         ? error.status
         : 500;
     const messages: Record<number, string> = {
       400: "Pilih bulan, tahun dan pemasok yang valid.",
       401: "Silakan masuk kembali.",
       403: "Anda tidak memiliki akses Pembayaran Hutang.",
+      422: "Hasil melebihi 5000 baris. Persempit filter laporan.",
       500: "Laporan tidak dapat diunduh.",
     };
     return Response.json({ message: messages[status] }, { status, headers });

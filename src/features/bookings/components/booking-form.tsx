@@ -207,10 +207,14 @@ export function BookingForm({
   };
   // Terberat from Dimensi (per-koli max), cleared by any manual change.
   const [dims, setDims] = useState("");
+  const [dimensionRows, setDimensionRows] = useState("");
   const setM =
     (key: keyof typeof emptyMeasure) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (key === "koli" || key === "kilo" || key === "volume") setDims("");
+      if (key === "koli" || key === "kilo" || key === "volume") {
+        setDims("");
+        setDimensionRows("");
+      }
       setMeasure((m) => ({ ...m, [key]: event.target.value }));
     };
 
@@ -252,6 +256,7 @@ export function BookingForm({
           setRoute({ origin: startOrigin, destination: "", service: "" });
           setMeasure(emptyMeasure);
           setDims("");
+          setDimensionRows("");
           setReceiver(emptyReceiver);
           setManualPrice(false);
           setModeId("");
@@ -409,7 +414,11 @@ export function BookingForm({
             name="transportModeId"
             text="Via Moda"
             options={options?.transportModes ?? []}
-            onChange={setModeId}
+            onChange={(value) => {
+              setModeId(value);
+              setDims("");
+              setDimensionRows("");
+            }}
           />
           <Choice
             key={`cost-${version}`}
@@ -458,8 +467,16 @@ export function BookingForm({
                     kilo: r.kilo || m.kilo,
                   }));
                   setDims(r.chargeable);
+                  setDimensionRows(JSON.stringify(r.rows));
                 }}
               />
+              {dimensionRows && (
+                <input
+                  type="hidden"
+                  name="dimensionRows"
+                  value={dimensionRows}
+                />
+              )}
               {dims && (
                 <input type="hidden" name="chargeableWeight" value={dims} />
               )}

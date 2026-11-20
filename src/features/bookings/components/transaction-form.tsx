@@ -186,10 +186,14 @@ export function TransactionForm({
   const mode = options.transportModes.find((m) => String(m.id) === modeId);
   // Terberat from Dimensi (per-koli max), cleared by any manual change.
   const [dims, setDims] = useState("");
+  const [dimensionRows, setDimensionRows] = useState("");
   const set =
     (key: keyof typeof initialPrice) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      if (key === "koli" || key === "kilo" || key === "volume") setDims("");
+      if (key === "koli" || key === "kilo" || key === "volume") {
+        setDims("");
+        setDimensionRows("");
+      }
       setPrice((p) => ({ ...p, [key]: event.target.value }));
     };
 
@@ -293,6 +297,7 @@ export function TransactionForm({
           window.scrollTo({ top: 0, behavior: "smooth" });
           setPrice(initialPrice);
           setDims("");
+          setDimensionRows("");
           setReceiver(emptyReceiver);
           setAwb("");
           setManualAwb(false);
@@ -504,7 +509,11 @@ export function TransactionForm({
             name="transportModeId"
             text="Via Moda"
             options={options.transportModes}
-            onChange={setModeId}
+            onChange={(value) => {
+              setModeId(value);
+              setDims("");
+              setDimensionRows("");
+            }}
           />
           <Choice
             name="costTypeId"
@@ -554,8 +563,16 @@ export function TransactionForm({
                     packingFee: r.packingFee || p.packingFee,
                   }));
                   setDims(r.chargeable);
+                  setDimensionRows(JSON.stringify(r.rows));
                 }}
               />
+              {dimensionRows && (
+                <input
+                  type="hidden"
+                  name="dimensionRows"
+                  value={dimensionRows}
+                />
+              )}
               {dims && (
                 <input type="hidden" name="chargeableWeight" value={dims} />
               )}

@@ -1,3 +1,12 @@
+## PR #11 latest review response (2026-11-20, active)
+- Branch `dev3/ready-for-review`; starting HEAD `13ea2e37135ece4c124f6fa174272faeff2982be`; changes remain uncommitted pending final gates. User authorized commit/push with GitHub identity `Ardiputra614` only; no merge/deploy.
+- Local fixes include AWB change proposal binding, explicit vendor-bill branch owner/backfill, per-koli server pricing, month-end AP aging, bounded Jakarta date validation, proof outcome-bound upload tokens, ambiguous AWB/koli scan rejection, and pre-read import file-size validation.
+- Decisions: AP Aging all bills open at month-end, Asia/Jakarta cutoff; server recalculation under D-26. Dev2 review remains outstanding. D-19 global policy remains open; unchanged operational display rules are not inferred.
+- Prisma validate/generate passed; guarded test migration deployed to `logistik_web_test`. Full unit suite 81 files / 723 tests passed before the final narrow follow-up; focused post-follow-up unit suite 4 files / 23 tests passed. Focused integration suite passed 29/29 after the latest changes. Lint (558 files) and typecheck passed.
+- Production build blocker: Turbopack was stopped after prolonged no-output compile; Webpack full and route-limited builds both failed in compile after 126–140 seconds, with generic “Build failed because of webpack errors” and no underlying diagnostics. Do not report build as passed.
+- Chrome inventory confirms `http://localhost:3000/dashboard`; browser DOM/screenshot API errors prevented visual inspection. Server is stopped.
+- Next: final diff and author audit; commit/push to the existing branch as `Ardiputra614` only, recording build blocker. No merge/deploy. Dev2 review and staging/UAT remain pending.
+
 ## Latest checkpoint: backlog recorded (2026-11-20)
 - Open work, pending decisions and pending reviews are listed in BACKLOG.md (sections A-E). Start there.
 - HEAD before this note: 8ebb283 on dev3/ready-for-review (PR #11). Gates at that commit: lint, typecheck, unit 718, integration 191, build PASS.

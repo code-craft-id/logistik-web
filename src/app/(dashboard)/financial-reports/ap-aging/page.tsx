@@ -12,12 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import {
   AP_HEADERS,
   apAgingReport,
 } from "@/features/reports/aging/server/ap-aging";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -43,7 +45,7 @@ const MONTHS = [
 const field = "min-h-11 w-full rounded-md border bg-background px-2 text-sm";
 const one = (v: string | string[] | undefined) =>
   (Array.isArray(v) ? v[0] : v) ?? "";
-const money = (v: number) => formatRupiah(v.toFixed(2), { prefix: false });
+const money = (v: string) => formatRupiah(v, { prefix: false });
 
 export default async function Page({
   searchParams,
@@ -54,9 +56,10 @@ export default async function Page({
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const params = await searchParams;
-  const now = new Date();
-  const month = Number(one(params.month)) || now.getUTCMonth() + 1;
-  const year = Number(one(params.year)) || now.getUTCFullYear();
+  const today = businessDateString();
+  const [businessYear, businessMonth] = today.split("-").map(Number);
+  const month = Number(one(params.month)) || businessMonth;
+  const year = Number(one(params.year)) || businessYear;
   const vendorId = one(params.vendorId);
   const show = one(params.show) === "1";
   const vendors = await prisma.vendor.findMany({
@@ -65,9 +68,17 @@ export default async function Page({
     orderBy: { name: "asc" },
     take: 2000,
   });
-  const report = show
-    ? await apAgingReport(current.actor, { month, year, vendorId })
-    : null;
+  let report: Awaited<ReturnType<typeof apAgingReport>> | null = null;
+  let reportError: string | null = null;
+  if (show) {
+    try {
+      report = await apAgingReport(current.actor, { month, year, vendorId });
+    } catch (error) {
+      if (error instanceof IdentityError && error.status === 422)
+        reportError = error.message;
+      else throw error;
+    }
+  }
   const pct = (v: number | null) => (v === null ? "NAN%" : `${v}%`);
 
   return (
@@ -76,7 +87,7 @@ export default async function Page({
         <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
           Rekap Aging Pemasok (Laporan AP)
         </h1>
-        <InfoTip text="Tagihan vendor/agen (Proses Vendor) yang belum lunas dan bertanggal faktur di bulan terpilih: batas waktu (tanggal terima atau faktur + termin), jumlah tagihan, dan kolom umur 0–30, 31–60, 61–90, > 90 hari sejak tanggal faktur. HASIL AKHIR berisi total dan persentase terhadap total tagihan." />
+        <InfoTip text="Semua tagihan vendor/agen yang masih terbuka pada akhir bulan terpilih, termasuk tagihan dari bulan sebelumnya. Umur dihitung sampai tanggal akhir bulan; cutoff status memakai Asia/Jakarta. Batas waktu adalah tanggal terima (atau faktur) + termin." />
       </header>
       <form
         action="/financial-reports/ap-aging"
@@ -106,13 +117,11 @@ export default async function Page({
             defaultValue={year}
             className={field}
           >
-            {Array.from({ length: 7 }, (_, i) => now.getUTCFullYear() - i).map(
-              (y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ),
-            )}
+            {Array.from({ length: 7 }, (_, i) => businessYear - i).map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
           </select>
         </div>
         <div className="grid gap-2 sm:grid-cols-[9rem_1fr] sm:items-center">
@@ -249,6 +258,14 @@ export default async function Page({
             </Table>
           </div>
         </section>
+      )}
+      {reportError && (
+        <p
+          role="alert"
+          className="rounded-md border border-destructive/40 p-4 text-sm text-destructive"
+        >
+          {reportError}
+        </p>
       )}
     </div>
   );

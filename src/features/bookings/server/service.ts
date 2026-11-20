@@ -22,7 +22,73 @@ type TxClient = Prisma.TransactionClient;
 
 type Money = Prisma.Decimal;
 const dec = (v: string | null | undefined) =>
-  v == null ? null : new Prisma.Decimal(v);
+  v == null || v.trim() === "" ? null : new Prisma.Decimal(v);
+
+type DimensionRow = NonNullable<
+  CreateTransactionInput["dimensionRows"]
+>[number];
+type DimensionTotals = {
+  kilo: string | null;
+  volume: string | null;
+  chargeableWeight: string;
+  packingFee: string;
+};
+
+export function calculateDimensionTotals(
+  rows: DimensionRow[],
+  dividerText: string | null | undefined,
+  koli: number | null | undefined,
+): DimensionTotals {
+  if (!koli || koli < 1 || rows.length !== koli)
+    throw new Error("VALIDATION_DIMENSION_KOLI");
+  const divider = dec(dividerText);
+  let totalKilo = new Prisma.Decimal(0);
+  let totalVolume = new Prisma.Decimal(0);
+  let totalChargeable = new Prisma.Decimal(0);
+  let totalPacking = new Prisma.Decimal(0);
+
+  for (const row of rows) {
+    const sides = [row.length, row.width, row.height].map(
+      (value) => dec(value) ?? new Prisma.Decimal(0),
+    );
+    const anySide = sides.some((value) => value.gt(0));
+    const allSides = sides.every((value) => value.gt(0));
+    if (anySide && !allSides) throw new Error("VALIDATION_DIMENSION_FIELDS");
+    if (anySide && (!divider || !divider.gt(0)))
+      throw new Error("VALIDATION_MODE_DIVIDER");
+
+    const kilo = dec(row.kilo) ?? new Prisma.Decimal(0);
+    if (!allSides && !kilo.gt(0))
+      throw new Error("VALIDATION_DIMENSION_FIELDS");
+    const volume = allSides
+      ? sides[0]
+          .times(sides[1])
+          .times(sides[2])
+          .div(divider as Money)
+      : new Prisma.Decimal(0);
+    totalKilo = totalKilo.plus(kilo);
+    totalVolume = totalVolume.plus(volume);
+    totalChargeable = totalChargeable.plus(Prisma.Decimal.max(volume, kilo));
+    if (row.packed)
+      totalPacking = totalPacking.plus(
+        dec(row.packing) ?? new Prisma.Decimal(0),
+      );
+  }
+
+  const kilo = totalKilo.toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
+  const volume = totalVolume.toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP);
+  const chargeable = totalChargeable.toDecimalPlaces(
+    2,
+    Prisma.Decimal.ROUND_HALF_UP,
+  );
+  const packing = totalPacking.toDecimalPlaces(0, Prisma.Decimal.ROUND_HALF_UP);
+  return {
+    kilo: kilo.gt(0) ? kilo.toFixed(2) : null,
+    volume: volume.gt(0) ? volume.toFixed(3) : null,
+    chargeableWeight: chargeable.toFixed(2),
+    packingFee: packing.toFixed(0),
+  };
+}
 
 /**
  * Entry AWB pricing as observed in the legacy form (rules pending finance
@@ -39,6 +105,8 @@ export function priceAwb(input: {
   volume?: string | null;
   /** Terberat from Dimensi: per-koli max(volume, berat), summed. */
   chargeableWeight?: string | null;
+  dimensionRows?: DimensionRow[];
+  modeDivider?: string | null;
   pricePerKg?: string | null;
   minWeight?: string | null;
   otherFee?: string | null;
@@ -48,26 +116,29 @@ export function priceAwb(input: {
   ppnPercent?: string | null;
   biaya?: string | null;
 }) {
-  const kilo = dec(input.kilo);
-  const volume = dec(input.volume);
+  const dimensions = input.dimensionRows?.length
+    ? calculateDimensionTotals(
+        input.dimensionRows,
+        input.modeDivider,
+        input.koli,
+      )
+    : null;
+  if (input.chargeableWeight && !dimensions)
+    throw new Error("VALIDATION_CHARGEABLE_WEIGHT");
+  const kilo = dec(dimensions?.kilo ?? input.kilo);
+  const volume = dec(dimensions?.volume ?? input.volume);
   const totals: Money | null =
     kilo && volume ? Prisma.Decimal.max(kilo, volume) : (kilo ?? volume);
-  // Dimensi (OBSERVED in the provider): Terberat = sum over koli of
-  // max(volume, berat). It lies between max(total volume, total berat)
-  // and total volume + total berat; anything else is refused.
-  const dims = dec(input.chargeableWeight);
-  if (dims) {
-    const low = totals ?? new Prisma.Decimal(0);
-    const high = (kilo ?? new Prisma.Decimal(0)).plus(
-      volume ?? new Prisma.Decimal(0),
-    );
-    if (dims.lt(low.minus(0.01)) || dims.gt(high.plus(0.01)))
-      throw new Error("VALIDATION_CHARGEABLE_WEIGHT");
-  }
-  const heaviest: Money | null = dims ?? totals;
+  const heaviest: Money | null = dimensions
+    ? new Prisma.Decimal(dimensions.chargeableWeight)
+    : totals;
+  const packingFee = dimensions?.packingFee ?? input.packingFee;
   const price = dec(input.pricePerKg);
   if (!price) {
     return {
+      kilo: kilo?.toFixed(2) ?? null,
+      volume: volume?.toFixed(3) ?? null,
+      packingFee: packingFee ?? null,
       chargeableWeight: heaviest?.toFixed(2) ?? null,
       totalCost: null,
       biaya: input.biaya ?? null,
@@ -88,7 +159,7 @@ export function priceAwb(input: {
   const total = round(
     freight
       .plus(dec(input.otherFee) ?? zero)
-      .plus(dec(input.packingFee) ?? zero)
+      .plus(dec(packingFee) ?? zero)
       .plus(dec(input.pickupFee) ?? zero),
   );
   const discount = round(
@@ -99,6 +170,9 @@ export function priceAwb(input: {
     afterDiscount.times(dec(input.ppnPercent) ?? zero).div(100),
   );
   return {
+    kilo: kilo?.toFixed(2) ?? null,
+    volume: volume?.toFixed(3) ?? null,
+    packingFee: packingFee ?? null,
     chargeableWeight: heaviest?.toFixed(2) ?? null,
     totalCost: total.toFixed(2),
     biaya: afterDiscount.plus(ppn).toFixed(2),
@@ -270,6 +344,16 @@ export async function createBooking(
       });
       if (!found) throw new Error("VALIDATION_MASTER_NOT_FOUND");
     }
+    const dimensionMode = data.dimensionRows?.length
+      ? await tx.transportMode.findFirst({
+          where: {
+            id: data.transportModeId ?? -1,
+            deletedAt: null,
+            status: "ACTIVE",
+          },
+          select: { divider: true },
+        })
+      : null;
     // Booking price as on the provider form: Harga/Kg x max(Terberat, Min
     // KG); "Ganti Harga" keeps the typed Grand Total.
     const priced = priceAwb({
@@ -277,6 +361,8 @@ export async function createBooking(
       kilo: data.kilo ?? null,
       volume: data.volume ?? null,
       chargeableWeight: data.chargeableWeight ?? null,
+      dimensionRows: data.dimensionRows,
+      modeDivider: dimensionMode?.divider,
       pricePerKg: data.pricePerKg ?? null,
       minWeight: data.minWeight ?? null,
       biaya: data.biaya ?? null,
@@ -320,8 +406,8 @@ export async function createBooking(
         description: data.description ?? null,
         remarks: data.remarks ?? null,
         koli: data.koli ?? null,
-        kilo: data.kilo ?? null,
-        volume: data.volume ?? null,
+        kilo: priced.kilo,
+        volume: priced.volume,
         chargeableWeight: priced.chargeableWeight,
         pricePerKg: data.pricePerKg ?? null,
         minWeight: data.minWeight ?? null,
@@ -489,7 +575,14 @@ function payloadMatchesExisting(
     return false;
   }
   // Compare decimals as normalized strings
-  const decFields = ["kilo", "volume", "biaya"];
+  const decFields = [
+    "kilo",
+    "volume",
+    "chargeableWeight",
+    "packingFee",
+    "totalCost",
+    "biaya",
+  ];
   for (const f of decFields) {
     const aNorm = normalizeDecimal(existing[f]);
     const bNorm = normalizeDecimal(data[f]);
@@ -564,6 +657,7 @@ export async function createTransaction(
     }
   }
 
+  let matchPayload: Record<string, unknown> = data;
   try {
     return await prisma.$transaction(async (tx: TxClient) => {
       const { isAdministrator } = await import(
@@ -674,13 +768,34 @@ export async function createTransaction(
         if (!found) throw new Error("VALIDATION_MASTER_NOT_FOUND");
       }
 
+      const dimensionMode = data.dimensionRows?.length
+        ? await tx.transportMode.findFirst({
+            where: {
+              id: data.transportModeId ?? -1,
+              deletedAt: null,
+              status: "ACTIVE",
+            },
+            select: { divider: true },
+          })
+        : null;
+      const priced = priceAwb({
+        ...data,
+        modeDivider: dimensionMode?.divider,
+      });
+      matchPayload = { ...data, totalCost: priced.totalCost };
+      data.kilo = priced.kilo;
+      data.volume = priced.volume;
+      data.chargeableWeight = priced.chargeableWeight;
+      data.packingFee = priced.packingFee;
+      data.biaya = priced.biaya;
+
       if (data.idempotencyKey) {
         const existingByKey = await tx.transaction.findUnique({
           where: { idempotencyKey: data.idempotencyKey },
         });
         if (existingByKey) {
           if (
-            !payloadMatchesExisting(existingByKey, data, {
+            !payloadMatchesExisting(existingByKey, matchPayload, {
               explicitTransactionDate,
             })
           ) {
@@ -712,7 +827,7 @@ export async function createTransaction(
             );
           }
           if (
-            !payloadMatchesExisting(existingByAwb, data, {
+            !payloadMatchesExisting(existingByAwb, matchPayload, {
               explicitTransactionDate,
             })
           ) {
@@ -758,14 +873,9 @@ export async function createTransaction(
           koli: rest.koli ?? null,
           kilo: rest.kilo ?? null,
           volume: rest.volume ?? null,
-          ...(() => {
-            const priced = priceAwb(rest);
-            return {
-              biaya: priced.biaya,
-              chargeableWeight: priced.chargeableWeight,
-              totalCost: priced.totalCost,
-            };
-          })(),
+          biaya: priced.biaya,
+          chargeableWeight: priced.chargeableWeight,
+          totalCost: priced.totalCost,
           pickupCourierId: rest.pickupCourierId ?? null,
           marketingPersonId: rest.marketingPersonId ?? null,
           consigneeId: rest.consigneeId ?? null,
@@ -820,7 +930,7 @@ export async function createTransaction(
         });
         if (existingByKey) {
           if (
-            !payloadMatchesExisting(existingByKey, data, {
+            !payloadMatchesExisting(existingByKey, matchPayload, {
               explicitTransactionDate,
             })
           ) {
@@ -852,7 +962,7 @@ export async function createTransaction(
             );
           }
           if (
-            !payloadMatchesExisting(existingByAwb, data, {
+            !payloadMatchesExisting(existingByAwb, matchPayload, {
               explicitTransactionDate,
             })
           ) {

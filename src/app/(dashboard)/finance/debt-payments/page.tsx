@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { permits } from "@/features/identity/permissions";
+import { isAdministrator, permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import {
   closeVendorBillAction,
@@ -34,6 +34,7 @@ import {
   VENDOR_BILL_CATEGORIES,
   VENDOR_BILL_STATUS,
 } from "@/features/modul/server/vendor-bills";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Pembayaran Hutang" };
@@ -61,7 +62,7 @@ export default async function Page({
   };
   const canCreate = permits(current.actor, "create", "debt_payment");
   const canClose = permits(current.actor, "close", "debt_payment");
-  const [rows, vendors] = await Promise.all([
+  const [rows, vendors, branches] = await Promise.all([
     listVendorBills(current.actor, values),
     canCreate
       ? prisma.vendor.findMany({
@@ -71,8 +72,22 @@ export default async function Page({
           take: 1000,
         })
       : Promise.resolve([]),
+    canCreate
+      ? prisma.branch.findMany({
+          where: {
+            deletedAt: null,
+            status: "ACTIVE",
+            ...(isAdministrator(current.actor)
+              ? {}
+              : { id: { in: current.actor.branchIds } }),
+          },
+          select: { id: true, name: true },
+          orderBy: { name: "asc" },
+          take: 1000,
+        })
+      : Promise.resolve([]),
   ]);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessDateString();
   return (
     <div className="min-w-0 space-y-5">
       <ModulHeader
@@ -86,6 +101,25 @@ export default async function Page({
           </summary>
           <ActionForm action={createVendorBillAction} reset className="mt-3">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="min-w-0 space-y-2">
+                <Label htmlFor="vb-branch">Cabang Pemilik</Label>
+                <ComboSelect
+                  id="vb-branch"
+                  name="branchId"
+                  required
+                  defaultValue={
+                    branches.length === 1 ? String(branches[0].id) : ""
+                  }
+                  className={selectClass}
+                >
+                  <option value="">Pilih cabang...</option>
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </option>
+                  ))}
+                </ComboSelect>
+              </div>
               <div className="min-w-0 space-y-2">
                 <Label htmlFor="vb-category">Kategori</Label>
                 <select
@@ -203,10 +237,11 @@ export default async function Page({
       >
         {rows.length ? (
           <div className="overflow-x-auto">
-            <Table className="min-w-[72rem]">
+            <Table className="min-w-[78rem]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">No.</TableHead>
+                  <TableHead>Cabang</TableHead>
                   <TableHead>Kategori</TableHead>
                   <TableHead>Vendor</TableHead>
                   <TableHead>Invoice No</TableHead>
@@ -225,6 +260,9 @@ export default async function Page({
                 {rows.map((row, index) => (
                   <TableRow key={row.id}>
                     <TableCell className="tabular-nums">{index + 1}</TableCell>
+                    <TableCell>
+                      {row.branch?.name ?? "Belum ditentukan"}
+                    </TableCell>
                     <TableCell>{row.category}</TableCell>
                     <TableCell>{row.vendor.name}</TableCell>
                     <TableCell>{row.invoiceNo}</TableCell>

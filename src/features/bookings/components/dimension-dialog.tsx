@@ -18,6 +18,10 @@ export type DimensionResult = {
   chargeable: string;
   packingFee: string;
   notes: string;
+  rows: Pick<
+    Row,
+    "length" | "width" | "height" | "kilo" | "packed" | "packing"
+  >[];
 };
 type Row = {
   length: string;
@@ -281,6 +285,16 @@ export function DimensionDialog({
                     )
                     .filter(Boolean)
                     .join("; "),
+                  rows: rows.map(
+                    ({ length, width, height, kilo, packed, packing }) => ({
+                      length,
+                      width,
+                      height,
+                      kilo,
+                      packed,
+                      packing,
+                    }),
+                  ),
                 });
                 setOpen(false);
               }}

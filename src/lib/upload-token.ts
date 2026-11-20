@@ -10,6 +10,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 type Claim = {
   actorId: number;
   transactionId: number;
+  outcome?: "DELIVERED" | "RETURNED";
   publicId: string;
   url: string;
 };
@@ -22,7 +23,14 @@ function secret() {
   return value;
 }
 const payload = (c: Claim, exp: number) =>
-  [c.actorId, c.transactionId, c.publicId, c.url, exp].join("|");
+  [
+    c.actorId,
+    c.transactionId,
+    c.outcome ?? "DELIVERED",
+    c.publicId,
+    c.url,
+    exp,
+  ].join("|");
 
 export function signUpload(claim: Claim, now = Date.now()) {
   const exp = now + TTL_MS;

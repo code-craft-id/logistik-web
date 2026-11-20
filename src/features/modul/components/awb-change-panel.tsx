@@ -1,4 +1,5 @@
 import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type AccessActor, permits } from "@/features/identity/permissions";
@@ -51,7 +52,7 @@ type Awb = {
   remarks: string | null;
 };
 
-/** Ajukan Edit/Hapus AWB and, once an edit is approved, the one-time edit form. */
+/** Submit an exact edit proposal and apply it after approval. */
 export async function AwbChangePanel({
   actor,
   transaction: t,
@@ -93,39 +94,19 @@ export async function AwbChangePanel({
         Edit / Hapus AWB
       </h2>
       {approvedEdit && canRequest && (
-        <ActionForm action={applyAwbEditAction}>
+        <ActionForm
+          action={applyAwbEditAction}
+          submit={
+            <Button type="submit" className="min-h-11">
+              Terapkan edit yang disetujui
+            </Button>
+          }
+        >
           <p className="text-sm">
-            Pengajuan edit sudah disetujui. Ubah data lalu Simpan (hanya
-            sekali).
+            Pengajuan edit sudah disetujui. Terapkan nilai yang telah disetujui
+            (hanya sekali).
           </p>
           <input type="hidden" name="requestId" value={approvedEdit.id} />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {field("senderName", "Pengirim", { maxLength: "255" })}
-            {field("senderPhone", "No. Telp Pengirim", { maxLength: "30" })}
-            {field("senderAddress", "Alamat Pengirim", { maxLength: "500" })}
-            {field("receiverName", "Penerima", { maxLength: "255" })}
-            {field("receiverPhone", "No. Telp Penerima", { maxLength: "30" })}
-            {field("receiverAddress", "Alamat Penerima", { maxLength: "500" })}
-            {field("doNo", "DO No.", { maxLength: "255" })}
-            {field("koli", "Koli", { type: "number", min: "0" })}
-            {field("kilo", "Berat (kg)", {
-              type: "number",
-              min: "0",
-              step: "0.01",
-            })}
-            {field("volume", "Volume", {
-              type: "number",
-              min: "0",
-              step: "0.001",
-            })}
-            {field("biaya", "Biaya (Rp)", {
-              type: "number",
-              min: "0",
-              step: "0.01",
-            })}
-            {field("description", "Isi Barang", { maxLength: "500" })}
-            {field("remarks", "Keterangan", { maxLength: "500" })}
-          </div>
         </ActionForm>
       )}
       {canRequest && (
@@ -170,6 +151,36 @@ export async function AwbChangePanel({
                 className="min-h-11"
               />
             </div>
+          </div>
+          <p className="text-sm font-medium">
+            Nilai usulan (untuk Ajukan Edit)
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {field("senderName", "Pengirim", { maxLength: "255" })}
+            {field("senderPhone", "No. Telp Pengirim", { maxLength: "30" })}
+            {field("senderAddress", "Alamat Pengirim", { maxLength: "500" })}
+            {field("receiverName", "Penerima", { maxLength: "255" })}
+            {field("receiverPhone", "No. Telp Penerima", { maxLength: "30" })}
+            {field("receiverAddress", "Alamat Penerima", { maxLength: "500" })}
+            {field("doNo", "DO No.", { maxLength: "255" })}
+            {field("koli", "Koli", { type: "number", min: "0" })}
+            {field("kilo", "Berat (kg)", {
+              type: "number",
+              min: "0",
+              step: "0.01",
+            })}
+            {field("volume", "Volume", {
+              type: "number",
+              min: "0",
+              step: "0.001",
+            })}
+            {field("biaya", "Biaya (Rp)", {
+              type: "number",
+              min: "0",
+              step: "0.01",
+            })}
+            {field("description", "Isi Barang", { maxLength: "500" })}
+            {field("remarks", "Keterangan", { maxLength: "500" })}
           </div>
         </ActionForm>
       )}
