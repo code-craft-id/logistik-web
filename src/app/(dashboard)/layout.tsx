@@ -1,8 +1,10 @@
 import { type ReactNode, Suspense } from "react";
 import { accessibleNavigation } from "@/components/shell/accessible-navigation";
 import { AppShell } from "@/components/shell/app-shell";
+import { HelpChat } from "@/features/help/components/help-chat";
 import { WorkspaceAccount } from "@/features/identity/components/workspace-account";
 import { currentIdentity } from "@/features/identity/server/context";
+import { NotificationBell } from "@/features/modul/components/notification-bell";
 
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   return (
@@ -20,21 +22,27 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
 async function AuthorizedShell({ children }: { children: ReactNode }) {
   const current = await currentIdentity();
   return (
-    <AppShell
-      groups={accessibleNavigation(current?.actor ?? null)}
-      accountContent={
-        <Suspense
-          fallback={
-            <output className="px-3 py-2 text-sm text-muted-foreground">
-              Memuat akun...
-            </output>
-          }
-        >
-          <WorkspaceAccount />
-        </Suspense>
-      }
-    >
-      {children}
-    </AppShell>
+    <>
+      <AppShell
+        groups={accessibleNavigation(current?.actor ?? null)}
+        headerActions={
+          current ? <NotificationBell key="notifications" /> : null
+        }
+        accountContent={
+          <Suspense
+            fallback={
+              <output className="px-3 py-2 text-sm text-muted-foreground">
+                Memuat akun...
+              </output>
+            }
+          >
+            <WorkspaceAccount />
+          </Suspense>
+        }
+      >
+        {children}
+      </AppShell>
+      {current && <HelpChat />}
+    </>
   );
 }

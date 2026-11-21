@@ -5,6 +5,7 @@ import screenMap from "../../docs/experiments/legacy-ui-screen-map.json";
 import { implementedPreviewRoutes } from "../../src/components/shell/implemented-preview-routes";
 import { legacyMenu } from "../../src/components/shell/legacy-menu";
 import {
+  liveRoutes,
   navigation,
   navigationDestinations,
   providerNavigation,
@@ -36,6 +37,26 @@ describe("legacy inventory coverage and presentation routing", () => {
       "/ui-examples",
       ...implementedPreviewRoutes.map((item) => item.href),
     ]);
+    // FIN is an adopted live workflow, outside the frozen 43-screen preview inventory.
+    const finance = navigationDestinations().filter(({ item }) =>
+      item.href?.startsWith("/finance/"),
+    );
+    // Seven Akunting entries, Master Data > Perkiraan and Modul > Invoice (New)
+    // and Pembayaran Hutang.
+    expect(finance).toHaveLength(10);
+    for (const { item } of finance) {
+      expect(
+        existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),
+      ).toBe(true);
+      if (item.href) available.add(item.href);
+    }
+    // Live report workflows added after the preview inventory must exist on disk.
+    for (const href of liveRoutes) {
+      expect(
+        existsSync(`src/app/(dashboard)${href.split("?")[0]}/page.tsx`),
+      ).toBe(true);
+      available.add(href);
+    }
     for (const { item } of navigationDestinations())
       if (item.href) expect(available.has(item.href)).toBe(true);
     for (const { href } of implementedPreviewRoutes)

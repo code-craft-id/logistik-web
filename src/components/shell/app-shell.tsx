@@ -75,33 +75,42 @@ function DesktopNavigation({
         {item.providerLabel} <span className="text-xs">— unavailable</span>
       </p>
     );
-  const groupPanel = (group: NavigationGroup) => (
-    <NavigationMenuContent aria-label={`${group.providerLabel} destinations`}>
-      <p className="mb-3 border-b px-3 pb-3 text-xs text-muted-foreground">
-        Navigate LMS pages
-      </p>
-      <ul className="grid grid-cols-2 items-start gap-4">
-        {navigationEntries(group).map((entry) => (
-          <li key={entry.label}>
-            {isNavigationSection(entry) ? (
-              <section aria-label={entry.providerPath.join(" / ")}>
-                <h2 className="mb-1 px-3 text-sm font-semibold">
-                  {entry.providerPath.join(" / ")}
-                </h2>
-                <ul>
-                  {entry.items.map((item) => (
-                    <li key={item.label}>{routeLink(item)}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : (
-              routeLink(entry)
-            )}
-          </li>
-        ))}
-      </ul>
-    </NavigationMenuContent>
-  );
+  // Panel width follows its content: one column for short groups, two for long ones.
+  const groupPanel = (group: NavigationGroup) => {
+    const entries = navigationEntries(group);
+    const links = entries.reduce(
+      (n, entry) => n + (isNavigationSection(entry) ? entry.items.length : 1),
+      0,
+    );
+    const wide = entries.length > 1 && links > 6;
+    return (
+      <NavigationMenuContent
+        aria-label={`${group.providerLabel} destinations`}
+        className={`left-1/2 -translate-x-1/2 p-2 ${wide ? "w-xl" : "w-64"}`}
+      >
+        <ul className={wide ? "columns-2 gap-2" : undefined}>
+          {entries.map((entry) => (
+            <li key={entry.label} className="mb-3 break-inside-avoid last:mb-0">
+              {isNavigationSection(entry) ? (
+                <section aria-label={entry.providerPath.join(" / ")}>
+                  <h2 className="mb-1 px-3 text-sm font-semibold">
+                    {entry.providerPath.join(" / ")}
+                  </h2>
+                  <ul>
+                    {entry.items.map((item) => (
+                      <li key={item.label}>{routeLink(item)}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                routeLink(entry)
+              )}
+            </li>
+          ))}
+        </ul>
+      </NavigationMenuContent>
+    );
+  };
   return (
     <NavigationMenu
       aria-label="Main navigation"
@@ -110,7 +119,11 @@ function DesktopNavigation({
     >
       <NavigationMenuList>
         {primary.map((group) => (
-          <NavigationMenuItem key={group.label} value={group.label}>
+          <NavigationMenuItem
+            key={group.label}
+            value={group.label}
+            className="relative"
+          >
             {group.href ? (
               <NavigationMenuLink
                 asChild
@@ -132,7 +145,7 @@ function DesktopNavigation({
           </NavigationMenuItem>
         ))}
         {additional.length > 0 && (
-          <NavigationMenuItem value="supplementary">
+          <NavigationMenuItem value="supplementary" className="relative">
             <NavigationMenuTrigger
               data-active={current && additional.includes(current.group)}
             >
@@ -162,9 +175,12 @@ function DesktopNavigation({
 // navigation. Pages and the dashboard layout retain their server boundaries.
 function ShellHeader({
   accountContent,
+  headerActions,
   groups,
 }: {
   accountContent?: ReactNode;
+  /** Optional controls shown before the account menu (e.g. notifications). */
+  headerActions?: ReactNode;
   groups: readonly NavigationGroup[];
 }) {
   const [openMenu, setOpenMenu] = useState("");
@@ -271,6 +287,7 @@ function ShellHeader({
               />
             </SheetContent>
           </Sheet>
+          {headerActions}
           <DropdownMenu
             open={account}
             onOpenChange={(value) => {
@@ -336,15 +353,16 @@ function ShellHeader({
 export function AppShell({
   children,
   accountContent,
+  headerActions,
   groups = navigation,
 }: {
   children?: ReactNode;
   accountContent?: ReactNode;
+  headerActions?: ReactNode;
   groups?: readonly NavigationGroup[];
 }) {
   const pathname = usePathname();
-  const breadcrumbs = navigationPath(pathname, groups)?.labels ??
-    navigationPath(pathname)?.labels ?? ["Page"];
+  const breadcrumbs = breadcrumbLabels(pathname, groups);
   return (
     <div className="min-h-dvh min-w-0 bg-workspace">
       <a
@@ -356,6 +374,7 @@ export function AppShell({
       <ShellHeader
         key={pathname}
         accountContent={accountContent}
+        headerActions={headerActions}
         groups={groups}
       />
       <nav
@@ -427,6 +446,15 @@ export function AppShell({
           "/logistics/division",
           "/vendor",
           "/shipment-status",
+          "/ticketting",
+          "/finance",
+          "/branch-reports/transaction-details",
+          "/branch-reports/manifest-outbound",
+          "/branch-reports/manifest-vendor",
+          "/branch-reports/delivery",
+          "/branch-reports/awb",
+          "/customer-reports/all-status",
+          "/dashboard",
         ].some(
           (route) => pathname === route || pathname.startsWith(`${route}/`),
         )
@@ -435,4 +463,42 @@ export function AppShell({
       </footer>
     </div>
   );
+}
+
+const segmentLabels: Record<string, string> = {
+  new: "Tambah",
+  edit: "Edit",
+  scan: "Scan AWB",
+  approvals: "Persetujuan",
+  history: "Riwayat",
+  lookup: "Cari AWB",
+};
+
+/**
+ * Menu path of the page; a sub-page without its own menu entry (for example
+ * /bookings/new or /manifest/7) gets its parent's path plus a short label,
+ * never the bare "Page".
+ */
+function breadcrumbLabels(
+  pathname: string,
+  groups: readonly NavigationGroup[],
+): string[] {
+  const find = (path: string) =>
+    navigationPath(path, groups)?.labels ?? navigationPath(path)?.labels;
+  const extra: string[] = [];
+  let path = pathname;
+  for (let depth = 0; depth < 4 && path.length > 1; depth++) {
+    const found = find(path);
+    if (found) return [...found, ...extra];
+    const segment = path.slice(path.lastIndexOf("/") + 1);
+    extra.unshift(
+      segmentLabels[segment] ??
+        (/^\d+$/.test(segment)
+          ? "Detail"
+          : segment.charAt(0).toUpperCase() +
+            segment.slice(1).replaceAll("-", " ")),
+    );
+    path = path.slice(0, path.lastIndexOf("/")) || "/";
+  }
+  return extra;
 }

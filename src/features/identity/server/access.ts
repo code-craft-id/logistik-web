@@ -13,7 +13,8 @@ const messages: Record<string, string> = {
   FORBIDDEN_BRANCH: "Cabang berada di luar cakupan Anda.",
   NOT_FOUND: "Data tidak ditemukan.",
   CONFLICT: "Data telah berubah. Muat data terbaru dan coba kembali.",
-  INVALID_PARENT: "Induk data tidak tersedia.",
+  INVALID_PARENT:
+    "Data induk (misalnya kantor atau perusahaan) tidak ditemukan atau tidak aktif.",
   INVALID_REFERENCE: "Pilihan terkait tidak tersedia.",
   IN_USE: "Data masih digunakan oleh data lain.",
 };
@@ -21,7 +22,8 @@ export class IdentityError extends Error {
   constructor(
     public code: string,
     public status: number,
-    message = messages[code] ?? "Permintaan tidak dapat diproses.",
+    message = messages[code] ??
+      "Permintaan tidak dapat diproses. Coba lagi; jika berulang, hubungi admin.",
   ) {
     super(message);
   }

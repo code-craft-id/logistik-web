@@ -1,0 +1,194 @@
+[
+  {
+    "path": "/finance/invoices",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "Invoice",
+    "controls": 2,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices/new",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "Buat invoice",
+    "controls": 14,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices/15",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "INV-15",
+    "controls": 0,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/accounts",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "Akun & kategori",
+    "controls": 70,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/journals",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "Jurnal",
+    "controls": 33,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/costs",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "Biaya aktual",
+    "controls": 17,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/periods",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "Periode akuntansi",
+    "controls": 6,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/reports",
+    "width": 375,
+    "pageWidth": 375,
+    "heading": "P&L, Gross Profit & arus kas",
+    "controls": 4,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices",
+    "width": 768,
+    "pageWidth": 768,
+    "heading": "Invoice",
+    "controls": 2,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices/new",
+    "width": 768,
+    "pageWidth": 768,
+    "heading": "Buat invoice",
+    "controls": 14,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices/15",
+    "width": 768,
+    "pageWidth": 768,
+    "heading": "INV-15",
+    "controls": 0,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/accounts",
+    "width": 768,
+    "pageWidth": 753,
+    "heading": "Akun & kategori",
+    "controls": 70,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/journals",
+    "width": 768,
+    "pageWidth": 753,
+    "heading": "Jurnal",
+    "controls": 33,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/costs",
+    "width": 768,
+    "pageWidth": 753,
+    "heading": "Biaya aktual",
+    "controls": 17,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/periods",
+    "width": 768,
+    "pageWidth": 768,
+    "heading": "Periode akuntansi",
+    "controls": 6,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/reports",
+    "width": 768,
+    "pageWidth": 753,
+    "heading": "P&L, Gross Profit & arus kas",
+    "controls": 4,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices",
+    "width": 1440,
+    "pageWidth": 1440,
+    "heading": "Invoice",
+    "controls": 2,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices/new",
+    "width": 1440,
+    "pageWidth": 1440,
+    "heading": "Buat invoice",
+    "controls": 14,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/invoices/15",
+    "width": 1440,
+    "pageWidth": 1440,
+    "heading": "INV-15",
+    "controls": 0,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/accounts",
+    "width": 1440,
+    "pageWidth": 1425,
+    "heading": "Akun & kategori",
+    "controls": 70,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/journals",
+    "width": 1440,
+    "pageWidth": 1425,
+    "heading": "Jurnal",
+    "controls": 33,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/costs",
+    "width": 1440,
+    "pageWidth": 1425,
+    "heading": "Biaya aktual",
+    "controls": 17,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/periods",
+    "width": 1440,
+    "pageWidth": 1440,
+    "heading": "Periode akuntansi",
+    "controls": 6,
+    "clippedControls": 0
+  },
+  {
+    "path": "/finance/accounting/reports",
+    "width": 1440,
+    "pageWidth": 1425,
+    "heading": "P&L, Gross Profit & arus kas",
+    "controls": 4,
+    "clippedControls": 0
+  }
+]

@@ -126,6 +126,16 @@ export const permissionResources = [
     actions: ["view", "create", "update", "delete"],
   },
   {
+    resource: "customer",
+    label: "Customer",
+    actions: ["view", "create", "update", "delete"],
+  },
+  {
+    resource: "consignee",
+    label: "Penerima",
+    actions: ["view", "create", "update", "delete"],
+  },
+  {
     resource: "courier",
     label: "Kurir",
     actions: ["view", "create", "update", "delete"],
@@ -168,7 +178,7 @@ export const permissionResources = [
   {
     resource: "booking",
     label: "Booking",
-    actions: ["view", "create", "update"],
+    actions: ["view", "create", "update", "approve"],
   },
   {
     resource: "transaction",
@@ -184,6 +194,91 @@ export const permissionResources = [
     resource: "delivery",
     label: "Delivery Sheet",
     actions: ["view", "create", "update"],
+  },
+  {
+    resource: "transaction_report",
+    label: "Laporan Detail Transaksi",
+    actions: ["view", "export"],
+  },
+  {
+    resource: "manifest_report",
+    label: "Laporan Manifes Cabang",
+    actions: ["view"],
+  },
+  {
+    resource: "delivery_report",
+    label: "Laporan Pengantaran",
+    actions: ["view"],
+  },
+  {
+    resource: "dashboard_report",
+    label: "Ringkasan Operasional",
+    actions: ["view"],
+  },
+  {
+    resource: "ticket",
+    label: "Ticketing",
+    actions: ["view", "create"],
+  },
+  {
+    resource: "invoice",
+    label: "Invoice",
+    actions: ["view", "create", "update", "issue", "void"],
+  },
+  {
+    resource: "payment",
+    label: "Pembayaran",
+    actions: ["view", "create", "reverse"],
+  },
+  {
+    resource: "finance_account",
+    label: "Akun dan kategori",
+    actions: ["view", "manage"],
+  },
+  {
+    resource: "journal",
+    label: "Jurnal",
+    actions: ["view", "create", "post", "reverse"],
+  },
+  {
+    resource: "finance_cost",
+    label: "Biaya aktual",
+    actions: ["view", "create", "finalize", "reverse"],
+  },
+  {
+    resource: "finance_period",
+    label: "Periode akuntansi",
+    actions: ["view", "close"],
+  },
+  {
+    resource: "financial_report",
+    label: "Laporan keuangan",
+    actions: ["view"],
+  },
+  {
+    resource: "awb_change",
+    label: "Persetujuan Edit/Delete AWB",
+    actions: ["view", "request", "approve"],
+  },
+  {
+    resource: "tariff",
+    label: "Tarif / Cek Ongkir",
+    actions: ["view", "manage"],
+  },
+  {
+    resource: "pod_return",
+    label: "POD Kembali",
+    actions: ["view", "create", "approve"],
+  },
+  {
+    resource: "debt_payment",
+    label: "Pembayaran Hutang",
+    actions: ["view", "create", "close"],
+  },
+  {
+    resource: "awb_scan",
+    label: "Scan AWB (ubah status lewat scan)",
+    actions: ["use"],
   },
 ] as const;
 
@@ -201,7 +296,36 @@ export const fullAccessPermission = {
 export function permissionRestriction(resource: string): string | undefined {
   if (resource === "vendor_tax")
     return "Lihat dan kelola NPWP vendor khusus administrator.";
-  if (["booking", "transaction", "manifest", "delivery"].includes(resource))
+  // FIN-02 contract: account/category management is a separately granted right,
+  // not administrator-only; the data is shared by every branch.
+  if (resource === "finance_account")
+    return "Akun dan kategori berlaku untuk semua cabang. Berikan hak kelola hanya kepada staf finance yang berwenang.";
+  if (
+    [
+      "booking",
+      "transaction",
+      "customer",
+      "consignee",
+      "manifest",
+      "delivery",
+      "awb_change",
+      "tariff",
+      "pod_return",
+      "debt_payment",
+      "awb_scan",
+      "ticket",
+      "transaction_report",
+      "manifest_report",
+      "delivery_report",
+      "dashboard_report",
+      "invoice",
+      "payment",
+      "journal",
+      "finance_cost",
+      "finance_period",
+      "financial_report",
+    ].includes(resource)
+  )
     return undefined;
   if (
     permissionResources.some((entry) => entry.resource === resource) &&

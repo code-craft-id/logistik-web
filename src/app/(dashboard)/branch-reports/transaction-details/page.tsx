@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/reports/preview/screens";
+import { Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
+import { TransactionReportPage } from "@/features/reports/transaction-details/components/report-page";
 
 export const metadata: Metadata = { title: "Detail Transaksi" };
-export default function Page() {
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   return (
-    <PreviewScreenPage
-      screen={screens["/branch-reports/transaction-details"]}
-    />
+    <Suspense fallback={<LoadingState label="Memuat laporan transaksi…" />}>
+      <Content searchParams={searchParams} />
+    </Suspense>
   );
+}
+async function Content({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return <TransactionReportPage query={await searchParams} />;
 }

@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/reports/preview/screens";
+import { SimpleReportPage } from "@/features/reports/simple/report-page";
 
-export const metadata: Metadata = { title: "Penjual Manifes" };
-export default function Page() {
+export const metadata: Metadata = { title: "Manifest Vendor" };
+
+// Session- and query-dependent report; blocking render.
+export const instant = false;
+
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   return (
-    <PreviewScreenPage screen={screens["/branch-reports/manifest-vendor"]} />
+    <SimpleReportPage
+      id="manifest-vendor"
+      route="/branch-reports/manifest-vendor"
+      searchParams={searchParams}
+    />
   );
 }

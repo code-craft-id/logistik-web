@@ -15,6 +15,55 @@ import {
 
 // A route enters this inventory only when its workflow is implemented.
 const routeResources: Record<string, readonly string[]> = {
+  "/finance/invoices": ["invoice"],
+  "/finance/accounting": [
+    "finance_account",
+    "journal",
+    "finance_cost",
+    "finance_period",
+    "financial_report",
+  ],
+  "/finance/accounting/accounts": ["finance_account"],
+  "/finance/accounting/journals": ["journal"],
+  "/finance/accounting/costs": ["finance_cost"],
+  "/finance/accounting/periods": ["finance_period"],
+  "/finance/accounting/reports": ["financial_report"],
+  "/dashboard": ["dashboard_report"],
+  "/transactions": ["transaction"],
+  "/transactions/new": ["transaction"],
+  "/transactions/lookup": ["transaction"],
+  "/transactions/void": ["transaction"],
+  "/transactions/history": ["transaction"],
+  "/marketing/revenue": ["customer"],
+  "/bookings": ["booking"],
+  "/transactions/approvals": ["awb_change"],
+  "/transactions/scan": ["awb_scan"],
+  "/customer-service/cek-ongkir": ["tariff"],
+  "/customer-service/status-pengantaran": ["transaction"],
+  "/branch-reports/rekap-transaksi": ["transaction_report"],
+  "/financial-reports/aging": ["invoice"],
+  "/financial-reports/ap-aging": ["debt_payment"],
+  "/akunting/rugi-laba": ["financial_report"],
+  "/pod-returns": ["pod_return"],
+  "/finance/debt-payments": ["debt_payment"],
+  "/manifest": ["manifest"],
+  "/marketing": ["customer", "consignee"],
+  "/branch-reports/awb": ["transaction_report"],
+  "/customer-reports/all-status": ["transaction_report"],
+  "/customer-reports/shipments": ["transaction_report"],
+  "/customer-reports/pod": ["transaction_report"],
+  "/branch-reports/customer-monthly-summary": ["transaction_report"],
+  "/branch-reports/daily-turnover-summary": ["transaction_report"],
+  "/branch-reports/inbound-transaction-details": ["transaction_report"],
+  "/branch-reports/manifest-vendor": ["manifest_report"],
+  "/branch-reports/gross-profit": ["financial_report"],
+  "/branch-reports/rekap-gross-profit": ["financial_report"],
+  "/courier-reports": ["delivery_report"],
+  "/financial-reports": ["invoice"],
+  "/branch-reports/manifest-outbound": ["manifest_report"],
+  "/branch-reports/delivery": ["delivery_report"],
+  "/branch-reports/transaction-details": ["transaction_report"],
+  "/ticketting": ["ticket"],
   "/group-user": ["user_group"],
   "/user-management": ["user"],
   "/hak-akses-menu": ["permission"],
@@ -56,7 +105,7 @@ export function accessibleNavigation(
   const showInventory = isAdministrator(actor);
   const allowed = (href?: string) =>
     !!href &&
-    !!routeResources[href]?.some(
+    !!routeResources[href.split("?")[0]]?.some(
       (resource) =>
         permits(actor, "view", resource) &&
         (resource !== "vendor_tax" || isAdministrator(actor)),

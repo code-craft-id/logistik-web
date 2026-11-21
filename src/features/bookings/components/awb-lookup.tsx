@@ -1,14 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { lookupTransactionAction } from "../lookup-actions";
 
 type BranchOption = { id: number; code: string; name: string };
@@ -202,22 +196,19 @@ export function AwbLookup() {
         </div>
         <div className="space-y-1">
           <Label htmlFor="originBranchId">Cabang asal</Label>
-          <Select
-            value={originBranchId || "any"}
-            onValueChange={(v) => onOriginBranchChange(v === "any" ? "" : v)}
+          <ComboSelect
+            id="originBranchId"
+            value={originBranchId}
+            onChange={(event) => onOriginBranchChange(event.target.value)}
+            className="w-full sm:w-[320px]"
           >
-            <SelectTrigger id="originBranchId" className="w-full sm:w-[320px]">
-              <SelectValue placeholder="Semua cabang dalam cakupan" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any">Semua cabang dalam cakupan</SelectItem>
-              {branchOptions.map((b) => (
-                <SelectItem key={b.id} value={String(b.id)}>
-                  {b.code ? `${b.code} - ${b.name}` : b.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <option value="">Semua cabang dalam cakupan</option>
+            {branchOptions.map((b) => (
+              <option key={b.id} value={String(b.id)}>
+                {b.code ? `${b.code} - ${b.name}` : b.name}
+              </option>
+            ))}
+          </ComboSelect>
           <p className="text-xs text-muted-foreground">
             Pilih cabang asal jika AWB ditemukan di beberapa cabang asal. Hanya
             cabang yang boleh diakses yang ditampilkan.

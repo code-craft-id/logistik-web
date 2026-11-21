@@ -1,0 +1,88 @@
+{
+  "source": "7997505",
+  "gates": [
+    {
+      "mode": "lint",
+      "started": "2026-11-15T11:47:00.799Z",
+      "ended": "2026-11-15T11:47:03.975Z",
+      "node": "v24.15.0",
+      "exit": 0,
+      "command": [
+        "C:\\Laragon\\bin\\nodejs\\node-v24.15.0-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "lint"
+      ]
+    },
+    {
+      "mode": "typecheck",
+      "started": "2026-11-15T11:47:00.885Z",
+      "ended": "2026-11-15T11:47:09.808Z",
+      "node": "v24.15.0",
+      "exit": 0,
+      "command": [
+        "C:\\Laragon\\bin\\nodejs\\node-v24.15.0-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "typecheck"
+      ]
+    },
+    {
+      "mode": "test",
+      "started": "2026-11-15T11:47:01.072Z",
+      "ended": "2026-11-15T11:48:27.811Z",
+      "node": "v24.15.0",
+      "exit": 0,
+      "command": [
+        "C:\\Laragon\\bin\\nodejs\\node-v24.15.0-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "test"
+      ]
+    },
+    {
+      "mode": "db",
+      "started": "2026-11-15T11:47:00.784Z",
+      "ended": "2026-11-15T11:48:10.428Z",
+      "node": "v24.15.0",
+      "exit": 0,
+      "command": [
+        "C:\\Laragon\\bin\\nodejs\\node-v24.15.0-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "test:integration"
+      ]
+    },
+    {
+      "mode": "build",
+      "started": "2026-11-15T11:44:17.091Z",
+      "ended": "2026-11-15T11:45:28.336Z",
+      "node": "v24.15.0",
+      "exit": 0,
+      "command": [
+        "C:\\Laragon\\bin\\nodejs\\node-v24.15.0-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "build"
+      ]
+    },
+    {
+      "mode": "schema",
+      "started": "2026-11-15T11:38:26.092Z",
+      "ended": "2026-11-15T11:38:33.276Z",
+      "node": "v24.15.0",
+      "exit": 0,
+      "command": ["node_modules/prisma/build/index.js", "validate"]
+    },
+    {
+      "mode": "diff",
+      "started": "2026-11-15T11:38:26.092Z",
+      "ended": "2026-11-15T11:38:36.404Z",
+      "node": "v24.15.0",
+      "exit": 2,
+      "command": [
+        "node_modules/prisma/build/index.js",
+        "migrate",
+        "diff",
+        "--from-config-datasource",
+        "--to-schema",
+        "prisma",
+        "--exit-code"
+      ]
+    }
+  ]
+}

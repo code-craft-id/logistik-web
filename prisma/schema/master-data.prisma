@@ -71,6 +71,7 @@ model PostalCode {
 }
 
 model Driver {
+  podReturns PodReturn[]
   deletedAt           DateTime?    @map("deleted_at")
   updatedAt           DateTime     @updatedAt @map("updated_at")
   createdAt           DateTime     @default(now()) @map("created_at")
@@ -90,6 +91,8 @@ model Driver {
 }
 
 model Courier {
+  bookings Booking[] @relation("BookingCourier")
+  pickupTransactions Transaction[] @relation("TransactionPickupCourier")
   deletedAt        DateTime?    @map("deleted_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
   createdAt        DateTime     @default(now()) @map("created_at")
@@ -110,15 +113,17 @@ model Courier {
 }
 
 model TransportMode {
+  bookings Booking[] @relation("BookingTransportMode")
   deletedAt        DateTime?         @map("deleted_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
   createdAt        DateTime          @default(now()) @map("created_at")
   id               Int               @id @default(autoincrement())
   name             String            @db.VarChar(100)
-  /// DRAFT: Legacy text maintenance approved by coordinator in chat, 2026-10-25. Numeric interpretation remains TBD, D-26; never calculate charges from this field.
+  /// DRAFT: legacy text (2026-10-25), D-26. OBSERVED 2026-11-19 and owner-approved for the Dimensi volume only (P x L x T cm / divider), pending Dev 2 review; non-numeric or zero disables it.
   divider          String            @db.VarChar(100)
   status           RecordStatus      @default(ACTIVE)
   deliveryServices DeliveryService[]
+  transactions     Transaction[]
 
   @@index([status])
   @@map("transport_modes")
@@ -139,6 +144,8 @@ model ServiceCategory {
 
 /// Service dictionary only; this is not an operational delivery model.
 model DeliveryService {
+  bookings Booking[] @relation("BookingDeliveryService")
+  tariffs Tariff[]
   deletedAt         DateTime?        @map("deleted_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
   createdAt         DateTime         @default(now()) @map("created_at")
@@ -149,6 +156,7 @@ model DeliveryService {
   transportModeId   Int?             @map("transport_mode_id")
   transportMode     TransportMode?   @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   status            RecordStatus     @default(ACTIVE)
+  transactions      Transaction[]
 
   @@index([serviceCategoryId])
   @@index([transportModeId])
@@ -157,19 +165,23 @@ model DeliveryService {
 }
 
 model GoodsType {
+  bookings Booking[] @relation("BookingGoodsType")
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
   createdAt DateTime     @default(now()) @map("created_at")
   id        Int          @id @default(autoincrement())
   name      String       @db.VarChar(100)
-  status    RecordStatus @default(ACTIVE)
+  status       RecordStatus  @default(ACTIVE)
+  transactions Transaction[]
 
   @@index([status])
   @@map("goods_types")
 }
 
 model CostType {
-  customers Customer[]
+  bookings Booking[] @relation("BookingCostType")
+  customers    Customer[]
+  transactions Transaction[]
   deletedAt DateTime?    @map("deleted_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
   createdAt DateTime     @default(now()) @map("created_at")
@@ -268,6 +280,8 @@ model ShipmentStatus {
 }
 
 model Vendor {
+  vendorBills VendorBill[]
+  manifests   Manifest[]
   deletedAt   DateTime?         @map("deleted_at")
   id          Int               @id @default(autoincrement())
   name        String

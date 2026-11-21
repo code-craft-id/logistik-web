@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/reports/preview/screens";
+import { SimpleReportPage } from "@/features/reports/simple/report-page";
 
 export const metadata: Metadata = { title: "Rekap Gross Profit" };
-export default function Page() {
+
+// Session- and query-dependent report; blocking render.
+export const instant = false;
+
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   return (
-    <PreviewScreenPage screen={screens["/branch-reports/rekap-gross-profit"]} />
+    <SimpleReportPage
+      id="gross-profit-recap"
+      route="/branch-reports/rekap-gross-profit"
+      searchParams={searchParams}
+    />
   );
 }

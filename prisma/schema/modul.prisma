@@ -1,0 +1,212 @@
+/// Persetujuan Edit/Delete AWB (OBSERVED legacy approve-modified-awb, 2026-11-19).
+/// A user asks to edit or delete an AWB with a reason; an approver decides.
+/// Status: PENDING, APPROVED, REJECTED, USED (approved edit already applied).
+model AwbChangeRequest {
+  id            Int         @id @default(autoincrement())
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  kind          String      @db.VarChar(10)
+  reason        String      @db.VarChar(500)
+  status        String      @default("PENDING") @db.VarChar(20)
+  changes       Json?
+  requestedById Int?        @map("requested_by_id")
+  requestedBy   User?       @relation("AwbChangeRequestedBy", fields: [requestedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  decidedById   Int?        @map("decided_by_id")
+  decidedBy     User?       @relation("AwbChangeDecidedBy", fields: [decidedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  decidedAt     DateTime?   @map("decided_at")
+  decisionNote  String?     @map("decision_note") @db.VarChar(500)
+  usedAt        DateTime?   @map("used_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  deletedAt     DateTime?   @map("deleted_at")
+
+  @@index([transactionId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("awb_change_requests")
+}
+
+/// Cek Ongkir tariff (OBSERVED legacy cek-ongkir columns, 2026-11-19).
+/// Charge = max(weight, minWeight) x pricePerKg; display only, never posted.
+model Tariff {
+  id                  Int              @id @default(autoincrement())
+  deliveryServiceId   Int?             @map("delivery_service_id")
+  deliveryService     DeliveryService? @relation(fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  originBranchId      Int              @map("origin_branch_id")
+  originBranch        Branch           @relation("TariffOrigin", fields: [originBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  destinationBranchId Int              @map("destination_branch_id")
+  destinationBranch   Branch           @relation("TariffDestination", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  minWeight           Decimal          @default(1) @map("min_weight") @db.Decimal(10, 2)
+  pricePerKg          Decimal          @map("price_per_kg") @db.Decimal(15, 2)
+  eta                 String?          @db.VarChar(50)
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+  deletedAt           DateTime?        @map("deleted_at")
+
+  @@index([originBranchId, destinationBranchId])
+  @@index([deliveryServiceId])
+  @@map("tariffs")
+}
+
+/// POD Kembali document (OBSERVED legacy approval-pod-kembali columns, 2026-11-19):
+/// a batch of delivered AWB proofs sent back to the origin branch, then approved.
+/// Status: PENDING, APPROVED, REJECTED.
+model PodReturn {
+  id                  Int             @id @default(autoincrement())
+  returnNo            String          @unique @map("return_no") @db.VarChar(50)
+  returnDate          DateTime        @default(now()) @map("return_date")
+  originBranchId      Int             @map("origin_branch_id")
+  originBranch        Branch          @relation("PodReturnOrigin", fields: [originBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  destinationBranchId Int             @map("destination_branch_id")
+  destinationBranch   Branch          @relation("PodReturnDestination", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  driverId            Int?            @map("driver_id")
+  driver              Driver?         @relation(fields: [driverId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  notes               String?         @db.VarChar(500)
+  status              String          @default("PENDING") @db.VarChar(20)
+  createdById         Int?            @map("created_by_id")
+  createdBy           User?           @relation("PodReturnCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  decidedById         Int?            @map("decided_by_id")
+  decidedBy           User?           @relation("PodReturnDecidedBy", fields: [decidedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  decidedAt           DateTime?       @map("decided_at")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  deletedAt           DateTime?       @map("deleted_at")
+  items               PodReturnItem[]
+
+  @@index([originBranchId])
+  @@index([destinationBranchId])
+  @@index([status])
+  @@index([returnDate])
+  @@map("pod_returns")
+}
+
+model PodReturnItem {
+  id            Int         @id @default(autoincrement())
+  podReturnId   Int         @map("pod_return_id")
+  podReturn     PodReturn   @relation(fields: [podReturnId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  deletedAt     DateTime?   @map("deleted_at")
+
+  @@unique([podReturnId, transactionId])
+  @@index([transactionId])
+  @@map("pod_return_items")
+}
+
+/// Pembayaran Hutang (OBSERVED legacy debt-payments columns, 2026-11-19): a
+/// vendor invoice register with its AWBs, closed when paid. Not posted to the
+/// ledger; journal treatment stays a finance decision.
+/// Status: OPEN, PAID.
+model VendorBill {
+  id           Int              @id @default(autoincrement())
+  branchId     Int?             @map("branch_id")
+  branch       Branch?          @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  category     String           @db.VarChar(30)
+  vendorId     Int              @map("vendor_id")
+  vendor       Vendor           @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  invoiceNo    String           @map("invoice_no") @db.VarChar(50)
+  billDate     DateTime         @default(now()) @map("bill_date")
+  receivedDate DateTime?        @map("received_date")
+  termDays     Int              @default(0) @map("term_days")
+  amount       Decimal          @default(0) @db.Decimal(15, 2)
+  status       String           @default("OPEN") @db.VarChar(20)
+  closedAt     DateTime?        @map("closed_at")
+  closedById   Int?             @map("closed_by_id")
+  closedBy     User?            @relation("VendorBillClosedBy", fields: [closedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdById  Int?             @map("created_by_id")
+  createdBy    User?            @relation("VendorBillCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  deletedAt    DateTime?        @map("deleted_at")
+  items        VendorBillItem[]
+
+  @@unique([vendorId, invoiceNo])
+  @@index([status])
+  @@index([billDate])
+  @@map("vendor_bills")
+}
+
+model VendorBillItem {
+  id            Int         @id @default(autoincrement())
+  vendorBillId  Int         @map("vendor_bill_id")
+  vendorBill    VendorBill  @relation(fields: [vendorBillId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  deletedAt     DateTime?   @map("deleted_at")
+
+  @@unique([vendorBillId, transactionId])
+  @@index([transactionId])
+  @@map("vendor_bill_items")
+}
+
+/// Bukti terima per AWB from Scan AWB (OBSERVED in the provider's courier app
+/// Progi, 2026-11-19): outcome DITERIMA/RETUR, receiver name, note, up to five
+/// photos and a drawn signature, all stored on Cloudinary (URL and id only).
+/// Outcome: DELIVERED or RETURNED.
+model DeliveryProof {
+  id                 Int                  @id @default(autoincrement())
+  transactionId      Int                  @map("transaction_id")
+  transaction        Transaction          @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  outcome            String               @db.VarChar(20)
+  receiverName       String?              @map("receiver_name") @db.VarChar(150)
+  notes              String?              @db.VarChar(500)
+  signatureUrl       String?              @map("signature_url") @db.VarChar(500)
+  signaturePublicId  String?              @map("signature_public_id") @db.VarChar(255)
+  createdById        Int?                 @map("created_by_id")
+  createdBy          User?                @relation("DeliveryProofCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  deletedAt          DateTime?            @map("deleted_at")
+  photos             DeliveryProofPhoto[]
+
+  @@index([transactionId])
+  @@index([createdAt])
+  @@map("delivery_proofs")
+}
+
+model DeliveryProofPhoto {
+  id        Int           @id @default(autoincrement())
+  proofId   Int           @map("proof_id")
+  proof     DeliveryProof @relation(fields: [proofId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  position  Int
+  url       String        @db.VarChar(500)
+  publicId  String        @map("public_id") @db.VarChar(255)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  deletedAt DateTime?     @map("deleted_at")
+
+  @@unique([proofId, position])
+  @@map("delivery_proof_photos")
+}
+
+/// Koli scan at a transit or destination branch (provider Cek Transit /
+/// Cek Inbound detail, OBSERVED 2026-11-19: "Masukan No. AWB/Koli No.",
+/// Scan Koli / Sisa Koli). The first TRANSIT scan of a manifest gives User
+/// Transit / Transit Date; the first INBOUND scan of an AWB gives Acc. In.
+/// Owner-approved 2026-11-19 (D-05), Dev 2 review pending. Append-only
+/// (immutable): no updatedAt or soft delete.
+model ManifestScan {
+  id            Int         @id @default(autoincrement())
+  manifestId    Int         @map("manifest_id")
+  manifest      Manifest    @relation(fields: [manifestId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Koli number 1..koli (label AWB-n).
+  piece         Int
+  /// TRANSIT or INBOUND.
+  kind          String      @db.VarChar(10)
+  branchId      Int?        @map("branch_id")
+  branch        Branch?     @relation("ManifestScanBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  scannedById   Int?        @map("scanned_by_id")
+  scannedBy     User?       @relation("ManifestScanBy", fields: [scannedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@unique([manifestId, transactionId, piece, kind])
+  @@index([transactionId, kind])
+  @@index([manifestId, kind])
+  @@map("manifest_scans")
+}

@@ -23,6 +23,18 @@ model LegacyUser {
 // Better Auth 1.6.23 core contract. Runtime activation is PLT-01.
 // Auth storage uses native expiry/cleanup, not domain soft deletion.
 model User {
+  manifestScans ManifestScan[] @relation("ManifestScanBy")
+  bookingsCancelled Booking[] @relation("BookingCancelledBy")
+  bookingsPickedUp Booking[] @relation("BookingPickedUpBy")
+  bookingsAssigned Booking[] @relation("BookingAssignedBy")
+  deliveryProofsCreated DeliveryProof[] @relation("DeliveryProofCreatedBy")
+  awbChangeRequests AwbChangeRequest[] @relation("AwbChangeRequestedBy")
+  awbChangeDecisions AwbChangeRequest[] @relation("AwbChangeDecidedBy")
+  podReturnsCreated PodReturn[] @relation("PodReturnCreatedBy")
+  podReturnsDecided PodReturn[] @relation("PodReturnDecidedBy")
+  vendorBillsClosed VendorBill[] @relation("VendorBillClosedBy")
+  vendorBillsCreated VendorBill[] @relation("VendorBillCreatedBy")
+  finCommands FinCommand[]
   id                  Int                  @id @default(autoincrement())
   name                String
   username            String?              @unique
@@ -48,6 +60,7 @@ model User {
   manifestsCreated         Manifest[]               @relation("ManifestCreatedBy")
   manifestItemsAssigned    ManifestItem[]           @relation("ManifestItemAssignedBy")
   deliverySheetsDelivered  DeliverySheet[]          @relation("DeliverySheetDeliveredBy")
+  ticketsCreated           Ticket[]
 
   @@map("auth_users")
 }

@@ -112,33 +112,36 @@ function awbInput(): HTMLInputElement {
   return el;
 }
 
-function setInputValue(el: HTMLInputElement, value: string) {
-  const setter = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    "value",
-  )?.set;
-  if (!setter) throw new Error("Missing value setter");
-  setter.call(el, value);
-  el.dispatchEvent(new Event("input", { bubbles: true }));
-  el.dispatchEvent(new Event("change", { bubbles: true }));
+async function setInputValue(el: HTMLInputElement, value: string) {
+  await act(async () => {
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )?.set;
+    if (!setter) throw new Error("Missing value setter");
+    setter.call(el, value);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  });
 }
 
 function originSelect(): HTMLSelectElement {
-  const el = host.querySelector<HTMLSelectElement>(
-    '[data-testid="origin-branch-select"]',
-  );
+  // ComboSelect keeps a native <select> as the form control.
+  const el = host.querySelector<HTMLSelectElement>("select#originBranchId");
   if (!el) throw new Error("Missing origin branch select");
   return el;
 }
 
-function setSelectValue(el: HTMLSelectElement, value: string) {
-  const setter = Object.getOwnPropertyDescriptor(
-    HTMLSelectElement.prototype,
-    "value",
-  )?.set;
-  if (!setter) throw new Error("Missing select value setter");
-  setter.call(el, value);
-  el.dispatchEvent(new Event("change", { bubbles: true }));
+async function setSelectValue(el: HTMLSelectElement, value: string) {
+  await act(async () => {
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLSelectElement.prototype,
+      "value",
+    )?.set;
+    if (!setter) throw new Error("Missing select value setter");
+    setter.call(el, value);
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  });
 }
 
 async function submitForm() {
@@ -184,7 +187,7 @@ afterEach(async () => {
 it("clears previous lookup result when AWB number changes (PR #9 regression)", async () => {
   mockLookup.mockResolvedValueOnce(singleResult("AWB-OLD", 101));
 
-  setInputValue(awbInput(), "AWB-OLD");
+  await setInputValue(awbInput(), "AWB-OLD");
   await submitForm();
   // Flush transition
   await act(async () => {
@@ -196,9 +199,7 @@ it("clears previous lookup result when AWB number changes (PR #9 regression)", a
   expect(host.textContent).toContain("ID Transaksi: 101");
 
   // Change AWB input — result should be cleared immediately
-  await act(async () => {
-    setInputValue(awbInput(), "AWB-NEW");
-  });
+  await setInputValue(awbInput(), "AWB-NEW");
 
   expect(host.textContent).not.toContain("AWB: AWB-OLD");
   expect(host.textContent).not.toContain("ID Transaksi: 101");
@@ -212,11 +213,11 @@ it("ignores stale lookup responses when a newer request completes (PR #9 regress
     .mockReturnValueOnce(second.promise);
 
   // First search
-  setInputValue(awbInput(), "AWB-FIRST");
+  await setInputValue(awbInput(), "AWB-FIRST");
   await submitForm();
 
   // Second search (newer)
-  setInputValue(awbInput(), "AWB-SECOND");
+  await setInputValue(awbInput(), "AWB-SECOND");
   await submitForm();
 
   // Resolve second first
@@ -248,12 +249,12 @@ it("invalidates in-flight lookup and clears stale results when origin branch cha
   const pending = deferred<ReturnType<typeof singleResult>>();
   mockLookup.mockReturnValueOnce(pending.promise);
 
-  setInputValue(awbInput(), "AWB123");
+  await setInputValue(awbInput(), "AWB123");
   await submitForm();
 
   // While request is in-flight, change origin filter to branch C (id 3).
+  await setSelectValue(originSelect(), "3");
   await act(async () => {
-    setSelectValue(originSelect(), "3");
     await Promise.resolve();
   });
 

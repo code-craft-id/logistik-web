@@ -3,6 +3,7 @@
 import { RotateCcw, Search } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -78,14 +79,14 @@ export function DashboardFilters() {
           </div>
           <div className="min-w-0 space-y-2">
             <Label htmlFor="dashboard-branch">Cabang (branch)</Label>
-            <select
+            <ComboSelect
               id="dashboard-branch"
               disabled
               aria-describedby="dashboard-filter-help"
               className="min-h-11 w-full rounded-md border border-input bg-muted px-3 text-sm text-muted-foreground"
             >
               <option>Unavailable — PLT-01</option>
-            </select>
+            </ComboSelect>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">

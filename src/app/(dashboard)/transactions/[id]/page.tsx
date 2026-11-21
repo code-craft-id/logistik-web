@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { Barcode } from "@/components/patterns/barcode";
 import { StatusUpdateForm } from "@/features/bookings/components/status-update-form";
 import { getTransactionById } from "@/features/bookings/server/queries";
-import { requirePermission } from "@/lib/auth/session";
+import { permits } from "@/features/identity/permissions";
+import { currentIdentity } from "@/features/identity/server/context";
+import { AwbChangePanel } from "@/features/modul/components/awb-change-panel";
+import { DeliveryProof } from "@/features/shipments/components/delivery-proof";
+import { requirePagePermission } from "@/lib/auth/page-access";
+import {
+  businessDateString,
+  businessDateTimeString,
+} from "@/lib/date/business-date";
 import type { TransactionStatusHistory } from "@/lib/db/generated/client";
+import { formatRupiah } from "@/lib/format/rupiah";
 
 export const instant = false;
 
@@ -17,14 +27,17 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requirePermission("view", "transaction");
+  await requirePagePermission("view", "transaction");
   const { id } = await params;
   const parsed = idSchema.safeParse(id);
   if (!parsed.success) {
     notFound();
   }
   const parsedId = parsed.data;
-  const tx = await getTransactionById(parsedId);
+  const [tx, current] = await Promise.all([
+    getTransactionById(parsedId),
+    currentIdentity(),
+  ]);
   if (!tx) notFound();
 
   return (
@@ -37,59 +50,99 @@ export default async function Page({
           AWB No: {tx.awbNo || "-"}
         </p>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="border rounded p-4 space-y-2">
-          <div>
-            <span className="font-medium">Tanggal:</span>{" "}
-            {tx.transactionDate.toISOString().slice(0, 10)}
+      {tx.awbNo && <Barcode value={tx.awbNo} />}
+      <a
+        href={`/print/awb?ids=${tx.id}`}
+        target="_blank"
+        rel="noopener"
+        className="inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+      >
+        Print AWB
+      </a>
+      <a
+        href={`/print/koli?ids=${tx.id}`}
+        target="_blank"
+        rel="noopener"
+        className="ml-4 inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4"
+      >
+        Print label koli ({Math.max(1, tx.koli ?? 1)})
+      </a>
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded border p-4 sm:grid-cols-2 lg:grid-cols-3">
+        {(
+          [
+            ["Tanggal", businessDateString(tx.transactionDate)],
+            ["DO No.", tx.doNo],
+            ["Status", tx.status],
+            ["Asal", tx.originBranch?.name],
+            ["Tujuan", tx.destinationBranch?.name],
+            ["Customer", tx.customer?.name],
+            ["Pengirim", tx.senderName],
+            ["Penerima", tx.receiverName],
+            ["Layanan", tx.deliveryService?.name],
+            ["DOC / PAC", tx.goodsType?.name],
+            ["Via Moda", tx.transportMode?.name],
+            ["Pembayaran", tx.costType?.name],
+            [
+              "Pricing Type",
+              tx.pricingType === "KOLI"
+                ? "Harga/Koli"
+                : tx.pricingType === "TRUCKING"
+                  ? "Trucking"
+                  : tx.pricingType === "KG"
+                    ? "Harga/Kg"
+                    : null,
+            ],
+            ["Pickup By", tx.pickupCourier?.name],
+            ["Marketing", tx.marketingPerson?.name],
+            ["Alamat Pengirim", tx.senderAddress],
+            ["No. Telp Pengirim", tx.senderPhone],
+            ["Penerima (master)", tx.consignee?.name],
+            ["Alamat Penerima", tx.receiverAddress],
+            ["No. Telp Penerima", tx.receiverPhone],
+            ["Koli", tx.koli],
+            ["Berat (kg)", tx.kilo?.toString()],
+            ["Volume", tx.volume?.toString()],
+            ["Terberat (Kg)", tx.chargeableWeight?.toString()],
+            ["Harga", formatRupiah(tx.pricePerKg)],
+            ["Min KG", tx.minWeight?.toString()],
+            ["Asuransi", tx.insured === null ? null : tx.insured ? "Y" : "N"],
+            ["Biaya Lain", formatRupiah(tx.otherFee)],
+            ["Biaya Packing", formatRupiah(tx.packingFee)],
+            ["Biaya Pickup", formatRupiah(tx.pickupFee)],
+            ["Total Biaya", formatRupiah(tx.totalCost)],
+            ["Discount (%)", tx.discountPercent?.toString()],
+            ["PPN (%)", tx.ppnPercent?.toString()],
+            ["Grand Total", formatRupiah(tx.biaya)],
+            ["Isi Barang", tx.description],
+            ["Keterangan", tx.remarks],
+            ["Kurir", tx.courier?.name],
+            ["Dibuat oleh", tx.createdBy?.name],
+          ] as const
+        ).map(([label, value]) => (
+          <div key={label} className="min-w-0">
+            <dt className="text-sm text-muted-foreground">{label}</dt>
+            <dd className="font-medium [overflow-wrap:anywhere]">
+              {value ?? "-"}
+            </dd>
           </div>
-          <div>
-            <span className="font-medium">DO No:</span> {tx.doNo || "-"}
-          </div>
-          <div>
-            <span className="font-medium">Pengirim:</span>{" "}
-            {tx.senderName || "-"}
-          </div>
-          <div>
-            <span className="font-medium">Penerima:</span>{" "}
-            {tx.receiverName || "-"}
-          </div>
-          <div>
-            <span className="font-medium">Status:</span> {tx.status}
-          </div>
-          <div>
-            <span className="font-medium">Koli/Kilo/Volume:</span>{" "}
-            {tx.koli ?? 0} / {String(tx.kilo ?? "-")} /{" "}
-            {String(tx.volume ?? "-")}
-          </div>
-          <div>
-            <span className="font-medium">Biaya:</span>{" "}
-            {String(tx.biaya ?? "-")}
-          </div>
-        </div>
-        <div className="border rounded p-4 space-y-2">
-          <div>
-            <span className="font-medium">Cabang Asal:</span>{" "}
-            {tx.originBranchId}
-          </div>
-          <div>
-            <span className="font-medium">Cabang Tujuan:</span>{" "}
-            {tx.destinationBranchId ?? "-"}
-          </div>
-          <div>
-            <span className="font-medium">Booking ID:</span>{" "}
-            {tx.bookingId ?? "-"}
-          </div>
-          <div>
-            <span className="font-medium">Kurir ID:</span> {tx.courierId ?? "-"}
-          </div>
-        </div>
-      </div>
+        ))}
+      </dl>
+      {current && <DeliveryProof actor={current.actor} transactionId={tx.id} />}
+      {current && <AwbChangePanel actor={current.actor} transaction={tx} />}
       <div className="border rounded p-4 space-y-3">
-        <h2 className="font-medium">Ubah Status</h2>
-        <div>
-          <StatusUpdateForm transactionId={tx.id} currentStatus={tx.status} />
-        </div>
+        {/* Only groups with "Transaksi: ubah" can change the status here; the
+            server action checks the same right. */}
+        {current && permits(current.actor, "update", "transaction") && (
+          <>
+            <h2 className="font-medium">Ubah Status</h2>
+            <div>
+              <StatusUpdateForm
+                transactionId={tx.id}
+                currentStatus={tx.status}
+              />
+            </div>
+          </>
+        )}
         <h2 className="font-medium">Riwayat Status (Immutable)</h2>
         <div className="space-y-1">
           {tx.statusHistory.length === 0 ? (
@@ -99,9 +152,8 @@ export default async function Page({
           ) : (
             tx.statusHistory.map((h: TransactionStatusHistory) => (
               <div key={h.id} className="text-sm">
-                {h.changedAt.toISOString().slice(0, 16).replace("T", " ")} |{" "}
-                {h.priorStatus || "-"} → {h.newStatus}{" "}
-                {h.reason ? `(${h.reason})` : ""}{" "}
+                {businessDateTimeString(h.changedAt)} | {h.priorStatus || "-"} →{" "}
+                {h.newStatus} {h.reason ? `(${h.reason})` : ""}{" "}
                 {h.actorId ? `(actor:${h.actorId})` : ""}
               </div>
             ))

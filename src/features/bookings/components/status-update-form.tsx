@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { ComboSelect } from "@/components/ui/combo-select";
 import { updateTransactionStatusAction } from "../actions";
 import { ALLOWED_TRANSITIONS } from "../status";
 
@@ -37,13 +38,13 @@ export function StatusUpdateForm({
   return (
     <form action={onSubmit} className="space-y-2">
       <div className="flex gap-2 items-center">
-        <select name="newStatus" className="border rounded px-2 py-1">
+        <ComboSelect name="newStatus" className="border rounded px-2 py-1">
           {allowed.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
           ))}
-        </select>
+        </ComboSelect>
         <input
           name="reason"
           placeholder="Alasan (opsional)"

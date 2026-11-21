@@ -232,9 +232,51 @@ type LegacyItem = {
   href?: string;
   children?: readonly LegacyItem[];
 };
-const implemented = new Set<string>(
-  implementedPreviewRoutes.map((item) => item.href),
-);
+// Live workflows added after the frozen preview inventory (outside its 43 screens).
+export const liveRoutes = [
+  "/customer-reports/all-status",
+  "/customer-reports/shipments",
+  "/customer-reports/pod",
+  // Perkiraan (chart of accounts) is served by the FIN-02 accounts page.
+  "/finance/accounting/accounts", // Modul menu entries mirroring the reference; query variants keep each
+  // legacy item distinct while landing on the live page that serves it.
+  "/marketing?tab=customer",
+  "/marketing?tab=consignee",
+  "/marketing/revenue",
+  "/transactions",
+  "/transactions?tab=inbound",
+  "/transactions?print=1",
+  "/transactions/approvals",
+  "/transactions/new",
+  "/customer-service/cek-ongkir",
+  "/bookings",
+  "/bookings?tab=inbound",
+  "/manifest",
+  "/manifest?view=agent",
+  "/pod-returns",
+  "/pod-returns?tab=approval",
+  "/finance/debt-payments",
+  "/transactions/void",
+  "/branch-reports/delivery?view=items",
+  "/customer-service/status-pengantaran",
+  "/branch-reports/rekap-transaksi",
+  "/financial-reports/aging",
+  "/financial-reports/ap-aging",
+  "/akunting/rugi-laba",
+  "/transactions/lookup",
+  "/transactions/history",
+  "/transactions/void?view=deleted",
+  "/manifest?type=Transit",
+  "/manifest?type=Inbound",
+  "/manifest?type=Outbound",
+  "/courier-reports?view=city",
+  "/branch-reports/manifest-vendor?view=process",
+  "/finance/invoices?from=modul",
+];
+const implemented = new Set<string>([
+  ...implementedPreviewRoutes.map((item) => item.href),
+  ...liveRoutes,
+]);
 const leaf = (item: LegacyItem): NavigationLeaf => {
   const href = item.href ? applicationPreviewPath(item.href) : undefined;
   return {
@@ -245,22 +287,70 @@ const leaf = (item: LegacyItem): NavigationLeaf => {
 };
 export const navigation: readonly NavigationGroup[] = [
   ...legacyMenu.map(
-    (item: LegacyItem): NavigationGroup => ({
-      ...leaf(item),
-      ...(item.children
+    (item: LegacyItem): NavigationGroup =>
+      item.label === "Akunting"
         ? {
-            entries: item.children.map((child) =>
-              child.children
-                ? {
-                    label: child.label,
-                    providerPath: [child.label],
-                    items: child.children.map(leaf),
-                  }
-                : leaf(child),
-            ),
+            label: item.label,
+            providerLabel: item.label,
+            entries: [
+              {
+                label: "Ikhtisar akuntansi",
+                providerLabel: "Ikhtisar akuntansi",
+                href: "/finance/accounting",
+              },
+              {
+                label: "Invoice",
+                providerLabel: "Invoice",
+                href: "/finance/invoices",
+              },
+              {
+                label: "Akun & kategori",
+                providerLabel: "Akun & kategori",
+                href: "/finance/accounting/accounts",
+              },
+              {
+                label: "Jurnal",
+                providerLabel: "Jurnal",
+                href: "/finance/accounting/journals",
+              },
+              {
+                label: "Biaya aktual",
+                providerLabel: "Biaya aktual",
+                href: "/finance/accounting/costs",
+              },
+              {
+                label: "Periode",
+                providerLabel: "Periode",
+                href: "/finance/accounting/periods",
+              },
+              {
+                label: "Hitung Rugi Laba",
+                providerLabel: "Hitung Rugi Laba",
+                href: "/akunting/rugi-laba",
+              },
+              {
+                label: "P&L, GP & arus kas",
+                providerLabel: "P&L, GP & arus kas",
+                href: "/finance/accounting/reports",
+              },
+            ],
           }
-        : {}),
-    }),
+        : {
+            ...leaf(item),
+            ...(item.children
+              ? {
+                  entries: item.children.map((child) =>
+                    child.children
+                      ? {
+                          label: child.label,
+                          providerPath: [child.label],
+                          items: child.children.map(leaf),
+                        }
+                      : leaf(child),
+                  ),
+                }
+              : {}),
+          },
   ),
   {
     label: "More previews",
@@ -268,6 +358,7 @@ export const navigation: readonly NavigationGroup[] = [
     entries: implementedPreviewRoutes
       .filter(
         (item) =>
+          !item.href.startsWith("/finance/") &&
           !legacyMenu.some(
             (group: LegacyItem) =>
               (group.href &&
@@ -361,12 +452,39 @@ export function navigationPath(
   pathname: string,
   groups: readonly NavigationGroup[] = navigation,
 ) {
+  const financeRoot = !navigationDestinations(groups).some(
+    ({ item }) => item.href === pathname,
+  )
+    ? ["/finance/invoices", "/finance/accounting", "/customer-reports"].find(
+        (root) => pathname.startsWith(`${root}/`),
+      )
+    : undefined;
+  const financeLabels: Record<string, string> = {
+    accounts: "Akun & kategori",
+    journals: "Jurnal",
+    costs: "Biaya aktual",
+    periods: "Periode",
+    reports: "Laporan keuangan",
+    new: "Buat invoice",
+    "all-status": "Semua Status",
+  };
+  const suffix = financeRoot
+    ? [
+        financeLabels[pathname.slice(financeRoot.length + 1)] ??
+          "Detail invoice",
+      ]
+    : [];
+  if (financeRoot) pathname = financeRoot;
   for (const group of groups) {
-    if (group.href === pathname) return { group, labels: [group.label] };
+    if (group.href === pathname)
+      return { group, labels: [group.label, ...suffix] };
     for (const entry of navigationEntries(group)) {
       if (!isNavigationSection(entry)) {
         if (entry.href === pathname)
-          return { group, labels: [group.providerLabel, entry.providerLabel] };
+          return {
+            group,
+            labels: [group.providerLabel, entry.providerLabel, ...suffix],
+          };
         continue;
       }
       const section = entry;
@@ -379,6 +497,7 @@ export function navigationPath(
             group.providerLabel,
             ...section.providerPath,
             leaf.providerLabel,
+            ...suffix,
           ],
         };
     }

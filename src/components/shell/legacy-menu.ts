@@ -55,7 +55,7 @@ export const legacyMenu = [
       },
       {
         label: "Perkiraan",
-        href: "/perkiraan",
+        href: "/finance/accounting/accounts",
       },
       {
         label: "Shipment Status",
@@ -72,28 +72,76 @@ export const legacyMenu = [
     children: [
       {
         label: "Pemasaran/Penjualan",
-        href: "/marketing",
+        children: [
+          { label: "Customer", href: "/marketing?tab=customer" },
+          { label: "Penerima", href: "/marketing?tab=consignee" },
+          { label: "Pendapatan Pelanggan", href: "/marketing/revenue" },
+        ],
+      },
+      {
+        label: "Layanan Pelanggan / Transaksi",
+        children: [
+          { label: "On Site Outbound", href: "/transactions" },
+          { label: "On Site Inbound", href: "/transactions?tab=inbound" },
+          { label: "Print AWB", href: "/transactions?print=1" },
+          {
+            label: "Persetujuan Edit/delete AWB",
+            href: "/transactions/approvals",
+          },
+          { label: "Void Awb", href: "/transactions/void" },
+        ],
       },
       {
         label: "Layanan Pelanggan",
         children: [
           {
-            label: "Transaksi",
-            href: "/transactions",
+            label: "Status Pengantaran",
+            href: "/customer-service/status-pengantaran",
           },
+          { label: "Cek Ongkir", href: "/customer-service/cek-ongkir" },
+          { label: "Cek Resi", href: "/transactions/lookup" },
+          { label: "Histori Edit Resi", href: "/transactions/history" },
+          { label: "Booking", href: "/bookings" },
+          { label: "Inbound Booking", href: "/bookings?tab=inbound" },
           {
-            label: "Booking",
-            href: "/bookings",
+            label: "History Delete Resi",
+            href: "/transactions/void?view=deleted",
           },
+        ],
+      },
+      {
+        label: "Operasional / Manifest",
+        children: [
+          { label: "Manifest", href: "/manifest" },
+          { label: "Cek Transit", href: "/manifest?type=Transit" },
+          { label: "Cek Inbound", href: "/manifest?type=Inbound" },
+          { label: "Cek Inbound Agen", href: "/manifest?view=agent" },
+          { label: "Print Manifest", href: "/manifest?type=Outbound" },
+        ],
+      },
+      {
+        label: "Operasional / Lembar Pengantaran",
+        children: [
+          { label: "Kurir Kota", href: "/courier-reports?view=city" },
+          { label: "Print DRS", href: "/branch-reports/delivery" },
         ],
       },
       {
         label: "Operasional",
         children: [
+          { label: "POD Kembali", href: "/pod-returns" },
+          { label: "Approval Pod Kembali", href: "/pod-returns?tab=approval" },
           {
-            label: "Manifest",
-            href: "/manifest",
+            label: "Proses Vendor",
+            href: "/branch-reports/manifest-vendor?view=process",
           },
+        ],
+      },
+      {
+        label: "Keuangan",
+        children: [
+          { label: "Invoice (New)", href: "/finance/invoices?from=modul" },
+          { label: "Pembayaran Hutang", href: "/finance/debt-payments" },
         ],
       },
     ],
@@ -107,6 +155,10 @@ export const legacyMenu = [
           {
             label: "Detail Transaksi",
             href: "/branch-reports/transaction-details",
+          },
+          {
+            label: "Rekap Transaksi",
+            href: "/branch-reports/rekap-transaksi",
           },
           {
             label: "Manifest Outbound",
@@ -152,11 +204,22 @@ export const legacyMenu = [
       },
       {
         label: "Laporan Keuangan",
-        href: "/financial-reports",
+        children: [
+          { label: "Laporan AR", href: "/financial-reports/aging" },
+          { label: "Laporan AP", href: "/financial-reports/ap-aging" },
+          { label: "Umur Piutang per Customer", href: "/financial-reports" },
+        ],
       },
       {
         label: "Customer Reports",
-        href: "/customer-reports",
+        children: [
+          { label: "Pengiriman", href: "/customer-reports/shipments" },
+          { label: "POD Kembali", href: "/customer-reports/pod" },
+          {
+            label: "Semua Status",
+            href: "/customer-reports/all-status",
+          },
+        ],
       },
     ],
   },

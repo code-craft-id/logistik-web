@@ -120,6 +120,14 @@ export async function createManifest(
       }
     }
 
+    if (data.vendorId) {
+      const vendor = await tx.vendor.findFirst({
+        where: { id: data.vendorId, deletedAt: null, status: "ACTIVE" },
+        select: { id: true },
+      });
+      if (!vendor) throw new IdentityError("FORBIDDEN_BRANCH", 403);
+    }
+
     return tx.manifest.create({
       data: {
         manifestNo: data.manifestNo,
@@ -128,6 +136,7 @@ export async function createManifest(
         branchId: data.branchId,
         vehicleId: data.vehicleId ?? null,
         courierId: data.courierId ?? null,
+        vendorId: data.vendorId ?? null,
         originBranchId: data.originBranchId ?? null,
         destinationBranchId: data.destinationBranchId ?? null,
         status: "Draft",
@@ -173,6 +182,9 @@ export async function assignTransactionToManifest(
       throw new Error("MANIFEST_NOT_ASSIGNABLE");
     }
 
+    // Serialize with an approved AWB delete (Persetujuan Edit/delete AWB),
+    // which locks the same row before checking manifest membership.
+    await tx.$queryRaw`SELECT id FROM transactions WHERE id = ${data.transactionId} FOR UPDATE`;
     const transaction = await tx.transaction.findFirst({
       where: {
         id: data.transactionId,
@@ -239,6 +251,8 @@ export async function assignTransactionToManifest(
     }
   });
 }
+
+export type DeliveryPhoto = { url: string; publicId: string };
 
 export async function recordDeliveryOutcome(
   input: DeliveryOutcomeInput,
@@ -387,5 +401,86 @@ export async function recordDeliveryOutcome(
       },
     });
     return result;
+  });
+}
+
+/** The delivery line a photo may be attached to, with all access checks. */
+async function photoTarget(
+  db: TxClient | typeof prisma,
+  input: { deliverySheetId: number; transactionId: number },
+  actor: AccessActor,
+) {
+  const { isAdministrator } = await import("@/features/identity/permissions");
+  const item = await db.deliverySheetItem.findFirst({
+    where: {
+      deliverySheetId: input.deliverySheetId,
+      transactionId: input.transactionId,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      outcome: true,
+      podPhotoUrl: true,
+      deliverySheet: {
+        select: { manifest: { select: { branchId: true, deletedAt: true } } },
+      },
+      transaction: {
+        select: { originBranchId: true, destinationBranchId: true },
+      },
+    },
+  });
+  if (!item || item.deliverySheet.manifest.deletedAt)
+    throw new Error("DELIVERY_SHEET_ITEM_NOT_FOUND");
+  const owner = item.deliverySheet.manifest.branchId;
+  if (!owner || !permitsBranch(actor, owner))
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  if (
+    !isAdministrator(actor) &&
+    ![
+      item.transaction.originBranchId,
+      item.transaction.destinationBranchId,
+    ].some((b) => b !== null && actor.branchIds.includes(b))
+  )
+    throw new IdentityError("FORBIDDEN_BRANCH", 403);
+  if (!item.outcome) throw new Error("DELIVERY_PHOTO_NEEDS_OUTCOME");
+  if (item.podPhotoUrl) throw new Error("DELIVERY_PHOTO_EXISTS");
+  return item;
+}
+
+/**
+ * Check, before any upload, that the actor may add a photo to this line:
+ * branch access, AWB scope, recorded outcome and no photo yet. Uploading
+ * only after this keeps unauthorized users from using the Cloudinary quota.
+ */
+export async function assertDeliveryPhotoAllowed(
+  input: { deliverySheetId: number; transactionId: number },
+  actor: AccessActor,
+) {
+  await photoTarget(prisma, input, actor);
+}
+
+/**
+ * Add a proof-of-delivery photo to a delivery sheet line that already has an
+ * outcome and no photo yet. The checks repeat inside the transaction and the
+ * update only matches a line without a photo, so an existing photo (evidence
+ * as first recorded) is never replaced, even by a concurrent upload.
+ */
+export async function attachDeliveryPhoto(
+  input: { deliverySheetId: number; transactionId: number },
+  actor: AccessActor,
+  photo: DeliveryPhoto,
+) {
+  return prisma.$transaction(async (tx: TxClient) => {
+    const item = await photoTarget(tx, input, actor);
+    const updated = await tx.deliverySheetItem.updateMany({
+      where: { id: item.id, podPhotoUrl: null },
+      data: {
+        podPhotoUrl: photo.url,
+        podPhotoPublicId: photo.publicId,
+        podPhotoAt: new Date(),
+      },
+    });
+    if (updated.count !== 1) throw new Error("DELIVERY_PHOTO_EXISTS");
+    return { id: item.id };
   });
 }

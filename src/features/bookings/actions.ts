@@ -5,6 +5,7 @@ import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePermission } from "@/lib/auth/session";
 import type { Transaction } from "@/lib/db/generated/client";
+import { missingAwbFields, missingBookingFields } from "./required-fields";
 import {
   createBookingSchema,
   createTransactionSchema,
@@ -26,7 +27,8 @@ type CreateTransactionResult =
     };
 
 export type CreateBookingActionResult =
-  | { ok: true; id: number }
+  | { ok: true; id: number; bookingNo?: string | null }
+  | { ok: false; error: "REQUIRED"; missing: string[] }
   | {
       ok: false;
       error:
@@ -41,10 +43,12 @@ export type CreateTransactionActionResult =
   | {
       ok: true;
       id: number;
+      awbNo?: string | null;
       created: boolean;
       idempotent: boolean;
       matchedBy?: string;
     }
+  | { ok: false; error: "REQUIRED"; missing: string[] }
   | {
       ok: false;
       error:
@@ -65,10 +69,12 @@ export async function createBookingAction(
     if (!current) return { ok: false, error: "UNAUTHENTICATED" };
 
     const raw = Object.fromEntries(formData.entries());
+    const missing = missingBookingFields(raw);
+    if (missing.length) return { ok: false, error: "REQUIRED", missing };
     const parsed = createBookingSchema.parse(raw);
     const result = await createBooking(parsed, current.actor);
     revalidatePath("/bookings");
-    return { ok: true, id: result.id };
+    return { ok: true, id: result.id, bookingNo: result.bookingNo };
   } catch (e: unknown) {
     if (e instanceof IdentityError) {
       if (e.code === "UNAUTHENTICATED")
@@ -80,6 +86,8 @@ export async function createBookingAction(
       return { ok: false, error: "VALIDATION" };
     }
     if (e instanceof Error) {
+      if (e.message.startsWith("VALIDATION_"))
+        return { ok: false, error: "VALIDATION" };
       if (e.message.includes("CONFLICT") || e.message.includes("P2002")) {
         return { ok: false, error: "CONFLICT" };
       }
@@ -97,6 +105,8 @@ export async function createTransactionAction(
     if (!current) return { ok: false, error: "UNAUTHENTICATED" };
 
     const raw = Object.fromEntries(formData.entries());
+    const missing = missingAwbFields(raw);
+    if (missing.length) return { ok: false, error: "REQUIRED", missing };
     const parsed = createTransactionSchema.parse(raw);
     const result: CreateTransactionResult = await createTransaction(
       parsed,
@@ -110,6 +120,7 @@ export async function createTransactionAction(
       return {
         ok: true,
         id: tx.id,
+        awbNo: tx.awbNo,
         created: true,
         idempotent: false,
       };
@@ -121,6 +132,7 @@ export async function createTransactionAction(
     return {
       ok: true,
       id: tx.id,
+      awbNo: tx.awbNo,
       created: false,
       idempotent: true,
       matchedBy: result.matchedBy,
@@ -142,6 +154,9 @@ export async function createTransactionAction(
         e.message === "AWB_EXISTS_WITH_DIFFERENT_PAYLOAD"
       ) {
         return { ok: false, error: "IDEMPOTENCY_CONFLICT" };
+      }
+      if (e.message.startsWith("VALIDATION_")) {
+        return { ok: false, error: "VALIDATION" };
       }
       if (e.message.includes("AWB_ALREADY_USED")) {
         return { ok: false, error: "CONFLICT" };

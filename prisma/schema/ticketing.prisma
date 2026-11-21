@@ -1,0 +1,23 @@
+/// SUP-01 bounded create/read only. No lifecycle or approval values are inferred.
+model Ticket {
+  id             Int       @id @default(autoincrement())
+  branchId       Int       @map("branch_id")
+  createdById    Int       @map("created_by_id")
+  subject        String    @db.VarChar(200)
+  menuName       String    @map("menu_name") @db.VarChar(200)
+  relatedPageUrl String    @map("related_page_url") @db.VarChar(2048)
+  remarks        String?   @db.VarChar(5000)
+  /// SQL CHECK tickets_priority_check enforces Low/Normal/High. No default.
+  priority       String    @db.VarChar(10)
+  idempotencyKey String    @map("idempotency_key") @db.VarChar(64)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  branch         Branch    @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdBy      User      @relation(fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([createdById, idempotencyKey])
+  @@index([createdById, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+  @@map("tickets")
+}

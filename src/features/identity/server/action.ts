@@ -33,7 +33,7 @@ export async function identityAction<T>(work: () => Promise<T>): Promise<T> {
     throw new IdentityError(
       "INTERNAL_ERROR",
       500,
-      "Permintaan tidak dapat diproses.",
+      "Permintaan tidak dapat diproses. Coba lagi; jika berulang, hubungi admin.",
     );
   }
 }

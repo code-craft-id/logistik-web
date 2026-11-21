@@ -1,5 +1,6 @@
 /// Personnel fields only. Sales workflows remain TBD, D-10.
 model MarketingPerson {
+  transactions Transaction[]
   customers        Customer[]
   deletedAt        DateTime?    @map("deleted_at")
   updatedAt        DateTime     @updatedAt @map("updated_at")
@@ -20,6 +21,7 @@ model MarketingPerson {
 
 /// Approved provider form inventory. Workflows remain D-10; requiredness D-25/D-30.
 model Customer {
+  finInvoices FinInvoice[]
   id                          Int                            @id @default(autoincrement())
   name                        String
   address                     String?
@@ -46,6 +48,7 @@ model Customer {
   accounting                  CustomerAccounting?
   whatsappNotifications       CustomerWhatsAppNotification[]
   bookings                    Booking[]
+  transactions                Transaction[]
   createdAt                   DateTime                       @default(now()) @map("created_at")
   updatedAt                   DateTime                       @updatedAt @map("updated_at")
   deletedAt                   DateTime?                      @map("deleted_at")
@@ -60,6 +63,8 @@ model Customer {
 
 /// Approved provider form inventory; branch authorization is PLT-01.
 model Consignee {
+  bookings Booking[] @relation("BookingConsignee")
+  transactions Transaction[]
   id         Int          @id @default(autoincrement())
   name       String
   address1   String?
@@ -116,13 +121,52 @@ model Booking {
   customer      Customer?     @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   senderName    String?       @map("sender_name")
   receiverName  String?       @map("receiver_name")
-  doNo          String?       @map("do_no") @db.VarChar(50)
+  doNo          String?       @map("do_no") @db.VarChar(255)
   destination   String?
+  /// Booking form fields as in the provider's Tambah Booking (OBSERVED
+  /// 2026-11-19): same shape as the AWB form without fees/discount/PPN.
+  destinationBranchId Int?             @map("destination_branch_id")
+  destinationBranch   Branch?          @relation("BookingDestinationBranch", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  senderAddress       String?          @map("sender_address") @db.VarChar(500)
+  senderPhone         String?          @map("sender_phone") @db.VarChar(30)
+  consigneeId         Int?             @map("consignee_id")
+  consignee           Consignee?       @relation("BookingConsignee", fields: [consigneeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  receiverAddress     String?          @map("receiver_address") @db.VarChar(500)
+  receiverPhone       String?          @map("receiver_phone") @db.VarChar(30)
+  deliveryServiceId   Int?             @map("delivery_service_id")
+  deliveryService     DeliveryService? @relation("BookingDeliveryService", fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  goodsTypeId         Int?             @map("goods_type_id")
+  goodsType           GoodsType?       @relation("BookingGoodsType", fields: [goodsTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId     Int?             @map("transport_mode_id")
+  transportMode       TransportMode?   @relation("BookingTransportMode", fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  costTypeId          Int?             @map("cost_type_id")
+  costType            CostType?        @relation("BookingCostType", fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  description         String?          @db.VarChar(500)
+  remarks             String?          @db.VarChar(500)
+  chargeableWeight    Decimal?         @map("chargeable_weight") @db.Decimal(10, 2)
+  pricePerKg          Decimal?         @map("price_per_kg") @db.Decimal(15, 2)
+  minWeight           Decimal?         @map("min_weight") @db.Decimal(10, 2)
+  totalCost           Decimal?         @map("total_cost") @db.Decimal(15, 2)
   koli          Int?          @default(0)
   kilo          Decimal?      @db.Decimal(10, 2)
   volume        Decimal?      @db.Decimal(10, 3)
   biaya         Decimal?      @db.Decimal(15, 2)
-  status        String        @default("Open") @db.VarChar(30)
+  /// Pickup lifecycle as in the provider app (OBSERVED 2026-11-19):
+  /// WAITING TO PICKUP, PROGRESS PICKUP, CANCEL PICKUP. Bookings stand alone
+  /// (not linked to AWBs in the provider web).
+  status        String        @default("WAITING TO PICKUP") @db.VarChar(30)
+  courierId     Int?          @map("courier_id")
+  courier       Courier?      @relation("BookingCourier", fields: [courierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  assignedAt    DateTime?     @map("assigned_at")
+  assignedById  Int?          @map("assigned_by_id")
+  assignedBy    User?         @relation("BookingAssignedBy", fields: [assignedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  pickedUpAt    DateTime?     @map("picked_up_at")
+  pickedUpById  Int?          @map("picked_up_by_id")
+  pickedUpBy    User?         @relation("BookingPickedUpBy", fields: [pickedUpById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cancelledAt   DateTime?     @map("cancelled_at")
+  cancelledById Int?          @map("cancelled_by_id")
+  cancelledBy   User?         @relation("BookingCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cancelReason  String?       @map("cancel_reason") @db.VarChar(500)
   createdById   Int?          @map("created_by_id")
   createdBy     User?         @relation("BookingCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt     DateTime      @default(now()) @map("created_at")
@@ -134,18 +178,29 @@ model Booking {
   @@index([customerId])
   @@index([status])
   @@index([bookingDate])
+  @@index([courierId])
+  @@index([destinationBranchId])
   @@map("bookings")
 }
 
 /// Transaction/AWB - operational document. Idempotent creation required (AC-02).
 model Transaction {
+  manifestScans ManifestScan[]
+  deliveryProofs DeliveryProof[]
+  awbChangeRequests AwbChangeRequest[]
+  podReturnItems PodReturnItem[]
+  vendorBillItems VendorBillItem[]
+  finLines FinLine[]
+  finCostState FinCostState?
+  finInvoiceItems FinInvoiceItem[]
+  finReservation FinReservation?
   id                    Int                        @id @default(autoincrement())
   idempotencyKey        String?                    @unique @map("idempotency_key") @db.VarChar(64)
   awbNo                 String?                    @map("awb_no") @db.VarChar(50)
   bookingId             Int?                       @map("booking_id")
   booking               Booking?                   @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   transactionDate       DateTime                   @default(now()) @map("transaction_date")
-  doNo                  String?                    @map("do_no") @db.VarChar(50)
+  doNo                  String?                    @map("do_no") @db.VarChar(255)
   senderName            String?                    @map("sender_name")
   receiverName          String?                    @map("receiver_name")
   originBranchId        Int?                       @map("origin_branch_id")
@@ -159,6 +214,42 @@ model Transaction {
   status                String                     @default("Open") @db.VarChar(30)
   courierId             Int?                       @map("courier_id")
   courier               Courier?                   @relation(fields: [courierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Legacy Entry AWB capture (OBSERVED 2026-11-18): Customer, Via Moda, Layanan, DOC/PAC, Pembayaran, Isi Barang, Keterangan. Nullable: historical rows unknown.
+  customerId            Int?                       @map("customer_id")
+  customer              Customer?                  @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId       Int?                       @map("transport_mode_id")
+  transportMode         TransportMode?             @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deliveryServiceId     Int?                       @map("delivery_service_id")
+  deliveryService       DeliveryService?           @relation(fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  goodsTypeId           Int?                       @map("goods_type_id")
+  goodsType             GoodsType?                 @relation(fields: [goodsTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  costTypeId            Int?                       @map("cost_type_id")
+  costType              CostType?                  @relation(fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  description           String?                    @db.VarChar(500)
+  remarks               String?                    @db.VarChar(500)
+  /// Legacy Entry AWB detail (OBSERVED on-site-add/tambah, 2026-11-19). Nullable: historical rows unknown.
+  pickupCourierId       Int?                       @map("pickup_courier_id")
+  pickupCourier         Courier?                   @relation("TransactionPickupCourier", fields: [pickupCourierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  marketingPersonId     Int?                       @map("marketing_person_id")
+  marketingPerson       MarketingPerson?           @relation(fields: [marketingPersonId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  senderAddress         String?                    @map("sender_address") @db.VarChar(500)
+  senderPhone           String?                    @map("sender_phone") @db.VarChar(30)
+  consigneeId           Int?                       @map("consignee_id")
+  consignee             Consignee?                 @relation(fields: [consigneeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  receiverAddress       String?                    @map("receiver_address") @db.VarChar(500)
+  receiverPhone         String?                    @map("receiver_phone") @db.VarChar(30)
+  chargeableWeight      Decimal?                   @map("chargeable_weight") @db.Decimal(10, 2)
+  /// KG (Harga/Kg), KOLI (Harga/Koli) or TRUCKING (flat), as in the legacy Pricing Type.
+  pricingType           String?                    @map("pricing_type") @db.VarChar(10)
+  pricePerKg            Decimal?                   @map("price_per_kg") @db.Decimal(15, 2)
+  minWeight             Decimal?                   @map("min_weight") @db.Decimal(10, 2)
+  insured               Boolean?
+  otherFee              Decimal?                   @map("other_fee") @db.Decimal(15, 2)
+  packingFee            Decimal?                   @map("packing_fee") @db.Decimal(15, 2)
+  pickupFee             Decimal?                   @map("pickup_fee") @db.Decimal(15, 2)
+  totalCost             Decimal?                   @map("total_cost") @db.Decimal(15, 2)
+  discountPercent       Decimal?                   @map("discount_percent") @db.Decimal(5, 2)
+  ppnPercent            Decimal?                   @map("ppn_percent") @db.Decimal(5, 2)
   createdById           Int?                       @map("created_by_id")
   createdBy             User?                      @relation("TransactionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt             DateTime                   @default(now()) @map("created_at")
@@ -174,6 +265,14 @@ model Transaction {
   @@index([bookingId])
   @@index([status])
   @@index([transactionDate])
+  @@index([customerId])
+  @@index([transportModeId])
+  @@index([deliveryServiceId])
+  @@index([goodsTypeId])
+  @@index([costTypeId])
+  @@index([pickupCourierId])
+  @@index([marketingPersonId])
+  @@index([consigneeId])
   @@map("transactions")
 }
 
@@ -198,6 +297,7 @@ model TransactionStatusHistory {
 /// Manifest - OBSERVED structure partially, D-08 rules TBD.
 /// Supports outbound/transit/inbound concepts via type/routes tracked flexibly.
 model Manifest {
+  scans ManifestScan[]
   id                Int                @id @default(autoincrement())
   manifestNo        String             @unique @map("manifest_no") @db.VarChar(50)
   manifestDate      DateTime           @default(now()) @map("manifest_date")
@@ -216,6 +316,9 @@ model Manifest {
   transit3          String?            @db.VarChar(100)
   transit4          String?            @db.VarChar(100)
   transit5          String?            @db.VarChar(100)
+  /// Legacy Manifest Vendor attribution (OBSERVED); nullable for historical rows.
+  vendorId          Int?               @map("vendor_id")
+  vendor            Vendor?            @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdById       Int?               @map("created_by_id")
   createdBy         User?              @relation("ManifestCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt         DateTime           @default(now()) @map("created_at")
@@ -228,6 +331,7 @@ model Manifest {
   @@index([originBranchId])
   @@index([status])
   @@index([manifestDate])
+  @@index([vendorId])
   @@map("manifests")
 }
 
@@ -276,6 +380,10 @@ model DeliverySheetItem {
   deliveredAt      DateTime?     @map("delivered_at")
   receivedBy       String?       @map("received_by")
   notes            String?
+  /// Proof-of-delivery photo stored on Cloudinary (WebP); URL and id only.
+  podPhotoUrl      String?       @map("pod_photo_url") @db.VarChar(500)
+  podPhotoPublicId String?       @map("pod_photo_public_id") @db.VarChar(255)
+  podPhotoAt       DateTime?     @map("pod_photo_at")
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
   deletedAt        DateTime?     @map("deleted_at")
