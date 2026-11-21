@@ -405,7 +405,9 @@ export function UserManagementPageClient({
                   </span>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {new Date(user.createdAt).toLocaleDateString("id-ID")}
+                  {new Date(user.createdAt).toLocaleDateString("id-ID", {
+                    timeZone: "Asia/Jakarta",
+                  })}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

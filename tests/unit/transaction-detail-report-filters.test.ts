@@ -11,7 +11,7 @@ describe("transaction report filter preparation", () => {
     expect(parseTransactionReportFilters(input)).toEqual({ status: "initial" });
   });
 
-  it("produces explicit UTC boundaries, defaults and a syntactic branch ID", () => {
+  it("produces explicit Jakarta-day boundaries, defaults and a syntactic branch ID", () => {
     const result = parseTransactionReportFilters({
       ...period,
       branchId: "17",
@@ -21,8 +21,8 @@ describe("transaction report filter preparation", () => {
     if (result.status !== "valid") throw new Error("Expected valid filters");
     expect(result.filters).toEqual({
       ...period,
-      from: new Date("2026-11-01T00:00:00.000Z"),
-      toExclusive: new Date("2026-11-16T00:00:00.000Z"),
+      from: new Date("2026-10-31T17:00:00.000Z"),
+      toExclusive: new Date("2026-11-15T17:00:00.000Z"),
       branchId: 17,
       originBranchId: null,
       destinationBranchId: null,
@@ -37,19 +37,23 @@ describe("transaction report filter preparation", () => {
   });
 
   it.each([
-    ["2024-02-29", "2024-03-01", "2024-03-02T00:00:00.000Z"],
-    ["2026-12-31", "2026-12-31", "2027-01-01T00:00:00.000Z"],
-    ["2026-03-01", "2026-03-31", "2026-04-01T00:00:00.000Z"],
-    ["2026-03-08", "2026-03-08", "2026-03-09T00:00:00.000Z"],
-    ["0099-01-01", "0099-01-01", "0099-01-02T00:00:00.000Z"],
-  ])("accepts real calendar boundaries %s..%s", (startDate, endDate, end) => {
+    ["2024-02-29", "2024-03-01"],
+    ["2026-12-31", "2026-12-31"],
+    ["2026-03-01", "2026-03-31"],
+    ["2026-03-08", "2026-03-08"],
+    ["0099-01-01", "0099-01-01"],
+  ])("accepts real Jakarta calendar boundaries %s..%s", (startDate, endDate) => {
     const result = parseTransactionReportFilters({ startDate, endDate });
     expect(result.status).toBe("valid");
     if (result.status !== "valid") throw new Error("Expected valid filters");
-    expect(result.filters.from.toISOString()).toBe(
-      `${startDate}T00:00:00.000Z`,
+    const expectedFrom = new Date(
+      new Date(`${startDate}T00:00:00.000Z`).getTime() - 7 * 60 * 60 * 1000,
     );
-    expect(result.filters.toExclusive.toISOString()).toBe(end);
+    const expectedToExclusive = new Date(
+      new Date(`${endDate}T00:00:00.000Z`).getTime() + 17 * 60 * 60 * 1000,
+    );
+    expect(result.filters.from).toEqual(expectedFrom);
+    expect(result.filters.toExclusive).toEqual(expectedToExclusive);
     expect(result.filters.branchId).toBeNull();
   });
 

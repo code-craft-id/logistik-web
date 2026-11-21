@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import type { TransactionReportFilters } from "../../transaction-details/filters";
 import { type OperationalReportResult, operationalRoutes } from "../contracts";
 import {
@@ -61,6 +62,8 @@ function cell(value: string | number | null): ReactNode {
       <span aria-hidden="true">—</span>
       <span className="sr-only">Tidak tersedia</span>
     </span>
+  ) : typeof value === "string" && /^\d{4}-\d{2}-\d{2}T.*Z$/.test(value) ? (
+    businessDateTimeString(value)
   ) : (
     value
   );
@@ -72,7 +75,7 @@ function reportTable(result: OperationalReportResult) {
   if (result.kind === "manifest") {
     headers = [
       "Manifes No.",
-      "Tanggal (UTC)",
+      "Tanggal (Asia/Jakarta)",
       "Cabang pemilik",
       "Asal (cabang tersimpan)",
       "Tujuan (cabang tersimpan)",
@@ -105,7 +108,7 @@ function reportTable(result: OperationalReportResult) {
     }));
   } else if (result.kind === "sheets") {
     headers = [
-      "Tanggal lembar (UTC)",
+      "Tanggal lembar (Asia/Jakarta)",
       "DRS No.",
       "Manifes No.",
       "Cabang pemilik",
@@ -132,11 +135,11 @@ function reportTable(result: OperationalReportResult) {
   } else {
     headers = [
       "DRS No.",
-      "Tanggal lembar (UTC)",
+      "Tanggal lembar (Asia/Jakarta)",
       "AWB No.",
       "Penerima barang",
       "Hasil tersimpan",
-      "Waktu pengantaran selesai (UTC)",
+      "Waktu pengantaran selesai (Asia/Jakarta)",
       "Diterima oleh",
       "Catatan",
     ];
@@ -157,8 +160,8 @@ function reportTable(result: OperationalReportResult) {
   return (
     <Table className="min-w-5xl [&_td]:align-top">
       <caption className="sr-only">
-        {titles[result.kind]}. Seluruh waktu menggunakan UTC. Gulir untuk
-        membaca semua kolom.
+        {titles[result.kind]}. Seluruh waktu menggunakan Asia/Jakarta. Gulir
+        untuk membaca semua kolom.
       </caption>
       <TableHeader>
         <TableRow>
@@ -338,11 +341,11 @@ export function OperationalReportView({
             id="operational-period-hint"
             className="text-sm text-muted-foreground"
           >
-            Pilih tanggal UTC, maksimal 31 hari termasuk kedua tanggal.
+            Pilih tanggal Asia/Jakarta, maksimal 31 hari termasuk kedua tanggal.
           </p>
           <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-2">
-              <Label htmlFor="op-start">Tanggal mulai (UTC)</Label>
+              <Label htmlFor="op-start">Tanggal mulai (Asia/Jakarta)</Label>
               <Input
                 id="op-start"
                 type="date"
@@ -354,7 +357,7 @@ export function OperationalReportView({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="op-end">Tanggal akhir (UTC)</Label>
+              <Label htmlFor="op-end">Tanggal akhir (Asia/Jakarta)</Label>
               <Input
                 id="op-end"
                 type="date"
@@ -439,7 +442,7 @@ export function OperationalReportView({
       {result.state === "initial" && (
         <EmptyState
           title="Pilih periode laporan"
-          description="Pilih rentang tanggal UTC dan tampilkan laporan untuk membaca data operasional."
+          description="Pilih rentang tanggal Asia/Jakarta dan tampilkan laporan untuk membaca data operasional."
         />
       )}
       {result.state === "ready" &&
@@ -454,7 +457,7 @@ export function OperationalReportView({
               className="rounded-lg border bg-background p-4 sm:p-6"
             >
               <h2 className="font-semibold">
-                Periode {f.startDate} sampai {f.endDate}, UTC
+                Periode {f.startDate} sampai {f.endDate}, Asia/Jakarta
               </h2>
               <dl className="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
                 {[
@@ -530,7 +533,7 @@ export function OperationalReportView({
                       {metric.value}
                     </dd>
                     <dd className="text-sm text-muted-foreground">
-                      {metric.basis} · UTC
+                      {metric.basis} · Asia/Jakarta
                     </dd>
                     {metric.href && (
                       <dd className="mt-auto">
@@ -565,7 +568,7 @@ export function OperationalReportView({
             <div className="space-y-1 border-b p-4">
               <h2 className="font-semibold">{titles[result.kind]}</h2>
               <p className="text-sm text-muted-foreground">
-                Periode {f.startDate} sampai {f.endDate}, UTC
+                Periode {f.startDate} sampai {f.endDate}, Asia/Jakarta
               </p>
             </div>
             {result.items.length ? (

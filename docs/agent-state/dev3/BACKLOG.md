@@ -66,7 +66,7 @@ Keep this file current: move items to "Done" with the commit when finished.
 | Finding | Disposition |
 |---|---|
 | Approved AWB edit could change arbitrary fields after approval | Patched locally: request stores before/after proposal in existing JSON; approval UI shows it; only requester may apply exact approved values; stale AWB values fail; size/weight edits are refused because per-koli detail is not retained by the edit workflow. Needs feature-owner review and verification. |
-| UTC “today” / date rendering vs WIB | D-19 remains open globally. Asia/Jakarta is approved only for status-import, invoice-handover future-date validation, and AP Aging month-end cutoff. |
+| UTC “today” / date rendering vs WIB | RESOLVED by project-owner system-wide D-19 approval on 2026-11-21: business dates/defaults, period cutoffs, identifiers, and displayed date/times use Asia/Jakarta; UTC remains storage/transport for instants. Implementation is locally verified; follow-up parity review remains. |
 | Vendor bill visible/closable across branches | Explicit owning branch is stored on each bill, checked at create/list/close, and backfilled only from unambiguous same-branch AWBs. Ambiguous legacy bills remain admin-only; migration and verification pending. |
 | Client-supplied chargeable weight | Server recalculates from per-koli dimensions under owner approval (2026-11-20); Dev 2 / D-26 review pending. |
 | Upload token does not bind outcome | Patched locally: outcome participates in the signed payload and must match when saving proof. |

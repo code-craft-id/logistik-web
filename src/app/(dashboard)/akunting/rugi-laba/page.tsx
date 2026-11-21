@@ -16,6 +16,7 @@ import { profitLoss } from "@/features/finance/server/profit-loss";
 import { isAdministrator } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessYearMonth } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -54,8 +55,9 @@ export default async function Page({
   if (!current) redirect("/login");
   const params = await searchParams;
   const now = new Date();
-  const month = Number(one(params.month)) || now.getUTCMonth() + 1;
-  const year = Number(one(params.year)) || now.getUTCFullYear();
+  const businessNow = businessYearMonth(now);
+  const month = Number(one(params.month)) || businessNow.month;
+  const year = Number(one(params.year)) || businessNow.year;
   const branchId = one(params.branchId);
   const branches = await prisma.branch.findMany({
     where: {
@@ -109,7 +111,7 @@ export default async function Page({
             defaultValue={year}
             className={field}
           >
-            {Array.from({ length: 10 }, (_, i) => now.getUTCFullYear() - i).map(
+            {Array.from({ length: 10 }, (_, i) => businessNow.year - i).map(
               (y) => (
                 <option key={y} value={y}>
                   {y}

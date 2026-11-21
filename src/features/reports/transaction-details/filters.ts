@@ -1,3 +1,8 @@
+import {
+  businessDateAfterUtc,
+  businessDateStartUtc,
+} from "@/lib/date/business-date";
+
 export const transactionReportSortFields = [
   "awbNo",
   "transactionDate",
@@ -159,9 +164,9 @@ export function parseTransactionReportFilters(
   const endDate = query.endDate ?? "";
   if (!startDate && !endDate) return { status: "initial" };
 
-  const from = calendarDate(startDate);
+  const start = calendarDate(startDate);
   const end = calendarDate(endDate);
-  if (!from) {
+  if (!start) {
     issues.push({
       field: "startDate",
       message: "Pilih tanggal mulai YYYY-MM-DD.",
@@ -173,16 +178,17 @@ export function parseTransactionReportFilters(
       message: "Pilih tanggal akhir YYYY-MM-DD.",
     });
   }
-  if (!from || !end) return { status: "invalid", issues };
+  if (!start || !end) return { status: "invalid", issues };
 
-  const inclusiveDays = (end.getTime() - from.getTime()) / dayMilliseconds + 1;
+  const inclusiveDays = (end.getTime() - start.getTime()) / dayMilliseconds + 1;
   if (inclusiveDays < 1 || inclusiveDays > 31) {
     return {
       status: "invalid",
       issues: [
         {
           field: "endDate",
-          message: "Periode UTC harus berurutan dan maksimal 31 hari.",
+          message:
+            "Periode waktu Jakarta harus berurutan dan maksimal 31 hari.",
         },
       ],
     };
@@ -193,8 +199,8 @@ export function parseTransactionReportFilters(
     filters: {
       startDate,
       endDate,
-      from,
-      toExclusive: new Date(end.getTime() + dayMilliseconds),
+      from: businessDateStartUtc(startDate),
+      toExclusive: businessDateAfterUtc(endDate),
       branchId,
       originBranchId,
       destinationBranchId,

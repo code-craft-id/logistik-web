@@ -24,6 +24,18 @@ type Money = Prisma.Decimal;
 const dec = (v: string | null | undefined) =>
   v == null || v.trim() === "" ? null : new Prisma.Decimal(v);
 
+function yearMonthInTimeZone(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  if (!year || !month) throw new Error("INVALID_NUMBER_DATE");
+  return `${year.slice(-2)}${month}`;
+}
+
 type DimensionRow = NonNullable<
   CreateTransactionInput["dimensionRows"]
 >[number];
@@ -180,8 +192,9 @@ export function priceAwb(input: {
 }
 
 /**
- * Next document number for a branch: prefix + YYMM (UTC) + a 5-digit running
- * number. The branch row lock serializes concurrent numbering.
+ * Next document number for a branch: prefix + YYMM + a 5-digit running
+ * number. Both AWB and booking numbers use the Asia/Jakarta calendar. The
+ * branch row lock serializes concurrent numbering.
  */
 async function nextNumber(
   tx: TxClient,
@@ -200,7 +213,7 @@ async function nextNumber(
       .toUpperCase()
       .replace(/[^A-Z0-9]/g, "")
       .slice(0, 10) || `C${branchId}`;
-  const yymm = `${String(date.getUTCFullYear()).slice(2)}${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+  const yymm = yearMonthInTimeZone(date, "Asia/Jakarta");
   const prefix = kind === "booking" ? `B-${code}${yymm}` : `${code}${yymm}`;
   const start = prefix.length + 1;
   const found =
@@ -233,8 +246,9 @@ export function nextBookingNo(
 }
 
 /**
- * Next automatic AWB number for a branch, as observed in the legacy app:
- * branch code + YYMM (UTC) + a 5-digit running number, e.g. JKT261100001.
+ * Next automatic AWB number for a branch: branch code + YYMM
+ * (Asia/Jakarta) + a 5-digit running number, e.g. JKT261100001. The project
+ * owner approved the system-wide timezone basis; Dev 2 agreed for AWB.
  * The branch row lock serializes concurrent numbering for one branch.
  */
 export async function nextAwbNo(

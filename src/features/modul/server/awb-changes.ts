@@ -6,15 +6,13 @@ import {
   isAdministrator,
 } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
+import {
+  businessDateAfterUtc,
+  businessDateStartUtc,
+} from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
-import {
-  dayEnd,
-  dayStart,
-  lockRow,
-  ModulError,
-  transactionScope,
-} from "./common";
+import { lockRow, ModulError, transactionScope } from "./common";
 
 export const AWB_CHANGE_KINDS = { EDIT: "Edit", DELETE: "Hapus" } as const;
 export const AWB_CHANGE_STATUS = {
@@ -23,6 +21,22 @@ export const AWB_CHANGE_STATUS = {
   REJECTED: "Ditolak",
   USED: "Sudah diedit",
 } as const;
+const businessRangeStart = (value?: string) => {
+  if (!value) return undefined;
+  try {
+    return businessDateStartUtc(value);
+  } catch {
+    return undefined;
+  }
+};
+const businessRangeEnd = (value?: string) => {
+  if (!value) return undefined;
+  try {
+    return businessDateAfterUtc(value);
+  } catch {
+    return undefined;
+  }
+};
 
 const decimal = (scale: number) =>
   z
@@ -380,8 +394,8 @@ export async function listAwbChanges(
       ? params.status
       : undefined;
   const search = params.search?.trim().slice(0, 50);
-  const from = dayStart(params.from);
-  const to = dayEnd(params.to);
+  const from = businessRangeStart(params.from);
+  const to = businessRangeEnd(params.to);
   const rows = await prisma.awbChangeRequest.findMany({
     where: {
       ...(status ? { status } : {}),

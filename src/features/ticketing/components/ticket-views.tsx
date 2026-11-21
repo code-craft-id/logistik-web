@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import type { TicketDTO } from "../contracts";
 
 export function TicketList({
@@ -99,13 +100,14 @@ export function TicketList({
         ) : (
           <Table className="min-w-5xl [&_td]:align-top">
             <caption className="sr-only">
-              Tiket, terbaru terlebih dahulu. Waktu pembuatan dalam UTC.
+              Tiket, terbaru terlebih dahulu. Waktu pembuatan dalam
+              Asia/Jakarta.
             </caption>
             <TableHeader>
               <TableRow>
                 {[
                   "ID internal",
-                  "Dibuat (UTC)",
+                  "Dibuat (Asia/Jakarta)",
                   "Judul",
                   "Menu",
                   "Cabang (ID)",
@@ -130,7 +132,7 @@ export function TicketList({
                       dateTime={ticket.createdAt}
                       className="whitespace-nowrap font-mono text-xs"
                     >
-                      {ticket.createdAt}
+                      {businessDateTimeString(ticket.createdAt)}
                     </time>
                   </TableCell>
                   <TableCell className="min-w-48 max-w-xs whitespace-normal font-medium [overflow-wrap:anywhere]">
@@ -184,7 +186,7 @@ export function TicketList({
 export function TicketDetail({ ticket }: { ticket: TicketDTO }) {
   const fields = [
     ["ID internal", String(ticket.id)],
-    ["Dibuat (UTC)", ticket.createdAt],
+    ["Dibuat (Asia/Jakarta)", ticket.createdAt],
     ["Cabang pemilik (ID)", String(ticket.branchId)],
     ["Pembuat (ID)", String(ticket.createdById)],
     ["Menu", ticket.menuName],
@@ -216,8 +218,8 @@ export function TicketDetail({ ticket }: { ticket: TicketDTO }) {
               {label}
             </dt>
             <dd className="whitespace-pre-wrap text-sm [overflow-wrap:anywhere]">
-              {label === "Dibuat (UTC)" ? (
-                <time dateTime={value}>{value}</time>
+              {label === "Dibuat (Asia/Jakarta)" ? (
+                <time dateTime={value}>{businessDateTimeString(value)}</time>
               ) : (
                 value
               )}

@@ -31,7 +31,7 @@ Currency is **IDR only** for this increment. An authorized actor enters each lin
 
 Amounts use Decimal/numeric(15,2), strictly positive, maximum13integer digits and at most2fraction digits. Reject excess precision instead of silently rounding; normalize display to2fraction digits. Invoice total is the exact server sum of lines, with overflow rejected. Payment amounts use the same scale/currency. No JS floating point, client total or client payment-status authority. Sum/subtract at fixed2decimal inputs needs no extra rounding rule.
 
-Invoice date, due date and received date are explicit valid calendar dates entered by the authorized actor; due date cannot precede invoice date. Audit timestamps are server UTC. No implicit recognition/cutoff/timezone, automatic term arithmetic or date-based tax rule. Broader D-19 remains open outside this date-only input/audit subset.
+Invoice date, due date and received date are explicit valid calendar dates entered by the authorized actor; due date cannot precede invoice date. Audit timestamps remain server UTC instants and are displayed in Asia/Jakarta under the owner-approved global D-19 policy. No implicit revenue recognition/cutoff, automatic term arithmetic or date-based tax rule is approved; those finance rules remain TBD.
 
 ## P3. Invoice lifecycle and numbering — proposed
 

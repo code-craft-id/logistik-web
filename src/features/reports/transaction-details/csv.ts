@@ -1,3 +1,4 @@
+import { businessDateTimeString } from "@/lib/date/business-date";
 import type { TransactionReportRow } from "./contracts";
 
 export const csvQuote = (value: string) => `"${value.replaceAll('"', '""')}"`;
@@ -13,7 +14,7 @@ export function csvText(value: string | null) {
 export function transactionReportCsv(rows: TransactionReportRow[]): string {
   const header = [
     "AWB No.",
-    "tanggal (UTC)",
+    "tanggal (Asia/Jakarta)",
     "Asal",
     "Tujuan",
     "Pengirim",
@@ -27,7 +28,7 @@ export function transactionReportCsv(rows: TransactionReportRow[]): string {
   const lines = rows.map((row) =>
     [
       csvText(row.awbNo),
-      csvQuote(row.transactionDate),
+      csvQuote(businessDateTimeString(row.transactionDate)),
       csvText(row.originBranch),
       csvText(row.destinationBranch),
       csvText(row.senderName),

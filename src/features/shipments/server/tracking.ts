@@ -4,6 +4,7 @@ import type { AccessActor } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
 import { transactionScope } from "@/features/modul/server/common";
 import { awbForScan, type ScanAwbView } from "@/features/modul/server/proof";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 export type TrackingMatch = {
@@ -92,7 +93,7 @@ export async function searchTracking(
     id: t.id,
     awbNo: t.awbNo ?? `#${t.id}`,
     doNo: t.doNo,
-    date: t.transactionDate.toISOString().slice(0, 10),
+    date: businessDateString(t.transactionDate),
     origin: t.originBranch?.name ?? null,
     destination: t.destinationBranch?.name ?? null,
     status: t.status,
@@ -153,7 +154,8 @@ export async function trackingDetail(
   const delivered = card.proofs.find((p) => p.outcome === "DELIVERED") ?? null;
   const receivedAt = delivered?.at ?? drs?.deliveredAt?.toISOString() ?? null;
   const receivedBy = delivered?.receiverName ?? drs?.receivedBy ?? null;
-  const day = (iso: string) => Date.parse(`${iso.slice(0, 10)}T00:00:00Z`);
+  const day = (iso: string) =>
+    Date.parse(`${businessDateString(new Date(iso))}T00:00:00Z`);
   const leadTimeDays = receivedAt
     ? Math.max(
         0,

@@ -9,6 +9,10 @@ import { currentIdentity } from "@/features/identity/server/context";
 import { AwbChangePanel } from "@/features/modul/components/awb-change-panel";
 import { DeliveryProof } from "@/features/shipments/components/delivery-proof";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import {
+  businessDateString,
+  businessDateTimeString,
+} from "@/lib/date/business-date";
 import type { TransactionStatusHistory } from "@/lib/db/generated/client";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -66,7 +70,7 @@ export default async function Page({
       <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded border p-4 sm:grid-cols-2 lg:grid-cols-3">
         {(
           [
-            ["Tanggal", tx.transactionDate.toISOString().slice(0, 10)],
+            ["Tanggal", businessDateString(tx.transactionDate)],
             ["DO No.", tx.doNo],
             ["Status", tx.status],
             ["Asal", tx.originBranch?.name],
@@ -148,9 +152,8 @@ export default async function Page({
           ) : (
             tx.statusHistory.map((h: TransactionStatusHistory) => (
               <div key={h.id} className="text-sm">
-                {h.changedAt.toISOString().slice(0, 16).replace("T", " ")} |{" "}
-                {h.priorStatus || "-"} → {h.newStatus}{" "}
-                {h.reason ? `(${h.reason})` : ""}{" "}
+                {businessDateTimeString(h.changedAt)} | {h.priorStatus || "-"} →{" "}
+                {h.newStatus} {h.reason ? `(${h.reason})` : ""}{" "}
                 {h.actorId ? `(actor:${h.actorId})` : ""}
               </div>
             ))

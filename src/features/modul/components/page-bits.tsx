@@ -4,13 +4,14 @@ import { InfoTip } from "@/components/patterns/info-tip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { businessDateString } from "@/lib/date/business-date";
 import { formatRupiah } from "@/lib/format/rupiah";
 
 export const selectClass =
   "min-h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm";
 
 export const day = (value: Date | null | undefined) =>
-  value ? value.toISOString().slice(0, 10) : "-";
+  value ? businessDateString(value) : "-";
 /** Table cells under an "(Rp)" header: grouped amount without prefix. */
 export const rupiah = (value: string | null | undefined) =>
   formatRupiah(value, { prefix: false });

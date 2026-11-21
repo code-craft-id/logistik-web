@@ -52,8 +52,8 @@ describe("AWB status report filters", () => {
       endDate: "2026-02-28",
     });
     expect(defaultPeriod("all-status", now)).toEqual({
-      startDate: "2026-02-14",
-      endDate: "2026-02-14",
+      startDate: "2026-02-15",
+      endDate: "2026-02-15",
     });
     expect(defaultPeriod("pending", now)).toBeNull();
   });
@@ -87,8 +87,8 @@ describe("AWB status CSV", () => {
       ],
     } satisfies AwbStatusResult;
     expect(awbStatusCsv(result).split("\r\n")).toEqual([
-      '"AWB No.","DO No.","Manifes No.","Tanggal manifest (UTC)","Tujuan","Koli","Berat (kg)","Volume"',
-      `"'+SUM(1)","","M-1","2026-11-04T08:00:00.000Z","Kota ""A""","2","","0.5"`,
+      '"AWB No.","DO No.","Manifes No.","Tanggal manifest (Asia/Jakarta)","Tujuan","Koli","Berat (kg)","Volume"',
+      `"'+SUM(1)","","M-1","2026-11-04 15:00","Kota ""A""","2","","0.5"`,
       "",
     ]);
   });

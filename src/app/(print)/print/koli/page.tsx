@@ -4,6 +4,7 @@ import { Barcode } from "@/components/patterns/barcode";
 import { QrCode } from "@/components/patterns/qr-code";
 import { isAdministrator } from "@/features/identity/permissions";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Print Label Koli" };
@@ -146,7 +147,7 @@ export default async function Page({
               <div>
                 <dt className="font-semibold">Tanggal · Moda</dt>
                 <dd>
-                  {tx.transactionDate.toISOString().slice(0, 10)} ·{" "}
+                  {businessDateString(tx.transactionDate)} ·{" "}
                   {tx.transportMode?.name ?? "-"}
                 </dd>
               </div>

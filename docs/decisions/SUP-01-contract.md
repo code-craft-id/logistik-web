@@ -16,7 +16,7 @@ The owner confirmed being the approver when asked for identity, but supplied no 
 
 ## Scope and evidence
 
-First increment: create, list and detail using observed subject, menu, related URL, remarks and explicit Low/Normal/High priority. Subject/Menu/URL are required in observed create UI; backend limits/defaults were not established. Internal database ID and labelled ISO8601 UTC creation display are bounded target differences in the selected scope, not claims about legacy numbering or timezone.
+First increment: create, list and detail using observed subject, menu, related URL, remarks and explicit Low/Normal/High priority. Subject/Menu/URL are required in observed create UI; backend limits/defaults were not established. Internal database ID is a bounded target difference. Timestamps remain ISO8601 UTC in transport and are displayed in Asia/Jakarta under the owner-approved global D-19 policy.
 
 DISC-04 is owner-accepted **DONE WITH NOTES**. Its evidence files are on the separately published, **not yet merged** discovery branch, not paths available in main: [closure and LD017–020/036](https://github.com/code-craft-id/logistik-web/blob/4b26315749b593ba261cb825ceae2c2ba6171e9a/docs/agent-state/dev3/DISC-04.md), [catalogue](https://github.com/code-craft-id/logistik-web/blob/4b26315749b593ba261cb825ceae2c2ba6171e9a/docs/agent-state/dev3/REPORT_CATALOGUE.md). No discovery-branch PR is currently open. This is an unmerged documentation dependency, not a reopened discovery ticket. ROADMAP records both accepted closure and its publication status.
 
@@ -50,7 +50,7 @@ Proposed new model Ticket, mapped with established English/snake_case convention
 | remarks | Nullable string, empty normalized to null, at most 5000 characters, escaped display |
 | priority | Required string; server allowlist Low/Normal/High and a named database CHECK enforcing the same three values. No Prisma enum or inferred default. Constraint is versioned in the eventual additive migration and tested directly. |
 | idempotencyKey | Required validated UUID, bounded VarChar(64); unique together with createdById. Not a ticket number; never returned in public DTOs. |
-| createdAt / updatedAt / deletedAt | Server timestamps; deletedAt nullable/unset. No update/delete/restore API. Label creation display ISO8601 UTC for this increment only. |
+| createdAt / updatedAt / deletedAt | Server timestamps; deletedAt nullable/unset. No update/delete/restore API. ISO8601 UTC transport; display in Asia/Jakarta per global D-19. |
 
 Index decisions: unique (createdById, idempotencyKey); (createdById, createdAt, id) for creator equality plus createdAt/id descending order across allowed branches; (createdAt, id) for administrator global ordering. branchId is a residual authorized filter for Option A, not the leading sort key. A branch-leading composite cannot serve the requested cross-branch global order without sorting. Final query plans and the minimal index set are verified on representative local test data during implementation.
 

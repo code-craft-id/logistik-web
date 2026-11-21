@@ -9,6 +9,7 @@ import {
   IdentityError,
   loadAccessActor,
 } from "@/features/identity/server/access";
+import { businessDateString } from "@/lib/date/business-date";
 import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
 import type { OperationalReportResult } from "../contracts";
 import { type OperationalKind, parseOperationalFilters } from "../filters";
@@ -163,7 +164,7 @@ async function invoiceBalances(
   return row ?? { unpaid: 0, partial: 0, paid: 0, outstanding: "0.00" };
 }
 
-/** AWB count per UTC transaction day, every day of the period present (zero-filled). */
+/** AWB count per Jakarta transaction day, every day of the period present (zero-filled). */
 async function dailyTransactions(
   tx: Prisma.TransactionClient,
   actor: AccessActor,
@@ -186,7 +187,7 @@ async function dailyTransactions(
     ? Prisma.sql`AND ${Prisma.join(scope, " AND ")}`
     : Prisma.empty;
   const rows = await tx.$queryRaw<{ day: string; count: number }[]>`
-    SELECT to_char(t.transaction_date, 'YYYY-MM-DD') AS day, count(*)::int AS count
+    SELECT to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS day, count(*)::int AS count
     FROM transactions t
     WHERE t.deleted_at IS NULL
       AND t.transaction_date >= ${from} AND t.transaction_date < ${toExclusive}
@@ -195,7 +196,7 @@ async function dailyTransactions(
   const counts = new Map(rows.map((row) => [row.day, row.count]));
   const days: { date: string; count: number }[] = [];
   for (let at = from.getTime(); at < toExclusive.getTime(); at += 86_400_000) {
-    const date = new Date(at).toISOString().slice(0, 10);
+    const date = businessDateString(new Date(at));
     days.push({ date, count: counts.get(date) ?? 0 });
   }
   return days;

@@ -453,7 +453,7 @@ describe("LP-R10/R11/R21 guarded real sources", () => {
     const csv = await service(scoped).export("pending", period);
     const lines = csv.trimEnd().split("\r\n");
     expect(lines[0]).toBe(
-      '"AWB No.","DO No.","Tanggal transaksi (UTC)","Tujuan","Koli","Berat (kg)","Volume"',
+      '"AWB No.","DO No.","Tanggal transaksi (Asia/Jakarta)","Tujuan","Koli","Berat (kg)","Volume"',
     );
     expect(lines).toHaveLength(5);
     const status = await service(scoped).export("all-status", period);

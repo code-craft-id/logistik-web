@@ -52,7 +52,7 @@ it("renders scoped manifest rows with accessible filters/table and no invented D
   expect([...host.querySelectorAll("th")].map((x) => x.textContent)).toEqual([
     "No.",
     "Manifes No.",
-    "Tanggal (UTC)",
+    "Tanggal (Asia/Jakarta)",
     "Cabang pemilik",
     "Asal (cabang tersimpan)",
     "Tujuan (cabang tersimpan)",

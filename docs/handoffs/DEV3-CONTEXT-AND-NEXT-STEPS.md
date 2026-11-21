@@ -91,7 +91,8 @@ Pemilik sudah menerima penghilangan scope tersebut untuk migrasi saat ini.
 ### 4.2 Reports dan dashboard — RPT-01 sampai RPT-04
 
 **Transaction Detail Report** menggunakan satu baris per Transaction dengan
-sembilan field nyata: AWB, tanggal transaksi UTC, cabang asal, cabang tujuan,
+sembilan field nyata: AWB, tanggal transaksi yang ditampilkan dalam Asia/Jakarta,
+cabang asal, cabang tujuan,
 pengirim, penerima, koli, kilo, dan status pengiriman yang tersimpan.
 
 Periode dibatasi maksimal 31 hari inklusif; filter cabang/AWB, pagination,
@@ -218,7 +219,7 @@ belum lengkap, GP 60000.00 tidak boleh dipresentasikan sebagai angka final.
 | D-13 | CONFIRMED untuk target FIN-02 B mengenai akun/mapping/posting/biaya/cashflow/periode. |
 | D-14 | CONFIRMED untuk target FIN-02 B mengenai recognition date, completeness dan rekonsiliasi P&L/GP/recap. |
 | D-21 | PARTIAL: hak finance dan same-actor issue/post/reverse/close diadopsi; approval operasional di luar subset ini belum otomatis disetujui. |
-| D-15/D-16/D-19/D-22 | Scope SUP/RPT tertentu sudah diterima; keputusan global yang lebih luas tidak otomatis berubah menjadi CONFIRMED. |
+| D-15/D-16/D-22 | Scope SUP/RPT tertentu sudah diterima; keputusan report/metric yang lebih luas tetap sesuai statusnya. D-19 timezone dikonfirmasi global oleh project owner pada 2026-11-21: semua tanggal/waktu bisnis memakai Asia/Jakarta, timestamp teknis tetap ISO UTC. |
 
 Hal penting untuk pembaca berikutnya:
 

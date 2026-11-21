@@ -23,8 +23,8 @@ export function DashboardDailyChart({
       <figcaption className="space-y-1">
         <span className="block font-semibold">Grafik Transaksi Harian</span>
         <span className="block text-sm text-muted-foreground">
-          Jumlah AWB per tanggal transaksi (UTC). Nominal per kategori bayar
-          belum tersedia.
+          Jumlah AWB per tanggal transaksi (Asia/Jakarta). Nominal per kategori
+          bayar belum tersedia.
         </span>
       </figcaption>
       <div className="flex gap-2">
@@ -111,7 +111,7 @@ export function DashboardDailyChart({
           <table className="w-full text-left">
             <thead>
               <tr>
-                <th className="py-1 font-medium">Tanggal (UTC)</th>
+                <th className="py-1 font-medium">Tanggal (Asia/Jakarta)</th>
                 <th className="py-1 text-right font-medium">AWB</th>
               </tr>
             </thead>

@@ -20,6 +20,7 @@ import {
   getPodReturn,
   POD_RETURN_STATUS,
 } from "@/features/modul/server/pod-returns";
+import { businessDateTimeString } from "@/lib/date/business-date";
 
 export const metadata: Metadata = { title: "Detail POD Kembali" };
 
@@ -74,7 +75,7 @@ export default async function Page({
             ["Diputuskan oleh", doc.decidedBy?.name],
             [
               "Waktu keputusan",
-              doc.decidedAt?.toISOString().slice(0, 16).replace("T", " "),
+              doc.decidedAt ? businessDateTimeString(doc.decidedAt) : null,
             ],
           ] as const
         ).map(([label, value]) => (

@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import {
   type TransactionReportResult,
   transactionReportRoute,
@@ -26,7 +27,7 @@ import { ReportSubmitButton } from "./submit-button";
 
 const headers = [
   "AWB No.",
-  "tanggal (UTC)",
+  "tanggal (Asia/Jakarta)",
   "Asal",
   "Tujuan",
   "Pengirim",
@@ -87,7 +88,7 @@ export function TransactionReportView({
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
             Detail Transaksi
           </h1>
-          <InfoTip text="Laporan operasional berdasarkan tanggal transaksi UTC. Setiap baris adalah satu transaksi, termasuk status Cancelled; transaksi terhapus tidak ditampilkan. Laporan dan CSV UTF-8 menampilkan sembilan kolom non-finansial. Asal dan Tujuan adalah cabang; Kilo ditampilkan sesuai nilai tersimpan." />
+          <InfoTip text="Laporan operasional berdasarkan tanggal transaksi waktu Asia/Jakarta. Setiap baris adalah satu transaksi, termasuk status Cancelled; transaksi terhapus tidak ditampilkan. Laporan dan CSV UTF-8 menampilkan sembilan kolom non-finansial. Asal dan Tujuan adalah cabang; Kilo ditampilkan sesuai nilai tersimpan." />
         </div>
       </header>
       <section
@@ -97,11 +98,11 @@ export function TransactionReportView({
         <Form action={transactionReportRoute} className="space-y-4">
           <p id="report-period-hint" className="text-sm text-muted-foreground">
             Pilih tanggal mulai dan akhir, maksimal 31 hari termasuk kedua
-            tanggal. Batas hari dan waktu hasil menggunakan UTC.
+            tanggal. Batas hari dan waktu hasil menggunakan Asia/Jakarta.
           </p>
           <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-2">
-              <Label htmlFor="report-start">Tanggal mulai (UTC)</Label>
+              <Label htmlFor="report-start">Tanggal mulai (Asia/Jakarta)</Label>
               <Input
                 id="report-start"
                 type="date"
@@ -113,7 +114,7 @@ export function TransactionReportView({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="report-end">Tanggal akhir (UTC)</Label>
+              <Label htmlFor="report-end">Tanggal akhir (Asia/Jakarta)</Label>
               <Input
                 id="report-end"
                 type="date"
@@ -245,7 +246,7 @@ export function TransactionReportView({
       {result.state === "initial" && (
         <EmptyState
           title="Pilih periode laporan"
-          description="Pilih rentang tanggal UTC dan cari transaksi untuk menampilkan laporan."
+          description="Pilih rentang tanggal Asia/Jakarta dan cari transaksi untuk menampilkan laporan."
         />
       )}
       {result.state === "ready" && filters && (
@@ -256,8 +257,8 @@ export function TransactionReportView({
           <div className="space-y-1 border-b p-4">
             <h2 className="font-semibold">Hasil transaksi</h2>
             <p className="text-sm text-muted-foreground">
-              Periode {filters.startDate} sampai {filters.endDate}, UTC · Status
-              saat ini
+              Periode {filters.startDate} sampai {filters.endDate}, Asia/Jakarta
+              · Status saat ini
             </p>
           </div>
           {!result.items.length ? (
@@ -286,8 +287,8 @@ export function TransactionReportView({
           ) : (
             <Table className="min-w-5xl [&_td]:align-top">
               <caption className="sr-only">
-                Detail transaksi non-finansial; seluruh waktu dalam UTC. Gulir
-                tabel untuk membaca semua kolom.
+                Detail transaksi non-finansial; waktu ditampilkan dalam
+                Asia/Jakarta. Gulir tabel untuk membaca semua kolom.
               </caption>
               <TableHeader>
                 <TableRow>
@@ -324,7 +325,7 @@ export function TransactionReportView({
                     </TableCell>
                     <TableCell className="whitespace-nowrap tabular-nums">
                       <time dateTime={row.transactionDate}>
-                        {row.transactionDate}
+                        {businessDateTimeString(row.transactionDate)}
                       </time>
                     </TableCell>
                     {[

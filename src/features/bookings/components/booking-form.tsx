@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { ComboSelect } from "@/components/ui/combo-select";
+import { businessDateString } from "@/lib/date/business-date";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { createBookingAction } from "../actions";
 import { DimensionDialog, modeDivider } from "./dimension-dialog";
@@ -343,7 +344,7 @@ export function BookingForm({
             name="bookingDate"
             text="Tanggal"
             type="date"
-            defaultValue={new Date().toISOString().slice(0, 10)}
+            defaultValue={businessDateString()}
           />
           <Choice
             name="branchId"

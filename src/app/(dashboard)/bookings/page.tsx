@@ -24,6 +24,7 @@ import { currentIdentity } from "@/features/identity/server/context";
 import { InboundBookings } from "@/features/modul/components/inbound-bookings";
 import { one } from "@/features/modul/components/page-bits";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 import { formatRupiah } from "@/lib/format/rupiah";
 
 export const metadata: Metadata = { title: "Kelola Booking" };
@@ -163,9 +164,7 @@ export default async function Page({
                       <TableCell className="font-mono">
                         {b.bookingNo || "-"}
                       </TableCell>
-                      <TableCell>
-                        {b.bookingDate.toISOString().slice(0, 10)}
-                      </TableCell>
+                      <TableCell>{businessDateString(b.bookingDate)}</TableCell>
                       <TableCell>{b.branch?.name ?? "-"}</TableCell>
                       <TableCell>{b.destination || "-"}</TableCell>
                       <TableCell>{b.senderName || "-"}</TableCell>

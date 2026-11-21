@@ -20,6 +20,7 @@ import {
 } from "@/features/shipments/components/manifest-forms";
 import { getManifest } from "@/features/shipments/server/manifests-queries";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 
 export const metadata: Metadata = { title: "Detail Manifest" };
 
@@ -142,7 +143,7 @@ export default async function Page({
           <DeliverySheetForm
             manifestId={manifest.id}
             suggestedNo={`DRS-${manifest.manifestNo}`}
-            today={new Date().toISOString().slice(0, 10)}
+            today={businessDateString()}
           />
         ) : (
           <p className="text-sm text-muted-foreground">

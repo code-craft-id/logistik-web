@@ -87,7 +87,7 @@ it("disables repeat submission while pending, then shows a sanitized error and p
     host.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled,
   ).toBe(false);
 });
-it("shows empty recovery and inert escaped URL/remarks with labelled UTC and internal ID", async () => {
+it("shows empty recovery and inert escaped URL/remarks with labelled Jakarta time and internal ID", async () => {
   await act(async () =>
     root.render(
       createElement(TicketList, {
@@ -115,7 +115,7 @@ it("shows empty recovery and inert escaped URL/remarks with labelled UTC and int
   await act(async () => root.render(createElement(TicketDetail, { ticket })));
   expect(host.querySelector("script")).toBeNull();
   expect(host.querySelector('a[href^="https:"]')).toBeNull();
-  expect(host.textContent).toContain("UTC");
+  expect(host.textContent).toContain("Asia/Jakarta");
   expect(host.textContent).toContain("ID internal");
   expect(host.textContent).toContain(ticket.remarks);
 });

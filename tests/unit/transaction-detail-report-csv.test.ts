@@ -15,11 +15,11 @@ const row: TransactionReportRow = {
   status: "Cancelled",
 };
 const header =
-  '"AWB No.","tanggal (UTC)","Asal","Tujuan","Pengirim","Penerima Barang","Koli","Kilo","Status Pengiriman"\r\n';
+  '"AWB No.","tanggal (Asia/Jakarta)","Asal","Tujuan","Pengirim","Penerima Barang","Koli","Kilo","Status Pengiriman"\r\n';
 it("maps exactly nine public fields with Unicode/quotes/newlines/nulls and exact numeric strings", () => {
   expect(transactionReportCsv([row])).toBe(
     header +
-      '"AWB","2026-11-01T00:00:00.000Z","Asal","","Nama, ""雪""\nBaris","Penerima","0","123456789012345.1234","Cancelled"\r\n',
+      '"AWB","2026-11-01 07:00","Asal","","Nama, ""雪""\nBaris","Penerima","0","123456789012345.1234","Cancelled"\r\n',
   );
   expect(transactionReportCsv([])).toBe(header);
   expect(transactionReportCsv([{ ...row, koli: null, kilo: null }])).toContain(

@@ -16,6 +16,7 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { id, invoiceListInput } from "../contracts";
 import { accountingQueries, financeService } from "../server/context";
@@ -474,7 +475,8 @@ export async function InvoiceDetailPage({ invoiceId }: { invoiceId: string }) {
         </h2>
         {row.audit.map((e) => (
           <p key={e.id} className="break-words text-sm">
-            {e.createdAt} · {e.action} · Pengguna #{e.actorId}
+            {businessDateTimeString(e.createdAt)} Asia/Jakarta · {e.action} ·
+            Pengguna #{e.actorId}
             {e.reason ? ` · ${e.reason}` : ""}
           </p>
         ))}

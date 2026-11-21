@@ -47,9 +47,8 @@ permissions alone do not authorize reports. Fresh currentidentity and loadAccess
 for every service entry inside one RepeatableRead snapshot with options/rows/counts.
 Ordinary membership includes only ACTIVE branches/offices/nondeletedcompany.
 
-Required real YYYY-MM-DD dates, inclusive UTC period via [start00Z, dayAfterEnd00Z),
-maximum31inclusive days; explicit initial no-data-query state. Reuse proven RPT01 filter
-parser without changing its accepted behavior. Optional currentlyallowedbranch and
+Required real YYYY-MM-DD dates, inclusive Asia/Jakarta business-day period represented
+as [start-date 00:00 Asia/Jakarta (= previous UTC date 17:00Z), day-after-end 00:00 Asia/Jakarta (= end UTC date 17:00Z)); maximum31inclusive days; explicit initial no-data-query state. Reuse the proven RPT01 filter parser under the owner-approved D-19 timezone policy. Optional currentlyallowedbranch and
 literal identifier substring<=50, page1..1000,size1..100/default20,maxoffset99900.
 Reject duplicate arrays/unknown keys/invalid dates; escape LIKE specialcharacters.
 Branchoptions: ordinary activecurrentIDs; admin allnondeletedbranches inclinactive.
@@ -64,7 +63,7 @@ surface without falsely treating all stored types as Outbound. One nondeleted Ma
 per row, owningbranch membership for ordinary users, nullowningbranch adminonly.
 Optional branchfilter applies to owningbranch, not scalar origin/destination IDs.
 
-Columns: ManifesNo, manifestDateUTC, owningbranchname, storedtype, vehicleplate,
+Columns: ManifesNo, manifestDate rendered in Asia/Jakarta, owningbranchname, storedtype, vehicleplate,
 **Kurir** (actual Courier relation, never relabel Driver), storedstatus, active assigned
 transaction count. Count only nondeleted/unreleased ManifestItems with nondeleted
 Transactions within current originORdestination scope. Count unit is active assigned
@@ -84,10 +83,10 @@ transaction.originORdestination in currentallowed. Admin sees all otherwise-elig
 rows. Historical reads do NOT require a currently active ManifestItem: a released
 assignment must not erase recorded delivery history.
 
-PerDRS rows: one sheet with at least one eligible visible item; DRSNo, deliveryDateUTC,
+PerDRS rows: one sheet with at least one eligible visible item; DRSNo, deliveryDate rendered in Asia/Jakarta,
 manifestNo, owningbranch, manifestcourier (labelled as such) and eligible visible itemcount. DeliverySheet has no status field; do not invent a sheetstatus or derived progress column.
 Label count as transactions in the reader's scope, not unknown Progress/Sukses/Gagal.
-Peritem rows: DRSNo/dateUTC, AWB, receiver, storedoutcome, actualdeliveredAtUTC,
+Peritem rows: DRSNo/date (Asia/Jakarta), AWB, receiver, storedoutcome, actualdeliveredAt (Asia/Jakarta),
 receivedBy, notes; explicit projection and nullable outputs, no derivedstatus/formulas.
 Search perDRS by sheetNo; peritem by AWB, labelled clearly. Count/rows/paging use
 the exact corresponding visibility/date/search predicate, no unbounded nested lists.
@@ -122,7 +121,7 @@ not pretend all legacy vendor functionality exists.
 
 TDD RED/GREEN; real guarded testDB reconciliation for all source grains, owning versus
 transaction scope/intersection, null/admin/inactive/revocation/deleted/released history,
-UTC boundaries/zero/null/duplicate dates/literal search/paging; no DTO money/PII extras.
+Jakarta-day boundaries/zero/null/duplicate dates/literal search/paging; no DTO money/PII extras.
 Actual external concurrent write between rows/count or dashboard counts proves snapshot.
 Independent QA; finallint/typecheck/unitUI/integration/build, then local fake browser
 permitted/denied/empty/invalid/paging and375/768/1440/keyboard; clean owned fixtures.

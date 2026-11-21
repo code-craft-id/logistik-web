@@ -4,6 +4,7 @@ import { TransactionForm } from "@/features/bookings/components/transaction-form
 import { transactionFormOptions } from "@/features/bookings/server/queries";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 
 // Session-dependent form options; blocking render.
 export const instant = false;
@@ -34,7 +35,7 @@ export default async function Page() {
       <TransactionForm
         options={options}
         defaultOrigin={defaultOrigin}
-        today={new Date().toISOString().slice(0, 10)}
+        today={businessDateString()}
       />
     </div>
   );

@@ -3,14 +3,14 @@ import { parseOperationalFilters } from "../../src/features/reports/operational/
 
 const period = { startDate: "2026-11-01", endDate: "2026-11-15" };
 describe("operational report query boundaries", () => {
-  it("reuses exact UTC and paging bounds and selects DRS by default", () => {
+  it("reuses exact Jakarta-day and paging bounds and selects DRS by default", () => {
     const parsed = parseOperationalFilters("delivery", period);
     expect(parsed.view).toBe("sheets");
     expect(parsed.parsed).toMatchObject({
       status: "valid",
       filters: {
-        from: new Date("2026-11-01T00:00:00Z"),
-        toExclusive: new Date("2026-11-16T00:00:00Z"),
+        from: new Date("2026-10-31T17:00:00Z"),
+        toExclusive: new Date("2026-11-15T17:00:00Z"),
         page: 1,
         take: 20,
       },
@@ -40,7 +40,7 @@ describe("operational report query boundaries", () => {
         "invalid",
       );
   });
-  it("opens the dashboard on the current UTC month to date, like legacy", () => {
+  it("opens the dashboard on the current Jakarta month to date", () => {
     const parsed = parseOperationalFilters(
       "dashboard",
       {},
@@ -50,7 +50,7 @@ describe("operational report query boundaries", () => {
     if (parsed.status !== "valid") return;
     expect(parsed.filters).toMatchObject({
       startDate: "2026-11-01",
-      endDate: "2026-11-18",
+      endDate: "2026-11-19",
     });
     expect(parseOperationalFilters("manifest", {}).parsed.status).toBe(
       "initial",

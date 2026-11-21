@@ -53,5 +53,7 @@ Recorded from chat; business owner approval, not Dev 2 / finance review.
 - 2026-11-20: Asia/Jakarta approved for status-import date validation, invoice-handover future-date validation, and AP Aging month-end status cutoff. Broader D-19 timezone policy remains TBD.
 - 2026-11-20: AP Aging includes all vendor bills open at the selected month end, with age calculated through month end; ownership scope follows explicit VendorBill.branchId.
 - 2026-11-20: Server recalculates kilo, volume, per-piece chargeable weight, packing fee, and price from each koli's dimensions under D-26; Dev 2 review remains pending.
+- 2026-11-21: Initial project-owner approval set Asia/Jakarta as the YYMM basis for automatic AWB numbers; Dev 2 agreed. Superseded later the same day by the system-wide timezone direction below, which also applies Jakarta to booking numbers. D-06 remains PARTIAL for other AWB numbering details.
+- 2026-11-21: Project owner superseded the prior bounded timezone exceptions and approved Asia/Jakarta system-wide for business-date defaults, date periods/cutoffs, generated identifiers, and user-facing date/time rendering across modules and reports. UTC remains the timestamp persistence/transport representation; date-only values retain their calendar date. Booking numbering now follows Jakarta as well. D-19 is CONFIRMED globally; D-06 remains PARTIAL for non-timezone AWB numbering details.
 Open items: BACKLOG.md.
 

@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { reportInput } from "../accounting-contracts";
 import { costListInput, listInput } from "../contracts";
@@ -945,7 +946,8 @@ export async function PeriodsPage({ query }: { query: Query }) {
       <Filter query={query} />
       {rows.map((r) => (
         <p key={r.id}>
-          Cabang {r.branchId} · ditutup sampai {r.month} · {r.createdAt}
+          Cabang {r.branchId} · ditutup sampai {r.month} ·{" "}
+          {businessDateTimeString(r.createdAt)} Asia/Jakarta
         </p>
       ))}
       {!rows.length && <p>Belum ada periode ditutup.</p>}

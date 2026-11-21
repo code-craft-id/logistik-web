@@ -5,6 +5,7 @@ import {
   permitsBranch,
 } from "@/features/identity/permissions";
 import { cloudinaryConfigured } from "@/lib/cloudinary";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { deliveryProofs } from "../server/manifests-queries";
 import { DeliveryPhotoForm } from "./delivery-photo-form";
@@ -14,8 +15,7 @@ const OUTCOME: Record<string, string> = {
   FAILED_DELIVERY: "Gagal",
   RETURNED: "Retur",
 };
-const time = (d: Date | null) =>
-  d ? d.toISOString().slice(0, 16).replace("T", " ") : "-";
+const time = (d: Date | null) => (d ? businessDateTimeString(d) : "-");
 
 /** Bukti Terima (POD) on the AWB detail page: outcome and optional photo. */
 export async function DeliveryProof({

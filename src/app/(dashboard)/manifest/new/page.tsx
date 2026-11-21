@@ -6,6 +6,7 @@ import { currentIdentity } from "@/features/identity/server/context";
 import { ManifestCreateForm } from "@/features/shipments/components/manifest-forms";
 import { manifestFormOptions } from "@/features/shipments/server/manifests-queries";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 
 export const metadata: Metadata = { title: "Tambah Manifest" };
 
@@ -37,10 +38,7 @@ export default async function Page() {
           />
         </div>
       </header>
-      <ManifestCreateForm
-        {...options}
-        today={new Date().toISOString().slice(0, 10)}
-      />
+      <ManifestCreateForm {...options} today={businessDateString()} />
     </div>
   );
 }

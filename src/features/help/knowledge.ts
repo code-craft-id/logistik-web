@@ -643,7 +643,7 @@ export const helpEntries: HelpEntry[] = [
       "92 hari",
     ],
     answer:
-      "Tanggal di laporan memakai UTC. Laporan operasional dibatasi 31 hari per tampilan, laporan rekap 92 hari. Jika periode kosong, laporan dan dashboard memakai bulan berjalan.",
+      "Tanggal dan waktu bisnis di seluruh sistem memakai Asia/Jakarta. Timestamp teknis tetap dikirim sebagai UTC dan ditampilkan dalam waktu Jakarta. Laporan operasional dibatasi 31 hari per tampilan, laporan rekap 92 hari. Jika periode kosong, laporan dan dashboard memakai bulan berjalan.",
   },
   {
     id: "help",

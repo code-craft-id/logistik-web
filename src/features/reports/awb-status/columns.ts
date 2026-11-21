@@ -13,7 +13,7 @@ export function awbStatusTable(result: AwbStatusResult): AwbStatusTable {
       columns: [
         { label: "AWB No." },
         { label: "DO No." },
-        { label: "Tanggal transaksi (UTC)" },
+        { label: "Tanggal transaksi (Asia/Jakarta)" },
         { label: "Tujuan" },
         { label: "Koli", numeric: true },
         { label: "Berat (kg)", numeric: true },
@@ -38,7 +38,7 @@ export function awbStatusTable(result: AwbStatusResult): AwbStatusTable {
         { label: "AWB No." },
         { label: "DO No." },
         { label: "Manifes No." },
-        { label: "Tanggal manifest (UTC)" },
+        { label: "Tanggal manifest (Asia/Jakarta)" },
         { label: "Tujuan" },
         { label: "Koli", numeric: true },
         { label: "Berat (kg)", numeric: true },
@@ -61,7 +61,7 @@ export function awbStatusTable(result: AwbStatusResult): AwbStatusTable {
   return {
     columns: [
       { label: "AWB No." },
-      { label: "Tanggal transaksi (UTC)" },
+      { label: "Tanggal transaksi (Asia/Jakarta)" },
       { label: "Asal" },
       { label: "Tujuan" },
       { label: "Pengirim" },
@@ -70,7 +70,7 @@ export function awbStatusTable(result: AwbStatusResult): AwbStatusTable {
       { label: "Berat (kg)", numeric: true },
       { label: "Status pengiriman" },
       { label: "Diterima oleh" },
-      { label: "Waktu diterima (UTC)" },
+      { label: "Waktu diterima (Asia/Jakarta)" },
       { label: "Manifes No." },
     ],
     rows: result.items.map((row) => ({

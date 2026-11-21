@@ -32,6 +32,7 @@ import {
   AWB_CHANGE_STATUS,
   listAwbChanges,
 } from "@/features/modul/server/awb-changes";
+import { businessDateTimeString } from "@/lib/date/business-date";
 
 export const metadata: Metadata = { title: "Persetujuan Edit/delete AWB" };
 
@@ -111,10 +112,7 @@ export default async function Page({
                         {index + 1}
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        {row.createdAt
-                          .toISOString()
-                          .slice(0, 16)
-                          .replace("T", " ")}
+                        {businessDateTimeString(row.createdAt)}
                       </TableCell>
                       <TableCell>
                         <Link

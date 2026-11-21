@@ -4,7 +4,7 @@ IMPLEMENTED + LOCAL VERIFIED on2026-11-15 at code723dce61309cc6157d2a374a2fba422
 
 ## Decision and authority
 
-Owner/project coordinator explicitly selected OptionA in the consolidated D15/D19/D22 question: “A — Sembilan kolom bersumber nyata (rekomendasi)”. It covers9real-source non-financial fields, labelled transactionDate UTC/maximum31day range, allstoredstatuses includingCancelled, nondeletedrecords, period/branch/AWBfilters, noaggregates/export/billingfilters/unsupportedcolumns. Formal named-approver record PARTIAL, retaining actual task-local selection without another name/approval question. Global D15/D19/D22 remain open outside this subset.
+Owner/project coordinator explicitly selected OptionA in the consolidated D15/D19/D22 question: “A — Sembilan kolom bersumber nyata (rekomendasi)”. It covers9real-source non-financial fields, transactionDate with a maximum31day range, allstoredstatuses includingCancelled, nondeletedrecords, period/branch/AWBfilters, noaggregates/export/billingfilters/unsupportedcolumns. On 2026-11-21 the owner superseded the former UTC date basis: periods and displayed timestamps now use Asia/Jakarta. Formal named-approver record PARTIAL. Global D15/D22 remain open outside this subset.
 
 Alternatives reviewed: B preserves14headers with5explicitlyunavailable columns (closer layout but empty width); C defers until allsources exist (fullparity later but delays usable data). Lead recommendationA selected: real useful operational output, smallest security/maintenance surface, no invented finance/deliverydata.
 
@@ -19,7 +19,7 @@ Accepted DISC04/REPORT_CATALOGUE LD001:14legacyheaders. LD042: workingperiodquer
 | Observed column in relative order | Actual source | Adopted representation |
 | --- | --- | --- |
 | AWB No. | Transaction.awbNo | Storedtext/nullunavailable; no AWBgrouping/dedup |
-| tanggal (UTC) | transactionDate | ISO8601 UTCtimestamp; notcreatedAt/deliverydate |
+| tanggal (Asia/Jakarta) | transactionDate | ISO8601 UTC instant in transport; rendered in Asia/Jakarta; notcreatedAt/deliverydate |
 | Asal | originBranch.name | Explicit sourcebranch, not inferred geographicarea |
 | Tujuan | destinationBranch.name | Explicit destinationbranch |
 | Pengirim | senderName | Storedescapedtext |
@@ -32,7 +32,7 @@ One row per Transaction.id, exclude deletedAt != null; include allstoredstatuses
 
 ## Implemented bounded behavior
 
-Required real calendar YYYY-MM-DD start/end interpreted inclusive UTC days as [start00:00Z, dayAfterEnd00:00Z). No browser/servertimezone fallback, initialpage asksforperiod withouttransactionquery. Maximum31inclusive days is an explicit query-cost bound. Reject malformed/reversed/oversizedperiods.
+Required real calendar YYYY-MM-DD start/end interpreted as inclusive Asia/Jakarta business days, with UTC instants [previous-day 17:00Z, day-after-end 17:00Z). No browser/servertimezone fallback, initialpage asksforperiod withouttransactionquery. Maximum31inclusive days is an explicit query-cost bound. Reject malformed/reversed/oversizedperiods.
 
 Optional onebranchfilter (origin OR destination) and literal AWBsubstring max50. Escape SQL LIKE specialcharacters in Prisma contains, no rawSQL. Fixed ordering transactionDateDESC,idDESC; page1..1000, pageSize1..100/default20, maximumoffset99900. Countmetadata describes scopedtransactionrows only, nofinancial/AWBaggregate.
 
@@ -55,4 +55,4 @@ Deferredmissing-source columns: Moda, Servis, Deskripsi, Komentar, Diterima Oleh
 Staging, physicaldevice/browsermatrix and finalhuman code/release acceptance remain pending; finalownerreview is not a developmentblocker. SUP-01 DONE for owner-accepted v1; SUP01A code untouched. FullDev3 notDONE. See [closure](DEV3-V1-CLOSURE.md).
 
 ## RPT-03/RPT-04 extension —2026-11-15
-Owner packet A adopted separate endpoint filters, nine-column sorting and capped5000 permissioned UTF8CSV. Implemented/local verified at core8d25df1/finalcopybe1d2e6; fixed-order/export-deferred paragraphs above describe original accepted v1. New authoritative [extension contract/disposition](DEV3-SUP-RPT-FOLLOWUPS.md) and [SHA-specific verification](evidence/dev3-sup-rpt-followups/verification.md). Nine fields/current scope/UTC date basis unchanged; five unsourced headers CLOSED WITH NOTES, no finance/vendor join invented.
+Owner packet A adopted separate endpoint filters, nine-column sorting and capped5000 permissioned UTF8CSV. Implemented/local verified at core8d25df1/finalcopybe1d2e6; fixed-order/export-deferred paragraphs above describe original accepted v1. New authoritative [extension contract/disposition](DEV3-SUP-RPT-FOLLOWUPS.md) and [SHA-specific verification](evidence/dev3-sup-rpt-followups/verification.md). Nine fields/current scope retained; date basis superseded to Asia/Jakarta by the owner on 2026-11-21. Five unsourced headers CLOSED WITH NOTES, no finance/vendor join invented.

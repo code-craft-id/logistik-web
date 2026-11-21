@@ -4,6 +4,7 @@ import { Barcode } from "@/components/patterns/barcode";
 import { QrCode } from "@/components/patterns/qr-code";
 import { isAdministrator } from "@/features/identity/permissions";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -103,8 +104,8 @@ export default async function Page({
                   )}
                   <h1 className="text-lg font-bold">BOOKING PICKUP</h1>
                   <p className="text-sm">
-                    {b.bookingDate.toISOString().slice(0, 10)} · {b.status} ·
-                    Cabang {b.branch?.name ?? "-"}
+                    {businessDateString(b.bookingDate)} · {b.status} · Cabang{" "}
+                    {b.branch?.name ?? "-"}
                   </p>
                   <p className="mt-2 font-mono text-xl font-bold tracking-widest">
                     {code}

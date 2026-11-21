@@ -18,6 +18,7 @@ const when = (iso: string) =>
   new Date(iso).toLocaleString("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Jakarta",
   });
 
 function Field({

@@ -5,9 +5,12 @@ import {
   isAdministrator,
 } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
+import {
+  businessDateAfterUtc,
+  businessDateStartUtc,
+} from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
-import { dayEnd, dayStart } from "./common";
 
 export type InboundBookingRow = {
   id: number;
@@ -23,6 +26,23 @@ export type InboundBookingRow = {
   biaya: string | null;
   dibuat_oleh: string | null;
   status: string;
+};
+
+const businessRangeStart = (value?: string) => {
+  if (!value) return undefined;
+  try {
+    return businessDateStartUtc(value);
+  } catch {
+    return undefined;
+  }
+};
+const businessRangeEnd = (value?: string) => {
+  if (!value) return undefined;
+  try {
+    return businessDateAfterUtc(value);
+  } catch {
+    return undefined;
+  }
 };
 
 /**
@@ -43,10 +63,10 @@ export async function listInboundBookings(
     ? Prisma.sql`db.id IN (${ids})`
     : Prisma.sql`db.id IS NOT NULL`;
   const search = params.search?.trim().slice(0, 50);
-  const from = dayStart(params.from);
-  const to = dayEnd(params.to);
+  const from = businessRangeStart(params.from);
+  const to = businessRangeEnd(params.to);
   return prisma.$queryRaw<InboundBookingRow[]>`
-    SELECT b.id, b.booking_no, to_char(b.booking_date, 'YYYY-MM-DD') AS tanggal,
+    SELECT b.id, b.booking_no, to_char((b.booking_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
            ob.name AS asal, COALESCE(db.name, b.destination) AS tujuan,
            b.sender_name AS pengirim, b.receiver_name AS penerima, b.koli,
            b.kilo::text AS kilo, b.volume::text AS volume, b.biaya::text AS biaya,

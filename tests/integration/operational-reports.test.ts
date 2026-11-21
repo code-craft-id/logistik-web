@@ -215,7 +215,7 @@ beforeAll(async () => {
   inactive = await manifest("inactive", { branchId: d });
   deleted = await manifest("deleted", { deletedAt: new Date() });
   before = await manifest("before", {
-    manifestDate: new Date("2026-10-31T23:59:59.999Z"),
+    manifestDate: new Date("2026-10-31T16:59:59.999Z"),
   });
   cutoff = await manifest("cutoff", {
     manifestDate: new Date("2026-11-16T00:00:00Z"),
@@ -250,7 +250,7 @@ beforeAll(async () => {
   await item(await sheet(unowned, "null"), txNull);
   await item(await sheet(inactive, "inactive"), txMixed);
   await item(await sheet(deleted, "deleted"), txA);
-  await item(await sheet(before, "before", "2026-10-31T23:59:59.999Z"), txA);
+  await item(await sheet(before, "before", "2026-10-31T16:59:59.999Z"), txA);
   await item(await sheet(cutoff, "cutoff", "2026-11-16T00:00:00Z"), txA);
 }, 30_000);
 afterAll(async () => {
@@ -492,7 +492,7 @@ describe("guarded operational report real sources", () => {
       });
     }
   });
-  it("treats identifier wildcard characters literally and applies UTC inclusive boundaries", async () => {
+  it("treats identifier wildcard characters literally and applies Jakarta inclusive boundaries", async () => {
     const literal = await manifest("literal_%\\");
     await manifest("literalABC");
     for (const search of ["literal_", "%", "\\"]) {

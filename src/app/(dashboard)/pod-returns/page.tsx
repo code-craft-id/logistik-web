@@ -39,6 +39,7 @@ import {
   listPodReturns,
   POD_RETURN_STATUS,
 } from "@/features/modul/server/pod-returns";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = { title: "POD Kembali" };
@@ -136,7 +137,7 @@ export default async function Page({
                   name="returnDate"
                   type="date"
                   required
-                  defaultValue={new Date().toISOString().slice(0, 10)}
+                  defaultValue={businessDateString()}
                   className="min-h-11"
                 />
               </div>

@@ -10,6 +10,7 @@ import {
   assertPermission,
   IdentityError,
 } from "@/features/identity/server/access";
+import { jakartaMonthStartUtc } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 /**
@@ -95,11 +96,11 @@ export async function recapTransactions(actor: AccessActor, raw: unknown) {
     select: { name: true },
   });
   if (!branch) throw new IdentityError("VALIDATION", 400);
-  const from = new Date(Date.UTC(input.year, input.month - 1, 1));
-  const to = new Date(Date.UTC(input.year, input.month, 1));
+  const from = jakartaMonthStartUtc(input.year, input.month);
+  const to = jakartaMonthStartUtc(input.year, input.month + 1);
 
   const days = await prisma.$queryRaw<{ day: string }[]>`
-    SELECT DISTINCT to_char(t.transaction_date, 'YYYY-MM-DD') AS day
+    SELECT DISTINCT to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS day
     FROM transactions t
     WHERE t.origin_branch_id = ${input.branchId}
       AND t.transaction_date >= ${from} AND t.transaction_date < ${to}
@@ -117,7 +118,7 @@ export async function recapTransactions(actor: AccessActor, raw: unknown) {
       cod: string;
     }[]
   >`
-    SELECT to_char(t.transaction_date, 'YYYY-MM-DD') AS day,
+    SELECT to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS day,
            d.name AS destination,
            count(*)::int AS awb,
            COALESCE(sum(t.koli), 0)::int AS koli,

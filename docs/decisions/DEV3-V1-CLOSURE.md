@@ -8,7 +8,9 @@ business rule is confirmed, and no test result is transferred to changed runtime
 | Ticket | DONE scope | Existing evidence |
 | --- | --- | --- |
 | SUP-01 — Ticketing v1 | Create/list/detail, own-created tickets in current allowed branches, explicit administrator rules, active hierarchy on create, idempotency, validation and responsive UI | [SUP verification](evidence/sup-01-core/verification.md), testedcode5575d12 |
-| RPT-01 — Transaction Detail Report v1 | Nine sourced non-financial columns, UTC31-day period, branch/literalAWB50 filters, scoped pagination and consistent snapshot, responsive UI | [RPT verification](evidence/rpt-01/verification.md), testedcode723dce6 |
+| RPT-01 — Transaction Detail Report v1 | Nine sourced non-financial columns, 31-day period (initial UTC basis superseded to Jakarta), branch/literalAWB50 filters, scoped pagination and consistent snapshot, responsive UI | [RPT verification](evidence/rpt-01/verification.md), testedcode723d6 |
+
+Timezone supersession (2026-11-21): project owner changed the report period and displayed timestamp basis from UTC to Asia/Jakarta under the confirmed system-wide D-19 policy. The original 2026-11-15 acceptance remains historical; current behavior is governed by [RPT-01 contract](RPT-01-contract.md).
 
 DONE means owner-accepted development/local verification for these v1 deliverables.
 Final combined-PR review, pre-merge hardening, staging and release remain separate.

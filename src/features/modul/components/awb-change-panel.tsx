@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type AccessActor, permits } from "@/features/identity/permissions";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import type { Prisma } from "@/lib/db/generated/client";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { applyAwbEditAction, requestAwbChangeAction } from "../actions";
@@ -199,7 +200,7 @@ export async function AwbChangePanel({
                 <li key={r.id} className="rounded-md border p-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="tabular-nums">
-                      {r.createdAt.toISOString().slice(0, 16).replace("T", " ")}
+                      {businessDateTimeString(r.createdAt)}
                     </span>
                     <span>{AWB_CHANGE_KINDS[r.kind as "EDIT"] ?? r.kind}</span>
                     <StatusText value={r.status} labels={AWB_CHANGE_STATUS} />
@@ -219,7 +220,7 @@ export async function AwbChangePanel({
                           {FIELD_LABELS[key] ?? key}: {showValue(key, before)} →{" "}
                           {showValue(key, after)}
                           {r.usedAt
-                            ? ` (${r.usedAt.toISOString().slice(0, 16).replace("T", " ")})`
+                            ? ` (${businessDateTimeString(r.usedAt)})`
                             : ""}
                         </li>
                       ))}

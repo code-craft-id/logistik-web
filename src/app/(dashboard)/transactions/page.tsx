@@ -19,6 +19,7 @@ import { listTransactions } from "@/features/bookings/server/queries";
 import { permits } from "@/features/identity/permissions";
 import { one } from "@/features/modul/components/page-bits";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessDateString } from "@/lib/date/business-date";
 import { awbScanEnabled } from "@/lib/features";
 
 export const metadata: Metadata = { title: "Kelola On Site" };
@@ -182,7 +183,7 @@ export default async function Page({
                     <TableCell className="tabular-nums">{index + 1}</TableCell>
                     <TableCell>{t.awbNo || "-"}</TableCell>
                     <TableCell>
-                      {t.transactionDate.toISOString().slice(0, 10)}
+                      {businessDateString(t.transactionDate)}
                     </TableCell>
                     <TableCell>{t.doNo || "-"}</TableCell>
                     <TableCell>{t.senderName || "-"}</TableCell>

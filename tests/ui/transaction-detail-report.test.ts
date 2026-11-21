@@ -44,7 +44,7 @@ describe("real report UI", () => {
     expect([...host.querySelectorAll("th")].map((x) => x.textContent)).toEqual([
       "No.",
       "AWB No.",
-      "tanggal (UTC)",
+      "tanggal (Asia/Jakarta)",
       "Asal",
       "Tujuan",
       "Pengirim",
@@ -93,7 +93,8 @@ describe("real report UI", () => {
           issues: [
             {
               field: "endDate",
-              message: "Periode UTC harus berurutan dan maksimal 31 hari.",
+              message:
+                "Periode waktu Jakarta harus berurutan dan maksimal 31 hari.",
             },
           ],
         },

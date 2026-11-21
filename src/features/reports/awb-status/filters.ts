@@ -1,4 +1,8 @@
 import {
+  businessDateString,
+  businessYearMonth,
+} from "@/lib/date/business-date";
+import {
   parseTransactionReportFilters,
   type TransactionReportFilterResult,
 } from "../transaction-details/filters";
@@ -59,21 +63,19 @@ export function awbView(value: unknown): AwbStatusKind | null {
   return null;
 }
 
-/** Legacy opening state: current month for LP-R11, today for LP-R21 (UTC). */
+/** Legacy opening state: current Jakarta month for LP-R11, Jakarta today for LP-R21. */
 export function defaultPeriod(
   kind: AwbStatusKind,
   now = new Date(),
 ): { startDate: string; endDate: string } | null {
-  const day = (date: Date) => date.toISOString().slice(0, 10);
+  const day = businessDateString;
   if (kind === "all-status") return { startDate: day(now), endDate: day(now) };
-  if (kind === "manifested")
+  if (kind === "manifested") {
+    const { year, month } = businessYearMonth(now);
     return {
-      startDate: day(
-        new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)),
-      ),
-      endDate: day(
-        new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)),
-      ),
+      startDate: `${year}-${String(month).padStart(2, "0")}-01`,
+      endDate: `${year}-${String(month).padStart(2, "0")}-${String(new Date(Date.UTC(year, month, 0)).getUTCDate()).padStart(2, "0")}`,
     };
+  }
   return null;
 }

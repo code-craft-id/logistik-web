@@ -2,6 +2,7 @@
 
 import { IdentityError } from "@/features/identity/server/access";
 import { requirePermission } from "@/lib/auth/session";
+import { businessDateString } from "@/lib/date/business-date";
 import type { Transaction } from "@/lib/db/generated/client";
 import { transactionLookupSchema } from "./schemas";
 import { lookupTransactionByAwb } from "./server/queries";
@@ -27,10 +28,7 @@ export async function lookupTransactionAction(formData: FormData) {
       id: r.id,
       awbNo: r.awbNo,
       status: r.status,
-      transactionDate:
-        r.transactionDate instanceof Date
-          ? r.transactionDate.toISOString().slice(0, 10)
-          : String(r.transactionDate).slice(0, 10),
+      transactionDate: businessDateString(new Date(r.transactionDate)),
       originBranchId: r.originBranchId,
       destinationBranchId: r.destinationBranchId,
       originBranch: r.originBranch

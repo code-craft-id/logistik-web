@@ -69,7 +69,7 @@ export const simpleReports: Record<string, ReportDef> = {
       "Satu baris per tanggal transaksi dan jenis pembayaran: jumlah AWB, koli, berat dan total biaya input AWB. Omset = jumlah biaya yang diisi saat Entry AWB (belum termasuk diskon/pajak). AWB tanpa biaya/koli/berat dihitung di kolom 'AWB data belum lengkap'.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
+        SELECT to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
                COALESCE(ct.name, 'Tidak diisi') AS pembayaran,
                count(*)::int AS awb,
                count(*) FILTER (WHERE t.koli IS NULL OR t.kilo IS NULL OR t.biaya IS NULL)::int AS tidak_lengkap,
@@ -82,7 +82,7 @@ export const simpleReports: Record<string, ReportDef> = {
         GROUP BY 1, t.cost_type_id, ct.name ORDER BY 1, 2`;
       return {
         columns: [
-          { key: "tanggal", label: "Tanggal (UTC)" },
+          { key: "tanggal", label: "Tanggal (Asia/Jakarta)" },
           { key: "pembayaran", label: "Pembayaran" },
           count("AWB", "awb"),
           count("AWB data belum lengkap", "tidak_lengkap"),
@@ -108,7 +108,7 @@ export const simpleReports: Record<string, ReportDef> = {
       "AWB yang tujuannya cabang Anda (atau cabang terpilih) menurut tanggal transaksi, dengan status tersimpan. Maksimal 2.000 baris.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT t.awb_no AS awb, to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
+        SELECT t.awb_no AS awb, to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
                ob.name AS asal, db.name AS tujuan, c.name AS customer,
                t.sender_name AS pengirim, t.receiver_name AS penerima,
                t.koli, t.kilo::text AS kilo, t.status
@@ -122,7 +122,7 @@ export const simpleReports: Record<string, ReportDef> = {
       return {
         columns: [
           { key: "awb", label: "AWB No." },
-          { key: "tanggal", label: "Tanggal (UTC)" },
+          { key: "tanggal", label: "Tanggal (Asia/Jakarta)" },
           { key: "asal", label: "Asal" },
           { key: "tujuan", label: "Tujuan" },
           { key: "customer", label: "Customer" },
@@ -231,7 +231,7 @@ export const simpleReports: Record<string, ReportDef> = {
       "Satu baris per manifest dalam periode tanggal manifest. Pendapatan = total biaya input AWB aktif di manifest; Biaya = biaya aktual bersih yang dicatat di Akunting (FIN-02) untuk AWB tersebut; GP = Pendapatan − Biaya. AWB tanpa biaya input atau tanpa biaya aktual dihitung 0 dan jumlahnya ditampilkan di kolom tersendiri.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT m.manifest_no AS manifest, to_char(m.manifest_date, 'YYYY-MM-DD') AS tanggal,
+        SELECT m.manifest_no AS manifest, to_char((m.manifest_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
                v.license_plate AS kendaraan, co.name AS kurir,
                count(mi.id)::int AS awb,
                count(mi.id) FILTER (WHERE t.biaya IS NULL)::int AS tanpa_tarif,
@@ -253,7 +253,7 @@ export const simpleReports: Record<string, ReportDef> = {
       return {
         columns: [
           { key: "manifest", label: "Manifest No." },
-          { key: "tanggal", label: "Tanggal (UTC)" },
+          { key: "tanggal", label: "Tanggal (Asia/Jakarta)" },
           { key: "kendaraan", label: "Kendaraan" },
           { key: "kurir", label: "Kurir" },
           count("AWB", "awb"),
@@ -361,7 +361,7 @@ export const simpleReports: Record<string, ReportDef> = {
       "Daftar AWB per customer menurut tanggal transaksi: layanan, moda, tujuan, koli, berat, status dan penerima. Maksimal 2.000 baris.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT t.awb_no AS awb, to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
+        SELECT t.awb_no AS awb, to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
                c.name AS customer, ds.name AS layanan, tm.name AS moda,
                db.name AS tujuan, t.receiver_name AS penerima,
                t.koli, t.kilo::text AS kilo, t.status
@@ -376,7 +376,7 @@ export const simpleReports: Record<string, ReportDef> = {
       return {
         columns: [
           { key: "awb", label: "AWB No." },
-          { key: "tanggal", label: "Tanggal (UTC)" },
+          { key: "tanggal", label: "Tanggal (Asia/Jakarta)" },
           { key: "customer", label: "Customer" },
           { key: "layanan", label: "Layanan" },
           { key: "moda", label: "Moda" },
@@ -398,9 +398,9 @@ export const simpleReports: Record<string, ReportDef> = {
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
         SELECT t.awb_no AS awb, c.name AS customer, ds.sheet_no AS drs,
-               to_char(ds.delivery_date, 'YYYY-MM-DD') AS tanggal,
+               to_char((ds.delivery_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
                i.received_by AS diterima,
-               to_char(i.delivered_at, 'YYYY-MM-DD HH24:MI') AS waktu
+               to_char((i.delivered_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD HH24:MI') AS waktu
         FROM delivery_sheet_items i
         JOIN delivery_sheets ds ON ds.id = i.delivery_sheet_id
         JOIN manifests m ON m.id = ds.manifest_id AND m.deleted_at IS NULL
@@ -415,9 +415,9 @@ export const simpleReports: Record<string, ReportDef> = {
           { key: "awb", label: "AWB No." },
           { key: "customer", label: "Customer" },
           { key: "drs", label: "DRS No." },
-          { key: "tanggal", label: "Tanggal DRS (UTC)" },
+          { key: "tanggal", label: "Tanggal DRS (Asia/Jakarta)" },
           { key: "diterima", label: "Diterima oleh" },
-          { key: "waktu", label: "Waktu terima (UTC)" },
+          { key: "waktu", label: "Waktu terima (Asia/Jakarta)" },
         ],
         ...capped(rows),
       };
@@ -430,12 +430,12 @@ export const simpleReports: Record<string, ReportDef> = {
       "AWB berstatus Cancelled atau sudah dihapus, menurut tanggal transaksi dalam periode. Hapus AWB lewat Persetujuan Edit/delete AWB; pembatalan tercatat di riwayat status.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT t.awb_no AS awb, to_char(t.transaction_date, 'YYYY-MM-DD') AS tanggal,
+        SELECT t.awb_no AS awb, to_char((t.transaction_date AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS tanggal,
                t.do_no AS do_no, db.name AS tujuan, t.sender_name AS pengirim,
                t.receiver_name AS penerima, t.koli, t.kilo::text AS kilo,
                t.biaya::text AS biaya,
                CASE WHEN t.deleted_at IS NOT NULL THEN 'Dihapus' ELSE t.status END AS keterangan,
-               to_char(COALESCE(t.deleted_at, h.changed_at), 'YYYY-MM-DD HH24:MI') AS waktu,
+               to_char((COALESCE(t.deleted_at, h.changed_at) AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD HH24:MI') AS waktu,
                COALESCE(CASE WHEN t.deleted_at IS NOT NULL THEN da.name END, u.name) AS oleh,
                d.reason AS alasan
         FROM transactions t
@@ -457,7 +457,7 @@ export const simpleReports: Record<string, ReportDef> = {
       return {
         columns: [
           { key: "awb", label: "AWB No." },
-          { key: "tanggal", label: "Tanggal (UTC)" },
+          { key: "tanggal", label: "Tanggal (Asia/Jakarta)" },
           { key: "do_no", label: "DO No." },
           { key: "tujuan", label: "Tujuan" },
           { key: "pengirim", label: "Pengirim" },
@@ -468,7 +468,7 @@ export const simpleReports: Record<string, ReportDef> = {
           { key: "keterangan", label: "Keterangan" },
           { key: "oleh", label: "Dibatalkan/disetujui oleh" },
           { key: "alasan", label: "Alasan hapus" },
-          { key: "waktu", label: "Waktu (UTC)" },
+          { key: "waktu", label: "Waktu (Asia/Jakarta)" },
         ],
         ...capped(rows),
       };
@@ -481,7 +481,7 @@ export const simpleReports: Record<string, ReportDef> = {
       "Riwayat perubahan AWB menurut waktu perubahan dalam periode: perubahan status (dari, ke, alasan, oleh) dan edit data yang disetujui lewat Persetujuan Edit/delete AWB (nilai sebelum dan sesudah).",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT awb, to_char(at, 'YYYY-MM-DD HH24:MI') AS waktu, jenis, dari, ke, alasan, oleh
+        SELECT awb, to_char((at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD HH24:MI') AS waktu, jenis, dari, ke, alasan, oleh
         FROM (
           SELECT t.awb_no AS awb, h.changed_at AS at, 'Status' AS jenis,
                  COALESCE(h.prior_status, '-') AS dari, h.new_status AS ke,
@@ -507,7 +507,7 @@ export const simpleReports: Record<string, ReportDef> = {
       return {
         columns: [
           { key: "awb", label: "AWB No." },
-          { key: "waktu", label: "Waktu (UTC)" },
+          { key: "waktu", label: "Waktu (Asia/Jakarta)" },
           { key: "jenis", label: "Jenis" },
           { key: "dari", label: "Sebelum" },
           { key: "ke", label: "Sesudah" },

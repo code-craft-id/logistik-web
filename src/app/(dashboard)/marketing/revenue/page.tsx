@@ -18,6 +18,7 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { customerRevenue } from "@/features/sales/server/revenue";
+import { businessDateString } from "@/lib/date/business-date";
 import { formatRupiah } from "@/lib/format/rupiah";
 
 export const metadata: Metadata = { title: "Pendapatan Pelanggan" };
@@ -44,7 +45,7 @@ export default async function Page({
   const query = await searchParams;
   const one = (v: string | string[] | undefined) =>
     typeof v === "string" ? v : "";
-  const thisMonth = new Date().toISOString().slice(0, 7);
+  const thisMonth = businessDateString().slice(0, 7);
   const requested = one(query.month);
   const month = /^\d{4}-(0[1-9]|1[0-2])$/.test(requested)
     ? requested
@@ -60,7 +61,7 @@ export default async function Page({
           </h1>
           <InfoTip
             text={
-              "Pendapatan = total biaya AWB customer pada bulan terpilih (UTC). Growth dibandingkan dengan bulan sebelumnya."
+              "Pendapatan = total biaya AWB customer pada bulan terpilih berdasarkan waktu Asia/Jakarta. Growth dibandingkan dengan bulan sebelumnya."
             }
           />
         </div>

@@ -4,6 +4,11 @@ import {
   type AccessActor,
   isAdministrator,
 } from "@/features/identity/permissions";
+import {
+  businessDateAfterUtc,
+  businessDateStartUtc,
+  businessDateString,
+} from "@/lib/date/business-date";
 import { Prisma } from "@/lib/db/generated/client";
 
 /** Simple report: one aggregated or bounded SQL query, scoped by branch. */
@@ -52,7 +57,7 @@ export type ParsedFilters =
       branchId: string;
     };
 
-/** Defaults to the current UTC month to date, like the legacy reports. */
+/** Defaults to the current Jakarta month to date. */
 export function parseFilters(
   query: Record<string, string | string[] | undefined>,
   allowedBranches: number[],
@@ -60,7 +65,7 @@ export function parseFilters(
 ): ParsedFilters {
   const one = (v: string | string[] | undefined) =>
     typeof v === "string" ? v.trim() : "";
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessDateString();
   const start = one(query.startDate) || `${today.slice(0, 8)}01`;
   const end = one(query.endDate) || today;
   const branch = one(query.branchId);
@@ -73,10 +78,16 @@ export function parseFilters(
   });
   const date = /^\d{4}-\d{2}-\d{2}$/;
   if (!date.test(start) || !date.test(end)) return bad("Tanggal tidak valid.");
-  const from = new Date(`${start}T00:00:00.000Z`);
-  const last = new Date(`${end}T00:00:00.000Z`);
-  if (Number.isNaN(from.getTime()) || Number.isNaN(last.getTime()))
+  let from: Date;
+  let last: Date;
+  let toExclusive: Date;
+  try {
+    from = businessDateStartUtc(start);
+    last = businessDateStartUtc(end);
+    toExclusive = businessDateAfterUtc(end);
+  } catch {
     return bad("Tanggal tidak valid.");
+  }
   if (last < from) return bad("Tanggal akhir sebelum tanggal mulai.");
   if ((last.getTime() - from.getTime()) / DAY + 1 > MAX_DAYS)
     return bad(`Periode maksimal ${MAX_DAYS} hari.`);
@@ -94,7 +105,7 @@ export function parseFilters(
       start,
       end,
       from,
-      toExclusive: new Date(last.getTime() + DAY),
+      toExclusive,
       branchId,
     },
   };

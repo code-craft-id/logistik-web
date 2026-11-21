@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import { OperationalSubmitButton } from "../../operational/components/submit-button";
 import {
   type TransactionReportFilters,
@@ -77,6 +78,8 @@ function cell(value: string | number | null): ReactNode {
       <span aria-hidden="true">—</span>
       <span className="sr-only">Tidak tersedia</span>
     </span>
+  ) : typeof value === "string" && /^\d{4}-\d{2}-\d{2}T.*Z$/.test(value) ? (
+    businessDateTimeString(value)
   ) : (
     value
   );
@@ -146,7 +149,7 @@ export function AwbStatusReportView({
     ? ""
     : result.allDates
       ? "Semua tanggal"
-      : `Periode ${f.startDate} sampai ${f.endDate}, UTC`;
+      : `Periode ${f.startDate} sampai ${f.endDate}, Asia/Jakarta`;
   const route = awbStatusRoutes[kind];
   const table = awbStatusTable(result);
   return (
@@ -184,13 +187,13 @@ export function AwbStatusReportView({
           )}
           <p id="awb-period-hint" className="text-sm text-muted-foreground">
             {kind === "manifested" ? "Tanggal manifest" : "Tanggal transaksi"}{" "}
-            dalam UTC, maksimal 31 hari termasuk kedua tanggal.
+            dalam Asia/Jakarta, maksimal 31 hari termasuk kedua tanggal.
             {kind === "pending" &&
               " Kosongkan kedua tanggal untuk menampilkan semua AWB tertunda."}
           </p>
           <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-2">
-              <Label htmlFor="awb-start">Tanggal mulai (UTC)</Label>
+              <Label htmlFor="awb-start">Tanggal mulai (Asia/Jakarta)</Label>
               <Input
                 id="awb-start"
                 type="date"
@@ -202,7 +205,7 @@ export function AwbStatusReportView({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="awb-end">Tanggal akhir (UTC)</Label>
+              <Label htmlFor="awb-end">Tanggal akhir (Asia/Jakarta)</Label>
               <Input
                 id="awb-end"
                 type="date"
@@ -311,7 +314,7 @@ export function AwbStatusReportView({
       {result.state === "initial" && (
         <EmptyState
           title="Pilih periode laporan"
-          description="Pilih rentang tanggal UTC lalu tampilkan laporan."
+          description="Pilih rentang tanggal Asia/Jakarta lalu tampilkan laporan."
         />
       )}
       {result.state === "ready" && f && (
@@ -355,8 +358,8 @@ export function AwbStatusReportView({
           {result.items.length ? (
             <Table className="min-w-5xl [&_td]:align-top">
               <caption className="sr-only">
-                {titles[kind]}. Seluruh waktu menggunakan UTC. Gulir untuk
-                membaca semua kolom.
+                {titles[kind]}. Seluruh waktu menggunakan Asia/Jakarta. Gulir
+                untuk membaca semua kolom.
               </caption>
               <TableHeader>
                 <TableRow>

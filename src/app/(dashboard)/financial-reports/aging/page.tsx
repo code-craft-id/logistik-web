@@ -19,6 +19,7 @@ import {
   agingReport,
 } from "@/features/reports/aging/server/aging";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessYearMonth } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { formatRupiah } from "@/lib/format/rupiah";
 
@@ -56,8 +57,9 @@ export default async function Page({
   if (!current) redirect("/login");
   const params = await searchParams;
   const now = new Date();
-  const month = Number(one(params.month)) || now.getUTCMonth() + 1;
-  const year = Number(one(params.year)) || now.getUTCFullYear();
+  const businessNow = businessYearMonth(now);
+  const month = Number(one(params.month)) || businessNow.month;
+  const year = Number(one(params.year)) || businessNow.year;
   const customerId = one(params.customerId);
   const show = one(params.show) === "1";
   const admin = isAdministrator(current.actor);
@@ -118,7 +120,7 @@ export default async function Page({
             defaultValue={year}
             className={field}
           >
-            {Array.from({ length: 7 }, (_, i) => now.getUTCFullYear() - i).map(
+            {Array.from({ length: 7 }, (_, i) => businessNow.year - i).map(
               (y) => (
                 <option key={y} value={y}>
                   {y}

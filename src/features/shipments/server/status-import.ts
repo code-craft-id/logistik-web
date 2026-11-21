@@ -47,7 +47,7 @@ export type ImportRow = {
 
 function cellDate(v: unknown): string | null {
   if (v instanceof Date && !Number.isNaN(v.getTime()))
-    return `${v.getFullYear()}-${String(v.getMonth() + 1).padStart(2, "0")}-${String(v.getDate()).padStart(2, "0")}`;
+    return businessDateString(v);
   const s = String(v ?? "").trim();
   const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
   const dmy = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/.exec(s);

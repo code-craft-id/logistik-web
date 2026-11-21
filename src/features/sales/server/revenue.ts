@@ -5,6 +5,7 @@ import {
   isAdministrator,
 } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
+import { jakartaMonthStartUtc } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
 
@@ -19,7 +20,7 @@ export type RevenueRow = {
 
 /**
  * Legacy "Pendapatan Pelanggan": every visible customer with the sum of AWB
- * biaya in the selected month (UTC), compared with the previous month.
+ * biaya in the selected month (Asia/Jakarta), compared with the previous month.
  */
 export async function customerRevenue(
   actor: AccessActor,
@@ -27,11 +28,10 @@ export async function customerRevenue(
   search = "",
 ): Promise<RevenueRow[]> {
   assertPermission(actor, "view", "customer");
-  const start = new Date(`${month}-01T00:00:00.000Z`);
-  const next = new Date(start);
-  next.setUTCMonth(next.getUTCMonth() + 1);
-  const previous = new Date(start);
-  previous.setUTCMonth(previous.getUTCMonth() - 1);
+  const [year, monthNumber] = month.split("-").map(Number);
+  const start = jakartaMonthStartUtc(year, monthNumber);
+  const next = jakartaMonthStartUtc(year, monthNumber + 1);
+  const previous = jakartaMonthStartUtc(year, monthNumber - 1);
   const admin = isAdministrator(actor);
   const scope = admin
     ? Prisma.sql`TRUE`

@@ -338,6 +338,7 @@ export function ProfilePageClient() {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
+                            timeZone: "Asia/Jakarta",
                           },
                         )}
                       </p>
@@ -503,10 +504,14 @@ export function ProfilePageClient() {
                           {session.ipAddress || "Unknown"}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {new Date(session.createdAt).toLocaleString("id-ID")}
+                          {new Date(session.createdAt).toLocaleString("id-ID", {
+                            timeZone: "Asia/Jakarta",
+                          })}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {new Date(session.expiresAt).toLocaleString("id-ID")}
+                          {new Date(session.expiresAt).toLocaleString("id-ID", {
+                            timeZone: "Asia/Jakarta",
+                          })}
                         </TableCell>
                         <TableCell>
                           <Button

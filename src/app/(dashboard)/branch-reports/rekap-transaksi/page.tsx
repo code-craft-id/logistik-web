@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { isAdministrator, permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { requirePagePermission } from "@/lib/auth/page-access";
+import { businessYearMonth } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Rekap Transaksi" };
@@ -44,7 +45,8 @@ export default async function Page() {
   });
   const canExport = permits(current.actor, "export", "transaction_report");
   const now = new Date();
-  const year = now.getUTCFullYear();
+  const businessNow = businessYearMonth(now);
+  const year = businessNow.year;
   const own = current.actor.branchIds.find((id) =>
     branches.some((b) => b.id === id),
   );
@@ -68,7 +70,7 @@ export default async function Page() {
           <select
             id="recap-month"
             name="month"
-            defaultValue={now.getUTCMonth() + 1}
+            defaultValue={businessNow.month}
             className={field}
           >
             {MONTHS.map((m, i) => (

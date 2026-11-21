@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { businessDateTimeString } from "@/lib/date/business-date";
 import type { TransactionReportFilters } from "../../transaction-details/filters";
 import type { DashboardInsights } from "../contracts";
 import { DashboardDailyChart } from "./dashboard-daily-chart";
@@ -70,7 +71,7 @@ export function DashboardInsightsView({
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
           Transaksi dalam periode tanpa penugasan manifest aktif · tanggal
-          transaksi, UTC
+          transaksi, Asia/Jakarta
         </p>
         {canOpenAwbReport && (
           <Link
@@ -186,7 +187,7 @@ export function DashboardInsightsView({
                 <p className="text-muted-foreground">
                   Oleh: {row.createdBy ?? "tidak tercatat"} ·{" "}
                   <time dateTime={row.createdAt}>
-                    {row.createdAt.slice(0, 16).replace("T", " ")} UTC
+                    {businessDateTimeString(row.createdAt)} Asia/Jakarta
                   </time>
                 </p>
               </li>

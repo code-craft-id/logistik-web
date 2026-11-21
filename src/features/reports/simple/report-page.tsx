@@ -91,7 +91,7 @@ export async function SimpleReportPage({
         {usesPeriod && (
           <>
             <div className="min-w-0 space-y-2">
-              <Label htmlFor="sr-start">Tanggal mulai (UTC)</Label>
+              <Label htmlFor="sr-start">Tanggal mulai (Asia/Jakarta)</Label>
               <Input
                 id="sr-start"
                 name="startDate"
@@ -101,7 +101,7 @@ export async function SimpleReportPage({
               />
             </div>
             <div className="min-w-0 space-y-2">
-              <Label htmlFor="sr-end">Tanggal akhir (UTC)</Label>
+              <Label htmlFor="sr-end">Tanggal akhir (Asia/Jakarta)</Label>
               <Input
                 id="sr-end"
                 name="endDate"
@@ -147,7 +147,7 @@ export async function SimpleReportPage({
         >
           <p className="border-b p-4 text-sm text-muted-foreground">
             {usesPeriod
-              ? `Periode ${parsed.filters.start} sampai ${parsed.filters.end} (UTC)`
+              ? `Periode ${parsed.filters.start} sampai ${parsed.filters.end} (Asia/Jakarta)`
               : "Posisi per hari ini"}
             {result ? ` · ${result.rows.length} baris` : ""}
           </p>

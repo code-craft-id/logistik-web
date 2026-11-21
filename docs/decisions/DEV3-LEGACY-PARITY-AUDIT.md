@@ -1,5 +1,7 @@
 # Dev3 legacy migration parity audit
 
+**Timezone supersession (2026-11-21):** UTC display/range statements below describe the audited 2026-11-16 baseline and historical acceptance. The project owner has since confirmed Asia/Jakarta system-wide under D-19; current contracts/code govern the active behavior.
+
 ## 1. Audit metadata and baseline
 
 2026-11-16, Asia/Bangkok. Branch `codex/dev3-ready-for-review`, HEAD `b8829d74c6a714cac74af5e672a9b8cf3ac46ef8`. Preflight found only untracked `DEV3-LEGACY-NAVIGATION-INVENTORY.md`; preserved unchanged. This audit changes documentation only. Single agent; no implementation, mutation, test-suite rerun, merge or deployment.
@@ -111,7 +113,7 @@ M sources for this batch: `src/app/(dashboard)/branch-reports/**/page.tsx`, `/co
 
 **Preview rule:** PreviewScreenPage explicitly states all rows/selections synthetic, no operational load/save. PreviewWorkspace search/sort/paging are local synthetic interactions; export tools disabled. Shared grouping does not consolidate business queries or prove equivalence. All preview data/business/exports are NOT_MIGRATED, with unknown legacy semantics separately UNVERIFIED. Pinned source and I, not the mere existence of a route, determine this conclusion.
 
-**Operational rule:** R1/R2 use fresh independent report grants, bounded inputs and RepeatableRead reads. Ordinary Transaction rows scope to current allowed origin OR destination; manifest/DRS ownership differs. UTC/max31 days is adopted policy, not inferred legacy timezone. Runtime and same-source reconciliation remain UNVERIFIED this pass. Global D-15/D-19/D-22 are not settled by bounded acceptance.
+**Operational rule:** R1/R2 use fresh independent report grants, bounded inputs and RepeatableRead reads. Ordinary Transaction rows scope to current allowed origin OR destination; manifest/DRS ownership differs. At the audit baseline, UTC/max31 days was adopted policy, not inferred legacy timezone. D-19 timezone is now confirmed system-wide as Asia/Jakarta; D-15/D-22 metric/source rules and runtime reconciliation remain separate.
 
 #### Laporan-laporan > Laporan Cabang
 

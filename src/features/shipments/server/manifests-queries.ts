@@ -5,6 +5,7 @@ import {
   isAdministrator,
   permitsBranch,
 } from "@/features/identity/permissions";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
 import { firstTransitScans } from "./manifest-scan";
@@ -168,7 +169,7 @@ export async function listManifests(
       return {
         id: row.id,
         manifestNo: row.manifestNo,
-        date: row.manifestDate.toISOString().slice(0, 10),
+        date: businessDateString(row.manifestDate),
         type: row.type,
         status: row.status,
         branch: row.branch?.name ?? null,
@@ -185,7 +186,7 @@ export async function listManifests(
         vendor: row.vendor?.name ?? null,
         /** First transit koli scan (provider User Transit / Transit Date). */
         transitUser: transitScans.get(row.id)?.user ?? null,
-        transitDate: firstTransit?.at.toISOString().slice(0, 10) ?? null,
+        transitDate: firstTransit ? businessDateString(firstTransit.at) : null,
         /** Transit1..Transit5 as on the provider's Cek Transit list. */
         transits: [
           row.transit1,
@@ -272,7 +273,7 @@ export async function getManifest(actor: AccessActor, id: number) {
   return {
     id: row.id,
     manifestNo: row.manifestNo,
-    date: row.manifestDate.toISOString().slice(0, 10),
+    date: businessDateString(row.manifestDate),
     type: row.type,
     status: row.status,
     branch: row.branch?.name ?? null,
@@ -287,7 +288,7 @@ export async function getManifest(actor: AccessActor, id: number) {
       ? {
           id: row.deliverySheet.id,
           sheetNo: row.deliverySheet.sheetNo,
-          date: row.deliverySheet.deliveryDate.toISOString().slice(0, 10),
+          date: businessDateString(row.deliverySheet.deliveryDate),
         }
       : null,
     createdBy: row.createdBy?.name ?? null,

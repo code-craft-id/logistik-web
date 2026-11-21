@@ -6,6 +6,21 @@ Original discovery entries followed by the finance mission log; both histories p
 
 This is an empty **template**. The kit did not start Codex, execute tests, observe the live provider, or mutate the repository. Only the lead appends factual events.
 
+## 2026-11-21 01:52 UTC — Audit tooling removal request
+
+- Searched the tracked repository, `/home/ardiputra/.agents`, `/home/ardiputra/.codex`, and `/tmp` for `security-audit-skill` files and audit run artifacts. None were present; no files were deleted.
+- Historical audit references remain in prior run-log entries. Current STATE/HANDOFF now record that the temporary artifacts are unavailable and the audit tooling is not present in the searched locations.
+- No application code, tests, merge, or deployment actions.
+
+## 2026-11-20 14:35 UTC — Cloudflare security audit progress
+
+- Branch `dev3/ready-for-review`; application source HEAD `2866b05e1fe02aa0cd56b605d4c7273c6abd4dab`. User asked for full audit before REL-01 and specifically requested Cloudflare `security-audit-skill`.
+- Read-only source reviews returned for authentication/identity, bookings/shipments, browser localStorage/help UI, personnel and shipment status imports, delivery proof uploads, WhatsApp/Cloudinary integrations, reports/exports, finance mutations, migration wrappers and supply-chain/release source. No application code modified.
+- `status-import-spreadsheet-expansion-before-row-limit` independently reviewed and retained as `needs_validation`: source shows XLSX parse and full sheet conversion precede the row cap; exploit impact, request ingress limits and runtime resource use are unknown. No severity assigned and no exploit was run.
+- Audit execution restriction: target project code/tests/build were not run in this audit because the required network isolation and resource/disk limits were not verified. User-provided successful build output is recorded separately; exact source SHA was not provided.
+- Audit artifacts currently consist of `run-metadata.json`, `architecture.md`, and `coverage-ledger.json` in `/tmp/security-audit-skill/logistik-web/run-1/`. Ledger has 14 units, all still `in_progress`; no final report/validated findings artifact exists. Full audit is incomplete, no vulnerability confirmed.
+- REL-01 remains NOT READY due audit incompleteness and existing staging/UAT, backup-restore, D-17, migration-coordinator and formal review gates. No merge/deploy. Next: reconcile evidence, complete cross-cutting source checks and audit validators, then publish final report with any unavailable runtime checks explicit.
+
 ## Event format
 
 ### YYYY-MM-DD HH:mm TZ | EVENT TYPE | TICKET | BRANCH@SHA
@@ -764,3 +779,30 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - `npm audit --omit=dev` (attempt 1: sandbox DNS blocked; escalated network attempt completed) exited 1 and reported 3 high advisories for `effect@3.20.0`, pinned by Prisma 7.10.1 / `@prisma/config`. `npm explain effect` confirms dependency path. GitHub advisory GHSA-7589-6fvf-x4pw says patched at 3.22.1. `rg` found no application source imports of `effect` or `@prisma/config`; production reachability/input path is unverified, so not a confirmed app finding. No dependency fix applied.
 - Static repo scan found no tracked `.github/workflows`, Docker/compose, or provider deployment config matching checked filenames. Therefore TLS, runtime image dependency inclusion, monitoring, backup/restore, CI secrets/signing and promotion controls need owner/staging validation, not inferred absence or presence.
 - REL-01 remains NOT READY: D-17 launch scope/date TBD; staging/UAT and backup/restore evidence absent; migration coordinator and finance/staging acceptance pending. PR remains draft. Next: obtain formal Dev2 and migration-coordinator review records; plan isolated staging/UAT and restore drill; establish deployment target/runtime package contents; resolve D-17.
+
+## 2026-11-21 02:12 UTC — Whole-project LMS readiness review
+- Branch `dev3/ready-for-review`, HEAD `2866b05e1fe02aa0cd56b605d4c7273c6abd4dab`; application source unchanged. Only checkpoint files were edited.
+- `npm run lint` PASS (558 files); `npm run typecheck` PASS; unit project PASS (59 files/525 tests); UI project PASS (22 files/198 tests; React `act(...)` warnings in AWB lookup); `npm run test:integration` PASS (21 files/192 tests) after sandbox EPERM on loopback PostgreSQL, rerun with approved escalation; database target confirmed as `logistik_web_test`.
+- `npx next build --webpack` PASS, compiled in 3.0 min, typecheck and 109 static pages completed. Initial Turbopack `npm run build` was interrupted after prolonged no output. No staging/browser responsive/provider comparison performed.
+- Review status: substantial LMS functionality is present, but REL-01 is NOT READY. D-06/07/08/09, D-17, D-20 and wider D-18 remain open; no tracked `.github` CI workflow found. `docs/agent-state/dev3/REPORT_CATALOGUE.md:181` has malformed concatenated RPT-03/04 documentation.
+- No application code, schema or migration changed; no merge/deploy.
+
+## 2026-11-21 02:38 UTC — Scoped readiness fixes
+- Branch `dev3/ready-for-review`, HEAD `2866b05e1fe02aa0cd56b605d4c7273c6abd4dab`. Corrected the RPT-02/03/04 catalogue entry formatting and added a GitHub Actions CI workflow using Node `.nvmrc`, PostgreSQL 18.3, guarded test migrations, lint/typecheck/unit-UI/integration/build. Updated FND-02 as PARTIAL; remote run and staging remain pending.
+- Fixed AWB lookup test helpers so DOM input/select events run inside React `act(...)`. Targeted test: 1 file/3 tests PASS without warning. Full `npx vitest run --reporter=dot`: 81 files/723 tests PASS. `npm run lint`: 558 files PASS. `npm run typecheck` PASS. CI YAML parsed and required DB/test steps asserted.
+- Prior same-source gates: guarded `npm run test:integration` rerun 21 files/192 tests PASS; `npx next build --webpack` PASS (109 generated static pages). No schema or application business logic changed.
+- Chrome review requested by user attempted. Local server started after loopback escalation, but CUA inventory had no browsers/apps and `iab` was unavailable. Stopped server; no UI viewport review performed.
+- No provider observation, merge, push, or deployment. Release still NOT READY due unresolved D-06/07/08/09, D-17, D-20, wider D-18, owner reviews, staging/UAT and provider parity.
+
+## 2026-11-21 02:55 UTC — AWB Jakarta YYMM approval and implementation
+- Owner approved using Jakarta time for AWB YYMM and Dev2 agreed. Updated `src/features/bookings/server/service.ts` to derive the AWB year/month in `Asia/Jakarta`; booking numbering continues to use UTC. Updated PRD D-06 (PARTIAL) and D-19 approved timezone subset; recorded decision in `DECISIONS.md`. Other AWB formatting, sequence, manual-numbering and uniqueness rules remain TBD.
+- Added `tests/unit/awb-numbering.test.ts`; UTC/Jakarta month-boundary checks PASS (2 tests).
+- Validation at uncommitted worktree on branch `dev3/ready-for-review`, HEAD `2866b05e1fe02aa0cd56b605d4c7273c6abd4dab`: `npm run check` PASS (lint 559 files, typecheck, 82 files/725 tests); `npm run test:integration -- tests/integration/transaction-capture.test.ts` PASS (1 file/7 tests); `npx next build --webpack` PASS (109 pages).
+- Chrome tab inventory confirms Dashboard at localhost:3000, but DOM and screenshot observation APIs failed before returning page content. Manual visual review remains UNVERIFIED. No browser-side writes, merge, push or deployment.
+
+## 2026-11-21 03:53 UTC — System-wide Jakarta timezone policy and implementation
+- Project owner directed all system dates/times to use Asia/Jakarta. This supersedes earlier UTC behavior for AWB-only numbering and bounded UTC report exceptions. D-19 is now CONFIRMED globally: business date defaults, periods/cutoffs, identifiers and user-facing displays use Asia/Jakarta; timestamp persistence/transport remains UTC and date-only values retain calendar dates. D-06 remains PARTIAL for remaining AWB numbering rules; booking numbering now also uses Jakarta.
+- Implemented shared date helpers and applied Jakarta semantics to AWB/booking numbers, report period bounds/labels and timestamp formatting, daily/monthly report grouping, revenue periods, inbound/AWB-change date filters, spreadsheet status date parsing, and date/time display across tickets, shipment, finance, profile, booking/manifest forms and print views. SQL date formatting explicitly interprets PostgreSQL `TIMESTAMP(3)` values as UTC before rendering in Asia/Jakarta.
+- Updated PRD, RPT-01/RPT-02/SUP-01 contracts and Dev3 state/backlog/decision/handoff docs to record the policy and supersede prior UTC scope.
+- Validation on uncommitted worktree, branch `dev3/ready-for-review`, HEAD `2866b05e1fe02aa0cd56b605d4c7273c6abd4dab`: `npm run lint` PASS (560 files), `npm run typecheck` PASS, `npx vitest run --reporter=dot --maxWorkers=2` PASS (83 files/728 tests), targeted report integration PASS (3 files/26 tests) and simple-report integration PASS (1 file/5 tests); `npx next build --webpack` PASS (109 pages, compile 108s). `git diff --check` PASS.
+- Chrome shows the user's Dashboard tab at localhost:3000; DOM/screenshot calls fail before page observation. Visual review remains UNVERIFIED. No schema/migration, merge, push or deployment.

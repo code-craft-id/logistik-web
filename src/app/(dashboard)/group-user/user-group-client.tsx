@@ -291,7 +291,9 @@ export function UserGroupPageClient({
                     <TableCell>{group._count.users}</TableCell>
                     <TableCell>{group._count.permissions}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(group.createdAt).toLocaleDateString("id-ID")}
+                      {new Date(group.createdAt).toLocaleDateString("id-ID", {
+                        timeZone: "Asia/Jakarta",
+                      })}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

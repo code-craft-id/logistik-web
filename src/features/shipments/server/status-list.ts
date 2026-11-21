@@ -3,6 +3,7 @@ import "server-only";
 import type { AccessActor } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
 import { transactionScope } from "@/features/modul/server/common";
+import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/lib/db/generated/client";
 import { slaLabel, slaTargetDays } from "../sla";
@@ -31,8 +32,7 @@ export type ShipmentStatusRow = {
   sla: string;
 };
 
-const day = (d: Date) =>
-  Date.parse(`${d.toISOString().slice(0, 10)}T00:00:00Z`);
+const day = (d: Date) => Date.parse(`${businessDateString(d)}T00:00:00Z`);
 
 /**
  * Kelola Status Pengiriman (provider "Status Pengantaran" / Quick Action
@@ -159,7 +159,7 @@ export async function listShipmentStatus(
       return {
         id: t.id,
         awbNo: t.awbNo ?? `#${t.id}`,
-        date: t.transactionDate.toISOString().slice(0, 10),
+        date: businessDateString(t.transactionDate),
         origin: t.originBranch?.name ?? null,
         destination: t.destinationBranch?.name ?? null,
         sender: t.senderName,

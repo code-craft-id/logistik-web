@@ -176,12 +176,12 @@ beforeAll(async () => {
   });
   beforeId = await record({
     awbNo: `${tag}-before`,
-    transactionDate: new Date("2026-10-31T23:59:59.999Z"),
+    transactionDate: new Date("2026-10-31T16:59:59.999Z"),
     originBranchId: branches[0],
   });
   cutoffId = await record({
     awbNo: `${tag}-cutoff`,
-    transactionDate: new Date("2026-11-16T00:00:00Z"),
+    transactionDate: new Date("2026-11-15T17:00:00Z"),
     originBranchId: branches[0],
   });
 });
@@ -195,7 +195,7 @@ afterAll(async () => {
   await db.$disconnect();
 });
 describe("RPT-01A guarded real PostgreSQL report", () => {
-  it("reconciles exact scoped source IDs, UTC boundaries, all statuses, duplicate AWBs and Decimal/null values", async () => {
+  it("reconciles exact scoped source IDs, Jakarta boundaries, all statuses, duplicate AWBs and Decimal/null values", async () => {
     const result = await service(users[1]).read(period);
     expect(result.total).toBe(visibleIds.length);
     expect(new Set(result.items.map((row) => row.id))).toEqual(
@@ -603,9 +603,9 @@ it("reconciles scoped sorted source rows to CSV, ignores paging, makes no writes
     });
     const csv = await service(users[1]).export(query);
     expect(csv).toBe(
-      '"AWB No.","tanggal (UTC)","Asal","Tujuan","Pengirim","Penerima Barang","Koli","Kilo","Status Pengiriman"\r\n' +
-        `"${tag}-export-B","2026-11-04T00:00:00.000Z","FAKE report branch 0","FAKE report branch 1","FAKE","","2","2.5","Open"\r\n` +
-        `"${tag}-export-A","2026-11-04T00:00:00.000Z","FAKE report branch 0","FAKE report branch 1","'=1+1","FAKE, ""受信""","10","10.25","Cancelled"\r\n`,
+      '"AWB No.","tanggal (Asia/Jakarta)","Asal","Tujuan","Pengirim","Penerima Barang","Koli","Kilo","Status Pengiriman"\r\n' +
+        `"${tag}-export-B","2026-11-04 07:00","FAKE report branch 0","FAKE report branch 1","FAKE","","2","2.5","Open"\r\n` +
+        `"${tag}-export-A","2026-11-04 07:00","FAKE report branch 0","FAKE report branch 1","'=1+1","FAKE, ""受信""","10","10.25","Cancelled"\r\n`,
     );
     expect(await service(users[1]).export(query)).toBe(csv);
     expect(
