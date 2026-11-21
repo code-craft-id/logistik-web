@@ -4,46 +4,14 @@ import type { TransactionReportFilters } from "../../transaction-details/filters
 import type { DashboardInsights } from "../contracts";
 import { DashboardDailyChart } from "./dashboard-daily-chart";
 
+export { DashboardQuickActions } from "./dashboard-quick-actions";
+
 const panel = "min-w-0 rounded-lg border bg-background p-4 sm:p-6";
 const link =
   "inline-flex min-h-11 items-center text-sm text-primary underline underline-offset-4";
 
 function period(f: TransactionReportFilters) {
   return new URLSearchParams({ startDate: f.startDate, endDate: f.endDate });
-}
-
-/** Legacy Quick Action row: implemented, permitted routes only. */
-export function DashboardQuickActions({
-  actions,
-}: {
-  actions: DashboardInsights["actions"];
-}) {
-  return (
-    <section aria-labelledby="dash-actions" className={panel}>
-      <h2 id="dash-actions" className="font-semibold">
-        Quick Action
-      </h2>
-      {actions.length ? (
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {actions.map((action) => (
-            <li key={action.href}>
-              <Link
-                prefetch={false}
-                href={action.href}
-                className="flex min-h-11 items-center rounded-md border px-3 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {action.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-2 text-sm text-muted-foreground">
-          Belum ada menu yang dapat Anda buka dari sini.
-        </p>
-      )}
-    </section>
-  );
 }
 
 /** Legacy dashboard widgets backed by approved sources only (D-12, D-22). */
@@ -141,10 +109,28 @@ export function DashboardInsightsView({
           <ul className="mt-3 space-y-3">
             {insights.statuses.map((row) => {
               const share = total ? (row.count / total) * 100 : 0;
+              const statusQuery = new URLSearchParams(pendingQuery);
+              statusQuery.set("status", row.status);
               return (
                 <li key={row.status} className="space-y-1">
                   <div className="flex justify-between gap-3 text-sm">
-                    <span className="min-w-0">{row.status}</span>
+                    <span className="min-w-0">
+                      {canOpenAwbReport && row.status.trim() ? (
+                        <Link
+                          prefetch={false}
+                          href={`/customer-reports/all-status?${statusQuery}`}
+                          className="underline underline-offset-4 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {row.status}
+                          <span className="sr-only">
+                            {" "}
+                            — lihat AWB dengan status ini
+                          </span>
+                        </Link>
+                      ) : (
+                        row.status || "(status kosong)"
+                      )}
+                    </span>
                     <span className="tabular-nums">
                       {row.count} ({share.toFixed(2)}%)
                     </span>

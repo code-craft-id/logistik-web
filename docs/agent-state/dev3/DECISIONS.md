@@ -57,3 +57,22 @@ Recorded from chat; business owner approval, not Dev 2 / finance review.
 - 2026-11-21: Project owner superseded the prior bounded timezone exceptions and approved Asia/Jakarta system-wide for business-date defaults, date periods/cutoffs, generated identifiers, and user-facing date/time rendering across modules and reports. UTC remains the timestamp persistence/transport representation; date-only values retain their calendar date. Booking numbering now follows Jakarta as well. D-19 is CONFIRMED globally; D-06 remains PARTIAL for non-timezone AWB numbering details.
 Open items: BACKLOG.md.
 
+## 2026-11-21 — Dashboard enhancement gates (DASH-01)
+
+The project owner requested a dashboard comparison-driven enhancement. DASH-01
+is limited to personal Quick Action selection among server-authorized links,
+Asia/Jakarta month/year navigation, and exact links from raw status counts to
+the existing scoped all-status AWB report. These are UI/navigation changes and
+do not change metric meaning.
+
+The owner selected “KPI tunggu definisi” when asked whether to derive new
+financial/outcome metrics now. This explicitly leaves metric implementation
+deferred until the required business definitions are supplied.
+
+Revenue amount/payment breakdown/top-customer revenue and average value remain
+blocked by D-11/D-15: Transaction has `biaya` but no modeled payment category,
+and `biaya` is not approved as omzet. Shipment Success/Failed/Return/POD
+outstanding remain blocked by D-07/D-09/D-15: no complete canonical grouping
+or POD outstanding formula is approved. Existing statuses/pending metrics stay
+as-is. No new business decision is inferred from the user's feature list.
+

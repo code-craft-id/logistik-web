@@ -57,7 +57,12 @@ export function parseOperationalFilters(
     query.startDate = `${today.slice(0, 8)}01`;
     query.endDate = today;
   }
-  const parsed = parseTransactionReportFilters(query);
+  // Dashboard supports a bounded year view; operational reports retain the
+  // normal 31-day cap. Yearly dashboard charts aggregate daily counts monthly.
+  const parsed = parseTransactionReportFilters(
+    query,
+    kind === "dashboard" ? 366 : 31,
+  );
   if (parsed.status === "invalid")
     return {
       view,

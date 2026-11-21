@@ -1,30 +1,42 @@
-/**
- * Daily AWB count column chart (single series, so no legend: the title names it).
- * Legacy "Grafik Penjualan" plots nominal per billing category; that money rule is
- * not approved (D-11/D-15), so this plots the approved count source instead.
- */
+/** Daily counts for short periods, grouped monthly for annual dashboard views. */
 export function DashboardDailyChart({
   days,
 }: {
   days: { date: string; count: number }[];
 }) {
-  const max = Math.max(0, ...days.map((day) => day.count));
+  const monthly = days.length > 31;
+  const chartDays = monthly
+    ? Array.from(
+        days.reduce((months, day) => {
+          const month = day.date.slice(0, 7);
+          months.set(month, (months.get(month) ?? 0) + day.count);
+          return months;
+        }, new Map<string, number>()),
+        ([date, count]) => ({ date, count }),
+      )
+    : days;
+  const max = Math.max(0, ...chartDays.map((day) => day.count));
   // Round the axis top to a readable step so gridlines land on whole numbers.
   const step = max <= 4 ? 1 : 10 ** Math.floor(Math.log10(max / 4));
   const top = max ? Math.ceil(max / 4 / step) * step * 4 : 4;
   const ticks = [top, (top * 3) / 4, top / 2, top / 4];
-  const peak = days.reduce(
+  const peak = chartDays.reduce(
     (best, day) => (day.count > best.count ? day : best),
-    days[0] ?? { date: "", count: 0 },
+    chartDays[0] ?? { date: "", count: 0 },
   );
-  const labelEvery = Math.ceil(days.length / 8);
+  const labelEvery = Math.max(1, Math.ceil(chartDays.length / 8));
+  const minWidth = `${chartDays.length * (monthly ? 42 : 14)}px`;
   return (
     <figure className="min-w-0 space-y-3">
       <figcaption className="space-y-1">
-        <span className="block font-semibold">Grafik Transaksi Harian</span>
+        <span className="block font-semibold">
+          {monthly ? "Grafik Transaksi Bulanan" : "Grafik Transaksi Harian"}
+        </span>
         <span className="block text-sm text-muted-foreground">
-          Jumlah AWB per tanggal transaksi (Asia/Jakarta). Nominal per kategori
-          bayar belum tersedia.
+          {monthly
+            ? "Jumlah AWB per bulan transaksi (Asia/Jakarta)."
+            : "Jumlah AWB per tanggal transaksi (Asia/Jakarta)."}{" "}
+          Nominal per kategori bayar belum tersedia.
         </span>
       </figcaption>
       <div className="flex gap-2">
@@ -42,7 +54,7 @@ export function DashboardDailyChart({
         <div className="min-w-0 flex-1 overflow-x-auto">
           <div
             className="relative h-48 border-b border-border"
-            style={{ minWidth: `${days.length * 14}px` }}
+            style={{ minWidth }}
           >
             {ticks.map((tick) => (
               <div
@@ -53,13 +65,15 @@ export function DashboardDailyChart({
               />
             ))}
             <ol
-              aria-label="Jumlah AWB per hari"
+              aria-label={
+                monthly ? "Jumlah AWB per bulan" : "Jumlah AWB per hari"
+              }
               className="absolute inset-0 flex items-end gap-0.5"
             >
-              {days.map((day) => (
+              {chartDays.map((day) => (
                 <li
                   key={day.date}
-                  // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard access to the per-day tooltip
+                  // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard access to the per-period tooltip
                   tabIndex={0}
                   className="group relative flex h-full min-w-0 flex-1 items-end justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
@@ -86,12 +100,14 @@ export function DashboardDailyChart({
           <div
             aria-hidden="true"
             className="flex gap-0.5 pt-1 text-xs tabular-nums text-muted-foreground"
-            style={{ minWidth: `${days.length * 14}px` }}
+            style={{ minWidth }}
           >
-            {days.map((day, index) => (
+            {chartDays.map((day, index) => (
               <span key={day.date} className="min-w-0 flex-1 text-center">
-                {index % labelEvery === 0 || index === days.length - 1
-                  ? Number(day.date.slice(8))
+                {index % labelEvery === 0 || index === chartDays.length - 1
+                  ? monthly
+                    ? `${day.date.slice(5, 7)}/${day.date.slice(2, 4)}`
+                    : Number(day.date.slice(8))
                   : ""}
               </span>
             ))}
@@ -100,7 +116,8 @@ export function DashboardDailyChart({
       </div>
       {peak.count > 0 && (
         <p className="text-sm text-muted-foreground">
-          Tertinggi {peak.count} AWB pada {peak.date}.
+          {monthly ? "Tertinggi per bulan" : "Tertinggi"} {peak.count} AWB pada{" "}
+          {peak.date}.
         </p>
       )}
       <details className="text-sm">
@@ -111,12 +128,14 @@ export function DashboardDailyChart({
           <table className="w-full text-left">
             <thead>
               <tr>
-                <th className="py-1 font-medium">Tanggal (Asia/Jakarta)</th>
+                <th className="py-1 font-medium">
+                  {monthly ? "Bulan (Asia/Jakarta)" : "Tanggal (Asia/Jakarta)"}
+                </th>
                 <th className="py-1 text-right font-medium">AWB</th>
               </tr>
             </thead>
             <tbody>
-              {days.map((day) => (
+              {chartDays.map((day) => (
                 <tr key={day.date} className="border-t">
                   <td className="py-1">{day.date}</td>
                   <td className="py-1 text-right tabular-nums">{day.count}</td>

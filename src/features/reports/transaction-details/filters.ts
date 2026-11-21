@@ -72,6 +72,7 @@ function positiveInteger(value: string, maximum: number): number | null {
 /** Validates query syntax only; branch membership must be checked by the service. */
 export function parseTransactionReportFilters(
   input: unknown,
+  maxInclusiveDays = 31,
 ): TransactionReportFilterResult {
   const issues: { field: string; message: string }[] = [];
   if (
@@ -181,14 +182,13 @@ export function parseTransactionReportFilters(
   if (!start || !end) return { status: "invalid", issues };
 
   const inclusiveDays = (end.getTime() - start.getTime()) / dayMilliseconds + 1;
-  if (inclusiveDays < 1 || inclusiveDays > 31) {
+  if (inclusiveDays < 1 || inclusiveDays > maxInclusiveDays) {
     return {
       status: "invalid",
       issues: [
         {
           field: "endDate",
-          message:
-            "Periode waktu Jakarta harus berurutan dan maksimal 31 hari.",
+          message: `Periode waktu Jakarta harus berurutan dan maksimal ${maxInclusiveDays} hari.`,
         },
       ],
     };

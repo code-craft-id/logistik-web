@@ -14,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { businessDateTimeString } from "@/lib/date/business-date";
+import {
+  businessDateString,
+  businessDateTimeString,
+} from "@/lib/date/business-date";
 import type { TransactionReportFilters } from "../../transaction-details/filters";
 import { type OperationalReportResult, operationalRoutes } from "../contracts";
 import {
@@ -55,6 +58,53 @@ function queryUrl(
   }
   if (view) query.set("view", view);
   return `${route}${query.size ? `?${query}` : ""}`;
+}
+function dashboardPeriodUrl(
+  startDate: string,
+  endDate: string,
+  branchId: number | null,
+) {
+  const query = new URLSearchParams({ startDate, endDate });
+  if (branchId !== null) query.set("branchId", String(branchId));
+  return `/dashboard?${query}`;
+}
+function dashboardPeriodShortcuts(branchId: number | null) {
+  const today = businessDateString(new Date());
+  const [yearText, monthText] = today.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const previousMonth = new Date(Date.UTC(year, month - 2, 1));
+  const previousMonthYear = previousMonth.getUTCFullYear();
+  const previousMonthNumber = previousMonth.getUTCMonth() + 1;
+  const previousMonthLastDay = new Date(
+    Date.UTC(previousMonthYear, previousMonthNumber, 0),
+  ).getUTCDate();
+  return [
+    {
+      label: "Bulan ini",
+      href: dashboardPeriodUrl(`${yearText}-${monthText}-01`, today, branchId),
+    },
+    {
+      label: "Bulan lalu",
+      href: dashboardPeriodUrl(
+        `${previousMonthYear}-${String(previousMonthNumber).padStart(2, "0")}-01`,
+        `${previousMonthYear}-${String(previousMonthNumber).padStart(2, "0")}-${String(previousMonthLastDay).padStart(2, "0")}`,
+        branchId,
+      ),
+    },
+    {
+      label: "Tahun ini",
+      href: dashboardPeriodUrl(`${yearText}-01-01`, today, branchId),
+    },
+    {
+      label: "Tahun lalu",
+      href: dashboardPeriodUrl(
+        `${year - 1}-01-01`,
+        `${year - 1}-12-31`,
+        branchId,
+      ),
+    },
+  ];
 }
 function cell(value: string | number | null): ReactNode {
   return value === null ? (
@@ -270,6 +320,11 @@ export function OperationalReportView({
   const dashboard = result.kind === "dashboard";
   const route = routes[result.kind];
   const view = result.kind === "items" ? "items" : "sheets";
+  const selectedBranchId = f
+    ? f.branchId
+    : display.branchId
+      ? Number(display.branchId)
+      : null;
   if (result.kind === "vendor")
     return (
       <div className="space-y-6">
@@ -341,8 +396,27 @@ export function OperationalReportView({
             id="operational-period-hint"
             className="text-sm text-muted-foreground"
           >
-            Pilih tanggal Asia/Jakarta, maksimal 31 hari termasuk kedua tanggal.
+            {dashboard
+              ? "Pilih periode Asia/Jakarta hingga satu tahun, atau gunakan pilihan cepat."
+              : "Pilih tanggal Asia/Jakarta, maksimal 31 hari termasuk kedua tanggal."}
           </p>
+          {dashboard && (
+            <nav
+              aria-label="Pilihan cepat periode dashboard"
+              className="flex flex-wrap gap-2"
+            >
+              {dashboardPeriodShortcuts(selectedBranchId).map((shortcut) => (
+                <Link
+                  key={shortcut.label}
+                  prefetch={false}
+                  href={shortcut.href}
+                  className="inline-flex min-h-10 items-center rounded-md border px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {shortcut.label}
+                </Link>
+              ))}
+            </nav>
+          )}
           <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0">
             <div className="space-y-2">
               <Label htmlFor="op-start">Tanggal mulai (Asia/Jakarta)</Label>

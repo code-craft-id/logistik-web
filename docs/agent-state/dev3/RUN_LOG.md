@@ -806,3 +806,27 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Updated PRD, RPT-01/RPT-02/SUP-01 contracts and Dev3 state/backlog/decision/handoff docs to record the policy and supersede prior UTC scope.
 - Validation on uncommitted worktree, branch `dev3/ready-for-review`, HEAD `2866b05e1fe02aa0cd56b605d4c7273c6abd4dab`: `npm run lint` PASS (560 files), `npm run typecheck` PASS, `npx vitest run --reporter=dot --maxWorkers=2` PASS (83 files/728 tests), targeted report integration PASS (3 files/26 tests) and simple-report integration PASS (1 file/5 tests); `npx next build --webpack` PASS (109 pages, compile 108s). `git diff --check` PASS.
 - Chrome shows the user's Dashboard tab at localhost:3000; DOM/screenshot calls fail before page observation. Visual review remains UNVERIFIED. No schema/migration, merge, push or deployment.
+# 2026-11-21 05:24 UTC — DASH-01 pre-implementation checkpoint
+- Resumed from pushed base `338f33e` on `dev3/ready-for-review`; user requested implementing four dashboard gaps identified against Redlogistik.
+- Created local branch `feat/dash-01-dashboard-navigation`; added DASH-01 as a bounded dashboard navigation slice in ROADMAP.
+- Source review: dashboard insights currently show raw status counts, active-assignment AWB pending, daily AWB counts and current invoice balances; daily trend is explicitly not omzet. Existing all-status AWB report supports exact raw status filters under transaction-report authorization. Existing dashboard range uses the shared maximum 31-day parser.
+- Guardrails: preserve Asia/Jakarta policy; local Quick Action preference must intersect current server-authorized links. Do not label `Transaction.biaya` as omzet or infer payment types. Do not infer shipment-success/failure/POD groups (D-07/D-09/D-11/D-15 remain unchanged).
+- Unrelated untracked files preserved: `.github/workflows/ci.yml` and `docs/visualisasi-pribadi-logistik.html`; neither is part of DASH-01.
+- Next implementation slice: personalized Quick Action config, month/year date shortcuts, dashboard-only annual periods/monthly aggregation, raw status deep links. No code/tests yet at this checkpoint; browser review remains unverified.
+
+## 2026-11-21 05:42 UTC — DASH-01 navigation slice implemented
+- Implemented dashboard-local Quick Action selection stored in this browser only. The control accepts only the currently server-authorized href set; no user permission is granted by saved preferences.
+- Added Asia/Jakarta period shortcuts for this month, last month, this year and last year while preserving the selected branch. Dashboard-only periods accept up to 366 days; yearly AWB count charts group by month. Other reports retain the shared 31-day limit.
+- Raw nonempty status labels link to the existing Semua Status AWB report with the same exact status, date range and branch. Empty status is displayed as `(status kosong)` and not linked to avoid an empty filter becoming an unfiltered query.
+- User chose to wait for KPI definitions. No `Transaction.biaya` omzet assumption, payment category, shipment success/failure, return or POD-outstanding formulas were implemented; D-07/D-09/D-11/D-15 remain unchanged.
+- Validation on branch `feat/dash-01-dashboard-navigation`, base `338f33e`: `npm run lint` PASS (562 files), `npm run typecheck` PASS, `git diff --check` PASS. No tests run (not requested); production build pending.
+- Unrelated untracked `.github/workflows/ci.yml` and `docs/visualisasi-pribadi-logistik.html` were preserved and excluded from DASH-01.
+
+## 2026-11-21 05:47 UTC — DASH-01 build and browser review checkpoint
+- `npm run lint` PASS (562 files), `npm run typecheck` PASS, `npx next build --webpack` PASS (Next.js 16.4.6, 109 generated pages; compilation completed in 93s), `git diff --check` PASS. No test suite run (not requested by user).
+- CUA inventory returned the open Chrome dashboard tab at `http://localhost:3000/dashboard`; selecting it failed twice with `Cannot read properties of undefined (reading 'timeoutMs')` before any page contents were exposed. No page interaction occurred. Visual and responsive verification remains UNVERIFIED.
+- Owner's async reply selected “KPI tunggu definisi”; decision-dependent metrics remain deferred. DASH-01 local implementation is ready for owner/Dev2 review; no commit, push, merge or deployment.
+
+## 2026-11-21 05:51 UTC — Return DASH-01 worktree to requested branch
+- User specified the work should remain on `dev3/ready-for-review`. Switched from the local feature branch back to `dev3/ready-for-review`, HEAD `338f33e`, tracking `origin/dev3/ready-for-review` and up-to-date.
+- Uncommitted DASH-01 changes and pre-existing unrelated untracked `.github/` and personal HTML remain in the worktree. No commit or push performed.
