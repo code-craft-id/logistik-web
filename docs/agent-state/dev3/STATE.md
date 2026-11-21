@@ -1,3 +1,11 @@
+## 2026-11-21 17:11 UTC — REL-01 Preview verified
+
+- Branch `dev3/ready-for-review`. Deployed source is `3905f610` plus the checked deployment patch. Preview `https://logistik-web-review-preview-softdev8.vercel.app` is Ready and requires Vercel Authentication. The generated deployment is `logistik-qp90cfsnj-softdev8.vercel.app`; branch metadata matches. No GitHub push since the linked Vercel project treats this Git branch as Production.
+- PostgreSQL 18.4 to Neon 18.7. Private custom archive verified and copied outside the repo. Restore matched all 83 tables, 1,068 rows, 259 indexes, 80 sequences, 147 foreign keys, CHECK semantics and 36 migration checksums. Applied the reviewed vendor bill migration on staging. Prisma status up to date with 37 migrations and pooled TLS verified. Two existing updated_at defaults remain drift.
+- Existing administrator `dev3_admin` confirmed on localhost and Preview. Chrome login, session refresh and dashboard widths 375/768/1440 passed. HTTPS route and asset checks passed. Live limited user verified denied admin access and branch-filtered AWBs, then the temporary user/group were removed.
+- npm ci, lint, typecheck, Prisma validation/generate and local/Vercel build passed. Unit/UI 728/728. Guarded local integration suite 190/192 first run; the two tests that timed out passed on targeted rerun with a 60-second test timeout.
+- Preview only. No legacy access or Production deployment/database change. See [deployment guide](../../DEPLOY_VERCEL_NEON.md).
+
 ## Latest checkpoint: DASH-01 on requested branch (2026-11-21 05:51 UTC)
 
 - Branch `dev3/ready-for-review`, HEAD `338f33e` (`Use Jakarta time across logistics workflows`). DASH-01 changes are uncommitted on the requested branch; lint/typecheck/build pass.

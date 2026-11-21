@@ -830,3 +830,12 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 ## 2026-11-21 05:51 UTC — Return DASH-01 worktree to requested branch
 - User specified the work should remain on `dev3/ready-for-review`. Switched from the local feature branch back to `dev3/ready-for-review`, HEAD `338f33e`, tracking `origin/dev3/ready-for-review` and up-to-date.
 - Uncommitted DASH-01 changes and pre-existing unrelated untracked `.github/` and personal HTML remain in the worktree. No commit or push performed.
+
+## 2026-11-21 16:49 UTC — REL-01 Vercel Preview staging
+
+- Preflight and private source snapshot verified at `3905f610`. Existing Vercel project linked in an isolated source snapshot and Neon staging branch/database provisioned. Prisma validation, generation and lint passed. Restore comparison, migration, deployment and live tests pending. No Production mutation or legacy access.
+
+## 2026-11-21 17:11 UTC — REL-01 Preview verified
+
+- Restore/reconciliation and one additive migration completed on Neon staging. `prisma migrate status` passed with 37 migrations; schema diff reports two pre-existing timestamp defaults. Vercel Preview Ready from `3905f610` plus the deployment patch. HTTPS login, dashboard, scoped denial and branch data, routes and assets verified. Browser checks passed at 375/768/1440.
+- Local checks: npm ci, lint, typecheck, Prisma validate/generate and npm run build passed. npm test passed 728 tests. Guarded npm run test:integration passed 190 and hit two 15-second timeouts. Both timed-out cases passed in the targeted 60-second rerun.

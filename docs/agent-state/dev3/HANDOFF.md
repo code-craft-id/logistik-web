@@ -1,3 +1,8 @@
+## 2026-11-21 17:11 UTC — REL-01 Preview verified
+
+- Ready and verified protected Preview with Neon staging. Read `STATE.md` and [deployment guide](../../DEPLOY_VERCEL_NEON.md). Preserve the private backup and use only the Vercel Preview target and canonical alias on subsequent releases.
+- The GitHub branch currently triggers Production on push. Preserve local validated deployment work until that automatic trigger is changed by the project owner.
+
 ## Current handoff — 2026-11-21 05:51 UTC
 
 - Resume branch `dev3/ready-for-review`, HEAD `338f33e`; user requested that dashboard changes stay on this branch. DASH-01 changes are uncommitted.

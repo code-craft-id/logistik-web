@@ -7,10 +7,14 @@ import { managedIdentityPaths } from "./managed-paths";
 import { authSchemaOptions } from "./schema-options";
 
 function createAuth() {
+  const previewHost =
+    process.env.VERCEL_ENV === "preview" ? process.env.VERCEL_URL : undefined;
   return betterAuth({
     ...authSchemaOptions(prisma),
     disabledPaths: managedIdentityPaths,
-    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    baseURL:
+      process.env.BETTER_AUTH_URL ||
+      (previewHost ? `https://${previewHost}` : "http://localhost:3000"),
     emailAndPassword: {
       enabled: true,
       disableSignUp: true,
@@ -35,7 +39,10 @@ function createAuth() {
         },
       },
     },
-    trustedOrigins: ["http://localhost:3000", "http://127.0.0.1:3000"],
+    trustedOrigins:
+      process.env.NODE_ENV === "production"
+        ? []
+        : ["http://localhost:3000", "http://127.0.0.1:3000"],
   });
 }
 let instance: ReturnType<typeof createAuth> | undefined;

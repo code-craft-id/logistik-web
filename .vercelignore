@@ -1,0 +1,11 @@
+/docs/reference/app-provider/
+/docs/visualisasi-pribadi-logistik.html
+/docs/**/evidence/
+/.agents/
+/.codex/
+/.aws/
+/.env*
+/cookies.txt
+/*.sql
+*.dump
+*.backup

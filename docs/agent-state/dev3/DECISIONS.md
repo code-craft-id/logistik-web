@@ -76,3 +76,7 @@ outstanding remain blocked by D-07/D-09/D-15: no complete canonical grouping
 or POD outstanding formula is approved. Existing statuses/pending metrics stay
 as-is. No new business decision is inferred from the user's feature list.
 
+
+## 2026-11-21 16:49 UTC — REL-01 Vercel Preview staging
+
+- Technical target selected under the user’s Preview deployment authorization. Preserve the verified source backup and existing administrator; require Vercel Authentication when connecting imported identity data. Existing business decision statuses remain unchanged.

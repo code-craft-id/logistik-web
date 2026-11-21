@@ -123,6 +123,7 @@ model VendorBill {
   items        VendorBillItem[]
 
   @@unique([vendorId, invoiceNo])
+  @@index([branchId])
   @@index([status])
   @@index([billDate])
   @@map("vendor_bills")
