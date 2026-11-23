@@ -617,7 +617,7 @@ function OrganizationList({
                   )
                 }
               >
-                <option value="">Perusahaan baru</option>
+                {total === 0 && <option value="">Perusahaan baru</option>}
                 {editing?.id &&
                   !items.some((item) => item.id === editing.id) && (
                     <option value={editing.id}>{editing.name}</option>
@@ -629,16 +629,6 @@ function OrganizationList({
                 ))}
               </ComboSelect>
             </div>
-            {writable && (
-              <Button
-                className="min-h-11"
-                variant="default"
-                onClick={() => setEditing(null)}
-              >
-                <Plus aria-hidden="true" />
-                Tambah Perusahaan
-              </Button>
-            )}
             <Button
               className="min-h-11"
               variant="outline"
@@ -665,29 +655,8 @@ function OrganizationList({
         )}
         {notice && <output>{notice}</output>}
         {editor}
-        {writable && total === 1 && editing?.id && (
-          <Button
-            className="min-h-11"
-            variant="default"
-            onClick={() => setEditing(null)}
-          >
-            <Plus aria-hidden="true" />
-            Tambah Perusahaan
-          </Button>
-        )}
-        {writable && editing?.id && (
-          <Button
-            className="min-h-11"
-            variant="destructive"
-            onClick={(event) => {
-              dialogTrigger.current = event.currentTarget;
-              setRemoving(editing);
-            }}
-          >
-            <Trash2 aria-hidden="true" />
-            Hapus perusahaan
-          </Button>
-        )}
+        {/* Single-company system: edit only; no add or delete once a
+            company exists (owner decision 2026-11-23). */}
         {deleteDialog}
       </div>
     );

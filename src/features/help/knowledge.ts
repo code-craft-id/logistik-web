@@ -304,7 +304,7 @@ export const helpEntries: HelpEntry[] = [
       "scan",
     ],
     answer:
-      "Resi AWB, slip booking, manifest dan DRS dicetak dengan barcode Code 128 dan QR berisi nomornya, sehingga bisa dibaca scanner genggam, kamera HP atau aplikasi kurir. Cetak AWB dari daftar Transaksi (centang lalu Print terpilih), slip booking dari daftar Booking, manifest dan DRS dari daftar/detail manifest. Label per koli: centang AWB di daftar Transaksi lalu Print label koli, atau Print label koli di detail AWB. Setiap koli mendapat label sendiri bernomor AWB-1, AWB-2, … (Koli n dari N) dengan barcode dan QR; scan label koli di Scan AWB membuka AWB induknya.",
+      "Resi AWB, slip booking, manifest dan DRS dicetak dengan barcode Code 128 dan QR berisi nomornya, sehingga bisa dibaca scanner genggam, kamera HP atau aplikasi kurir. Cetak AWB dari daftar Transaksi (centang lalu Print terpilih; tiap AWB dicetak 3 rangkap SHIPPER/OPERATIONAL/BILLING dalam satu lembar A4), slip booking dari daftar Booking, manifest dan DRS dari daftar/detail manifest. Label per koli: centang AWB di daftar Transaksi lalu Print label koli, atau Print label koli di detail AWB. Setiap koli mendapat label sendiri bernomor AWB-1, AWB-2, … (Koli n dari N) dengan barcode dan QR; scan label koli di Scan AWB membuka AWB induknya.",
     href: "/transactions",
   },
   {
@@ -320,7 +320,7 @@ export const helpEntries: HelpEntry[] = [
       "cara kerja",
     ],
     answer:
-      "Alur utama: Booking (pesanan jemput: WAITING TO PICKUP → kurir ditugaskan → scan jemput PROGRESS PICKUP, atau CANCEL PICKUP; berdiri sendiri) → AWB/Transaksi (dibuat admin di kantor, terpisah dari booking; label per koli AWB-n; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dibuat dari manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
+      "Alur utama: Booking (pesanan jemput: WAITING TO PICKUP → kurir ditugaskan → scan jemput PROGRESS PICKUP, atau CANCEL PICKUP; berdiri sendiri) → AWB/Transaksi (dibuat admin di kantor, terpisah dari booking; label per koli AWB-n; harga dari tarif Cek Ongkir) → Manifest (AWB dimuat ke kendaraan/vendor) → DRS/Lembar Pengantaran (dari detail manifest, atau DRS Kurir Kota tanpa manifest) → Hasil antar dan Bukti Terima (DRS, detail AWB atau Scan AWB) → POD Kembali (bukti dikirim balik ke cabang asal, disetujui cabang tujuan) → Invoice dan pembayaran customer. Pendukung: Proses Vendor untuk AWB yang diteruskan ke vendor, Persetujuan Edit/delete AWB untuk mengubah atau menghapus AWB, Pembayaran Hutang untuk invoice vendor/agen, laporan cabang/kurir/keuangan membaca data dari alur ini. Hak akses per grup menentukan menu dan cabang yang bisa dibuka.",
   },
   {
     id: "access",
@@ -356,7 +356,7 @@ export const helpEntries: HelpEntry[] = [
       "resi",
     ],
     answer:
-      "Buka AWB dari daftar Transaksi. Halaman detail menampilkan barcode Code 128 nomor AWB, semua data pengiriman dan harga (format Rupiah), bagian Bukti Terima (POD) berisi hasil antar, nama penerima, keterangan, foto penerima 1–5 dan tanda tangan (dari DRS atau Scan AWB), panel Edit/Hapus AWB (lewat persetujuan) beserta riwayat sebelum → sesudah, dan riwayat status. Print AWB membuka resi di tab baru dengan kop perusahaan, barcode dan QR (biaya tampil bila diizinkan di master Perusahaan).",
+      "Buka AWB dari daftar Transaksi. Halaman detail menampilkan barcode Code 128 nomor AWB, semua data pengiriman dan harga (format Rupiah), bagian Bukti Terima (POD) berisi hasil antar, nama penerima, keterangan, foto penerima 1–5 dan tanda tangan (dari DRS atau Scan AWB), panel Edit/Hapus AWB (lewat persetujuan) beserta riwayat sebelum → sesudah, dan riwayat status. Print AWB membuka resi di tab baru: satu lembar A4 per AWB berisi 3 rangkap (SHIPPER, OPERATIONAL, BILLING) seperti aplikasi lama, masing-masing dengan kop dan logo perusahaan, barcode dan QR, pengirim, penerima, Origin, Destination, No. Reff, Weight, Volume, Payment, Service, rincian harga, isi kiriman, instruksi khusus, kolom tanda tangan dan nama pembuat AWB. Di atas resi pilih Tipe print: Harga (nilai harga dicetak) atau Non Harga (kotak harga tetap ada tetapi kosong). Harga tidak pernah dicetak bila master Perusahaan tidak mengizinkannya.",
 
     href: "/transactions",
   },
@@ -561,15 +561,71 @@ export const helpEntries: HelpEntry[] = [
       "hutang",
     ],
     answer:
-      "Laporan Keuangan menampilkan saldo invoice terbit yang belum lunas per customer per hari ini, dikelompokkan: belum jatuh tempo, 1–30, 31–60, 61–90, lebih dari 90 hari. Laporan hutang (AP) belum tersedia.",
+      "Laporan Keuangan menampilkan saldo invoice terbit yang belum lunas per customer per hari ini, dikelompokkan: belum jatuh tempo, 1–30, 31–60, 61–90, lebih dari 90 hari. Hutang vendor/agen ada di Laporan Keuangan > Laporan AP.",
     href: "/financial-reports",
+  },
+  {
+    id: "kurir-kota",
+    title: "Kurir Kota (DRS tanpa manifest) dan Print DRS",
+    keywords: [
+      "kurir kota",
+      "drs",
+      "lembar pengantaran",
+      "delivery sheet",
+      "print drs",
+      "antar kota",
+    ],
+    answer:
+      "Modul > Operasional / Lembar Pengantaran > Kurir Kota: isi Tanggal, Cabang, Kurir (wajib), Driver, Nopol, Agen dan Keterangan lalu Simpan; DRS No. otomatis (DRS-kode cabang-tahun bulan-urut) bila dikosongkan. Di detail DRS ketik atau scan nomor AWB lalu Tambahkan. AWB harus dalam cakupan cabang Anda, belum Delivered/Cancelled, dan tidak sedang menunggu hasil di DRS lain. Catat hasil antar (Terkirim, Gagal, Retur) per AWB; Terkirim mengubah AWB menjadi Delivered. AWB yang belum punya hasil bisa dihapus dari DRS; DRS tanpa hasil antar bisa dihapus. Print DRS mencetak daftar AWB untuk ditandatangani penerima. Konfirmasi lewat Scan AWB juga mengisi hasil di DRS ini.",
+    href: "/delivery-sheets",
+  },
+  {
+    id: "proses-vendor",
+    title: "Proses Vendor",
+    keywords: ["proses vendor", "vendor", "awb vendor", "pihak ketiga"],
+    answer:
+      "Modul > Operasional > Proses Vendor: catat AWB yang diteruskan ke vendor (Tanggal, AWB, Vendor, AWB Vendor, Keterangan). Satu AWB hanya boleh punya satu proses vendor aktif; bila salah, hapus lalu catat ulang. Data milik cabang asal atau tujuan AWB yang ada di cakupan Anda. Hak akses: Proses Vendor lihat/tambah/hapus.",
+    href: "/vendor-processes",
+  },
+  {
+    id: "rekap-manifest",
+    title: "Rekap Manifest",
+    keywords: ["rekap manifest", "recap manifest", "manifest bulanan"],
+    answer:
+      "Laporan > Laporan Cabang > Rekap Manifest: pilih Bulan, Tahun, Cabang (atau semua cabang Anda) dan Jenis Lembar, klik Tampilkan. Tabel menampilkan per manifest total AWB aktif, koli, berat, volume, kendaraan, kurir, vendor dan status. Ekspor Excel: Multiple Sheet = satu sheet per tanggal manifest, One Sheet = semua dalam satu sheet.",
+    href: "/branch-reports/rekap-manifest",
+  },
+  {
+    id: "detail-kurir",
+    title: "Laporan Detail Kurir",
+    keywords: ["detail kurir", "laporan kurir", "sukses", "pending", "failed"],
+    answer:
+      "Laporan > Laporan Kurir > Laporan Detail Kurir: setiap AWB di DRS (dari manifest maupun Kurir Kota) dengan kurir, asal, tujuan, pengirim, layanan, status, penerima, diterima oleh, tanggal diterima dan L.Time (Lead Time AWB). Status: Sukses = Terkirim, Failed = Gagal atau Retur, Pending = belum dicatat. Filter periode, cabang, kurir dan status; total Sukses/Pending/Failed di atas tabel.",
+    href: "/courier-reports/detail",
+  },
+  {
+    id: "cod-asuransi",
+    title: "COD, asuransi, PIC dan Lead Time di Entry AWB",
+    keywords: [
+      "cod",
+      "asuransi",
+      "nilai barang",
+      "biaya cod",
+      "pic",
+      "lead time",
+      "show price",
+      "harga di resi",
+    ],
+    answer:
+      "Di Entry AWB isi PIC 1, PIC 2 dan Lead Time setelah data penerima. Di bagian harga: Nilai Barang dan Nilai COD hanya dicatat (tidak menambah Grand Total); Biaya Asuransi dan Biaya COD ikut dijumlahkan ke Total Biaya seperti Biaya Lain, lalu dipotong Discount dan ditambah PPN. Nilai COD tercetak di resi dan di DRS supaya kurir menagih penerima. Show Price Print AWB = Tidak menyembunyikan harga di resi AWB ini, walaupun dicetak dengan tipe Harga.",
+    href: "/transactions/new",
   },
   {
     id: "ticketing",
     title: "Ticketing",
     keywords: ["tiket", "ticket", "ticketing", "keluhan", "support", "bantuan"],
     answer:
-      "Menu Ticketing: buat tiket (cabang, prioritas, judul, menu, link halaman, catatan), lihat daftar dan detail. Pembuat dan cabangnya bisa melihat tiket; admin bisa melihat semua.",
+      "Menu Ticketing > Tiket Support: buat tiket (cabang, prioritas, judul, menu, link halaman, catatan), lihat daftar dan detail. Status tiket Open → In Progress → Finish diubah tim support (hak Ticketing: manage) di detail tiket. Setelah Finish, pembuat tiket membuka Ticketing > Persetujuan Tiketing lalu memilih Approve Finish (selesai, final) atau Revisi (wajib catatan; tiket kembali Open). Pembuat melihat tiketnya sendiri; tim support melihat tiket cabangnya; admin melihat semua.",
     href: "/ticketting",
   },
   {
@@ -626,7 +682,7 @@ export const helpEntries: HelpEntry[] = [
       "office",
     ],
     answer:
-      "Menu Kantor: Perusahaan, Kantor Cabang, Kantor dan Agen. Semua data operasional dan laporan dibatasi ke cabang yang ditugaskan ke user.",
+      "Menu Kantor: Perusahaan, Kantor Cabang, Kantor dan Agen. Sistem memakai satu perusahaan: di menu Perusahaan datanya hanya bisa diubah (nama, alamat, logo, pengaturan harga di resi), tidak bisa ditambah atau dihapus. Semua data operasional dan laporan dibatasi ke cabang yang ditugaskan ke user.",
     href: "/office/branches",
   },
   {

@@ -179,12 +179,12 @@ describe("PLT-02 organization persistence and boundaries", () => {
   it("stores a validated inline logo in the existing company column", async () => {
     const logo =
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==";
-    const saved = await service(adminId).save("company", null, {
+    // Single-company system: the logo is stored by editing the company.
+    const saved = await service(adminId).save("company", companies[0], {
       ...companyData,
-      name: `${tag} Logo`,
+      name: `${tag} 0`,
       logo,
     });
-    companies.push(saved.id);
     expect(
       (await db.company.findUniqueOrThrow({ where: { id: saved.id } })).logo,
     ).toBe(logo);
@@ -382,43 +382,42 @@ describe("PLT-02 organization persistence and boundaries", () => {
       await db.identityAuditEvent.count({ where: { actorId: readerId } }),
     ).toBe(0);
   });
-  it("creates and edits atomically, soft deletes, and audits without contact data", async () => {
-    const created = await service(adminId).save("company", null, {
-      ...companyData,
-      name: `${tag} created`,
-    });
-    companies.push(created.id);
-    await service(adminId).save("company", created.id, {
+  it("keeps one company: refuses add and delete, edits atomically and audits without contact data", async () => {
+    await expect(
+      service(adminId).save("company", null, {
+        ...companyData,
+        name: `${tag} second`,
+      }),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+    expect(await db.company.count({ where: { name: `${tag} second` } })).toBe(
+      0,
+    );
+    const edited = companies[1];
+    await service(adminId).save("company", edited, {
       ...companyData,
       name: `${tag} changed`,
       phoneNumber: "INVALID-CONTACT",
     });
-    await service(adminId).remove("company", created.id);
+    await expect(
+      service(adminId).remove("company", edited),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
     expect(
-      (await db.company.findUniqueOrThrow({ where: { id: created.id } }))
-        .deletedAt,
-    ).not.toBeNull();
-    const page = await service(adminId).list("company", {
-      search: `${tag} changed`,
-    });
-    expect(page.items).toHaveLength(0);
+      (await db.company.findUniqueOrThrow({ where: { id: edited } })).deletedAt,
+    ).toBeNull();
     const events = await db.identityAuditEvent.findMany({
       where: {
         actorId: adminId,
         subjectType: "company",
-        subjectId: created.id,
+        subjectId: edited,
       },
     });
-    expect(events).toHaveLength(3);
+    expect(events.length).toBeGreaterThanOrEqual(1);
     expect(JSON.stringify(events)).not.toContain("INVALID-CONTACT");
-    await expect(
-      service(adminId).save("company", created.id, companyData),
-    ).rejects.toMatchObject({ status: 404 });
   });
   it("rejects live children, assigned branches, invalid parents and invalid input without partial writes", async () => {
     await expect(
       service(adminId).remove("company", companies[0]),
-    ).rejects.toMatchObject({ code: "IN_USE" });
+    ).rejects.toMatchObject({ code: "CONFLICT" });
     await expect(
       service(adminId).remove("office", offices[0]),
     ).rejects.toMatchObject({ code: "IN_USE" });

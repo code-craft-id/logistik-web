@@ -57,14 +57,16 @@ try {
         where: { name: { in: ["DEMO CUSTOMER A", "DEMO CUSTOMER B"] } },
       });
 
-      // A fictional company and head office for the demo branches.
+      // Single-company system: reuse the existing company; create the
+      // fictional demo company only on an empty database.
       const company =
         (await tx.company.findFirst({
-          where: { name: "PT Nusantara Kirim Cepat", deletedAt: null },
+          where: { deletedAt: null },
+          orderBy: { id: "asc" },
         })) ??
         (await tx.company.create({
           data: {
-            name: "PT Nusantara Kirim Cepat",
+            name: "SOFTDEV",
             address: "Jl. Gunung Sahari Raya No. 18",
             city: "Jakarta Pusat",
             postalCode: "10720",
@@ -877,7 +879,8 @@ try {
               manifest_report: ["view"],
               delivery_report: ["view"],
               dashboard_report: ["view"],
-              ticket: ["view", "create"],
+              vendor_process: ["view", "create", "delete"],
+              ticket: ["view", "create", "manage"],
             },
           },
           {
@@ -938,6 +941,7 @@ try {
               consignee: ["view"],
               awb_change: ["view", "request"],
               pod_return: ["view", "create", "approve"],
+              vendor_process: ["view", "create"],
               tariff: ["view"],
               transaction_report: ["view"],
               dashboard_report: ["view"],

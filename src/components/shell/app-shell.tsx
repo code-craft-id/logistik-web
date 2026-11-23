@@ -41,6 +41,18 @@ import {
 
 export { Navigation } from "./compact-navigation";
 
+// Exact routes still rendered by PreviewScreenPage (no live data).
+const PREVIEW_ONLY_ROUTES = new Set([
+  "/akunting",
+  "/branch-reports",
+  "/customer-reports",
+  "/customer-service",
+  "/operations",
+  "/master-data/categories",
+  "/master-data/logistics",
+  "/master-data/units",
+]);
+
 function DesktopNavigation({
   value,
   onValueChange,
@@ -434,32 +446,13 @@ export function AppShell({
         {children}
       </main>
       <footer className="border-t bg-background px-4 py-5 text-xs text-muted-foreground sm:px-6 lg:px-8">
-        {[
-          "/group-user",
-          "/user-management",
-          "/hak-akses-menu",
-          "/profile",
-          "/office",
-          "/logistics/areas",
-          "/logistics/services",
-          "/logistics/vehicles",
-          "/logistics/division",
-          "/vendor",
-          "/shipment-status",
-          "/ticketting",
-          "/finance",
-          "/branch-reports/transaction-details",
-          "/branch-reports/manifest-outbound",
-          "/branch-reports/manifest-vendor",
-          "/branch-reports/delivery",
-          "/branch-reports/awb",
-          "/customer-reports/all-status",
-          "/dashboard",
-        ].some(
-          (route) => pathname === route || pathname.startsWith(`${route}/`),
-        )
-          ? "LMS · Administrasi · Perubahan data dicatat"
-          : "LMS · Presentation preview · No operational records loaded or saved"}
+        {/* Only synthetic examples and the remaining preview screens promise
+            no saves; every other route is a live, audited workflow. */}
+        {pathname === "/ui-examples" ||
+        pathname.startsWith("/ui-examples/") ||
+        PREVIEW_ONLY_ROUTES.has(pathname)
+          ? "LMS · Presentation preview · No operational records loaded or saved"
+          : "LMS · Administrasi · Perubahan data dicatat"}
       </footer>
     </div>
   );
