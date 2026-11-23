@@ -111,6 +111,12 @@ it("shows empty recovery and inert escaped URL/remarks with labelled Jakarta tim
     remarks: "<script>alert(1)</script>",
     priority: "Low",
     createdAt: "2026-11-15T00:00:00.000Z",
+    status: "Open",
+    approval: null,
+    approvalNote: null,
+    approvedAt: null,
+    approvedBy: null,
+    createdBy: null,
   };
   await act(async () => root.render(createElement(TicketDetail, { ticket })));
   expect(host.querySelector("script")).toBeNull();

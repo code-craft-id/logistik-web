@@ -149,20 +149,20 @@ model VendorBillItem {
 /// photos and a drawn signature, all stored on Cloudinary (URL and id only).
 /// Outcome: DELIVERED or RETURNED.
 model DeliveryProof {
-  id                 Int                  @id @default(autoincrement())
-  transactionId      Int                  @map("transaction_id")
-  transaction        Transaction          @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  outcome            String               @db.VarChar(20)
-  receiverName       String?              @map("receiver_name") @db.VarChar(150)
-  notes              String?              @db.VarChar(500)
-  signatureUrl       String?              @map("signature_url") @db.VarChar(500)
-  signaturePublicId  String?              @map("signature_public_id") @db.VarChar(255)
-  createdById        Int?                 @map("created_by_id")
-  createdBy          User?                @relation("DeliveryProofCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt          DateTime             @default(now()) @map("created_at")
-  updatedAt          DateTime             @updatedAt @map("updated_at")
-  deletedAt          DateTime?            @map("deleted_at")
-  photos             DeliveryProofPhoto[]
+  id                Int                  @id @default(autoincrement())
+  transactionId     Int                  @map("transaction_id")
+  transaction       Transaction          @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  outcome           String               @db.VarChar(20)
+  receiverName      String?              @map("receiver_name") @db.VarChar(150)
+  notes             String?              @db.VarChar(500)
+  signatureUrl      String?              @map("signature_url") @db.VarChar(500)
+  signaturePublicId String?              @map("signature_public_id") @db.VarChar(255)
+  createdById       Int?                 @map("created_by_id")
+  createdBy         User?                @relation("DeliveryProofCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  deletedAt         DateTime?            @map("deleted_at")
+  photos            DeliveryProofPhoto[]
 
   @@index([transactionId])
   @@index([createdAt])
@@ -210,4 +210,30 @@ model ManifestScan {
   @@index([transactionId, kind])
   @@index([manifestId, kind])
   @@map("manifest_scans")
+}
+
+/// Proses Vendor (OBSERVED columns: Tanggal, AWB, AWB Vendor, Vendor,
+/// Keterangan; D-35). One active row per AWB, checked in a transaction.
+model VendorProcess {
+  id            Int         @id @default(autoincrement())
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vendorId      Int         @map("vendor_id")
+  vendor        Vendor      @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  branchId      Int         @map("branch_id")
+  branch        Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vendorAwbNo   String?     @map("vendor_awb_no") @db.VarChar(100)
+  processDate   DateTime    @default(now()) @map("process_date")
+  remarks       String?     @db.VarChar(500)
+  createdById   Int?        @map("created_by_id")
+  createdBy     User?       @relation("VendorProcessCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  deletedAt     DateTime?   @map("deleted_at")
+
+  @@index([transactionId])
+  @@index([vendorId])
+  @@index([branchId])
+  @@index([processDate])
+  @@map("vendor_processes")
 }

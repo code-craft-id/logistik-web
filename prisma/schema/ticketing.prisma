@@ -1,4 +1,5 @@
-/// SUP-01 bounded create/read only. No lifecycle or approval values are inferred.
+/// SUP-01 ticket. Lifecycle Open/In Progress/Finish and requester approval
+/// (Approve Finish / Revisi) follow the provider observation (D-35).
 model Ticket {
   id             Int       @id @default(autoincrement())
   branchId       Int       @map("branch_id")
@@ -10,14 +11,21 @@ model Ticket {
   /// SQL CHECK tickets_priority_check enforces Low/Normal/High. No default.
   priority       String    @db.VarChar(10)
   idempotencyKey String    @map("idempotency_key") @db.VarChar(64)
+  status         String    @default("Open") @db.VarChar(20)
+  approval       String?   @db.VarChar(20)
+  approvalNote   String?   @map("approval_note") @db.VarChar(1000)
+  approvedById   Int?      @map("approved_by_id")
+  approvedAt     DateTime? @map("approved_at")
+  approvedBy     User?     @relation("TicketApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
   branch         Branch    @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdBy      User      @relation(fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdBy      User      @relation("TicketCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
 
   @@unique([createdById, idempotencyKey])
   @@index([createdById, createdAt(sort: Desc), id(sort: Desc)])
   @@index([createdAt(sort: Desc), id(sort: Desc)])
+  @@index([status])
   @@map("tickets")
 }

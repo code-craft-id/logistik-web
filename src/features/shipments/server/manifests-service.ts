@@ -271,34 +271,43 @@ export async function recordDeliveryOutcome(
     const sheet = await tx.deliverySheet.findUnique({
       where: { id: data.deliverySheetId },
     });
-    if (!sheet) throw new Error("DELIVERY_SHEET_NOT_FOUND");
+    if (!sheet || sheet.deletedAt) throw new Error("DELIVERY_SHEET_NOT_FOUND");
 
-    const manifest = await tx.manifest.findFirst({
-      where: {
-        id: sheet.manifestId,
-        deletedAt: null,
-      },
-    });
-    if (!manifest) {
-      throw new Error("MANIFEST_NOT_FOUND");
-    }
-    if (!manifest.branchId) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403);
-    }
-    if (!permitsBranch(actor, manifest.branchId)) {
-      throw new IdentityError("FORBIDDEN_BRANCH", 403);
-    }
+    // Standalone DRS (Kurir Kota): the line must already be on the sheet and
+    // the sheet's own branch decides access. Manifest DRS: the AWB must be
+    // actively assigned to that manifest.
+    if (sheet.manifestId === null) {
+      if (!sheet.branchId || !permitsBranch(actor, sheet.branchId)) {
+        throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
+    } else {
+      const manifest = await tx.manifest.findFirst({
+        where: {
+          id: sheet.manifestId,
+          deletedAt: null,
+        },
+      });
+      if (!manifest) {
+        throw new Error("MANIFEST_NOT_FOUND");
+      }
+      if (!manifest.branchId) {
+        throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
+      if (!permitsBranch(actor, manifest.branchId)) {
+        throw new IdentityError("FORBIDDEN_BRANCH", 403);
+      }
 
-    const manifestItem = await tx.manifestItem.findFirst({
-      where: {
-        manifestId: manifest.id,
-        transactionId: data.transactionId,
-        releasedAt: null,
-        deletedAt: null,
-      },
-    });
-    if (!manifestItem) {
-      throw new Error("MANIFEST_ITEM_NOT_FOUND");
+      const manifestItem = await tx.manifestItem.findFirst({
+        where: {
+          manifestId: manifest.id,
+          transactionId: data.transactionId,
+          releasedAt: null,
+          deletedAt: null,
+        },
+      });
+      if (!manifestItem) {
+        throw new Error("MANIFEST_ITEM_NOT_FOUND");
+      }
     }
 
     const txRecord = await tx.transaction.findFirst({
@@ -328,6 +337,9 @@ export async function recordDeliveryOutcome(
       },
     });
     if (allowedItem?.deletedAt) {
+      throw new Error("DELIVERY_SHEET_ITEM_NOT_FOUND");
+    }
+    if (!allowedItem && sheet.manifestId === null) {
       throw new Error("DELIVERY_SHEET_ITEM_NOT_FOUND");
     }
     if (!allowedItem) {
@@ -422,16 +434,21 @@ async function photoTarget(
       outcome: true,
       podPhotoUrl: true,
       deliverySheet: {
-        select: { manifest: { select: { branchId: true, deletedAt: true } } },
+        select: {
+          branchId: true,
+          deletedAt: true,
+          manifest: { select: { branchId: true, deletedAt: true } },
+        },
       },
       transaction: {
         select: { originBranchId: true, destinationBranchId: true },
       },
     },
   });
-  if (!item || item.deliverySheet.manifest.deletedAt)
+  const sheet = item?.deliverySheet;
+  if (!item || !sheet || sheet.deletedAt || sheet.manifest?.deletedAt)
     throw new Error("DELIVERY_SHEET_ITEM_NOT_FOUND");
-  const owner = item.deliverySheet.manifest.branchId;
+  const owner = sheet.manifest ? sheet.manifest.branchId : sheet.branchId;
   if (!owner || !permitsBranch(actor, owner))
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
   if (

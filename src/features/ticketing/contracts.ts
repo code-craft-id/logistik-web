@@ -53,6 +53,23 @@ export const ticketListInput = z.strictObject({
   page: integer(100_000).default(1),
   pageSize: integer(100).default(20),
   search: z.string().trim().max(100).default(""),
+  /** "approval": Persetujuan Tiketing (my finished tickets to approve). */
+  tab: z.enum(["all", "approval"]).default("all"),
+});
+export const TICKET_STATUSES = ["Open", "In Progress", "Finish"] as const;
+export const ticketStatusInput = z.strictObject({
+  id: ticketId,
+  status: z.enum(TICKET_STATUSES),
+});
+export const ticketDecisionInput = z.strictObject({
+  id: ticketId,
+  decision: z.enum(["Approved", "Revision"]),
+  note: z
+    .string()
+    .trim()
+    .max(1000)
+    .optional()
+    .transform((value) => value || null),
 });
 export type TicketCreateInput = z.infer<typeof ticketCreateInput>;
 export type TicketDTO = {
@@ -65,4 +82,10 @@ export type TicketDTO = {
   remarks: string | null;
   priority: string;
   createdAt: string;
+  status: string;
+  approval: string | null;
+  approvalNote: string | null;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  createdBy: string | null;
 };

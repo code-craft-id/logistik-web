@@ -2,6 +2,7 @@ import "server-only";
 import {
   type AccessActor,
   isAdministrator,
+  permits,
   permitsBranch,
 } from "@/features/identity/permissions";
 import {
@@ -14,8 +15,10 @@ import {
   type TicketCreateInput,
   type TicketDTO,
   ticketCreateInput,
+  ticketDecisionInput,
   ticketId,
   ticketListInput,
+  ticketStatusInput,
 } from "../contracts";
 
 const publicSelect = {
@@ -28,6 +31,12 @@ const publicSelect = {
   remarks: true,
   priority: true,
   createdAt: true,
+  status: true,
+  approval: true,
+  approvalNote: true,
+  approvedAt: true,
+  approvedBy: { select: { name: true } },
+  createdBy: { select: { name: true } },
 } satisfies Prisma.TicketSelect;
 type PublicRecord = Prisma.TicketGetPayload<{ select: typeof publicSelect }>;
 const dto = (row: PublicRecord): TicketDTO => ({
@@ -40,13 +49,25 @@ const dto = (row: PublicRecord): TicketDTO => ({
   remarks: row.remarks,
   priority: row.priority,
   createdAt: row.createdAt.toISOString(),
+  status: row.status,
+  approval: row.approval,
+  approvalNote: row.approvalNote,
+  approvedAt: row.approvedAt?.toISOString() ?? null,
+  approvedBy: row.approvedBy?.name ?? null,
+  createdBy: row.createdBy?.name ?? null,
 });
+/**
+ * Administrators see every ticket; support staff (ticket: manage) see the
+ * tickets of their branches; everyone else sees only their own.
+ */
 function visible(current: AccessActor): Prisma.TicketWhereInput {
+  if (isAdministrator(current)) return { deletedAt: null };
   return {
     deletedAt: null,
-    ...(!isAdministrator(current)
-      ? { createdById: current.id, branchId: { in: current.branchIds } }
-      : {}),
+    branchId: { in: current.branchIds },
+    ...(permits(current, "manage", "ticket")
+      ? {}
+      : { createdById: current.id }),
   };
 }
 function identical(row: PublicRecord, input: TicketCreateInput) {
@@ -65,7 +86,7 @@ export function createTicketService(
   resolveActor: () => Promise<AccessActor | null>,
 ) {
   async function actor(
-    action: "view" | "create",
+    action: "view" | "create" | "manage",
     connection: Prisma.TransactionClient = db,
     expectedId?: number,
   ) {
@@ -129,9 +150,12 @@ export function createTicketService(
       return db.$transaction(
         async (tx) => {
           const current = await actor("view", tx);
-          const { page, pageSize, search } = ticketListInput.parse(input);
+          const { page, pageSize, search, tab } = ticketListInput.parse(input);
           const where: Prisma.TicketWhereInput = {
             ...visible(current),
+            ...(tab === "approval"
+              ? { createdById: current.id, status: "Finish", approval: null }
+              : {}),
             ...(search
               ? {
                   OR: [
@@ -149,7 +173,7 @@ export function createTicketService(
             orderBy: [{ createdAt: "desc" }, { id: "desc" }],
           });
           const total = await tx.ticket.count({ where });
-          return { items: rows.map(dto), total, page, pageSize, search };
+          return { items: rows.map(dto), total, page, pageSize, search, tab };
         },
         { isolationLevel: "RepeatableRead" },
       );
@@ -162,6 +186,73 @@ export function createTicketService(
         select: publicSelect,
       });
       return row ? dto(row) : null;
+    },
+    /** Support changes the status; an approved ticket is final. */
+    async setStatus(input: unknown) {
+      const current = await actor("manage");
+      const data = ticketStatusInput.parse(input);
+      const changed = await db.ticket.updateMany({
+        where: {
+          ...visible(current),
+          id: data.id,
+          status: { not: data.status },
+          // NULL-safe: a plain NOT would also skip tickets without approval.
+          OR: [{ approval: null }, { approval: { not: "Approved" } }],
+        },
+        data: { status: data.status, approval: null, approvalNote: null },
+      });
+      if (changed.count !== 1)
+        throw new IdentityError(
+          "CONFLICT",
+          409,
+          "Status tidak bisa diubah: tiket sudah disetujui, sudah berstatus itu, atau tidak ditemukan.",
+        );
+      return { id: data.id };
+    },
+    /**
+     * The ticket creator approves a finished ticket (final) or asks for a
+     * revision, which reopens it with the note.
+     */
+    async decide(input: unknown) {
+      const current = await actor("view");
+      const data = ticketDecisionInput.parse(input);
+      if (data.decision === "Revision" && !data.note)
+        throw new IdentityError(
+          "CONFLICT",
+          409,
+          "Tulis catatan revisi agar tim support tahu yang perlu diperbaiki.",
+        );
+      const changed = await db.ticket.updateMany({
+        where: {
+          ...visible(current),
+          id: data.id,
+          createdById: current.id,
+          status: "Finish",
+          approval: null,
+        },
+        data:
+          data.decision === "Approved"
+            ? {
+                approval: "Approved",
+                approvalNote: data.note,
+                approvedById: current.id,
+                approvedAt: new Date(),
+              }
+            : {
+                status: "Open",
+                approval: "Revision",
+                approvalNote: data.note,
+                approvedById: current.id,
+                approvedAt: new Date(),
+              },
+      });
+      if (changed.count !== 1)
+        throw new IdentityError(
+          "CONFLICT",
+          409,
+          "Hanya pembuat tiket yang bisa menyetujui tiket berstatus Finish yang belum diputuskan.",
+        );
+      return { id: data.id };
     },
     async branches() {
       const current = await actor("create");

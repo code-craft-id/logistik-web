@@ -122,8 +122,8 @@ export const legacyMenu = [
       {
         label: "Operasional / Lembar Pengantaran",
         children: [
-          { label: "Kurir Kota", href: "/courier-reports?view=city" },
-          { label: "Print DRS", href: "/branch-reports/delivery" },
+          { label: "Kurir Kota", href: "/delivery-sheets" },
+          { label: "Print DRS", href: "/delivery-sheets?tab=print" },
         ],
       },
       {
@@ -131,10 +131,7 @@ export const legacyMenu = [
         children: [
           { label: "POD Kembali", href: "/pod-returns" },
           { label: "Approval Pod Kembali", href: "/pod-returns?tab=approval" },
-          {
-            label: "Proses Vendor",
-            href: "/branch-reports/manifest-vendor?view=process",
-          },
+          { label: "Proses Vendor", href: "/vendor-processes" },
         ],
       },
       {
@@ -163,6 +160,10 @@ export const legacyMenu = [
           {
             label: "Manifest Outbound",
             href: "/branch-reports/manifest-outbound",
+          },
+          {
+            label: "Rekap Manifest",
+            href: "/branch-reports/rekap-manifest",
           },
           {
             label: "Pengantaran",
@@ -200,7 +201,10 @@ export const legacyMenu = [
       },
       {
         label: "Laporan Kurir",
-        href: "/courier-reports",
+        children: [
+          { label: "Harian Kurir", href: "/courier-reports" },
+          { label: "Laporan Detail Kurir", href: "/courier-reports/detail" },
+        ],
       },
       {
         label: "Laporan Keuangan",
@@ -225,6 +229,9 @@ export const legacyMenu = [
   },
   {
     label: "Ticketing",
-    href: "/ticketting",
+    children: [
+      { label: "Tiket Support", href: "/ticketting" },
+      { label: "Persetujuan Tiketing", href: "/ticketting?tab=approval" },
+    ],
   },
 ] as const;

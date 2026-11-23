@@ -15,7 +15,7 @@ export function DeliveryPhotoForm({
   deliverySheetId,
   transactionId,
 }: {
-  manifestId: number;
+  manifestId: number | null;
   deliverySheetId: number;
   transactionId: number;
 }) {
@@ -54,7 +54,9 @@ export function DeliveryPhotoForm({
         });
       }}
     >
-      <input type="hidden" name="manifestId" value={manifestId} />
+      {manifestId !== null && (
+        <input type="hidden" name="manifestId" value={manifestId} />
+      )}
       <input type="hidden" name="deliverySheetId" value={deliverySheetId} />
       <input type="hidden" name="transactionId" value={transactionId} />
       <div className="space-y-1">

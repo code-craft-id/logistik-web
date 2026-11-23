@@ -48,53 +48,55 @@ model Office {
 }
 
 model Branch {
-  manifestScans ManifestScan[] @relation("ManifestScanBranch")
-  finAccounts FinAccount[] @relation("FinAccountBranch")
-  bookingsInbound Booking[] @relation("BookingDestinationBranch")
-  tariffOrigins Tariff[] @relation("TariffOrigin")
-  tariffDestinations Tariff[] @relation("TariffDestination")
-  podReturnOrigins PodReturn[] @relation("PodReturnOrigin")
-  podReturnDestinations PodReturn[] @relation("PodReturnDestination")
-  finMappings FinMapping[]
-  finJournals FinJournal[]
-  finCostStates FinCostState[]
-  finClosedPeriods FinClosedPeriod[]
-  finInvoices FinInvoice[]
-  finCommands FinCommand[]
-  customers           Customer[]
-  consignees          Consignee[]
-  bookings            Booking[]
-  manifests           Manifest[]
-  transactionsOrigin  Transaction[]       @relation("TransactionOriginBranch")
-  transactionsDest    Transaction[]       @relation("TransactionDestinationBranch")
-  vendorBills         VendorBill[]
-  id                  Int                 @id @default(autoincrement())
-  officeId            Int                 @map("office_id")
-  code                String
-  name                String
-  address             String?
-  city                String?
-  phoneNumber         String?             @map("phone_number")
-  managerName         String?             @map("manager_name")
-  managerContact      String?             @map("manager_contact")
-  postalCode          String?             @map("postal_code")
-  faxNumber           String?             @map("fax_number")
-  email               String?
-  financeContactName  String?             @map("finance_contact_name")
-  marketingContactName String?            @map("marketing_contact_name")
-  taxId               String?             @map("tax_id")
-  status              RecordStatus
-  office              Office              @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt           DateTime            @default(now()) @map("created_at")
-  updatedAt           DateTime            @updatedAt @map("updated_at")
-  deletedAt           DateTime?           @map("deleted_at")
-  agents              Agent[]
-  drivers             Driver[]
-  couriers            Courier[]
-  vehicles            Vehicle[]
-  marketingPeople     MarketingPerson[]
-  userAllowedBranches UserAllowedBranch[]
-  tickets             Ticket[]
+  manifestScans         ManifestScan[]      @relation("ManifestScanBranch")
+  finAccounts           FinAccount[]        @relation("FinAccountBranch")
+  bookingsInbound       Booking[]           @relation("BookingDestinationBranch")
+  tariffOrigins         Tariff[]            @relation("TariffOrigin")
+  tariffDestinations    Tariff[]            @relation("TariffDestination")
+  podReturnOrigins      PodReturn[]         @relation("PodReturnOrigin")
+  podReturnDestinations PodReturn[]         @relation("PodReturnDestination")
+  finMappings           FinMapping[]
+  finJournals           FinJournal[]
+  finCostStates         FinCostState[]
+  finClosedPeriods      FinClosedPeriod[]
+  finInvoices           FinInvoice[]
+  finCommands           FinCommand[]
+  customers             Customer[]
+  consignees            Consignee[]
+  bookings              Booking[]
+  manifests             Manifest[]
+  transactionsOrigin    Transaction[]       @relation("TransactionOriginBranch")
+  transactionsDest      Transaction[]       @relation("TransactionDestinationBranch")
+  vendorBills           VendorBill[]
+  id                    Int                 @id @default(autoincrement())
+  officeId              Int                 @map("office_id")
+  code                  String
+  name                  String
+  address               String?
+  city                  String?
+  phoneNumber           String?             @map("phone_number")
+  managerName           String?             @map("manager_name")
+  managerContact        String?             @map("manager_contact")
+  postalCode            String?             @map("postal_code")
+  faxNumber             String?             @map("fax_number")
+  email                 String?
+  financeContactName    String?             @map("finance_contact_name")
+  marketingContactName  String?             @map("marketing_contact_name")
+  taxId                 String?             @map("tax_id")
+  status                RecordStatus
+  office                Office              @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+  deletedAt             DateTime?           @map("deleted_at")
+  agents                Agent[]
+  drivers               Driver[]
+  couriers              Courier[]
+  vehicles              Vehicle[]
+  marketingPeople       MarketingPerson[]
+  userAllowedBranches   UserAllowedBranch[]
+  tickets               Ticket[]
+  deliverySheets        DeliverySheet[]
+  vendorProcesses       VendorProcess[]
 
   @@index([officeId])
   @@index([status])
@@ -118,26 +120,27 @@ model Department {
 }
 
 model Agent {
-  id             Int          @id @default(autoincrement())
-  branchId       Int          @map("branch_id")
-  departmentId   Int?         @map("department_id")
+  deliverySheets DeliverySheet[]
+  id             Int             @id @default(autoincrement())
+  branchId       Int             @map("branch_id")
+  departmentId   Int?            @map("department_id")
   code           String
   initials       String
   name           String
   category       String
-  phoneNumber    String?      @map("phone_number")
-  managerName    String?      @map("manager_name")
-  mobileNumber   String?      @map("mobile_number")
+  phoneNumber    String?         @map("phone_number")
+  managerName    String?         @map("manager_name")
+  mobileNumber   String?         @map("mobile_number")
   /// DRAFT: currency, precision, and rounding TBD, D-11, D-24
-  balance        Decimal      @db.Decimal(19, 2)
+  balance        Decimal         @db.Decimal(19, 2)
   /// DRAFT: rate unit, precision, and rounding TBD, D-11
-  commissionRate Decimal      @map("commission_rate") @db.Decimal(9, 4)
+  commissionRate Decimal         @map("commission_rate") @db.Decimal(9, 4)
   status         RecordStatus
-  branch         Branch       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  department     Department?  @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
-  deletedAt      DateTime?    @map("deleted_at")
+  branch         Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  department     Department?     @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  deletedAt      DateTime?       @map("deleted_at")
 
   @@index([branchId])
   @@index([departmentId])

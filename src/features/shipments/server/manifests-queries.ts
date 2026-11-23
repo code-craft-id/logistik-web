@@ -415,7 +415,10 @@ export async function deliveryProofs(transactionId: number) {
     where: {
       transactionId,
       deletedAt: null,
-      deliverySheet: { manifest: { deletedAt: null } },
+      deliverySheet: {
+        deletedAt: null,
+        OR: [{ manifest: { deletedAt: null } }, { manifestId: null }],
+      },
     },
     orderBy: { id: "desc" },
     take: 10,
@@ -429,7 +432,9 @@ export async function deliveryProofs(transactionId: number) {
       podPhotoAt: true,
       deliverySheet: {
         select: {
+          id: true,
           sheetNo: true,
+          branchId: true,
           manifest: {
             select: { id: true, manifestNo: true, branchId: true },
           },

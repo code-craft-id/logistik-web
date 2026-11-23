@@ -259,7 +259,8 @@ export function OutcomeForm({
   deliverySheetId,
   transactionId,
 }: {
-  manifestId: number;
+  /** Absent for a standalone DRS (Kurir Kota). */
+  manifestId?: number;
   deliverySheetId: number;
   transactionId: number;
 }) {
@@ -288,7 +289,9 @@ export function OutcomeForm({
         });
       }}
     >
-      <input type="hidden" name="manifestId" value={manifestId} />
+      {manifestId !== undefined && (
+        <input type="hidden" name="manifestId" value={manifestId} />
+      )}
       <input type="hidden" name="deliverySheetId" value={deliverySheetId} />
       <input type="hidden" name="transactionId" value={transactionId} />
       <ComboSelect

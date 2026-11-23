@@ -99,6 +99,9 @@ export default async function Page({
             ["Penerima (master)", tx.consignee?.name],
             ["Alamat Penerima", tx.receiverAddress],
             ["No. Telp Penerima", tx.receiverPhone],
+            ["PIC 1", tx.pic1],
+            ["PIC 2", tx.pic2],
+            ["Lead Time", tx.leadTime],
             ["Koli", tx.koli],
             ["Berat (kg)", tx.kilo?.toString()],
             ["Volume", tx.volume?.toString()],
@@ -106,6 +109,10 @@ export default async function Page({
             ["Harga", formatRupiah(tx.pricePerKg)],
             ["Min KG", tx.minWeight?.toString()],
             ["Asuransi", tx.insured === null ? null : tx.insured ? "Y" : "N"],
+            ["Nilai Barang", formatRupiah(tx.goodsValue)],
+            ["Biaya Asuransi", formatRupiah(tx.insuranceFee)],
+            ["Nilai COD", formatRupiah(tx.codValue)],
+            ["Biaya COD", formatRupiah(tx.codFee)],
             ["Biaya Lain", formatRupiah(tx.otherFee)],
             ["Biaya Packing", formatRupiah(tx.packingFee)],
             ["Biaya Pickup", formatRupiah(tx.pickupFee)],
@@ -113,6 +120,14 @@ export default async function Page({
             ["Discount (%)", tx.discountPercent?.toString()],
             ["PPN (%)", tx.ppnPercent?.toString()],
             ["Grand Total", formatRupiah(tx.biaya)],
+            [
+              "Show Price Print AWB",
+              tx.showPriceOnPrint === null
+                ? "Ikuti perusahaan"
+                : tx.showPriceOnPrint
+                  ? "Ya"
+                  : "Tidak",
+            ],
             ["Isi Barang", tx.description],
             ["Keterangan", tx.remarks],
             ["Kurir", tx.courier?.name],

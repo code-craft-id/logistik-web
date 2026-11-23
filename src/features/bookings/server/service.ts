@@ -106,7 +106,8 @@ export function calculateDimensionTotals(
  * Entry AWB pricing as observed in the legacy form (rules pending finance
  * confirmation): Terberat = max(Berat, Volume). Freight by Pricing Type:
  * KG = max(Terberat, Min KG) x Harga; KOLI = Koli x Harga; TRUCKING = Harga.
- * Total Biaya = freight + Biaya Lain + Packing + Pickup; Grand Total = (Total - Discount%) + PPN% of the discounted amount,
+ * Total Biaya = freight + Biaya Lain + Packing + Pickup + Biaya Asuransi +
+ * Biaya COD (owner decision D-35); Grand Total = (Total - Discount%) + PPN% of the discounted amount,
  * each step rounded half-up to 2 decimals. Grand Total is stored as `biaya`.
  * Without Harga/Kg the typed Biaya is kept (legacy "Ganti Harga").
  */
@@ -124,6 +125,8 @@ export function priceAwb(input: {
   otherFee?: string | null;
   packingFee?: string | null;
   pickupFee?: string | null;
+  insuranceFee?: string | null;
+  codFee?: string | null;
   discountPercent?: string | null;
   ppnPercent?: string | null;
   biaya?: string | null;
@@ -172,7 +175,9 @@ export function priceAwb(input: {
     freight
       .plus(dec(input.otherFee) ?? zero)
       .plus(dec(packingFee) ?? zero)
-      .plus(dec(input.pickupFee) ?? zero),
+      .plus(dec(input.pickupFee) ?? zero)
+      .plus(dec(input.insuranceFee) ?? zero)
+      .plus(dec(input.codFee) ?? zero),
   );
   const discount = round(
     total.times(dec(input.discountPercent) ?? zero).div(100),
@@ -594,6 +599,8 @@ function payloadMatchesExisting(
     "volume",
     "chargeableWeight",
     "packingFee",
+    "insuranceFee",
+    "codFee",
     "totalCost",
     "biaya",
   ];
@@ -904,6 +911,14 @@ export async function createTransaction(
           otherFee: rest.otherFee ?? null,
           packingFee: rest.packingFee ?? null,
           pickupFee: rest.pickupFee ?? null,
+          goodsValue: rest.goodsValue ?? null,
+          insuranceFee: rest.insuranceFee ?? null,
+          codValue: rest.codValue ?? null,
+          codFee: rest.codFee ?? null,
+          pic1: rest.pic1 ?? null,
+          pic2: rest.pic2 ?? null,
+          leadTime: rest.leadTime ?? null,
+          showPriceOnPrint: rest.showPriceOnPrint ?? null,
           discountPercent: rest.discountPercent ?? null,
           ppnPercent: rest.ppnPercent ?? null,
           courierId: rest.courierId ?? null,

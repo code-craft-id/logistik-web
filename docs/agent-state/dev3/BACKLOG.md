@@ -12,13 +12,25 @@ Keep this file current: move items to "Done" with the commit when finished.
 | A1 | Export Excel on Status Pengantaran | `/shipment-status` has search / refresh / export | Same rows and filters as the page |
 | A2 | Export Excel on Hitung Rugi Laba | `/rugi-laba` has Search / Export / Refresh | Same layout as the page |
 | A3 | Perkiraan Export Excel, Template Import, Import Data | `/perkiraan` buttons | Import must validate like the account form (Induk loops, Kategori Rugi Laba only on revenue/expense) |
-| A4 | Delivery Sheet list page: DRS No., Tanggal, Branch, Agent, Kurir, Tot. Koli / Kg / Volume, Status, Create DRS, Action | `/delivery-sheet` | Today DRS lives only on the manifest detail; Kurir/driver/nopol on DRS is part of this |
+| A4 | ~~Delivery Sheet list page~~ DONE locally 2026-11-23 (uncommitted): `/delivery-sheets` standalone DRS (Kurir Kota) with courier/driver/nopol/agent, Print DRS | `/delivery-sheet` | D-35; needs Dev 2 review |
 | A5 | Quick Action "Atur Menu" (per-user favourite menu) and "Refresh Quick Action" | Provider dashboard | Per-user setting; only links the user may open |
 | A6 | Mobile check at 375px of all pages | AGENTS.md definition of done | Never done properly (window resize did not work in the browser tool) |
 | A7 | Full menu-by-menu re-audit (Sistem Setting, Kantor, Master Data, Modul, Laporan) | Provider navigation | Only Quick Action and the hidden accounting pages were compared one by one in this session |
 | A8 | Not yet checked: dashboard "AI Executive Summary", "Rekomendasi AI", "Notifikasi Pending" cards | Provider dashboard | Inspect first; AI content may be out of scope |
 | A9 | Not yet checked: Tutorial System pages | Provider menu "Tutorial System" | We have the in-app help chat (`knowledge.ts`), not tutorial pages |
 | A10 | Not yet checked: customer self-service portal (Report Customer Member: shipments, POD return, invoices, all status) | Digitalindo feature list, provider menu "Report Customer" | Staff-side customer reports exist; customer login not decided |
+
+## A2. Added 2026-11-23 (D-35, uncommitted, needs review)
+
+| # | Item | Notes |
+|---|---|---|
+| N1 | Entry AWB COD / insurance / PIC / Lead Time / Show Price per AWB | Migration 20261123000100; fees join Grand Total (owner) |
+| N2 | Standalone DRS (Kurir Kota) + Print DRS | Migration 20261123000200; manifest_id nullable |
+| N3 | Proses Vendor | Migration 20261123000300; permission `vendor_process` |
+| N4 | Ticket status + Persetujuan Tiketing | Migration 20261123000400; permission `ticket: manage` |
+| N5 | Rekap Manifest + Excel, Laporan Detail Kurir | No schema change |
+| N6 | Print AWB: provider 3-copy A4 layout, Harga / Non Harga | OBSERVED in provider and reference |
+| N7 | Still TBD | COD List / Kas Terima, COD and insurance formulas, SLA / Acc. in in Detail Kurir, ticket rating |
 
 ## B. Waiting for a business decision
 

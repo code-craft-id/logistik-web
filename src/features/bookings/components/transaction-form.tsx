@@ -121,6 +121,8 @@ const initialPrice = {
   otherFee: "",
   packingFee: "",
   pickupFee: "",
+  insuranceFee: "",
+  codFee: "",
   discountPercent: "",
   ppnPercent: "11",
 };
@@ -243,7 +245,9 @@ export function TransactionForm({
     freight +
       num(price.otherFee) +
       num(price.packingFee) +
-      num(price.pickupFee),
+      num(price.pickupFee) +
+      num(price.insuranceFee) +
+      num(price.codFee),
   );
   const discount = round2((total * num(price.discountPercent)) / 100);
   const ppn = ppnOn
@@ -665,6 +669,14 @@ export function TransactionForm({
               setReceiver((r) => ({ ...r, phone: e.target.value }))
             }
           />
+          <Text name="pic1" text="PIC 1" placeholder="PIC 1" maxLength={100} />
+          <Text name="pic2" text="PIC 2" placeholder="PIC 2" maxLength={100} />
+          <Text
+            name="leadTime"
+            text="Lead Time"
+            placeholder="mis. 2-3 hari"
+            maxLength={50}
+          />
           <div className={row}>
             <span className={label}>Harga Kg I</span>
             <div className="grid grid-cols-[1fr_auto_6rem] items-center gap-2">
@@ -724,8 +736,24 @@ export function TransactionForm({
               </select>
             </div>
           </div>
+          <Text
+            name="goodsValue"
+            text="Nilai Barang"
+            type="number"
+            min="0"
+            step="0.01"
+          />
+          <Text
+            name="codValue"
+            text="Nilai COD"
+            type="number"
+            min="0"
+            step="0.01"
+          />
           {(
             [
+              ["insuranceFee", "Biaya Asuransi"],
+              ["codFee", "Biaya COD"],
               ["otherFee", "Biaya Lain"],
               ["packingFee", "Biaya Packing"],
               ["pickupFee", "Biaya Pickup"],
@@ -826,9 +854,25 @@ export function TransactionForm({
           </div>
           <p className="text-xs text-muted-foreground">
             Grand Total dihitung ulang oleh server: {priceLabel} x Terberat
-            (minimal Min KG) / Koli / tarif tetap, + biaya lain, packing,
-            pickup, - discount, + PPN. Ganti Harga = isi Grand Total manual.
+            (minimal Min KG) / Koli / tarif tetap, + biaya asuransi, COD, lain,
+            packing, pickup, - discount, + PPN. Nilai Barang dan Nilai COD hanya
+            dicatat, tidak menambah Grand Total. Ganti Harga = isi Grand Total
+            manual.
           </p>
+          <div className={row}>
+            <label htmlFor="showPriceOnPrint" className={label}>
+              Show Price Print AWB
+            </label>
+            <select
+              id="showPriceOnPrint"
+              name="showPriceOnPrint"
+              defaultValue="Y"
+              className={field}
+            >
+              <option value="Y">Ya, harga boleh dicetak</option>
+              <option value="N">Tidak, sembunyikan harga</option>
+            </select>
+          </div>
           <button
             type="submit"
             disabled={isPending}

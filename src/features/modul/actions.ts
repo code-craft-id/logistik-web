@@ -15,6 +15,10 @@ import { ModulError } from "./server/common";
 import { createPodReturn, decidePodReturn } from "./server/pod-returns";
 import { deleteTariff, saveTariff } from "./server/tariffs";
 import { closeVendorBill, createVendorBill } from "./server/vendor-bills";
+import {
+  createVendorProcess,
+  deleteVendorProcess,
+} from "./server/vendor-processes";
 
 export type ModulResult = {
   ok: boolean;
@@ -179,5 +183,28 @@ export async function closeVendorBillAction(formData: FormData) {
       return { ok: true, message: "Invoice ditandai lunas." };
     },
     ["/finance/debt-payments"],
+  );
+}
+
+export async function createVendorProcessAction(formData: FormData) {
+  return run(
+    async (actor) => {
+      await createVendorProcess(actor, fields(formData));
+      return {
+        ok: true,
+        message: `AWB ${String(formData.get("awbNo") ?? "").trim()} dicatat ke vendor.`,
+      };
+    },
+    ["/vendor-processes"],
+  );
+}
+
+export async function deleteVendorProcessAction(formData: FormData) {
+  return run(
+    async (actor) => {
+      await deleteVendorProcess(actor, fields(formData));
+      return { ok: true, message: "Data proses vendor dihapus." };
+    },
+    ["/vendor-processes"],
   );
 }

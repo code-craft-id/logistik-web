@@ -116,12 +116,13 @@ export async function DeliveryProof({
       ) : (
         proofs.map((p) => {
           const manifest = p.deliverySheet.manifest;
+          const owner = manifest ? manifest.branchId : p.deliverySheet.branchId;
           const canUpload =
             canUpdate &&
             !p.podPhotoUrl &&
             !!p.outcome &&
-            !!manifest.branchId &&
-            permitsBranch(actor, manifest.branchId);
+            !!owner &&
+            permitsBranch(actor, owner);
           return (
             <div
               key={p.deliverySheetId}
@@ -155,10 +156,16 @@ export async function DeliveryProof({
                 ))}
                 <div className="col-span-full">
                   <Link
-                    href={`/manifest/${manifest.id}`}
+                    href={
+                      manifest
+                        ? `/manifest/${manifest.id}`
+                        : `/delivery-sheets/${p.deliverySheet.id}`
+                    }
                     className="inline-flex min-h-11 items-center text-primary underline underline-offset-4"
                   >
-                    Buka manifest {manifest.manifestNo}
+                    {manifest
+                      ? `Buka manifest ${manifest.manifestNo}`
+                      : `Buka DRS ${p.deliverySheet.sheetNo}`}
                   </Link>
                 </div>
               </dl>
@@ -187,7 +194,7 @@ export async function DeliveryProof({
                 ) : canUpload ? (
                   enabled ? (
                     <DeliveryPhotoForm
-                      manifestId={manifest.id}
+                      manifestId={manifest?.id ?? null}
                       deliverySheetId={p.deliverySheetId}
                       transactionId={transactionId}
                     />

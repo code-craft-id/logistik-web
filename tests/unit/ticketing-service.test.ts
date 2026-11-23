@@ -39,6 +39,12 @@ const record = {
   deletedAt: null,
   createdAt: new Date("2026-11-15T00:00:00Z"),
   updatedAt: new Date("2026-11-15T00:00:00Z"),
+  status: "Open",
+  approval: null,
+  approvalNote: null,
+  approvedAt: null,
+  approvedBy: null,
+  createdBy: null,
 };
 const db = {
   user: { findUnique: vi.fn() },

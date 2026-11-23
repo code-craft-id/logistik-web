@@ -166,6 +166,7 @@ const outcomeMessages: Record<string, string> = {
     "Data berubah bersamaan. Muat ulang halaman.",
   STATUS_CONCURRENTLY_UPDATED: "Data berubah bersamaan. Muat ulang halaman.",
   DELIVERY_SHEET_ITEM_NOT_FOUND: "AWB tidak ada di lembar pengantaran ini.",
+  DELIVERY_SHEET_NOT_FOUND: "Lembar pengantaran tidak ditemukan.",
   DELIVERY_PHOTO_NEEDS_OUTCOME: "Catat hasil antar dulu sebelum menambah foto.",
   DELIVERY_PHOTO_EXISTS: "AWB ini sudah punya foto bukti terima.",
 };
@@ -195,7 +196,9 @@ export async function recordOutcomeFormAction(
     const input = deliveryOutcomeSchema.parse(raw);
     // Photos are added on the AWB detail page (attachDeliveryPhoto) only.
     const result = await recordDeliveryOutcome(input, current.actor);
-    revalidatePath(`/manifest/${formData.get("manifestId")}`);
+    const manifestId = formData.get("manifestId");
+    if (manifestId) revalidatePath(`/manifest/${manifestId}`);
+    else revalidatePath(`/delivery-sheets/${input.deliverySheetId}`);
     return { ok: true, id: result?.id ?? 0 };
   } catch (e) {
     if (e instanceof UploadError) return { ok: false, message: e.message };
@@ -243,7 +246,9 @@ export async function attachDeliveryPhotoFormAction(
         current.actor,
         photo,
       );
-      revalidatePath(`/manifest/${formData.get("manifestId")}`);
+      const manifestId = formData.get("manifestId");
+      if (manifestId) revalidatePath(`/manifest/${manifestId}`);
+      else revalidatePath(`/delivery-sheets/${deliverySheetId}`);
       revalidatePath(`/transactions/${transactionId}`);
       return { ok: true, id: result.id };
     } catch (e) {

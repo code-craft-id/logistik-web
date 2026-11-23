@@ -71,19 +71,20 @@ model PostalCode {
 }
 
 model Driver {
-  podReturns PodReturn[]
-  deletedAt           DateTime?    @map("deleted_at")
-  updatedAt           DateTime     @updatedAt @map("updated_at")
-  createdAt           DateTime     @default(now()) @map("created_at")
-  id                  Int          @id @default(autoincrement())
-  name                String       @db.VarChar(100)
+  deliverySheets      DeliverySheet[]
+  podReturns          PodReturn[]
+  deletedAt           DateTime?       @map("deleted_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  id                  Int             @id @default(autoincrement())
+  name                String          @db.VarChar(100)
   address             String
-  nationalIdNumber    String       @map("national_id_number") @db.VarChar(20)
-  driverLicenseNumber String       @map("driver_license_number") @db.VarChar(20)
-  phone               String       @db.VarChar(20)
-  branchId            Int?         @map("branch_id")
-  branch              Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  status              RecordStatus @default(ACTIVE)
+  nationalIdNumber    String          @map("national_id_number") @db.VarChar(20)
+  driverLicenseNumber String          @map("driver_license_number") @db.VarChar(20)
+  phone               String          @db.VarChar(20)
+  branchId            Int?            @map("branch_id")
+  branch              Branch?         @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status              RecordStatus    @default(ACTIVE)
 
   @@index([branchId])
   @@index([status])
@@ -91,21 +92,22 @@ model Driver {
 }
 
 model Courier {
-  bookings Booking[] @relation("BookingCourier")
-  pickupTransactions Transaction[] @relation("TransactionPickupCourier")
-  deletedAt        DateTime?    @map("deleted_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
-  createdAt        DateTime     @default(now()) @map("created_at")
-  id               Int          @id @default(autoincrement())
-  name             String       @db.VarChar(100)
-  address          String
-  nationalIdNumber String       @map("national_id_number") @db.VarChar(20)
-  phone            String       @db.VarChar(20)
-  branchId         Int?         @map("branch_id")
-  branch           Branch?      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  status           RecordStatus @default(ACTIVE)
-  transactions     Transaction[]
-  manifests        Manifest[]
+  deliverySheets     DeliverySheet[]
+  bookings           Booking[]       @relation("BookingCourier")
+  pickupTransactions Transaction[]   @relation("TransactionPickupCourier")
+  deletedAt          DateTime?       @map("deleted_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  id                 Int             @id @default(autoincrement())
+  name               String          @db.VarChar(100)
+  address            String
+  nationalIdNumber   String          @map("national_id_number") @db.VarChar(20)
+  phone              String          @db.VarChar(20)
+  branchId           Int?            @map("branch_id")
+  branch             Branch?         @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status             RecordStatus    @default(ACTIVE)
+  transactions       Transaction[]
+  manifests          Manifest[]
 
   @@index([branchId])
   @@index([status])
@@ -113,7 +115,7 @@ model Courier {
 }
 
 model TransportMode {
-  bookings Booking[] @relation("BookingTransportMode")
+  bookings         Booking[]         @relation("BookingTransportMode")
   deletedAt        DateTime?         @map("deleted_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
   createdAt        DateTime          @default(now()) @map("created_at")
@@ -144,8 +146,8 @@ model ServiceCategory {
 
 /// Service dictionary only; this is not an operational delivery model.
 model DeliveryService {
-  bookings Booking[] @relation("BookingDeliveryService")
-  tariffs Tariff[]
+  bookings          Booking[]        @relation("BookingDeliveryService")
+  tariffs           Tariff[]
   deletedAt         DateTime?        @map("deleted_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
   createdAt         DateTime         @default(now()) @map("created_at")
@@ -165,12 +167,12 @@ model DeliveryService {
 }
 
 model GoodsType {
-  bookings Booking[] @relation("BookingGoodsType")
-  deletedAt DateTime?    @map("deleted_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
-  createdAt DateTime     @default(now()) @map("created_at")
-  id        Int          @id @default(autoincrement())
-  name      String       @db.VarChar(100)
+  bookings     Booking[]     @relation("BookingGoodsType")
+  deletedAt    DateTime?     @map("deleted_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(100)
   status       RecordStatus  @default(ACTIVE)
   transactions Transaction[]
 
@@ -179,15 +181,15 @@ model GoodsType {
 }
 
 model CostType {
-  bookings Booking[] @relation("BookingCostType")
+  bookings     Booking[]     @relation("BookingCostType")
   customers    Customer[]
   transactions Transaction[]
-  deletedAt DateTime?    @map("deleted_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
-  createdAt DateTime     @default(now()) @map("created_at")
-  id        Int          @id @default(autoincrement())
-  name      String       @db.VarChar(100)
-  status    RecordStatus @default(ACTIVE)
+  deletedAt    DateTime?     @map("deleted_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(100)
+  status       RecordStatus  @default(ACTIVE)
 
   @@index([status])
   @@map("cost_types")
@@ -208,29 +210,30 @@ model Term {
 }
 
 model Vehicle {
-  deletedAt              DateTime?     @map("deleted_at")
-  updatedAt              DateTime      @updatedAt @map("updated_at")
-  createdAt              DateTime      @default(now()) @map("created_at")
-  id                     Int           @id @default(autoincrement())
-  name                   String        @db.VarChar(100)
-  truckingTypeId         Int?          @map("trucking_type_id")
-  truckingType           TruckingType? @relation(fields: [truckingTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deliverySheets         DeliverySheet[]
+  deletedAt              DateTime?       @map("deleted_at")
+  updatedAt              DateTime        @updatedAt @map("updated_at")
+  createdAt              DateTime        @default(now()) @map("created_at")
+  id                     Int             @id @default(autoincrement())
+  name                   String          @db.VarChar(100)
+  truckingTypeId         Int?            @map("trucking_type_id")
+  truckingType           TruckingType?   @relation(fields: [truckingTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   year                   Int
-  licensePlate           String        @map("license_plate") @db.VarChar(20)
-  registrationHolderName String        @map("registration_holder_name") @db.VarChar(100)
-  registrationNumber     String        @map("registration_number") @db.VarChar(50)
-  registrationDate       DateTime?     @map("registration_date") @db.Date
-  cylinderCapacity       String        @map("cylinder_capacity") @db.VarChar(50)
-  color                  String        @db.VarChar(50)
-  insuranceName          String        @map("insurance_name") @db.VarChar(100)
-  insuranceExpiry        DateTime?     @map("insurance_expiry") @db.Date
+  licensePlate           String          @map("license_plate") @db.VarChar(20)
+  registrationHolderName String          @map("registration_holder_name") @db.VarChar(100)
+  registrationNumber     String          @map("registration_number") @db.VarChar(50)
+  registrationDate       DateTime?       @map("registration_date") @db.Date
+  cylinderCapacity       String          @map("cylinder_capacity") @db.VarChar(50)
+  color                  String          @db.VarChar(50)
+  insuranceName          String          @map("insurance_name") @db.VarChar(100)
+  insuranceExpiry        DateTime?       @map("insurance_expiry") @db.Date
   description            String
-  chassisNumber          String        @map("chassis_number") @db.VarChar(100)
-  engineNumber           String        @map("engine_number") @db.VarChar(100)
-  status                 RecordStatus  @default(ACTIVE)
-  serviceTrucking        Boolean       @default(false) @map("service_trucking")
-  branchId               Int?          @map("branch_id")
-  branch                 Branch?       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  chassisNumber          String          @map("chassis_number") @db.VarChar(100)
+  engineNumber           String          @map("engine_number") @db.VarChar(100)
+  status                 RecordStatus    @default(ACTIVE)
+  serviceTrucking        Boolean         @default(false) @map("service_trucking")
+  branchId               Int?            @map("branch_id")
+  branch                 Branch?         @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   manifests              Manifest[]
 
   @@index([truckingTypeId])
@@ -280,26 +283,27 @@ model ShipmentStatus {
 }
 
 model Vendor {
-  vendorBills VendorBill[]
-  manifests   Manifest[]
-  deletedAt   DateTime?         @map("deleted_at")
-  id          Int               @id @default(autoincrement())
-  name        String
-  address1    String
-  address2    String
-  city        String
-  postalCode  String            @map("postal_code")
-  phone       String
-  fax         String
-  email       String
-  contactName String            @map("contact_name")
-  branch      String
-  status      RecordStatus      @default(ACTIVE)
-  services    VendorService[]
-  taxProfile  VendorTaxProfile?
-  accounting  VendorAccounting?
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
+  vendorProcesses VendorProcess[]
+  vendorBills     VendorBill[]
+  manifests       Manifest[]
+  deletedAt       DateTime?         @map("deleted_at")
+  id              Int               @id @default(autoincrement())
+  name            String
+  address1        String
+  address2        String
+  city            String
+  postalCode      String            @map("postal_code")
+  phone           String
+  fax             String
+  email           String
+  contactName     String            @map("contact_name")
+  branch          String
+  status          RecordStatus      @default(ACTIVE)
+  services        VendorService[]
+  taxProfile      VendorTaxProfile?
+  accounting      VendorAccounting?
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
 
   @@index([status])
   @@map("vendors")

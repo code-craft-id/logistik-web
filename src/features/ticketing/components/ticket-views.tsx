@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/patterns/content-state";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,8 +12,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ActionForm } from "@/features/modul/components/action-form";
 import { businessDateTimeString } from "@/lib/date/business-date";
-import type { TicketDTO } from "../contracts";
+import { decideTicketAction, setTicketStatusAction } from "../actions";
+import { TICKET_STATUSES, type TicketDTO } from "../contracts";
+
+const APPROVAL: Record<string, string> = {
+  Approved: "Approve Finish",
+  Revision: "Revisi",
+};
+
+function StatusBadge({ ticket }: { ticket: TicketDTO }) {
+  const tone =
+    ticket.approval === "Approved"
+      ? "border-primary"
+      : ticket.status === "Finish"
+        ? "border-primary/60"
+        : "border-muted-foreground/40";
+  return (
+    <span
+      className={`inline-flex rounded-full border px-2 py-0.5 text-xs whitespace-nowrap ${tone}`}
+    >
+      {ticket.approval === "Approved" ? "Selesai disetujui" : ticket.status}
+    </span>
+  );
+}
 
 export function TicketList({
   items,
@@ -20,6 +44,7 @@ export function TicketList({
   page,
   pageSize,
   search,
+  tab = "all",
   canCreate,
 }: {
   items: TicketDTO[];
@@ -27,19 +52,34 @@ export function TicketList({
   page: number;
   pageSize: number;
   search: string;
+  tab?: "all" | "approval";
   canCreate: boolean;
 }) {
   const pageLink = (next: number) =>
-    `/ticketting?${new URLSearchParams({ search, page: String(next), pageSize: String(pageSize) })}`;
+    `/ticketting?${new URLSearchParams({ search, page: String(next), pageSize: String(pageSize), ...(tab === "approval" ? { tab } : {}) })}`;
   return (
     <div className="min-w-0 space-y-5 [overflow-wrap:anywhere]">
+      <PageTabs
+        label="Ticketing"
+        tabs={[
+          { key: "all", label: "Tiket Support", href: "/ticketting" },
+          {
+            key: "approval",
+            label: "Persetujuan Tiketing",
+            href: "/ticketting?tab=approval",
+          },
+        ]}
+        active={tab}
+      />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-            Ticketing
+            {tab === "approval" ? "Persetujuan Tiketing" : "Ticketing"}
           </h1>
           <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-            Tiket yang tersedia dalam cakupan akses Anda.
+            {tab === "approval"
+              ? "Tiket Anda yang sudah Finish dan menunggu Approve Finish atau Revisi."
+              : "Tiket yang tersedia dalam cakupan akses Anda."}
           </p>
         </div>
         {canCreate && (
@@ -68,6 +108,9 @@ export function TicketList({
             />
           </div>
           <input type="hidden" name="pageSize" value={pageSize} />
+          {tab === "approval" && (
+            <input type="hidden" name="tab" value="approval" />
+          )}
           <Button type="submit" variant="secondary" className="min-h-11">
             Cari tiket
           </Button>
@@ -112,6 +155,8 @@ export function TicketList({
                   "Menu",
                   "Cabang (ID)",
                   "Prioritas",
+                  "Status",
+                  "Approval",
                   "Link URL",
                   "Aksi",
                 ].map((label) => (
@@ -143,6 +188,17 @@ export function TicketList({
                   </TableCell>
                   <TableCell>{ticket.branchId}</TableCell>
                   <TableCell>{ticket.priority}</TableCell>
+                  <TableCell>
+                    <StatusBadge ticket={ticket} />
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {ticket.approval ? APPROVAL[ticket.approval] : "-"}
+                    {ticket.approvedBy && (
+                      <span className="block text-xs text-muted-foreground">
+                        {ticket.approvedBy}
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell className="min-w-48 max-w-xs whitespace-normal [overflow-wrap:anywhere]">
                     {ticket.relatedPageUrl}
                   </TableCell>
@@ -183,12 +239,29 @@ export function TicketList({
   );
 }
 
-export function TicketDetail({ ticket }: { ticket: TicketDTO }) {
+export function TicketDetail({
+  ticket,
+  canManage = false,
+  isCreator = false,
+}: {
+  ticket: TicketDTO;
+  canManage?: boolean;
+  isCreator?: boolean;
+}) {
+  const approved = ticket.approval === "Approved";
   const fields = [
     ["ID internal", String(ticket.id)],
     ["Dibuat (Asia/Jakarta)", ticket.createdAt],
     ["Cabang pemilik (ID)", String(ticket.branchId)],
-    ["Pembuat (ID)", String(ticket.createdById)],
+    ["Pembuat", ticket.createdBy ?? String(ticket.createdById)],
+    ["Status", approved ? "Finish (disetujui)" : ticket.status],
+    [
+      "Approval",
+      ticket.approval
+        ? `${APPROVAL[ticket.approval]}${ticket.approvedBy ? ` oleh ${ticket.approvedBy}` : ""}${ticket.approvedAt ? ` · ${businessDateTimeString(ticket.approvedAt)}` : ""}`
+        : "Belum diputuskan",
+    ],
+    ...(ticket.approvalNote ? [["Catatan approval", ticket.approvalNote]] : []),
     ["Menu", ticket.menuName],
     ["Prioritas", ticket.priority],
     ["Link URL terkait", ticket.relatedPageUrl],
@@ -227,6 +300,78 @@ export function TicketDetail({ ticket }: { ticket: TicketDTO }) {
           </div>
         ))}
       </dl>
+      {canManage && !approved && (
+        <section
+          aria-label="Ubah status tiket"
+          className="rounded-lg border bg-background p-4 sm:p-6"
+        >
+          <h2 className="mb-3 font-semibold">Ubah status (tim support)</h2>
+          <ActionForm
+            action={setTicketStatusAction}
+            submit={
+              <Button type="submit" className="min-h-11">
+                Simpan status
+              </Button>
+            }
+          >
+            <input type="hidden" name="id" value={ticket.id} />
+            <Label htmlFor="ticket-status">Status</Label>
+            <select
+              id="ticket-status"
+              name="status"
+              defaultValue={ticket.status}
+              className="min-h-11 w-full max-w-xs rounded-md border border-input bg-background px-3 text-base md:text-sm"
+            >
+              {TICKET_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </ActionForm>
+        </section>
+      )}
+      {isCreator && ticket.status === "Finish" && !ticket.approval && (
+        <section
+          aria-label="Persetujuan tiket"
+          className="rounded-lg border bg-background p-4 sm:p-6"
+        >
+          <h2 className="mb-3 font-semibold">Persetujuan</h2>
+          <ActionForm
+            action={decideTicketAction}
+            submit={
+              <>
+                <Button
+                  type="submit"
+                  name="decision"
+                  value="Approved"
+                  className="min-h-11"
+                >
+                  Approve Finish
+                </Button>
+                <Button
+                  type="submit"
+                  name="decision"
+                  value="Revision"
+                  variant="outline"
+                  className="min-h-11"
+                >
+                  Revisi
+                </Button>
+              </>
+            }
+          >
+            <input type="hidden" name="id" value={ticket.id} />
+            <Label htmlFor="ticket-note">Catatan (wajib untuk Revisi)</Label>
+            <Input
+              id="ticket-note"
+              name="note"
+              maxLength={1000}
+              className="min-h-11"
+            />
+          </ActionForm>
+        </section>
+      )}
       <Button asChild variant="outline" className="min-h-11">
         <Link href="/ticketting">Kembali ke daftar</Link>
       </Button>

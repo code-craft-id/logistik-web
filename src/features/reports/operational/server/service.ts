@@ -277,15 +277,31 @@ export function createOperationalReportService(
             deletedAt: null,
             transaction: { is: txVisible },
           };
+          // Manifest DRS follow manifest visibility; standalone DRS (Kurir
+          // Kota) follow their own branch.
+          const sheetVisible: Prisma.DeliverySheetWhereInput = {
+            deletedAt: null,
+            OR: [
+              { manifest: { is: manifestVisible } },
+              {
+                manifestId: null,
+                ...(f.branchId !== null
+                  ? { branchId: f.branchId }
+                  : admin
+                    ? {}
+                    : { branchId: { in: actor.branchIds } }),
+              },
+            ],
+          };
           const sheetsWhere: Prisma.DeliverySheetWhereInput = {
             deliveryDate: range,
-            manifest: { is: manifestVisible },
+            ...sheetVisible,
             items: { some: eligibleItems },
           };
           const itemsWhere: Prisma.DeliverySheetItemWhereInput = {
             ...eligibleItems,
             deliverySheet: {
-              is: { deliveryDate: range, manifest: { is: manifestVisible } },
+              is: { deliveryDate: range, ...sheetVisible },
             },
           };
           if (kind === "manifest") {
@@ -508,6 +524,8 @@ export function createOperationalReportService(
                 id: true,
                 sheetNo: true,
                 deliveryDate: true,
+                branch: { select: { name: true } },
+                courier: { select: { name: true } },
                 manifest: {
                   select: {
                     manifestNo: true,
@@ -555,9 +573,11 @@ export function createOperationalReportService(
                   id: row.id,
                   sheetNo: row.sheetNo,
                   date: row.deliveryDate.toISOString(),
-                  manifestNo: row.manifest.manifestNo,
-                  branch: row.manifest.branch?.name ?? null,
-                  courier: row.manifest.courier?.name ?? null,
+                  manifestNo: row.manifest?.manifestNo ?? "Kurir Kota",
+                  branch:
+                    (row.manifest ? row.manifest.branch : row.branch)?.name ??
+                    null,
+                  courier: (row.courier ?? row.manifest?.courier)?.name ?? null,
                   visibleTransactions: row._count.items,
                   ...quantity,
                 };

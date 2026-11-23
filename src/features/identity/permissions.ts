@@ -218,7 +218,7 @@ export const permissionResources = [
   {
     resource: "ticket",
     label: "Ticketing",
-    actions: ["view", "create"],
+    actions: ["view", "create", "manage"],
   },
   {
     resource: "invoice",
@@ -271,6 +271,11 @@ export const permissionResources = [
     actions: ["view", "create", "approve"],
   },
   {
+    resource: "vendor_process",
+    label: "Proses Vendor",
+    actions: ["view", "create", "delete"],
+  },
+  {
     resource: "debt_payment",
     label: "Pembayaran Hutang",
     actions: ["view", "create", "close"],
@@ -311,6 +316,7 @@ export function permissionRestriction(resource: string): string | undefined {
       "awb_change",
       "tariff",
       "pod_return",
+      "vendor_process",
       "debt_payment",
       "awb_scan",
       "ticket",

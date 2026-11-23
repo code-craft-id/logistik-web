@@ -23,44 +23,47 @@ model LegacyUser {
 // Better Auth 1.6.23 core contract. Runtime activation is PLT-01.
 // Auth storage uses native expiry/cleanup, not domain soft deletion.
 model User {
-  manifestScans ManifestScan[] @relation("ManifestScanBy")
-  bookingsCancelled Booking[] @relation("BookingCancelledBy")
-  bookingsPickedUp Booking[] @relation("BookingPickedUpBy")
-  bookingsAssigned Booking[] @relation("BookingAssignedBy")
-  deliveryProofsCreated DeliveryProof[] @relation("DeliveryProofCreatedBy")
-  awbChangeRequests AwbChangeRequest[] @relation("AwbChangeRequestedBy")
-  awbChangeDecisions AwbChangeRequest[] @relation("AwbChangeDecidedBy")
-  podReturnsCreated PodReturn[] @relation("PodReturnCreatedBy")
-  podReturnsDecided PodReturn[] @relation("PodReturnDecidedBy")
-  vendorBillsClosed VendorBill[] @relation("VendorBillClosedBy")
-  vendorBillsCreated VendorBill[] @relation("VendorBillCreatedBy")
-  finCommands FinCommand[]
-  id                  Int                  @id @default(autoincrement())
-  name                String
-  username            String?              @unique
-  displayUsername     String?              @map("display_username")
-  email               String               @unique
-  emailVerified       Boolean              @default(false) @map("email_verified")
+  manifestScans            ManifestScan[]             @relation("ManifestScanBy")
+  bookingsCancelled        Booking[]                  @relation("BookingCancelledBy")
+  bookingsPickedUp         Booking[]                  @relation("BookingPickedUpBy")
+  bookingsAssigned         Booking[]                  @relation("BookingAssignedBy")
+  deliveryProofsCreated    DeliveryProof[]            @relation("DeliveryProofCreatedBy")
+  awbChangeRequests        AwbChangeRequest[]         @relation("AwbChangeRequestedBy")
+  awbChangeDecisions       AwbChangeRequest[]         @relation("AwbChangeDecidedBy")
+  podReturnsCreated        PodReturn[]                @relation("PodReturnCreatedBy")
+  podReturnsDecided        PodReturn[]                @relation("PodReturnDecidedBy")
+  vendorBillsClosed        VendorBill[]               @relation("VendorBillClosedBy")
+  vendorBillsCreated       VendorBill[]               @relation("VendorBillCreatedBy")
+  finCommands              FinCommand[]
+  id                       Int                        @id @default(autoincrement())
+  name                     String
+  username                 String?                    @unique
+  displayUsername          String?                    @map("display_username")
+  email                    String                     @unique
+  emailVerified            Boolean                    @default(false) @map("email_verified")
   /// Application-managed account availability; not writable through provider public inputs.
-  status              RecordStatus         @default(ACTIVE)
-  image               String?
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
-  sessions            Session[]
-  authAccounts        AuthAccount[]
-  group                    UserGroup?           @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  groupId                  Int?                 @map("group_id")
+  status                   RecordStatus               @default(ACTIVE)
+  image                    String?
+  createdAt                DateTime                   @default(now()) @map("created_at")
+  updatedAt                DateTime                   @updatedAt @map("updated_at")
+  sessions                 Session[]
+  authAccounts             AuthAccount[]
+  group                    UserGroup?                 @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  groupId                  Int?                       @map("group_id")
   /// Retained unused column from the first PLT-01 migration; never an authorization source.
-  legacyBranchIds          Int[]                @map("branch_ids") @ignore
+  legacyBranchIds          Int[]                      @map("branch_ids") @ignore
   allowedBranches          UserAllowedBranch[]
   identityAuditEvents      IdentityAuditEvent[]
-  bookingsCreated          Booking[]                @relation("BookingCreatedBy")
-  transactionsCreated      Transaction[]            @relation("TransactionCreatedBy")
+  bookingsCreated          Booking[]                  @relation("BookingCreatedBy")
+  transactionsCreated      Transaction[]              @relation("TransactionCreatedBy")
   transactionStatusChanges TransactionStatusHistory[] @relation("TransactionStatusChangedBy")
-  manifestsCreated         Manifest[]               @relation("ManifestCreatedBy")
-  manifestItemsAssigned    ManifestItem[]           @relation("ManifestItemAssignedBy")
-  deliverySheetsDelivered  DeliverySheet[]          @relation("DeliverySheetDeliveredBy")
-  ticketsCreated           Ticket[]
+  manifestsCreated         Manifest[]                 @relation("ManifestCreatedBy")
+  manifestItemsAssigned    ManifestItem[]             @relation("ManifestItemAssignedBy")
+  deliverySheetsDelivered  DeliverySheet[]            @relation("DeliverySheetDeliveredBy")
+  ticketsCreated           Ticket[]                   @relation("TicketCreatedBy")
+  ticketsApproved          Ticket[]                   @relation("TicketApprovedBy")
+  deliverySheetsCreated    DeliverySheet[]            @relation("DeliverySheetCreatedBy")
+  vendorProcessesCreated   VendorProcess[]            @relation("VendorProcessCreatedBy")
 
   @@map("auth_users")
 }

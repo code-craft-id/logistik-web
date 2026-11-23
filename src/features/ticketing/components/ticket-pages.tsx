@@ -80,5 +80,11 @@ export async function TicketDetailPage({ id }: { id: string }) {
   if (!parsed.success) notFound();
   const ticket = await ticketService.detail(parsed.data);
   if (!ticket) notFound();
-  return <TicketDetail ticket={ticket} />;
+  return (
+    <TicketDetail
+      ticket={ticket}
+      canManage={permits(actor, "manage", "ticket")}
+      isCreator={ticket.createdById === actor.id}
+    />
+  );
 }

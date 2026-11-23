@@ -252,6 +252,32 @@ export const createTransactionSchema = withDimensionClaim({
   otherFee: decimalField(13, 2),
   packingFee: decimalField(13, 2),
   pickupFee: decimalField(13, 2),
+  goodsValue: decimalField(13, 2),
+  insuranceFee: decimalField(13, 2),
+  codValue: decimalField(13, 2),
+  codFee: decimalField(13, 2),
+  pic1: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(100).optional().nullable(),
+  ),
+  pic2: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(100).optional().nullable(),
+  ),
+  leadTime: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(50).optional().nullable(),
+  ),
+  /** Per-AWB "Show Price Print AWB" (Y/N); absent follows the company. */
+  showPriceOnPrint: z.preprocess(
+    (v) =>
+      v === "Y" || v === true
+        ? true
+        : v === "N" || v === false
+          ? false
+          : undefined,
+    z.boolean().optional(),
+  ),
   discountPercent: decimalField(3, 2).refine(
     (v) => v == null || Number(v) <= 100,
     "Discount maksimal 100%",

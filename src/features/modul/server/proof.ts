@@ -412,7 +412,25 @@ async function syncDeliverySheet(
       manifest: { select: { deliverySheet: { select: { id: true } } } },
     },
   });
-  const sheetId = active?.manifest.deliverySheet?.id;
+  // Manifest DRS first; otherwise the newest open line on a standalone DRS
+  // (Kurir Kota) that already lists this AWB.
+  const standalone = active?.manifest.deliverySheet?.id
+    ? null
+    : await tx.deliverySheetItem.findFirst({
+        where: {
+          transactionId,
+          deletedAt: null,
+          OR: [
+            { outcome: null },
+            { outcome: { notIn: ["DELIVERED", "RETURNED"] } },
+          ],
+          deliverySheet: { manifestId: null, deletedAt: null },
+        },
+        orderBy: { id: "desc" },
+        select: { deliverySheetId: true },
+      });
+  const sheetId =
+    active?.manifest.deliverySheet?.id ?? standalone?.deliverySheetId;
   if (!sheetId) return;
   const values = {
     outcome: data.outcome,

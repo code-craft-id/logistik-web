@@ -73,6 +73,7 @@ describe("bounded ticket validation", () => {
       page: 1,
       pageSize: 20,
       search: "",
+      tab: "all",
     });
     for (const bad of [
       { page: 0 },

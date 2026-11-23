@@ -272,6 +272,14 @@ export const liveRoutes = [
   "/courier-reports?view=city",
   "/branch-reports/manifest-vendor?view=process",
   "/finance/invoices?from=modul",
+  // D-35 simplified provider workflows (2026-11-23).
+  "/delivery-sheets",
+  "/delivery-sheets?tab=print",
+  "/vendor-processes",
+  "/branch-reports/rekap-manifest",
+  "/courier-reports/detail",
+  "/ticketting",
+  "/ticketting?tab=approval",
 ];
 const implemented = new Set<string>([
   ...implementedPreviewRoutes.map((item) => item.href),
