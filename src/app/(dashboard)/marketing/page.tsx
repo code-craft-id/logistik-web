@@ -121,6 +121,11 @@ export default async function Page({
             options: options.terms,
             emptyLabel: "Tidak dipilih",
           },
+          {
+            key: "whatsAppNotificationEnabled",
+            label: "WA Notif",
+            type: "toggle",
+          },
         ]
       : [
           {
@@ -153,6 +158,7 @@ export default async function Page({
           "Marketing",
           "Pembayaran",
           "Termin",
+          "WA Notif",
         ]
       : ["Nama", "Alamat", "No. Telp", "PIC", "Customer", "Cabang"];
   const editing = result.items.find((item) => item.id === editId);

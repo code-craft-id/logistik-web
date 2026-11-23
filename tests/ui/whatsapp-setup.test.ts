@@ -52,28 +52,28 @@ describe("WA-01 preparation panel", () => {
         gatewayConfiguration: "configured",
       },
     });
-    const base = { branchId: 1, phoneNumber: null };
-    const transport = vi
-      .fn<typeof fetch>()
-      .mockResolvedValueOnce(Response.json({ ...base, status: "disconnected" }))
-      .mockResolvedValueOnce(Response.json({ ...base, status: "qr" }))
-      .mockResolvedValueOnce(
-        Response.json({
-          branchId: 1,
-          qrDataUrl: "data:image/png;base64,iVBORw0KGgoAAA==",
-          expiresAt: new Date(Date.now() + 60_000).toISOString(),
-        }),
-      )
-      .mockResolvedValueOnce(
-        Response.json({
-          branchId: 1,
-          status: "connected",
-          phoneNumber: "+6281234567890",
-        }),
-      )
-      .mockResolvedValueOnce(
-        Response.json({ ...base, status: "disconnected" }),
-      );
+    // Routed fake gateway: the dialog now follows a pairing attempt by
+    // itself (status polling + automatic QR), so calls are not a fixed list.
+    let state: "disconnected" | "qr" | "connected" = "disconnected";
+    const transport = vi.fn<typeof fetch>(async (input, init) => {
+      const url = String(input);
+      const method = init?.method ?? "GET";
+      if (url.endsWith("/qr"))
+        return state === "qr"
+          ? Response.json({
+              branchId: 1,
+              qrDataUrl: "data:image/png;base64,iVBORw0KGgoAAA==",
+              expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            })
+          : new Response(null, { status: 409 });
+      if (method === "POST") state = "qr";
+      if (method === "DELETE") state = "disconnected";
+      return Response.json({
+        branchId: 1,
+        status: state,
+        phoneNumber: state === "connected" ? "+6281234567890" : null,
+      });
+    });
     vi.stubGlobal("fetch", transport);
     await render();
     await act(async () => button("Periksa WhatsApp FAKE Branch A").click());
@@ -87,21 +87,25 @@ describe("WA-01 preparation panel", () => {
       return element;
     };
     await act(async () => dialogButton("Hubungkan nomor").click());
-    expect(transport).toHaveBeenLastCalledWith(
-      "/api/whatsapp/branches/1/session",
-      { method: "POST", cache: "no-store" },
-    );
-    await act(async () => dialogButton("Tampilkan QR").click());
+    expect(transport).toHaveBeenCalledWith("/api/whatsapp/branches/1/session", {
+      method: "POST",
+      cache: "no-store",
+    });
+    // No "Tampilkan QR" click needed: the QR is fetched automatically.
+    for (let i = 0; i < 5; i++) await act(async () => {});
     expect(
       document.querySelector('[role="dialog"] img')?.getAttribute("alt"),
     ).toContain("FAKE Branch A");
+    expect(document.querySelector('[role="dialog"]')?.textContent).toContain(
+      "QR diperbarui otomatis",
+    );
+    state = "connected";
     await act(async () => dialogButton("Muat status").click());
     expect(document.querySelector('[role="dialog"] img')).toBeNull();
     expect(document.querySelector('[role="dialog"]')?.textContent).toContain(
       "+6281234567890",
     );
     await act(async () => dialogButton("Putuskan koneksi").click());
-    expect(transport).toHaveBeenCalledTimes(4);
     await act(async () => dialogButton("Ya, putuskan").click());
     expect(transport).toHaveBeenLastCalledWith(
       "/api/whatsapp/branches/1/session",

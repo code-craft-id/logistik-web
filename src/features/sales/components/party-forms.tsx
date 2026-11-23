@@ -24,6 +24,12 @@ export type PartyField =
       type: "choice";
       options: Option[];
       emptyLabel: string;
+    }
+  | {
+      key: string;
+      label: string;
+      /** Aktif (Y) / Nonaktif (N), e.g. provider "WA Notif". */
+      type: "toggle";
     };
 
 const select =
@@ -75,7 +81,17 @@ export function PartyForm({
                 {field.label}
                 {"required" in field && field.required ? " *" : ""}
               </Label>
-              {field.type === "choice" ? (
+              {field.type === "toggle" ? (
+                <select
+                  id={fieldId}
+                  name={field.key}
+                  defaultValue={value === "Y" ? "Y" : "N"}
+                  className={select}
+                >
+                  <option value="Y">Aktif</option>
+                  <option value="N">Nonaktif</option>
+                </select>
+              ) : field.type === "choice" ? (
                 <ComboSelect
                   id={fieldId}
                   name={field.key}

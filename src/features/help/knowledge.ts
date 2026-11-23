@@ -436,7 +436,7 @@ export const helpEntries: HelpEntry[] = [
       "marketing",
     ],
     answer:
-      "Modul > Pemasaran/Penjualan. Tab Customer dan Penerima: cari, tambah (klik + Tambah), ubah dan hapus. Pengguna cabang hanya bisa mengubah data cabangnya sendiri; data 'Semua cabang' hanya bisa dibuat admin. Data yang dihapus tetap tercatat di AWB lama.",
+      "Modul > Pemasaran/Penjualan. Tab Customer dan Penerima: cari, tambah (klik + Tambah), ubah dan hapus. Isian WA Notif (Aktif/Nonaktif) menentukan apakah customer itu boleh menerima notifikasi WhatsApp; default Nonaktif. Pengguna cabang hanya bisa mengubah data cabangnya sendiri; data 'Semua cabang' hanya bisa dibuat admin. Data yang dihapus tetap tercatat di AWB lama.",
     href: "/marketing",
   },
   {
@@ -619,6 +619,14 @@ export const helpEntries: HelpEntry[] = [
     answer:
       "Di Entry AWB isi PIC 1, PIC 2 dan Lead Time setelah data penerima. Di bagian harga: Nilai Barang dan Nilai COD hanya dicatat (tidak menambah Grand Total); Biaya Asuransi dan Biaya COD ikut dijumlahkan ke Total Biaya seperti Biaya Lain, lalu dipotong Discount dan ditambah PPN. Nilai COD tercetak di resi dan di DRS supaya kurir menagih penerima. Show Price Print AWB = Tidak menyembunyikan harga di resi AWB ini, walaupun dicetak dengan tipe Harga.",
     href: "/transactions/new",
+  },
+  {
+    id: "whatsapp-cabang",
+    title: "WhatsApp per cabang",
+    keywords: ["whatsapp", "wa", "qr", "nomor wa", "notifikasi wa", "wa notif"],
+    answer:
+      "Kantor > Perusahaan > WA Notifikasi > WhatsApp per cabang: satu gateway WhatsApp melayani semua cabang, tiap cabang memakai nomornya sendiri. Admin memilih cabang dan klik Hubungkan nomor; QR muncul sendiri dan diperbarui otomatis selama 2 menit. Di HP cabang buka WhatsApp > Perangkat tertaut > Tautkan perangkat lalu pindai QR; status menjadi Terhubung. Putuskan koneksi = logout dan hapus sesi cabang itu. Satu nomor tidak bisa dipakai dua cabang. Pesan WhatsApp dari satu cabang dikirim berurutan dengan jeda minimal 10 detik, dan hanya ke customer yang WA Notif-nya Aktif. Pengiriman otomatis per kejadian (misalnya AWB terkirim) belum aktif.",
+    href: "/office/company",
   },
   {
     id: "ticketing",

@@ -37,6 +37,11 @@ export const customerInput = z.strictObject({
   marketingPersonId: id,
   termId: id,
   costTypeId: id,
+  /** Provider "WA Notif": Y = send WhatsApp notifications to this customer. */
+  whatsAppNotificationEnabled: z.preprocess(
+    (v) => (v === "Y" ? true : v === "N" ? false : v),
+    z.boolean().optional(),
+  ),
 });
 export const consigneeInput = z.strictObject({
   name: z.string().trim().min(1).max(150),
@@ -119,6 +124,9 @@ export async function listParties(
           marketingPersonId: r.marketingPersonId,
           termId: r.termId,
           costTypeId: r.costTypeId,
+          whatsAppNotificationEnabled: r.whatsAppNotificationEnabled
+            ? "Y"
+            : "N",
         },
         columns: [
           r.name,
@@ -129,6 +137,7 @@ export async function listParties(
           r.marketingPerson?.name ?? null,
           r.costType?.name ?? null,
           r.term?.name ?? null,
+          r.whatsAppNotificationEnabled ? "Aktif" : "Nonaktif",
         ],
       })),
     };
@@ -282,6 +291,13 @@ export async function saveParty(
         marketingPersonId: data.marketingPersonId ?? null,
         termId: data.termId ?? null,
         costTypeId: data.costTypeId ?? null,
+        // Only change WA Notif when the form sent it; new customers start
+        // with notifications off.
+        ...(data.whatsAppNotificationEnabled !== undefined
+          ? { whatsAppNotificationEnabled: data.whatsAppNotificationEnabled }
+          : existingId
+            ? {}
+            : { whatsAppNotificationEnabled: false }),
       };
       return existingId
         ? tx.customer.update({ where: { id: existingId }, data: values })
