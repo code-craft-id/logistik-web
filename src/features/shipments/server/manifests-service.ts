@@ -5,6 +5,7 @@ import {
   permitsBranch,
 } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
+import { enqueueWhatsApp } from "@/features/whatsapp/server/notifications";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/db/generated/client";
 import { ALLOWED_TRANSITIONS } from "../../bookings/status";
@@ -399,6 +400,13 @@ export async function recordDeliveryOutcome(
             newStatus: "Delivered",
             reason: "DELIVERY_COMPLETED",
             actorId: actor.id,
+          },
+        });
+        await enqueueWhatsApp(tx, ["SHIPMENT_STATUS"], data.transactionId, {
+          branchId: sheet.branchId,
+          payload: {
+            receivedBy: data.receivedBy || null,
+            receivedAt: new Date().toISOString(),
           },
         });
       }

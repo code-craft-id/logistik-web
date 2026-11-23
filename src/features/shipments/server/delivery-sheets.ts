@@ -10,6 +10,7 @@ import {
   assertPermission,
   IdentityError,
 } from "@/features/identity/server/access";
+import { enqueueWhatsApp } from "@/features/whatsapp/server/notifications";
 import {
   businessDateStartUtc,
   businessDateString,
@@ -45,7 +46,7 @@ export async function createDeliverySheet(actor: AccessActor, input: unknown) {
       throw new IdentityError("FORBIDDEN_BRANCH", 403);
     if (manifest.status === "Closed")
       throw new IdentityError("CONFLICT", 409, "Manifest sudah ditutup.");
-    return tx.deliverySheet.create({
+    const sheet = await tx.deliverySheet.create({
       data: {
         manifestId: manifest.id,
         branchId: manifest.branchId,
@@ -55,6 +56,17 @@ export async function createDeliverySheet(actor: AccessActor, input: unknown) {
         // is the manifest's courier, so it stays unset here.
       },
     });
+    // Every AWB actively on the manifest is now out for delivery.
+    const items = await tx.manifestItem.findMany({
+      where: { manifestId: manifest.id, deletedAt: null, releasedAt: null },
+      select: { transactionId: true },
+    });
+    for (const item of items)
+      await enqueueWhatsApp(tx, ["DELIVERY_SHEET"], item.transactionId, {
+        branchId: manifest.branchId,
+        payload: { deliverySheetId: sheet.id },
+      });
+    return sheet;
   });
 }
 
@@ -272,7 +284,7 @@ export async function addAwbToDeliverySheet(
     if (existing && !existing.deletedAt)
       conflict(`AWB ${awb.awbNo} sudah ada di DRS ini.`);
     // A line removed earlier is restored, since (sheet, AWB) is unique.
-    return existing
+    const line = await (existing
       ? tx.deliverySheetItem.update({
           where: { id: existing.id },
           data: {
@@ -287,7 +299,12 @@ export async function addAwbToDeliverySheet(
       : tx.deliverySheetItem.create({
           data: { deliverySheetId: sheet.id, transactionId: awb.id },
           select: { id: true },
-        });
+        }));
+    await enqueueWhatsApp(tx, ["DELIVERY_SHEET"], awb.id, {
+      branchId: sheet.branchId,
+      payload: { deliverySheetId: sheet.id },
+    });
+    return line;
   });
 }
 

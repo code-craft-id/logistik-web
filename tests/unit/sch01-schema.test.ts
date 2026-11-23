@@ -99,6 +99,10 @@ describe("SCH-01 preservation and adapter contract", () => {
           "DeliverySheetItem",
           "TransactionStatusHistory",
           "DeliverySheet",
+          // D-37: one template row per kind is edited in place (switched off,
+          // never deleted); the outbox is a delivery log.
+          "WhatsAppTemplate",
+          "WhatsAppOutbox",
           ...noSoftDelete,
         ].includes(name)
       ) {

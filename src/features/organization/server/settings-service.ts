@@ -24,7 +24,7 @@ import {
 
 /** Coordinator-approved configuration maintenance only. No payments, postings,
  * external API calls, notification delivery or use of financial account models.
- * Template payload storage is intentionally absent: schema changes were declined.
+ * WhatsApp message templates live in features/whatsapp (D-37), not here.
  */
 const configurationQuery = listQuerySchema.extend({
   companyId: identityId.optional(),

@@ -41,7 +41,7 @@ model Customer {
   costTypeId                  Int?                           @map("cost_type_id")
   costType                    CostType?                      @relation(fields: [costTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   /// Provider "WA Notif" on/off per customer (OBSERVED, owner decision D-37).
-  /// Raw form value only; no default, synchronization, or sending behavior.
+  /// true = automatic WhatsApp notifications are sent for this customer AWBs.
   whatsAppNotificationEnabled Boolean?                       @map("whatsapp_notification_enabled")
   consignees                  Consignee[]
   taxProfile                  CustomerTaxProfile?
@@ -268,6 +268,7 @@ model Transaction {
   manifestItems       ManifestItem[]
   deliverySheetItems  DeliverySheetItem[]
   vendorProcesses     VendorProcess[]
+  whatsappOutbox      WhatsAppOutbox[]
 
   @@unique([originBranchId, awbNo])
   @@index([originBranchId])

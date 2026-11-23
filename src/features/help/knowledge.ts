@@ -625,7 +625,23 @@ export const helpEntries: HelpEntry[] = [
     title: "WhatsApp per cabang",
     keywords: ["whatsapp", "wa", "qr", "nomor wa", "notifikasi wa", "wa notif"],
     answer:
-      "Kantor > Perusahaan > WA Notifikasi > WhatsApp per cabang: satu gateway WhatsApp melayani semua cabang, tiap cabang memakai nomornya sendiri. Admin memilih cabang dan klik Hubungkan nomor; QR muncul sendiri dan diperbarui otomatis selama 2 menit. Di HP cabang buka WhatsApp > Perangkat tertaut > Tautkan perangkat lalu pindai QR; status menjadi Terhubung. Putuskan koneksi = logout dan hapus sesi cabang itu. Satu nomor tidak bisa dipakai dua cabang. Pesan WhatsApp dari satu cabang dikirim berurutan dengan jeda minimal 10 detik, dan hanya ke customer yang WA Notif-nya Aktif. Pengiriman otomatis per kejadian (misalnya AWB terkirim) belum aktif.",
+      "Kantor > Perusahaan > WA Notifikasi > WhatsApp per cabang: satu gateway WhatsApp melayani semua cabang, tiap cabang memakai nomornya sendiri. Admin memilih cabang dan klik Hubungkan nomor; QR muncul sendiri dan diperbarui otomatis selama 2 menit. Di HP cabang buka WhatsApp > Perangkat tertaut > Tautkan perangkat lalu pindai QR; status menjadi Terhubung. Putuskan koneksi = logout dan hapus sesi cabang itu. Satu nomor tidak bisa dipakai dua cabang. Pesan WhatsApp dari satu cabang dikirim berurutan dengan jeda minimal 10 detik.",
+    href: "/office/company",
+  },
+  {
+    id: "whatsapp-notifikasi",
+    title: "Notifikasi WhatsApp otomatis",
+    keywords: [
+      "pesan whatsapp",
+      "pesan wa",
+      "template wa",
+      "notif wa",
+      "wa otomatis",
+      "kirim wa",
+      "customer aktif wa",
+    ],
+    answer:
+      "Sama seperti web asli, ada 4 pesan otomatis di Kantor > Perusahaan > WA Notifikasi > Lihat Pesan Whatsapp: (1) Transaksi ke Pengirim dan (2) Transaksi ke Penerima saat AWB disimpan; (3) Shipment Status ke Pengirim saat AWB berstatus Delivered (diterima, lewat Scan & Konfirmasi, import status, hasil DRS, atau ubah status); (4) Delivery Sheet ke Penerima saat AWB masuk DRS (Kurir Kota) atau DRS manifest dibuat. Penerima tiap pesan tetap; isi pesan dan Status on/off bisa diubah (hak Konfigurasi WhatsApp: update). Variabel seperti {awb}, {namaPengirim}, {namaPenerima}, {alamatPenerima}, {cabangAsal}, {cabangTujuan}, {tglKonos}, {diterima}, {tglDiterima}, {jamDiterima}, {namaKurir}, {namaPerusahaan} diisi dari AWB. Pesan hanya dikirim untuk AWB milik customer yang WA Notif-nya Aktif (Pemasaran > Customer; daftarnya tampil di List Customer Aktif WA Notifikasi) dan bila nomor pengirim/penerima di AWB valid (08…/62…). Nomor pengirim pesan adalah WA cabang yang melakukan kejadian; bila belum terhubung dipakai cabang asal/tujuan AWB. Pesan diantrekan setelah data tersimpan dan dikirim berjeda ±10 detik; gagal kirim dicoba ulang sampai 5 kali dalam 24 jam.",
     href: "/office/company",
   },
   {

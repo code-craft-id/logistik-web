@@ -29,7 +29,13 @@ const masterActions = vi.hoisted(() => ({
 vi.mock("../../src/features/master-data/actions", () => masterActions);
 vi.mock("../../src/features/organization/actions", () => actions);
 vi.mock("../../src/features/organization/settings-actions", () => settings);
+const whatsapp = vi.hoisted(() => ({
+  getWhatsAppNotificationSettings: vi.fn(),
+  saveWhatsAppTemplate: vi.fn(),
+  listWhatsAppActiveCustomers: vi.fn(),
+}));
 vi.mock("../../src/features/whatsapp/actions", () => ({
+  ...whatsapp,
   listBranchWhatsAppSetup: vi.fn().mockResolvedValue({
     ok: true,
     data: {
@@ -388,9 +394,46 @@ describe("Office access and reference workflow", () => {
     ).toBe("FAKE bank 1");
     expect(button("Update").disabled).toBe(false);
   });
-  it("shows the three WhatsApp preview tabs without saving or sending", async () => {
+  it("shows the provider's WA Notifikasi: active customers and four editable messages", async () => {
+    const { WHATSAPP_KINDS, WHATSAPP_TEMPLATE_INFO } = await import(
+      "../../src/features/whatsapp/templates"
+    );
+    whatsapp.listWhatsAppActiveCustomers.mockResolvedValue({
+      ok: true,
+      data: {
+        items: [{ id: 7, name: "FAKE Customer Aktif" }],
+        page: 1,
+        total: 1,
+        totalPages: 1,
+        pageSize: 10,
+      },
+    });
+    whatsapp.getWhatsAppNotificationSettings.mockResolvedValue({
+      ok: true,
+      data: {
+        templates: WHATSAPP_KINDS.map((kind) => ({
+          kind,
+          message: WHATSAPP_TEMPLATE_INFO[kind].defaultMessage,
+          isEnabled: true,
+        })),
+        canEdit: true,
+        recent: { PENDING: 0, SENT: 2, SKIPPED: 1, FAILED: 0 },
+      },
+    });
+    whatsapp.saveWhatsAppTemplate.mockResolvedValue({
+      ok: true,
+      data: { kind: "TRX_SENDER" },
+    });
+    vi.useFakeTimers();
     await act(async () => root.render(createElement(WhatsAppMessagePreview)));
-    await act(async () => button("Lihat Pesan WhatsApp").click());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(300);
+    });
+    vi.useRealTimers();
+    expect(host.textContent).toContain("List Customer Aktif WA Notifikasi");
+    expect(host.textContent).toContain("FAKE Customer Aktif");
+    expect(host.textContent).toContain("2 terkirim ke antrean");
+    await act(async () => button("Lihat Pesan Whatsapp").click());
     expect(
       [...document.querySelectorAll('[role="dialog"] [role="tab"]')].map(
         (e) => e.textContent,
@@ -400,13 +443,22 @@ describe("Office access and reference workflow", () => {
       "Message WA Shipment Status",
       "Message WA Delivery Sheet",
     ]);
-    expect(
-      (
-        document.querySelector(
-          '[role="dialog"] textarea',
-        ) as HTMLTextAreaElement
-      ).readOnly,
-    ).toBe(true);
+    const textarea = document.querySelector(
+      '[role="dialog"] textarea',
+    ) as HTMLTextAreaElement;
+    expect(textarea.readOnly).toBe(false);
+    expect(textarea.value).toContain("Dear {namaPengirim}");
+    const submit = [
+      ...document.querySelectorAll<HTMLButtonElement>(
+        '[role="dialog"] button[type="submit"]',
+      ),
+    ][0];
+    await act(async () => submit?.click());
+    expect(whatsapp.saveWhatsAppTemplate).toHaveBeenCalledWith({
+      kind: "TRX_SENDER",
+      message: WHATSAPP_TEMPLATE_INFO.TRX_SENDER.defaultMessage,
+      isEnabled: true,
+    });
     expect(settings.saveConfiguration).not.toHaveBeenCalled();
   });
   it("filters company configuration and pins the company on new records", async () => {

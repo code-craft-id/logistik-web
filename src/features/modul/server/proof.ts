@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ALLOWED_TRANSITIONS } from "@/features/bookings/status";
 import type { AccessActor } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
+import { enqueueWhatsApp } from "@/features/whatsapp/server/notifications";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/lib/db/generated/client";
 import { lockRow, ModulError, transactionScope } from "./common";
@@ -387,6 +388,13 @@ export async function writeProof(
     select: { id: true },
   });
   await syncDeliverySheet(tx, t.id, data, meta.receivedAt);
+  if (data.outcome === "DELIVERED")
+    await enqueueWhatsApp(tx, ["SHIPMENT_STATUS"], t.id, {
+      payload: {
+        receivedBy: data.receiverName ?? null,
+        receivedAt: (meta.receivedAt ?? new Date()).toISOString(),
+      },
+    });
   return proof;
 }
 

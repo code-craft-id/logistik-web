@@ -17,3 +17,45 @@ model CustomerWhatsAppNotification {
   @@index([customerId])
   @@map("customer_whatsapp_notifications")
 }
+
+/// Provider "Pesan Whatsapp" (OBSERVED Perusahaan > WA Notifikasi, D-37):
+/// one editable message + on/off per kind. Recipients are fixed per kind.
+/// kind: TRX_SENDER | TRX_RECEIVER | SHIPMENT_STATUS | DELIVERY_SHEET
+model WhatsAppTemplate {
+  id        Int      @id @default(autoincrement())
+  companyId Int      @map("company_id")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  kind      String   @db.VarChar(30)
+  message   String   @db.VarChar(2000)
+  isEnabled Boolean  @default(true) @map("is_enabled")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([companyId, kind])
+  @@map("whatsapp_templates")
+}
+
+/// Outbox of automatic WhatsApp notifications (D-37). Rows are written in
+/// the same database transaction as the triggering event and handed to the
+/// gateway after commit. Phone numbers and texts are not stored.
+/// status: PENDING | SENDING | SENT | SKIPPED | FAILED
+model WhatsAppOutbox {
+  id            Int         @id @default(autoincrement())
+  kind          String      @db.VarChar(30)
+  transactionId Int         @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Preferred sending branch (the branch that performed the event).
+  branchId      Int?        @map("branch_id")
+  /// Event details used by the template (receiver name, times).
+  payload       Json?
+  status        String      @default("PENDING") @db.VarChar(20)
+  attempts      Int         @default(0)
+  lastError     String?     @map("last_error") @db.VarChar(100)
+  sentBranchId  Int?        @map("sent_branch_id")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@index([transactionId])
+  @@map("whatsapp_outbox")
+}

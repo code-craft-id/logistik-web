@@ -21,6 +21,7 @@ model Company {
   invoiceSettings       CompanyInvoiceSettings[]
   digitalWallets        CompanyDigitalWallet[]
   whatsappNotifications CustomerWhatsAppNotification[]
+  whatsappTemplates     WhatsAppTemplate[]
 
   @@map("companies")
 }

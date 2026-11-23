@@ -5,6 +5,7 @@ import {
   permitsBranch,
 } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
+import { enqueueWhatsApp } from "@/features/whatsapp/server/notifications";
 import { prisma } from "@/lib/db";
 import type { Transaction } from "@/lib/db/generated/client";
 import { Prisma } from "@/lib/db/generated/client";
@@ -942,6 +943,9 @@ export async function createTransaction(
           actorId: actor.id,
         },
       });
+      await enqueueWhatsApp(tx, ["TRX_SENDER", "TRX_RECEIVER"], created.id, {
+        branchId: created.originBranchId,
+      });
       return {
         transaction: created,
         created: true,
@@ -1077,6 +1081,11 @@ export async function updateTransactionStatus(
         actorId: actor.id,
       },
     });
+    if (data.newStatus === "Delivered")
+      await enqueueWhatsApp(tx, ["SHIPMENT_STATUS"], transaction.id, {
+        branchId: transaction.destinationBranchId,
+        payload: { receivedAt: new Date().toISOString() },
+      });
 
     return updated;
   });

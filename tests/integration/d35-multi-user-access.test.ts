@@ -83,7 +83,10 @@ const tickets = (who: Who) =>
   m.ticket.createTicketService(db, () =>
     m.access.loadAccessActor(db, ids.users[who]),
   );
-const today = new Date().toISOString().slice(0, 10);
+// Business date in Asia/Jakarta, like the reports (UTC lags 7 hours).
+const today = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Jakarta",
+}).format(new Date());
 let seq = 0;
 const awb = async (
   origin: "a" | "b",

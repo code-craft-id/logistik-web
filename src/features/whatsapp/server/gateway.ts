@@ -101,5 +101,39 @@ export function createWhatsAppGateway(
     async qr(branchId: number) {
       return gatewayQrSchema.parse(await request(branchId, "GET", true));
     },
+    /**
+     * Queue one text on the branch's number. The gateway paces sends (10 s
+     * default) and ignores a repeated idempotencyKey. Never throws.
+     */
+    async send(
+      branchId: number,
+      message: { to: string; text: string; idempotencyKey: string },
+    ): Promise<"queued" | "not_connected" | "not_configured" | "error"> {
+      const config = readConfig();
+      if (config.state !== "configured") return "not_configured";
+      try {
+        const response = await transport(
+          `${config.url.replace(/\/$/, "")}/v1/branches/${branchId}/messages`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${config.apiKey}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+            redirect: "error",
+            cache: "no-store",
+            signal: AbortSignal.timeout(8000),
+          },
+        );
+        await response.body?.cancel();
+        if (response.status === 202) return "queued";
+        if (response.status === 409) return "not_connected";
+        return "error";
+      } catch {
+        return "error";
+      }
+    },
   };
 }

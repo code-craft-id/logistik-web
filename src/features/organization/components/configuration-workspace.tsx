@@ -115,23 +115,20 @@ function ConfigurationLoader({
             capabilities={capabilities}
           />
         )}
-      {(kind === "vendor_tax" ||
-        (kind === "whatsapp_configuration" && companyId)) && (
-        <div
-          className={
-            kind === "whatsapp_configuration" ? "grid gap-6 xl:grid-cols-2" : ""
-          }
-        >
-          <ReferenceWorkspace
-            key={`${kind}:${companyId}`}
-            fixedValues={fixedValues}
-            kind={kind}
-            definition={configurationForms[kind]}
-            capabilities={capabilities}
-            api={api}
-          />
-          {kind === "whatsapp_configuration" && <WhatsAppMessagePreview />}
-        </div>
+      {kind === "vendor_tax" && (
+        <ReferenceWorkspace
+          key={`${kind}:${companyId}`}
+          fixedValues={fixedValues}
+          kind={kind}
+          definition={configurationForms[kind]}
+          capabilities={capabilities}
+          api={api}
+        />
+      )}
+      {/* Provider WA Notifikasi (D-37): active customers come from the
+          customer's WA Notif switch; messages are the company templates. */}
+      {kind === "whatsapp_configuration" && companyId && (
+        <WhatsAppMessagePreview />
       )}
       {kind === "whatsapp_configuration" && companyId && (
         <BranchWhatsAppSetupPanel
