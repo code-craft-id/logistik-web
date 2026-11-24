@@ -111,6 +111,7 @@ describe("available navigation", () => {
       "/customer-reports/shipments",
       "/customer-reports/pod",
       "/customer-reports/all-status",
+      "/report-customer",
     ]);
   });
   it("prunes empty groups and includes only granted view routes", () => {

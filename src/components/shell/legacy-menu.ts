@@ -236,6 +236,7 @@ export const legacyMenu = [
           },
         ],
       },
+      { label: "Report Customer", href: "/report-customer" },
     ],
   },
   {

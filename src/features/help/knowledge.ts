@@ -93,6 +93,20 @@ export const helpEntries: HelpEntry[] = [
     href: "/branch-reports/rekap-transaksi-harian",
   },
   {
+    id: "report-customer",
+    title: "Report Customer (Excel)",
+    keywords: [
+      "report customer",
+      "detail transaction customer",
+      "laporan customer",
+      "billing type",
+      "export customer",
+    ],
+    answer:
+      "Laporan > Report Customer. Isi Periode Date (maksimal 31 hari), lalu bila perlu pilih Origin, Destination, Customer dan Billing Type (jenis pembayaran), klik Export Excel. File Detail_Transaction_Customer berisi satu baris per AWB dengan kelompok kolom Detail Resi (AWB, tanggal, DO, asal, tujuan, customer, layanan, moda), Pengirim, Penerima Barang, Barang & Biaya (isi barang, koli, berat, volume, terberat, harga/kg, biaya lain, packing, pickup, asuransi, discount, PPN, Grand Total), Jenis Tagihan (CASH, TRF, KREDIT, COD: Grand Total masuk ke kolom sesuai pembayaran AWB), COD dan Status Terakhir, ditutup baris TOTAL. Hanya AWB dari atau ke cabang Anda; AWB yang di-void tidak ikut. Maksimal 20.000 AWB per unduhan. Butuh hak Laporan Transaksi: ekspor.",
+    href: "/report-customer",
+  },
+  {
     id: "awb-tertunda-termanifest",
     title: "AWB Tertunda dan AWB Termanifest",
     keywords: [

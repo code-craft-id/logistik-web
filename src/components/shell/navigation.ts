@@ -264,6 +264,7 @@ export const liveRoutes = [
   "/branch-reports/rekap-transaksi-harian",
   "/branch-reports/awb?view=pending",
   "/branch-reports/awb?view=manifested",
+  "/report-customer",
   "/financial-reports/aging",
   "/financial-reports/ap-aging",
   "/akunting/rugi-laba",
