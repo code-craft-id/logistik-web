@@ -225,6 +225,7 @@ export const legacyMenu = [
         children: [
           { label: "Laporan AR", href: "/financial-reports/aging" },
           { label: "Laporan AP", href: "/financial-reports/ap-aging" },
+          { label: "Laporan Keuntungan", href: "/financial-reports/profit" },
           { label: "Umur Piutang per Customer", href: "/financial-reports" },
         ],
       },

@@ -12,6 +12,7 @@ import {
 } from "@/features/identity/server/access";
 import {
   businessDateStartUtc,
+  businessDateString,
   jakartaMonthStartUtc,
 } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
@@ -213,7 +214,7 @@ export function codReportWorkbook(
     header,
     ...report.rows.map((r) => [
       r.awbNo,
-      r.transactionDate.toISOString().slice(0, 10),
+      businessDateString(r.transactionDate),
       r.transportMode?.name ?? "",
       r.deliveryService?.name ?? "",
       r.originBranch?.name ?? "",

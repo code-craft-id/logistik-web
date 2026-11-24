@@ -269,6 +269,7 @@ export const liveRoutes = [
   "/cod",
   "/cod?tab=received",
   "/branch-reports/report-cod",
+  "/financial-reports/profit",
   "/financial-reports/aging",
   "/financial-reports/ap-aging",
   "/akunting/rugi-laba",

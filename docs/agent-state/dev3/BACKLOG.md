@@ -50,7 +50,7 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 | M5 | Tutorial System > List Tutorial | `list-tutorial` | Not in the main menu |
 | M6 | Sistem Seting > Feature Update (release notes) | `news-update` | Missing. Page / Menu Management are provider admin tools; menu is code in LMS (propose not to copy) |
 | M7 | ~~Master Data as one menu per item~~ CLOSED 2026-11-24: user keeps one page per group with tabs ("jadikan satu page halaman beda tab aja") | Leaf menus | Grouped pages with tabs |
-| M8 | "Umur Piutang per Customer" is LMS-only | Not in real web or sandbox | Decide keep or hide |
+| M8 | ~~"Umur Piutang per Customer" is LMS-only~~ KEEP (user 2026-11-24) | Not in real web or sandbox | Decide keep or hide |
 
 ### Group 2: not in the real web, in the sandbox (fill)
 
@@ -60,7 +60,7 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 | S2 | ~~Report Cod~~ DONE 2026-11-24 `/branch-reports/report-cod` | Laporan Cabang |
 | S3 | Transaksi Agent: On Site Agent, Print Agent, History Deposit Agent, Manifest Agent | Modul |
 | S4 | Laporan Agen: Transaksi Agen, Laporan Komisi Agen | Laporan |
-| S5 | Laporan Keuntungan | Laporan Keuangan |
+| S5 | ~~Laporan Keuntungan~~ DONE 2026-11-24 `/financial-reports/profit` (D-42) | Laporan Keuangan |
 | S6 | Share Truck: Dashboard, Charter (Order Masuk, List Order Keluar), Status (Update, Cek), Invoice Keluar / Masuk, Ready Truck | New top menu |
 
 ### Group 3: Akunting details not yet like the sandbox

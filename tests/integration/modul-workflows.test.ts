@@ -419,6 +419,20 @@ describe("Pembayaran Hutang", () => {
     );
     expect(row.reminderDate.toISOString().slice(0, 10)).toBe("2026-11-26");
     expect(row._count.items).toBe(1);
+    // Laporan Keuntungan: Biaya (AWB Grand Total) - Biaya Vendor (bill).
+    const profit = await import(
+      "../../src/features/modul/server/profit-report"
+    );
+    const report = await profit.profitReport(user, {
+      month: 11,
+      year: 2026,
+      vendorId: ids.vendor,
+    });
+    expect(report.rows.find((r) => r.id === id)).toMatchObject({
+      revenue: 10000,
+      vendorCost: 150000,
+      profit: -140000,
+    });
     await m.bills.closeVendorBill(user, id);
     await expect(m.bills.closeVendorBill(user, id)).rejects.toThrow(
       "sudah lunas",

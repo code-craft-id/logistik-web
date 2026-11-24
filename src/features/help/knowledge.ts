@@ -123,6 +123,21 @@ export const helpEntries: HelpEntry[] = [
     href: "/cod",
   },
   {
+    id: "laporan-keuntungan",
+    title: "Laporan Keuntungan (Rekap Laporan Laba)",
+    keywords: [
+      "laporan keuntungan",
+      "laba",
+      "rekap laba",
+      "profit",
+      "keuntungan vendor",
+      "biaya vendor",
+    ],
+    answer:
+      "Laporan > Laporan Keuangan > Laporan Keuntungan. Pilih Bulan, Tahun dan Penjual (vendor, atau Semua) lalu Cari; Ekspor Excel mengunduh data yang sama. Satu baris per tagihan vendor dari Pembayaran Hutang pada bulan Tanggal tagihan: Penjual, No. Faktur, Tanggal, Status, Biaya (jumlah Grand Total AWB yang ada di tagihan), Biaya Vendor (nilai tagihan) dan Laba (Biaya - Biaya Vendor), ditutup baris Total. Hanya tagihan cabang Anda. Butuh hak Pembayaran Hutang: lihat. Ini bukan laporan Rugi Laba akunting.",
+    href: "/financial-reports/profit",
+  },
+  {
     id: "awb-tertunda-termanifest",
     title: "AWB Tertunda dan AWB Termanifest",
     keywords: [
