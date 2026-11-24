@@ -49,7 +49,7 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 | M4 | ~~Harian Kurir by pickup~~ DONE 2026-11-24 with D-39 courier pickup result (Nama Kurir, Jumlah Terambil, Jumlah Miss Pickup) | `daily-report-courier`, OBSERVED as courier 2026-11-24 | Counts deliveries, not pickups |
 | M5 | Tutorial System > List Tutorial | `list-tutorial` | Not in the main menu |
 | M6 | Sistem Seting > Feature Update (release notes) | `news-update` | Missing. Page / Menu Management are provider admin tools; menu is code in LMS (propose not to copy) |
-| M7 | Master Data as one menu per item (Provinsi, Kabupaten, Moda, Kurir, ...) | Leaf menus | Grouped pages with tabs |
+| M7 | ~~Master Data as one menu per item~~ CLOSED 2026-11-24: user keeps one page per group with tabs ("jadikan satu page halaman beda tab aja") | Leaf menus | Grouped pages with tabs |
 | M8 | "Umur Piutang per Customer" is LMS-only | Not in real web or sandbox | Decide keep or hide |
 
 ### Group 2: not in the real web, in the sandbox (fill)
