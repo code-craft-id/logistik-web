@@ -852,3 +852,10 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Built `/branch-reports/rekap-transaksi-harian` and `/print/rekap-transaksi-harian`. Column mapping by name (Onhand = CASH, Transfer = TRF, Kredit = KREDIT, Tagih Tujuan = COD) is OBSERVED, pending finance confirmation; sample amounts were zero.
 - Laporan Cabang now lists AWB Tertunda and AWB Termanifest as two menus (`/branch-reports/awb?view=`).
 - Checks: lint, typecheck, unit 738 pass (incl. new daily-recap-groups), `npm run build` pass; print page verified in Chrome on local dev.
+
+## 2026-11-24 — M3, D-39, M4, D-40 (S1/S2); M5/M6 dropped; M7 reverted
+
+- M3 Report Customer Excel (`3eee37d`). D-39 courier pickup result + Harian Kurir by pickup (`86f3880`, migration `20261124000300`). D-40 Cod List / Kas Terima / Report Cod (`e22b2ce`, migration `20261124000400`).
+- User dropped Tutorial and Feature Update (M5/M6); their uncommitted tables were dropped from dev/test DBs. User kept Master Data as one page per group with tabs (M7 reverted `5d72242`).
+- Sandbox agent pages (On Site Agent, Print Agent, History Deposit Agent, Manifest Agent, Transaksi Agen, Rekap Komisi Agen) rely on Agent.balance / commissionRate, which are DRAFT (D-11, D-24). Laporan Keuntungan needs P&L rules. Share Truck has no approved model. Asked the user before building.
+- Checks: lint, typecheck, unit 737+, integration modul-workflows 24/24, simple-reports 5/5.
