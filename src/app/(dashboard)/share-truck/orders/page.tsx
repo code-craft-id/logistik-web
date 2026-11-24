@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { ActionForm } from "@/features/modul/components/action-form";
@@ -58,14 +59,13 @@ export default async function Page({
         }
       />
       {!incoming && canManage && (
-        <details className="rounded-lg border bg-background p-4">
-          <summary className="min-h-11 cursor-pointer py-2 font-medium">
-            Tambah Order Keluar
-          </summary>
-          <ActionForm
+        <div>
+          <FormDialog
+            trigger="Tambah Order Keluar"
+            title="Tambah Order Keluar Charter"
+            description="Sewa truk vendor. Order langsung Diterima dan lanjut di Update Status."
             action={createOutgoingOrderAction}
-            reset
-            className="grid gap-3 pt-3 sm:grid-cols-2 lg:grid-cols-3"
+            wide
           >
             <Field
               label="Vendor"
@@ -96,8 +96,8 @@ export default async function Page({
             <Field label="Total Biaya" name="totalCost" required />
             <Field label="Isi Barang" name="goods" maxLength={255} />
             <Field label="Keterangan" name="remarks" maxLength={255} />
-          </ActionForm>
-        </details>
+          </FormDialog>
+        </div>
       )}
       <ListFilter
         action="/share-truck/orders"

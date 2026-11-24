@@ -575,8 +575,20 @@ export async function listCharterInvoices(
   actor: AccessActor,
   direction: "IN" | "OUT",
   search = "",
+  period: { from?: string; to?: string } = {},
 ) {
   view(actor);
+  const created: Prisma.DateTimeFilter = {};
+  try {
+    if (period.from && /^\d{4}-\d{2}-\d{2}$/.test(period.from))
+      created.gte = businessDateStartUtc(period.from);
+    if (period.to && /^\d{4}-\d{2}-\d{2}$/.test(period.to))
+      created.lt = new Date(
+        businessDateStartUtc(period.to).getTime() + 86_400_000,
+      );
+  } catch {
+    throw new ModulError("Tanggal tidak valid.");
+  }
   const where = {
     deletedAt: null,
     direction,
@@ -588,6 +600,7 @@ export async function listCharterInvoices(
       where: {
         deletedAt: null,
         order: where,
+        ...(created.gte || created.lt ? { createdAt: created } : {}),
         ...(search
           ? {
               invoiceNo: { contains: search.slice(0, 50), mode: "insensitive" },

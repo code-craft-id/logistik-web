@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Form from "next/form";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { ActionForm } from "@/features/modul/components/action-form";
 import {
   day,
   ModulHeader,
@@ -113,66 +113,61 @@ export default async function Page({
               <TableCell>{day(r.availableFrom)}</TableCell>
               <TableCell>{day(r.availableTo)}</TableCell>
               {canManage && (
-                <TableCell className="min-w-72">
-                  <details>
-                    <summary className="min-h-11 cursor-pointer py-2 text-primary">
-                      Order
-                    </summary>
-                    <ActionForm
-                      action={createIncomingOrderAction}
-                      className="grid gap-2 pt-2"
-                    >
-                      <input type="hidden" name="shareId" value={r.id} />
-                      <Field
-                        label="Customer"
-                        name="customerId"
-                        required
-                        options={choices.customers}
-                      />
-                      <Field
-                        label="Cabang"
-                        name="branchId"
-                        required
-                        options={choices.branches}
-                        defaultValue={choices.branches[0]?.id}
-                      />
-                      <Field
-                        label="Tanggal Muat"
-                        name="loadDate"
-                        type="date"
-                        required
-                        defaultValue={businessDateString()}
-                      />
-                      <Field
-                        label="Asal"
-                        name="origin"
-                        required
-                        defaultValue={r.origin}
-                        maxLength={100}
-                      />
-                      <Field
-                        label="Tujuan"
-                        name="destination"
-                        required
-                        defaultValue={r.destination}
-                        maxLength={100}
-                      />
-                      <Field label="Berat (kg)" name="weight" type="number" />
-                      <Field label="Koli" name="koli" type="number" />
-                      <Field
-                        label="Total Biaya"
-                        name="totalCost"
-                        required
-                        defaultValue={r.price.toFixed(0)}
-                      />
-                      <Field label="Isi Barang" name="goods" maxLength={255} />
-                      <Field
-                        label="Keterangan"
-                        name="remarks"
-                        maxLength={255}
-                      />
-                    </ActionForm>
-                  </details>
+                <TableCell>
+                  <FormDialog
+                    trigger="Order"
+                    title={`Order truk ${r.vehicle.licensePlate}`}
+                    description={`${r.origin} → ${r.destination}, ${r.leadTimeDays} hari. Order masuk ke Order Masuk Charter dengan status Menunggu.`}
+                    action={createIncomingOrderAction}
+                    submitLabel="Buat Order"
+                    wide
+                  >
+                    <input type="hidden" name="shareId" value={r.id} />
+                    <Field
+                      label="Customer"
+                      name="customerId"
+                      required
+                      options={choices.customers}
+                    />
+                    <Field
+                      label="Cabang"
+                      name="branchId"
+                      required
+                      options={choices.branches}
+                      defaultValue={choices.branches[0]?.id}
+                    />
+                    <Field
+                      label="Tanggal Muat"
+                      name="loadDate"
+                      type="date"
+                      required
+                      defaultValue={businessDateString()}
+                    />
+                    <Field
+                      label="Asal"
+                      name="origin"
+                      required
+                      defaultValue={r.origin}
+                      maxLength={100}
+                    />
+                    <Field
+                      label="Tujuan"
+                      name="destination"
+                      required
+                      defaultValue={r.destination}
+                      maxLength={100}
+                    />
+                    <Field label="Berat (kg)" name="weight" type="number" />
+                    <Field label="Koli" name="koli" type="number" />
+                    <Field
+                      label="Total Biaya"
+                      name="totalCost"
+                      required
+                      defaultValue={r.price.toFixed(0)}
+                    />
+                    <Field label="Isi Barang" name="goods" maxLength={255} />
+                    <Field label="Keterangan" name="remarks" maxLength={255} />
+                  </FormDialog>
                 </TableCell>
               )}
             </TableRow>

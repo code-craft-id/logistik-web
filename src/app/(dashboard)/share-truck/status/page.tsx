@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { ActionForm } from "@/features/modul/components/action-form";
 import {
   day,
   ListFilter,
@@ -97,7 +95,7 @@ export default async function Page({
                   {r.direction === "IN" ? "Order Masuk" : "Order Keluar"}
                 </TableCell>
                 <TableCell>{STATUS_LABEL[r.status] ?? r.status}</TableCell>
-                <TableCell className="min-w-64">
+                <TableCell className="min-w-48">
                   {check ? (
                     <ol className="space-y-1 text-xs">
                       {r.statusLogs.map((l) => (
@@ -110,24 +108,24 @@ export default async function Page({
                       ))}
                     </ol>
                   ) : update && next ? (
-                    <ActionForm
+                    <FormDialog
+                      trigger={STATUS_LABEL[next] ?? next}
+                      title={`Ubah status ${r.orderNo}`}
+                      description={`${STATUS_LABEL[r.status] ?? r.status} → ${STATUS_LABEL[next] ?? next}`}
                       action={advanceOrderStatusAction}
-                      submit={
-                        <Button type="submit" className="min-h-11">
-                          {STATUS_LABEL[next]}
-                        </Button>
-                      }
+                      submitLabel="Simpan Status"
                     >
                       <input type="hidden" name="orderId" value={r.id} />
                       <input type="hidden" name="status" value={next} />
-                      <Input
-                        name="note"
-                        maxLength={255}
-                        placeholder="Catatan (opsional)"
-                        aria-label={`Catatan status ${r.orderNo}`}
-                        className="min-h-11"
-                      />
-                    </ActionForm>
+                      <label className="grid gap-1 text-sm font-medium">
+                        Catatan (opsional)
+                        <input
+                          name="note"
+                          maxLength={255}
+                          className="min-h-11 rounded-md border bg-background px-3"
+                        />
+                      </label>
+                    </FormDialog>
                   ) : (
                     "-"
                   )}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { ActionForm } from "@/features/modul/components/action-form";
@@ -37,10 +38,13 @@ export default async function Page({
   const query = await searchParams;
   const incoming = one(query.type) === "masuk";
   const search = one(query.search) ?? "";
+  const from = one(query.from);
+  const to = one(query.to);
   const { invoices, uninvoiced } = await listCharterInvoices(
     actor,
     incoming ? "OUT" : "IN",
     search,
+    { from, to },
   );
   return (
     <div className="min-w-0 space-y-5">
@@ -52,18 +56,18 @@ export default async function Page({
             : "Tagihan ke customer untuk Order Masuk Charter yang sudah diterima. Pilih No. Order, isi Invoice No lalu tandai Lunas saat dibayar. Nilai = Total Biaya order; belum membuat jurnal."
         }
       />
-      {canManage && (
-        <section className="rounded-lg border bg-background p-4">
-          <h2 className="pb-2 font-medium">Add Invoice</h2>
-          {uninvoiced.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Semua order yang diterima sudah punya invoice.
-            </p>
-          ) : (
-            <ActionForm
+      {canManage &&
+        (uninvoiced.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Semua order yang diterima sudah punya invoice.
+          </p>
+        ) : (
+          <div>
+            <FormDialog
+              trigger="Add Invoice"
+              title={incoming ? "Add Invoice Masuk" : "Add Invoice Keluar"}
+              description="Nilai invoice = Total Biaya order."
               action={createCharterInvoiceAction}
-              reset
-              className="grid gap-3 sm:grid-cols-3"
             >
               <Field
                 label="Nopol / No. Order"
@@ -81,14 +85,13 @@ export default async function Page({
                 maxLength={50}
               />
               <Field label="Keterangan" name="notes" maxLength={255} />
-            </ActionForm>
-          )}
-        </section>
-      )}
+            </FormDialog>
+          </div>
+        ))}
       <ListFilter
         action="/share-truck/invoices"
         searchLabel="Invoice No."
-        values={{ search }}
+        values={{ search, from, to }}
         hidden={incoming ? { type: "masuk" } : undefined}
       />
       {invoices.length === 0 ? (

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { PageTabs } from "@/components/patterns/page-tabs";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -14,7 +14,6 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { receiveCodAction } from "@/features/modul/actions";
-import { ActionForm } from "@/features/modul/components/action-form";
 import {
   day,
   ListFilter,
@@ -149,34 +148,32 @@ export default async function Page({
                     </TableCell>
                   )}
                   {canReceive && (
-                    <TableCell className="min-w-56">
+                    <TableCell>
                       {r.status === "Delivered" ? (
-                        <ActionForm
+                        <FormDialog
+                          trigger="Terima Kas"
+                          title={`Terima kas COD ${r.awbNo ?? r.id}`}
+                          description={`Nilai COD Rp ${rupiah(r.codValue?.toString())}. AWB pindah ke Kas Terima.`}
                           action={receiveCodAction}
-                          submit={
-                            <button
-                              type="submit"
-                              className="inline-flex min-h-11 items-center rounded-md bg-primary px-3 text-sm text-primary-foreground"
-                            >
-                              Terima Kas
-                            </button>
-                          }
+                          submitLabel="Terima Kas"
                         >
                           <input
                             type="hidden"
                             name="transactionId"
                             value={r.id}
                           />
-                          <Input
-                            name="note"
-                            required
-                            minLength={2}
-                            maxLength={255}
-                            placeholder="Ket. Pembayaran"
-                            aria-label={`Ket. Pembayaran AWB ${r.awbNo ?? r.id}`}
-                            className="min-h-11"
-                          />
-                        </ActionForm>
+                          <label className="grid gap-1 text-sm font-medium">
+                            Ket. Pembayaran
+                            <input
+                              name="note"
+                              required
+                              minLength={2}
+                              maxLength={255}
+                              placeholder="mis. Tunai dari kurir"
+                              className="min-h-11 rounded-md border bg-background px-3"
+                            />
+                          </label>
+                        </FormDialog>
                       ) : (
                         <span className="text-sm text-muted-foreground">
                           Menunggu Delivered

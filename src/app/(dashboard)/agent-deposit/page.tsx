@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Form from "next/form";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -15,7 +15,6 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { topUpAgentAction } from "@/features/modul/actions";
-import { ActionForm } from "@/features/modul/components/action-form";
 import {
   ModulHeader,
   one,
@@ -95,33 +94,34 @@ export default async function Page({
             </span>
           </p>
           {canTopUp && (
-            <ActionForm
-              action={topUpAgentAction}
-              reset
-              className="grid gap-2 sm:grid-cols-[10rem_14rem_auto] sm:items-end"
-              submit={
-                <Button type="submit" className="min-h-11">
-                  Debit Saldo
-                </Button>
-              }
-            >
-              <input type="hidden" name="agentId" value={agent.id} />
-              <Input
-                name="amount"
-                inputMode="decimal"
-                required
-                placeholder="Jumlah (Rp)"
-                aria-label="Jumlah deposit (Rp)"
-                className="min-h-11"
-              />
-              <Input
-                name="note"
-                maxLength={255}
-                placeholder="Keterangan"
-                aria-label="Keterangan"
-                className="min-h-11"
-              />
-            </ActionForm>
+            <div>
+              <FormDialog
+                trigger="Debit Saldo"
+                title={`Debit Saldo ${agent.name}`}
+                description="Menambah saldo deposit agen; tercatat di riwayat."
+                action={topUpAgentAction}
+                submitLabel="Tambah Saldo"
+              >
+                <input type="hidden" name="agentId" value={agent.id} />
+                <label className="grid gap-1 text-sm font-medium">
+                  Jumlah (Rp)
+                  <input
+                    name="amount"
+                    inputMode="decimal"
+                    required
+                    className="min-h-11 rounded-md border bg-background px-3"
+                  />
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  Keterangan
+                  <input
+                    name="note"
+                    maxLength={255}
+                    className="min-h-11 rounded-md border bg-background px-3"
+                  />
+                </label>
+              </FormDialog>
+            </div>
           )}
         </section>
       )}

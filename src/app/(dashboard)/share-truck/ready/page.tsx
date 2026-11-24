@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { ActionForm } from "@/features/modul/components/action-form";
@@ -75,14 +76,14 @@ export default async function Page() {
                   {s ? rupiah(s.price.toString()) : "-"}
                 </TableCell>
                 {canManage && (
-                  <TableCell className="min-w-72">
-                    <details>
-                      <summary className="min-h-11 cursor-pointer py-2 text-primary">
-                        {s ? "Ubah Share" : "Share"}
-                      </summary>
-                      <ActionForm
+                  <TableCell>
+                    <div className="flex flex-wrap gap-2">
+                      <FormDialog
+                        trigger={s ? "Ubah Share" : "Share"}
+                        title={`Share truk ${v.licensePlate}`}
+                        description="Truk tampil di Dashboard Share Truck sampai Tgl Berakhir."
                         action={shareTruckAction}
-                        className="grid gap-2 pt-2"
+                        wide
                       >
                         <input type="hidden" name="vehicleId" value={v.id} />
                         <Field
@@ -130,24 +131,24 @@ export default async function Page() {
                           required
                           defaultValue={s?.price.toFixed(0)}
                         />
-                      </ActionForm>
-                    </details>
-                    {s && (
-                      <ActionForm
-                        action={unshareTruckAction}
-                        submit={
-                          <Button
-                            type="submit"
-                            variant="outline"
-                            className="min-h-11"
-                          >
-                            Unshare
-                          </Button>
-                        }
-                      >
-                        <input type="hidden" name="vehicleId" value={v.id} />
-                      </ActionForm>
-                    )}
+                      </FormDialog>
+                      {s && (
+                        <ActionForm
+                          action={unshareTruckAction}
+                          submit={
+                            <Button
+                              type="submit"
+                              variant="outline"
+                              className="min-h-11"
+                            >
+                              Unshare
+                            </Button>
+                          }
+                        >
+                          <input type="hidden" name="vehicleId" value={v.id} />
+                        </ActionForm>
+                      )}
+                    </div>
                   </TableCell>
                 )}
               </TableRow>

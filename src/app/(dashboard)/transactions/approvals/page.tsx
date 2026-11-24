@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ConfirmSubmit } from "@/components/patterns/confirm-dialog";
 import { EmptyState } from "@/components/patterns/content-state";
+import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -16,7 +15,6 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { decideAwbChangeAction } from "@/features/modul/actions";
-import { ActionForm } from "@/features/modul/components/action-form";
 import {
   FIELD_LABELS,
   showValue,
@@ -153,35 +151,19 @@ export default async function Page({
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="min-w-56">
+                      <TableCell>
                         {row.status === "PENDING" && canApprove ? (
-                          <ActionForm
+                          <FormDialog
+                            trigger="Putuskan"
+                            title={`${AWB_CHANGE_KINDS[row.kind as "EDIT"] ?? row.kind} AWB ${row.transaction?.awbNo ?? ""}`}
+                            description={
+                              row.kind === "DELETE"
+                                ? "Setujui hapus: AWB langsung dihapus dari daftar dan tidak bisa dibatalkan dari layar."
+                                : "Setujui atau tolak pengajuan ini. Catatan boleh dikosongkan."
+                            }
                             action={decideAwbChangeAction}
-                            submit={
+                            buttons={
                               <>
-                                {row.kind === "DELETE" ? (
-                                  <ConfirmSubmit
-                                    name="decision"
-                                    value="APPROVE"
-                                    className="min-h-11"
-                                    title={`Setujui hapus AWB ${row.transaction?.awbNo ?? ""}?`}
-                                    description="AWB langsung dihapus dari daftar setelah disetujui. Tindakan ini tidak bisa dibatalkan dari layar."
-                                  >
-                                    Setujui hapus
-                                  </ConfirmSubmit>
-                                ) : (
-                                  <Button
-                                    type="submit"
-                                    name="decision"
-                                    value="APPROVE"
-                                    className="min-h-11"
-                                  >
-                                    Setujui{" "}
-                                    {AWB_CHANGE_KINDS[
-                                      row.kind as "EDIT"
-                                    ]?.toLowerCase()}
-                                  </Button>
-                                )}
                                 <Button
                                   type="submit"
                                   name="decision"
@@ -191,18 +173,34 @@ export default async function Page({
                                 >
                                   Tolak
                                 </Button>
+                                <Button
+                                  type="submit"
+                                  name="decision"
+                                  value="APPROVE"
+                                  variant={
+                                    row.kind === "DELETE"
+                                      ? "destructive"
+                                      : "default"
+                                  }
+                                  className="min-h-11"
+                                >
+                                  {row.kind === "DELETE"
+                                    ? "Setujui hapus"
+                                    : `Setujui ${AWB_CHANGE_KINDS[row.kind as "EDIT"]?.toLowerCase() ?? ""}`}
+                                </Button>
                               </>
                             }
                           >
                             <input type="hidden" name="id" value={row.id} />
-                            <Input
-                              name="note"
-                              maxLength={500}
-                              placeholder="Catatan (opsional)"
-                              aria-label={`Catatan keputusan untuk AWB ${row.transaction.awbNo ?? row.transaction.id}`}
-                              className="min-h-11"
-                            />
-                          </ActionForm>
+                            <label className="grid gap-1 text-sm font-medium">
+                              Catatan (opsional)
+                              <input
+                                name="note"
+                                maxLength={500}
+                                className="min-h-11 rounded-md border bg-background px-3"
+                              />
+                            </label>
+                          </FormDialog>
                         ) : (
                           "-"
                         )}
