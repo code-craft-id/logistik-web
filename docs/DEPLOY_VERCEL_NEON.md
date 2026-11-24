@@ -42,3 +42,7 @@ Gunakan data restore bila referensi dan akun masih valid. Verifikasi pengguna ak
 Untuk pemulihan, arahkan alias Preview yang dilindungi ke deployment Preview terakhir yang kompatibel, atau buat deployment Preview dari sumber yang diketahui baik. Bila restore perlu diulang, buat database staging kosong yang terpisah dan validasi ulang sebelum mengubah konfigurasi. Simpan backup lama secara privat. Jangan gunakan promosi/rollback Production atau reset database.
 
 Referensi resmi [Vercel CLI](https://vercel.com/docs/cli/deploy), [Node.js di Vercel](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions), [Deployment Protection](https://vercel.com/docs/deployment-protection), [Prisma Config](https://docs.prisma.io/docs/orm/reference/prisma-config-reference), [Better Auth Security](https://better-auth.com/docs/reference/security).
+
+## Migrasi otomatis saat deploy Production (2026-11-24)
+
+`vercel.json` menjalankan `prisma migrate deploy` hanya bila `VERCEL_ENV=production`, sebelum `next build`. URL yang dipakai: `DIRECT_URL`, lalu `DATABASE_NEON_DATABASE_URL_UNPOOLED`, lalu `DATABASE_URL`. Deploy Preview tidak memigrasi. Bila migrasi gagal, build gagal dan deployment lama tetap aktif. Seed tidak pernah dijalankan otomatis.
