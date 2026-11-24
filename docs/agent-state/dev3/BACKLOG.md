@@ -1,6 +1,6 @@
 # Dev 3 backlog: not done, waiting for a decision, waiting for review
 
-Updated 2026-11-20 (branch `dev3/ready-for-review`, PR #11, review follow-up at 13ea2e3 plus local uncommitted changes).
+Updated 2026-11-24 (branch `dev3/ready-for-review`, HEAD `799e027`). Earlier update 2026-11-20.
 Source of each item: comparison with the provider app (read-only), the
 earlier Go + React prototype and owner instructions in the Dev 3 session.
 Keep this file current: move items to "Done" with the commit when finished.
@@ -31,6 +31,53 @@ Keep this file current: move items to "Done" with the commit when finished.
 | N5 | Rekap Manifest + Excel, Laporan Detail Kurir | No schema change |
 | N6 | Print AWB: provider 3-copy A4 layout, Harga / Non Harga | OBSERVED in provider and reference |
 | N7 | Still TBD | COD List / Kas Terima, COD and insurance formulas, SLA / Acc. in in Detail Kurir, ticket rating |
+
+## A3. Menu parity queue (added 2026-11-24, user: "lanjutkan semuanya")
+
+Rule from the user (2026-11-24): follow the real web (redlogistik) first;
+what the real web does not have follows the sandbox (newapps). Order below
+is the agreed work order. Done so far: D-37 WhatsApp notifications
+(`4a64dc2`), D-38 Akunting like the sandbox (`799e027`).
+
+### Group 1: in the real web, missing or different in LMS (first)
+
+| # | Item | Real web | LMS now |
+|---|---|---|---|
+| M1 | Rekap Transaksi Harian | Laporan Cabang (`rekap-omzet-harian`) | No menu of its own |
+| M2 | AWB Tertunda and AWB Termanifest as two menus | `awb-pending`, `awb-termanifest` | Combined into one "AWB" menu |
+| M3 | Report Customer | Laporan (`report-customer`) | Missing |
+| M4 | Harian Kurir by pickup (Nama Kurir, Jumlah Terambil, Jumlah Miss Pickup) | `daily-report-courier`, OBSERVED as courier 2026-11-24 | Counts deliveries, not pickups |
+| M5 | Tutorial System > List Tutorial | `list-tutorial` | Not in the main menu |
+| M6 | Sistem Seting > Feature Update (release notes) | `news-update` | Missing. Page / Menu Management are provider admin tools; menu is code in LMS (propose not to copy) |
+| M7 | Master Data as one menu per item (Provinsi, Kabupaten, Moda, Kurir, ...) | Leaf menus | Grouped pages with tabs |
+| M8 | "Umur Piutang per Customer" is LMS-only | Not in real web or sandbox | Decide keep or hide |
+
+### Group 2: not in the real web, in the sandbox (fill)
+
+| # | Item | Sandbox |
+|---|---|---|
+| S1 | Cod List, Kas Terima | Modul > Layanan Pelanggan > Transaksi |
+| S2 | Report Cod | Laporan Cabang |
+| S3 | Transaksi Agent: On Site Agent, Print Agent, History Deposit Agent, Manifest Agent | Modul |
+| S4 | Laporan Agen: Transaksi Agen, Laporan Komisi Agen | Laporan |
+| S5 | Laporan Keuntungan | Laporan Keuangan |
+| S6 | Share Truck: Dashboard, Charter (Order Masuk, List Order Keluar), Status (Update, Cek), Invoice Keluar / Masuk, Ready Truck | New top menu |
+
+### Group 3: Akunting details not yet like the sandbox
+
+| # | Item | Notes |
+|---|---|---|
+| K1 | Asset depreciation journal posting | Rule TBD (which account debit / credit); now display only |
+| K2 | Lampiran (attachment upload) on Kasir vouchers | Cloudinary exists for POD photos |
+| K3 | Import / Export Excel (Perkiraan, Assets, Kasir, reports) | Overlaps A1-A3 above |
+
+### Also open from this session
+
+| # | Item |
+|---|---|
+| W1 | WhatsApp: restart LMS dev server and gateway; first live send not yet tested (avoid real numbers) |
+| W2 | Gateway repo `~/lms-wa-gateway` has no GitHub remote yet |
+| W3 | Asset depreciation posting rule and Opening Balance policy need finance confirmation |
 
 ## B. Waiting for a business decision
 

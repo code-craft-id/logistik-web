@@ -839,3 +839,9 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 
 - Restore/reconciliation and one additive migration completed on Neon staging. `prisma migrate status` passed with 37 migrations; schema diff reports two pre-existing timestamp defaults. Vercel Preview Ready from `3905f610` plus the deployment patch. HTTPS login, dashboard, scoped denial and branch data, routes and assets verified. Browser checks passed at 375/768/1440.
 - Local checks: npm ci, lint, typecheck, Prisma validate/generate and npm run build passed. npm test passed 728 tests. Guarded npm run test:integration passed 190 and hit two 15-second timeouts. Both timed-out cases passed in the targeted 60-second rerun.
+
+## 2026-11-24 — WhatsApp notifications and Akunting like the sandbox
+
+- Observed (read-only) real web Perusahaan > WA Notifikasi > Pesan Whatsapp: four messages, fixed recipients, all ON; list of customers with WA Notif active. Built D-37 (`4a64dc2`).
+- Observed sandbox Akunting (24 pages, GET only). Built D-38 (`799e027`). Real web has no Akunting menu, so the sandbox is the reference (user rule).
+- Compared full menus of real web, sandbox and LMS; remaining gaps recorded in BACKLOG section A3. User asked to save the remaining list first before continuing.
