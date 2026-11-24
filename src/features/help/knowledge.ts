@@ -107,6 +107,22 @@ export const helpEntries: HelpEntry[] = [
     href: "/report-customer",
   },
   {
+    id: "cod-kas-terima",
+    title: "Cod List, Kas Terima dan Report Cod",
+    keywords: [
+      "cod",
+      "cod list",
+      "kas terima",
+      "terima kas",
+      "report cod",
+      "nilai cod",
+      "setor cod",
+    ],
+    answer:
+      "Modul > Layanan Pelanggan / Transaksi > Cod List: AWB dengan Nilai COD yang tujuannya cabang Anda dan uang COD-nya belum diserahkan ke kantor. Cari dengan AWB No. atau DO No. dan tanggal. Setelah AWB berstatus Delivered, isi Ket. Pembayaran (misalnya Tunai dari kurir) lalu klik Terima Kas: AWB pindah ke tab Kas Terima dengan User Pembayaran dan Tgl. Pembayaran; satu AWB hanya bisa diterima sekali. AWB yang belum Delivered menampilkan Menunggu Delivered. Laporan > Laporan Cabang > Report Cod: AWB COD per bulan dengan status pengiriman, penerima, Nilai COD dan status Kas Terima, tombol Ekspor mengunduh Excel. Melihat butuh hak Pembayaran: lihat; Terima Kas butuh Pembayaran: buat. Belum membuat jurnal akunting.",
+    href: "/cod",
+  },
+  {
     id: "awb-tertunda-termanifest",
     title: "AWB Tertunda dan AWB Termanifest",
     keywords: [

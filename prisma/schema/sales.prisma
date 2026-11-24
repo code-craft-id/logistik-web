@@ -261,6 +261,11 @@ model Transaction {
   insuranceFee        Decimal?                   @map("insurance_fee") @db.Decimal(15, 2)
   codValue            Decimal?                   @map("cod_value") @db.Decimal(15, 2)
   codFee              Decimal?                   @map("cod_fee") @db.Decimal(15, 2)
+  /// Kas Terima (sandbox Cod List / Kas Terima, OBSERVED 2026-11-24): COD cash handed in at the branch. No journal posting (rules TBD).
+  codReceivedAt       DateTime?                  @map("cod_received_at")
+  codReceivedById     Int?                       @map("cod_received_by_id")
+  codReceivedBy       User?                      @relation("TransactionCodReceivedBy", fields: [codReceivedById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  codReceivedNote     String?                    @map("cod_received_note") @db.VarChar(255)
   pic1                String?                    @db.VarChar(100)
   pic2                String?                    @db.VarChar(100)
   leadTime            String?                    @map("lead_time") @db.VarChar(50)
@@ -291,6 +296,7 @@ model Transaction {
   @@index([pickupCourierId])
   @@index([marketingPersonId])
   @@index([consigneeId])
+  @@index([codReceivedById])
   @@map("transactions")
 }
 

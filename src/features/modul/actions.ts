@@ -11,6 +11,7 @@ import {
   decideAwbChange,
   requestAwbChange,
 } from "./server/awb-changes";
+import { receiveCod } from "./server/cod";
 import { ModulError } from "./server/common";
 import { createPodReturn, decidePodReturn } from "./server/pod-returns";
 import { deleteTariff, saveTariff } from "./server/tariffs";
@@ -206,5 +207,15 @@ export async function deleteVendorProcessAction(formData: FormData) {
       return { ok: true, message: "Data proses vendor dihapus." };
     },
     ["/vendor-processes"],
+  );
+}
+
+export async function receiveCodAction(formData: FormData) {
+  return run(
+    async (actor) => {
+      await receiveCod(actor, fields(formData));
+      return { ok: true, message: "Kas COD diterima (pindah ke Kas Terima)." };
+    },
+    ["/cod"],
   );
 }

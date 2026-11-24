@@ -45,6 +45,7 @@ const all = [
   ["transaction", ["view", "update"]],
   ["transaction_report", ["view", "export"]],
   ["manifest", ["view", "update"]],
+  ["payment", ["view", "create"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -800,6 +801,43 @@ describe("Booking pickup (berdiri sendiri)", () => {
     expect((await pickup.scanBooking(adminA, `${tag}-BK2`))?.blocked).toBe(
       "Booking sudah dibatalkan.",
     );
+  });
+});
+
+describe("Cod List / Kas Terima", () => {
+  it("receives COD cash once for a delivered AWB of the destination branch", async () => {
+    const cod = await import("../../src/features/modul/server/cod");
+    const open = await awb("COD1");
+    const done = await awb("COD2", "Delivered");
+    await db.transaction.updateMany({
+      where: { id: { in: [open.id, done.id] } },
+      data: { codValue: "50000" },
+    });
+    const adminB = actor(ids.approver, [ids.b]);
+    const list = await cod.listCod(adminB, { search: tag });
+    expect(list.rows.map((r) => r.id).sort()).toEqual(
+      [open.id, done.id].sort(),
+    );
+    await expect(
+      cod.receiveCod(adminB, { transactionId: open.id, note: "Tunai" }),
+    ).rejects.toThrow("Delivered");
+    await expect(
+      cod.receiveCod(actor(ids.approver, [ids.a]), {
+        transactionId: done.id,
+        note: "Tunai",
+      }),
+    ).rejects.toThrow("bukan cabang Anda");
+    await cod.receiveCod(adminB, { transactionId: done.id, note: "Tunai" });
+    await expect(
+      cod.receiveCod(adminB, { transactionId: done.id, note: "Tunai" }),
+    ).rejects.toThrow("sudah diterima");
+    const received = await cod.listCod(adminB, {
+      tab: "received",
+      search: tag,
+    });
+    expect(received.rows).toEqual([
+      expect.objectContaining({ id: done.id, codReceivedNote: "Tunai" }),
+    ]);
   });
 });
 

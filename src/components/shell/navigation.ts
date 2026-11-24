@@ -265,6 +265,10 @@ export const liveRoutes = [
   "/branch-reports/awb?view=pending",
   "/branch-reports/awb?view=manifested",
   "/report-customer",
+  // Sandbox COD (2026-11-24).
+  "/cod",
+  "/cod?tab=received",
+  "/branch-reports/report-cod",
   "/financial-reports/aging",
   "/financial-reports/ap-aging",
   "/akunting/rugi-laba",

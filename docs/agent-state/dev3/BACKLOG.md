@@ -56,8 +56,8 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 
 | # | Item | Sandbox |
 |---|---|---|
-| S1 | Cod List, Kas Terima | Modul > Layanan Pelanggan > Transaksi |
-| S2 | Report Cod | Laporan Cabang |
+| S1 | ~~Cod List, Kas Terima~~ DONE 2026-11-24 `/cod` (D-40) | Modul > Layanan Pelanggan > Transaksi |
+| S2 | ~~Report Cod~~ DONE 2026-11-24 `/branch-reports/report-cod` | Laporan Cabang |
 | S3 | Transaksi Agent: On Site Agent, Print Agent, History Deposit Agent, Manifest Agent | Modul |
 | S4 | Laporan Agen: Transaksi Agen, Laporan Komisi Agen | Laporan |
 | S5 | Laporan Keuntungan | Laporan Keuangan |

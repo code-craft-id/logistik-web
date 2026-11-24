@@ -85,6 +85,8 @@ export const legacyMenu = [
             href: "/transactions/approvals",
           },
           { label: "Void Awb", href: "/transactions/void" },
+          { label: "Cod List", href: "/cod" },
+          { label: "Kas Terima", href: "/cod?tab=received" },
         ],
       },
       {
@@ -208,6 +210,7 @@ export const legacyMenu = [
             label: "Detail Transaksi Inbound",
             href: "/branch-reports/inbound-transaction-details",
           },
+          { label: "Report Cod", href: "/branch-reports/report-cod" },
         ],
       },
       {

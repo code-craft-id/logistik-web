@@ -57,6 +57,7 @@ model User {
   identityAuditEvents      IdentityAuditEvent[]
   bookingsCreated          Booking[]                  @relation("BookingCreatedBy")
   transactionsCreated      Transaction[]              @relation("TransactionCreatedBy")
+  transactionsCodReceived  Transaction[]              @relation("TransactionCodReceivedBy")
   transactionStatusChanges TransactionStatusHistory[] @relation("TransactionStatusChangedBy")
   manifestsCreated         Manifest[]                 @relation("ManifestCreatedBy")
   manifestItemsAssigned    ManifestItem[]             @relation("ManifestItemAssignedBy")
