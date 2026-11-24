@@ -4,15 +4,23 @@ import { z } from "zod";
 import {
   type AccessActor,
   isAdministrator,
+  permits,
   permitsBranch,
 } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
 import { prisma } from "@/lib/db";
 
-/** Booking pickup lifecycle (OBSERVED in the provider app). */
+/**
+ * Booking pickup lifecycle: WAITING / PROGRESS / CANCEL are OBSERVED in the
+ * provider app. SUCCESS / MISS are the courier's outcome after PROGRESS
+ * (owner request 2026-11-24, D-39), counted by Harian Kurir as Jumlah
+ * Terambil / Jumlah Miss Pickup like the real web.
+ */
 export const BOOKING_STATUS = {
   WAITING: "WAITING TO PICKUP",
   PROGRESS: "PROGRESS PICKUP",
+  SUCCESS: "SUCCESS PICKUP",
+  MISS: "MISS PICKUP",
   CANCEL: "CANCEL PICKUP",
 } as const;
 
@@ -54,9 +62,12 @@ export async function assignCourier(actor: AccessActor, input: unknown) {
   return prisma.$transaction(async (tx) => {
     await lock(tx, data.bookingId);
     const booking = await bookingInScope(tx, actor, data.bookingId);
-    if (booking.status !== BOOKING_STATUS.WAITING)
+    if (
+      booking.status !== BOOKING_STATUS.WAITING &&
+      booking.status !== BOOKING_STATUS.MISS
+    )
       throw new PickupError(
-        `Kurir hanya bisa ditugaskan saat ${BOOKING_STATUS.WAITING}.`,
+        `Kurir hanya bisa ditugaskan saat ${BOOKING_STATUS.WAITING} atau ${BOOKING_STATUS.MISS}.`,
       );
     const courier = await tx.courier.findFirst({
       where: { id: data.courierId, deletedAt: null, status: "ACTIVE" },
@@ -70,10 +81,18 @@ export async function assignCourier(actor: AccessActor, input: unknown) {
       );
     return tx.booking.update({
       where: { id: booking.id },
+      // A missed pickup is retried: back to waiting with the new courier.
       data: {
         courierId: data.courierId,
         assignedAt: new Date(),
         assignedById: actor.id,
+        ...(booking.status === BOOKING_STATUS.MISS
+          ? {
+              status: BOOKING_STATUS.WAITING,
+              pickedUpAt: null,
+              pickedUpById: null,
+            }
+          : {}),
       },
       select: { id: true },
     });
@@ -97,7 +116,10 @@ export async function cancelBooking(actor: AccessActor, input: unknown) {
   return prisma.$transaction(async (tx) => {
     await lock(tx, data.bookingId);
     const booking = await bookingInScope(tx, actor, data.bookingId);
-    if (booking.status !== BOOKING_STATUS.WAITING)
+    if (
+      booking.status !== BOOKING_STATUS.WAITING &&
+      booking.status !== BOOKING_STATUS.MISS
+    )
       throw new PickupError(
         booking.status === BOOKING_STATUS.CANCEL
           ? "Booking sudah dibatalkan."
@@ -131,6 +153,7 @@ export type BookingScanView = {
   pickedUpAt: string | null;
   pickedUpBy: string | null;
   cancelReason: string | null;
+  pickupNote: string | null;
   /** Why "Konfirmasi Jemput" is not possible, or null when it is. */
   blocked: string | null;
 };
@@ -148,6 +171,7 @@ const view = {
   bookingDate: true,
   pickedUpAt: true,
   cancelReason: true,
+  pickupNote: true,
   courierId: true,
   branch: { select: { name: true } },
   courier: { select: { name: true } },
@@ -166,6 +190,7 @@ function toView(b: {
   bookingDate: Date;
   pickedUpAt: Date | null;
   cancelReason: string | null;
+  pickupNote: string | null;
   courierId: number | null;
   branch: { name: string } | null;
   courier: { name: string } | null;
@@ -175,10 +200,14 @@ function toView(b: {
     b.status === BOOKING_STATUS.CANCEL
       ? "Booking sudah dibatalkan."
       : b.status === BOOKING_STATUS.PROGRESS
-        ? "Booking sudah dijemput."
-        : !b.courierId
-          ? "Booking belum ditugaskan ke kurir. Minta admin cabang menugaskan kurir dulu."
-          : null;
+        ? "Booking sedang dijemput. Catat hasilnya: Terambil atau Miss Pickup."
+        : b.status === BOOKING_STATUS.SUCCESS
+          ? "Barang booking sudah terambil."
+          : b.status === BOOKING_STATUS.MISS
+            ? "Pickup gagal (Miss Pickup). Minta admin menugaskan ulang kurir."
+            : !b.courierId
+              ? "Booking belum ditugaskan ke kurir. Minta admin cabang menugaskan kurir dulu."
+              : null;
   return {
     id: b.id,
     bookingNo: b.bookingNo ?? `#${b.id}`,
@@ -194,6 +223,7 @@ function toView(b: {
     pickedUpAt: b.pickedUpAt?.toISOString() ?? null,
     pickedUpBy: b.pickedUpBy?.name ?? null,
     cancelReason: b.cancelReason,
+    pickupNote: b.pickupNote,
     blocked,
   };
 }
@@ -248,6 +278,56 @@ export async function confirmPickup(actor: AccessActor, bookingId: number) {
         status: BOOKING_STATUS.PROGRESS,
         pickedUpAt: new Date(),
         pickedUpById: actor.id,
+      },
+      select: view,
+    });
+    return toView(updated);
+  });
+}
+
+const resultSchema = z.object({
+  bookingId: z.coerce.number().int().positive(),
+  result: z.enum(["SUCCESS", "MISS"]),
+  note: z.string().trim().max(500).optional().default(""),
+});
+
+/**
+ * Courier outcome after Konfirmasi Jemput: PROGRESS PICKUP → SUCCESS PICKUP
+ * (Terambil) or MISS PICKUP (note required). Only the courier user who
+ * confirmed the pickup, or a booking approver, may record it.
+ */
+export async function recordPickupResult(actor: AccessActor, input: unknown) {
+  assertPermission(actor, "use", "awb_scan");
+  const parsed = resultSchema.safeParse(input);
+  if (!parsed.success) throw new PickupError("Pilih hasil pickup.");
+  const data = parsed.data;
+  if (data.result === "MISS" && data.note.length < 3)
+    throw new PickupError("Alasan Miss Pickup minimal 3 karakter.");
+  return prisma.$transaction(async (tx) => {
+    await lock(tx, data.bookingId);
+    await bookingInScope(tx, actor, data.bookingId);
+    const current = await tx.booking.findUniqueOrThrow({
+      where: { id: data.bookingId },
+      select: { ...view, pickedUpById: true },
+    });
+    if (current.status !== BOOKING_STATUS.PROGRESS)
+      throw new PickupError(
+        `Hasil pickup hanya bisa dicatat saat ${BOOKING_STATUS.PROGRESS}.`,
+      );
+    if (
+      current.pickedUpById !== actor.id &&
+      !permits(actor, "approve", "booking")
+    )
+      throw new PickupError(
+        "Hanya kurir yang menjemput atau admin booking yang bisa mencatat hasil.",
+      );
+    const updated = await tx.booking.update({
+      where: { id: current.id },
+      data: {
+        status: BOOKING_STATUS[data.result],
+        pickupResultAt: new Date(),
+        pickupResultById: actor.id,
+        pickupNote: data.note || null,
       },
       select: view,
     });

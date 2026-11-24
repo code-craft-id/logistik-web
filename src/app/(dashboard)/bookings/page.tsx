@@ -71,6 +71,8 @@ export default async function Page({
   const tone: Record<string, string> = {
     [BOOKING_STATUS.WAITING]: "border-muted-foreground/40",
     [BOOKING_STATUS.PROGRESS]: "border-primary",
+    [BOOKING_STATUS.SUCCESS]: "border-primary bg-primary/10",
+    [BOOKING_STATUS.MISS]: "border-destructive/60",
     [BOOKING_STATUS.CANCEL]: "border-destructive text-destructive",
   };
 
@@ -82,7 +84,7 @@ export default async function Page({
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
             Kelola Booking
           </h1>
-          <InfoTip text="Booking adalah pesanan jemput dan berdiri sendiri (tidak tertaut ke AWB). Alur: WAITING TO PICKUP → ✔ tugaskan kurir → kurir scan barcode booking (Konfirmasi Jemput) → PROGRESS PICKUP; atau ✖ batalkan → CANCEL PICKUP. AWB dibuat terpisah setelah barang tiba." />
+          <InfoTip text="Booking adalah pesanan jemput dan berdiri sendiri (tidak tertaut ke AWB). Alur: WAITING TO PICKUP → ✔ tugaskan kurir → kurir scan barcode booking (Konfirmasi Jemput) → PROGRESS PICKUP → kurir mencatat hasil: SUCCESS PICKUP (barang terambil) atau MISS PICKUP (wajib catatan; admin bisa ✔ tugaskan ulang kurir, booking kembali WAITING TO PICKUP); atau ✖ batalkan → CANCEL PICKUP. AWB dibuat terpisah setelah barang tiba." />
         </div>
         <Button asChild className="min-h-11">
           <Link href="/bookings/new">Tambah Booking</Link>
@@ -142,7 +144,9 @@ export default async function Page({
                 </TableRow>
               ) : (
                 bookings.map((b, index) => {
-                  const waiting = b.status === BOOKING_STATUS.WAITING;
+                  const waiting =
+                    b.status === BOOKING_STATUS.WAITING ||
+                    b.status === BOOKING_STATUS.MISS;
                   const branchCouriers = couriers.filter(
                     (c) => c.branchId === null || c.branchId === b.branchId,
                   );
@@ -188,9 +192,9 @@ export default async function Page({
                         >
                           {b.status}
                         </span>
-                        {b.cancelReason && (
+                        {(b.cancelReason || b.pickupNote) && (
                           <span className="block max-w-48 whitespace-normal text-xs text-muted-foreground">
-                            {b.cancelReason}
+                            {b.cancelReason ?? b.pickupNote}
                           </span>
                         )}
                       </TableCell>

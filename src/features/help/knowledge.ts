@@ -93,7 +93,7 @@ export const helpEntries: HelpEntry[] = [
     href: "/branch-reports/rekap-transaksi-harian",
   },
   {
-    id: "report-customer",
+    id: "report-customer-excel",
     title: "Report Customer (Excel)",
     keywords: [
       "report customer",
@@ -218,7 +218,7 @@ export const helpEntries: HelpEntry[] = [
       "slip",
     ],
     answer:
-      "Modul > Layanan Pelanggan > Booking. Booking adalah pesanan jemput (pickup) yang berdiri sendiri, tidak tertaut ke AWB. Klik Tambah Booking: form-nya sama seperti di aplikasi lama (Asal, Tujuan, Customer, data pengirim dan penerima, Layanan, DOC/PAC, Kurir, Via Moda, Pembayaran, Isi Barang, Keterangan, Koli/Volume/Berat, Harga/Kg, Min KG, Total harga, Grand Total dan Ganti Harga). Asal langsung terisi cabang Anda dan AWB No. booking langsung berisi nomor otomatis (B- + kode cabang + tahun bulan + nomor urut) yang terkunci; tekan Manual AWB untuk mengosongkan kolom dan mengetik nomor sendiri (tidak boleh dobel di cabang yang sama). Kolom wajib (bertanda *): Asal, Tujuan, Nama, Alamat dan No. Telp Pengirim (untuk penjemputan) serta Koli minimal 1; berat dan data penerima boleh menyusul. Tombol Dimensi menghitung Volume per koli (P x L x T dibagi pembagi Via Moda) dan Berat, sama seperti di Entry AWB. Memilih Kurir di form langsung menugaskan booking ke kurir itu (kurir harus dari cabang Asal). Status awal WAITING TO PICKUP. Admin cabang dengan hak Booking: Setujui menekan ✔ Tugaskan (pilih kurir dari cabang booking) atau ✖ Batal (wajib alasan, status CANCEL PICKUP). Kurir membuka Scan AWB, memilih mode Booking (jemput), scan barcode slip booking lalu Konfirmasi Jemput: status menjadi PROGRESS PICKUP. Booking cabang lain ditolak dengan pesan No. Booking tidak sesuai dengan cabang asal kurir; booking yang belum ditugaskan kurir belum bisa dijemput. AWB dibuat terpisah oleh admin setelah barang tiba. Print atau Print terpilih (barcode) mencetak slip booking dengan barcode dan QR. Tab Inbound Booking menampilkan booking yang Tujuannya cabang Anda.",
+      "Modul > Layanan Pelanggan > Booking. Booking adalah pesanan jemput (pickup) yang berdiri sendiri, tidak tertaut ke AWB. Klik Tambah Booking: form-nya sama seperti di aplikasi lama (Asal, Tujuan, Customer, data pengirim dan penerima, Layanan, DOC/PAC, Kurir, Via Moda, Pembayaran, Isi Barang, Keterangan, Koli/Volume/Berat, Harga/Kg, Min KG, Total harga, Grand Total dan Ganti Harga). Asal langsung terisi cabang Anda dan AWB No. booking langsung berisi nomor otomatis (B- + kode cabang + tahun bulan + nomor urut) yang terkunci; tekan Manual AWB untuk mengosongkan kolom dan mengetik nomor sendiri (tidak boleh dobel di cabang yang sama). Kolom wajib (bertanda *): Asal, Tujuan, Nama, Alamat dan No. Telp Pengirim (untuk penjemputan) serta Koli minimal 1; berat dan data penerima boleh menyusul. Tombol Dimensi menghitung Volume per koli (P x L x T dibagi pembagi Via Moda) dan Berat, sama seperti di Entry AWB. Memilih Kurir di form langsung menugaskan booking ke kurir itu (kurir harus dari cabang Asal). Status awal WAITING TO PICKUP. Admin cabang dengan hak Booking: Setujui menekan ✔ Tugaskan (pilih kurir dari cabang booking) atau ✖ Batal (wajib alasan, status CANCEL PICKUP). Kurir membuka Scan AWB, memilih mode Booking (jemput), scan barcode slip booking lalu Konfirmasi Jemput: status menjadi PROGRESS PICKUP. Setelah itu kurir mencatat hasil di kartu booking yang sama (scan lagi nomor booking): Barang Terambil (SUCCESS PICKUP) atau Miss Pickup (MISS PICKUP, catatan wajib minimal 3 karakter, misalnya toko tutup). Hanya kurir yang menjemput atau admin dengan hak Booking: Setujui yang bisa mencatat hasil. Booking MISS PICKUP bisa ✔ ditugaskan ulang (kembali WAITING TO PICKUP) atau ✖ dibatalkan. Hasil ini dihitung di Harian Kurir. Booking cabang lain ditolak dengan pesan No. Booking tidak sesuai dengan cabang asal kurir; booking yang belum ditugaskan kurir belum bisa dijemput. AWB dibuat terpisah oleh admin setelah barang tiba. Print atau Print terpilih (barcode) mencetak slip booking dengan barcode dan QR. Tab Inbound Booking menampilkan booking yang Tujuannya cabang Anda.",
 
     href: "/bookings",
   },
@@ -625,7 +625,7 @@ export const helpEntries: HelpEntry[] = [
       "manifest vendor",
     ],
     answer:
-      "Laporan Kurir: per kurir total AWB diantar, berhasil, gagal, retur. Detail Transaksi Inbound: AWB yang tujuannya cabang Anda. Manifest Outbound dan Pengantaran: daftar manifest dan DRS. Manifest Vendor: per vendor yang dipilih saat membuat manifest.",
+      "Laporan > Laporan Kurir > Harian Kurir: satu baris per kurir aktif cabang dengan Jumlah Terambil (booking SUCCESS PICKUP) dan Jumlah Miss Pickup (booking MISS PICKUP) yang hasilnya dicatat dalam periode, seperti aplikasi lama, ditambah AWB diantar di DRS (manifest maupun Kurir Kota): berhasil, gagal, retur dan belum ada hasil. Detail Transaksi Inbound: AWB yang tujuannya cabang Anda. Manifest Outbound dan Pengantaran: daftar manifest dan DRS. Manifest Vendor: per vendor yang dipilih saat membuat manifest.",
     href: "/courier-reports",
   },
   {

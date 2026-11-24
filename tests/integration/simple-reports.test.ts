@@ -16,6 +16,7 @@ const db = new PrismaClient({
 const tag = `SR${randomUUID().slice(0, 10)}`;
 const ids = {
   company: 0,
+  courier: 0,
   office: 0,
   a: 0,
   b: 0,
@@ -121,10 +122,35 @@ beforeAll(async () => {
       .slice(0, 2)
       .map((transactionId) => ({ manifestId: ids.manifest, transactionId })),
   });
+  ids.courier = (
+    await db.courier.create({
+      data: {
+        name: `${tag} kurir`,
+        address: "-",
+        nationalIdNumber: "1",
+        phone: "1",
+        branchId: ids.a,
+      },
+    })
+  ).id;
+  // A booking picked up and one missed inside the period (Harian Kurir).
+  await db.booking.createMany({
+    data: [
+      ["SUCCESS PICKUP", "1"],
+      ["MISS PICKUP", "2"],
+    ].map(([status, n]) => ({
+      bookingNo: `${tag}-B${n}`,
+      branchId: ids.a,
+      courierId: ids.courier,
+      status,
+      pickupResultAt: new Date("2026-11-05T03:00:00Z"),
+    })),
+  });
   ids.sheet = (
     await db.deliverySheet.create({
       data: {
         sheetNo: `${tag}-D`,
+        courierId: ids.courier,
         manifestId: ids.manifest,
         deliveryDate: new Date("2026-11-05T00:00:00Z"),
       },
@@ -152,6 +178,8 @@ afterAll(async () => {
     where: { deliverySheetId: ids.sheet },
   });
   await db.deliverySheet.deleteMany({ where: { id: ids.sheet } });
+  await db.booking.deleteMany({ where: { courierId: ids.courier } });
+  await db.courier.deleteMany({ where: { id: ids.courier } });
   await db.manifestItem.deleteMany({ where: { manifestId: ids.manifest } });
   await db.manifest.deleteMany({ where: { id: ids.manifest } });
   await db.transaction.deleteMany({ where: { id: { in: ids.tx } } });
@@ -208,7 +236,13 @@ describe("simple reports", () => {
       `${tag}-2`,
     ]);
     const courier = await run("courier", actor([ids.a]), ids.a);
-    expect(courier.totals).toMatchObject({ awb: 2, berhasil: 1, gagal: 1 });
+    expect(courier.totals).toMatchObject({
+      terambil: 1,
+      miss: 1,
+      awb: 2,
+      berhasil: 1,
+      gagal: 1,
+    });
     const gp = await run("gross-profit", actor([ids.a]), ids.a);
     expect(gp.rows[0]).toMatchObject({
       awb: 2,

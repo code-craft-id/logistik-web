@@ -26,6 +26,7 @@ model User {
   manifestScans            ManifestScan[]             @relation("ManifestScanBy")
   bookingsCancelled        Booking[]                  @relation("BookingCancelledBy")
   bookingsPickedUp         Booking[]                  @relation("BookingPickedUpBy")
+  bookingsPickupResult     Booking[]                  @relation("BookingPickupResultBy")
   bookingsAssigned         Booking[]                  @relation("BookingAssignedBy")
   deliveryProofsCreated    DeliveryProof[]            @relation("DeliveryProofCreatedBy")
   awbChangeRequests        AwbChangeRequest[]         @relation("AwbChangeRequestedBy")

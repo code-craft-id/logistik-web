@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   confirmPickupAction,
+  recordPickupResultAction,
   scanBookingAction,
 } from "@/features/bookings/pickup-actions";
 import type { BookingScanView } from "@/features/bookings/server/pickup";
@@ -269,6 +270,24 @@ function BookingCard({
   onError: (message: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState("");
+  const run = async (
+    call: () => Promise<
+      { ok: true; booking: BookingScanView } | { ok: false; message: string }
+    >,
+  ) => {
+    setBusy(true);
+    try {
+      const result = await call();
+      if (result.ok) onConfirmed(result.booking);
+      else onError(result.message);
+    } catch {
+      onError("Koneksi terputus. Coba lagi.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  const inProgress = booking.status === "PROGRESS PICKUP";
   return (
     <article className="space-y-4" aria-label={`Booking ${booking.bookingNo}`}>
       <header className="flex flex-wrap items-center justify-between gap-2">
@@ -298,30 +317,74 @@ function BookingCard({
           {booking.cancelReason && (
             <Field label="Alasan batal" value={booking.cancelReason} />
           )}
+          {booking.pickupNote && (
+            <Field label="Catatan pickup" value={booking.pickupNote} />
+          )}
         </dl>
       </section>
-      {booking.blocked && (
+      {inProgress ? (
+        <section className="space-y-3" aria-label="Hasil pickup">
+          <label className="grid gap-1 text-sm">
+            <span className="font-medium">
+              Catatan (wajib untuk Miss Pickup)
+            </span>
+            <textarea
+              value={note}
+              maxLength={500}
+              onChange={(e) => setNote(e.target.value)}
+              className="min-h-20 rounded-md border bg-background p-2"
+            />
+          </label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button
+              type="button"
+              className="min-h-11"
+              disabled={busy}
+              onClick={() =>
+                run(() =>
+                  recordPickupResultAction({
+                    bookingId: booking.id,
+                    result: "SUCCESS",
+                    note,
+                  }),
+                )
+              }
+            >
+              Barang Terambil
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              className="min-h-11"
+              disabled={busy || note.trim().length < 3}
+              onClick={() =>
+                run(() =>
+                  recordPickupResultAction({
+                    bookingId: booking.id,
+                    result: "MISS",
+                    note,
+                  }),
+                )
+              }
+            >
+              Miss Pickup
+            </Button>
+          </div>
+        </section>
+      ) : null}
+      {!inProgress && booking.blocked && (
         <p className="text-sm text-muted-foreground">{booking.blocked}</p>
       )}
-      <Button
-        type="button"
-        className="min-h-11 w-full"
-        disabled={!!booking.blocked || busy}
-        onClick={async () => {
-          setBusy(true);
-          try {
-            const result = await confirmPickupAction(booking.id);
-            if (result.ok) onConfirmed(result.booking);
-            else onError(result.message);
-          } catch {
-            onError("Koneksi terputus. Coba lagi.");
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        {busy ? "Menyimpan…" : "Konfirmasi Jemput"}
-      </Button>
+      {!inProgress && (
+        <Button
+          type="button"
+          className="min-h-11 w-full"
+          disabled={!!booking.blocked || busy}
+          onClick={() => run(() => confirmPickupAction(booking.id))}
+        >
+          {busy ? "Menyimpan…" : "Konfirmasi Jemput"}
+        </Button>
+      )}
     </article>
   );
 }

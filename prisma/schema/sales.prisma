@@ -163,6 +163,11 @@ model Booking {
   pickedUpAt          DateTime?        @map("picked_up_at")
   pickedUpById        Int?             @map("picked_up_by_id")
   pickedUpBy          User?            @relation("BookingPickedUpBy", fields: [pickedUpById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Courier pickup outcome (owner request 2026-11-24, D-39): SUCCESS PICKUP or MISS PICKUP, with the courier's note.
+  pickupResultAt      DateTime?        @map("pickup_result_at")
+  pickupResultById    Int?             @map("pickup_result_by_id")
+  pickupResultBy      User?            @relation("BookingPickupResultBy", fields: [pickupResultById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  pickupNote          String?          @map("pickup_note") @db.VarChar(500)
   cancelledAt         DateTime?        @map("cancelled_at")
   cancelledById       Int?             @map("cancelled_by_id")
   cancelledBy         User?            @relation("BookingCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict, onUpdate: Restrict)
@@ -180,6 +185,7 @@ model Booking {
   @@index([bookingDate])
   @@index([courierId])
   @@index([destinationBranchId])
+  @@index([pickupResultById])
   @@map("bookings")
 }
 

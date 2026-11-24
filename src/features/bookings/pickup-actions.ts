@@ -12,6 +12,7 @@ import {
   cancelBooking,
   confirmPickup,
   PickupError,
+  recordPickupResult,
   scanBooking,
 } from "./server/pickup";
 
@@ -83,6 +84,24 @@ export async function confirmPickupAction(
     if (!awbScanEnabled())
       throw new PickupError("Fitur Scan AWB belum diaktifkan.");
     const booking = await confirmPickup(await actor(), Number(bookingId));
+    revalidatePath("/bookings");
+    return { ok: true, booking };
+  } catch (e) {
+    return { ok: false, message: message(e) };
+  }
+}
+
+export async function recordPickupResultAction(input: {
+  bookingId: number;
+  result: "SUCCESS" | "MISS";
+  note?: string;
+}): Promise<
+  { ok: true; booking: BookingScanView } | { ok: false; message: string }
+> {
+  try {
+    if (!awbScanEnabled())
+      throw new PickupError("Fitur Scan AWB belum diaktifkan.");
+    const booking = await recordPickupResult(await actor(), input);
     revalidatePath("/bookings");
     return { ok: true, booking };
   } catch (e) {

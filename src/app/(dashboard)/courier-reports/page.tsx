@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SimpleReportPage } from "@/features/reports/simple/report-page";
 
-export const metadata: Metadata = { title: "Laporan Kurir" };
+export const metadata: Metadata = { title: "Harian Kurir" };
 
 // Session- and query-dependent report; blocking render.
 export const instant = false;

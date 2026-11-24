@@ -712,11 +712,69 @@ describe("Booking pickup (berdiri sendiri)", () => {
       courier: `${tag} kurir A`,
     });
     await expect(pickup.confirmPickup(adminA, booking.id)).rejects.toThrow(
-      "sudah dijemput",
+      "sedang dijemput",
     );
     await expect(
       pickup.cancelBooking(adminA, { bookingId: booking.id, reason: "Batal" }),
     ).rejects.toThrow("tidak bisa dibatalkan");
+  });
+
+  it("records the courier's pickup result and retries a missed pickup", async () => {
+    const pickup = await import("../../src/features/bookings/server/pickup");
+    const courier = await db.courier.create({
+      data: {
+        name: `${tag} kurir C`,
+        address: "-",
+        nationalIdNumber: "3",
+        phone: "3",
+        branchId: ids.a,
+      },
+    });
+    const booking = await db.booking.create({
+      data: { bookingNo: `${tag}-BK3`, branchId: ids.a, courierId: courier.id },
+    });
+    const adminA = actor(ids.approver, [ids.a]);
+    await expect(
+      pickup.recordPickupResult(adminA, {
+        bookingId: booking.id,
+        result: "SUCCESS",
+      }),
+    ).rejects.toThrow("PROGRESS PICKUP");
+    await pickup.confirmPickup(adminA, booking.id);
+    await expect(
+      pickup.recordPickupResult(adminA, {
+        bookingId: booking.id,
+        result: "MISS",
+        note: "",
+      }),
+    ).rejects.toThrow("minimal 3");
+    const missed = await pickup.recordPickupResult(adminA, {
+      bookingId: booking.id,
+      result: "MISS",
+      note: "Toko tutup",
+    });
+    expect(missed).toMatchObject({
+      status: "MISS PICKUP",
+      pickupNote: "Toko tutup",
+    });
+    // Admin re-assigns: back to waiting, the courier can pick up again.
+    await pickup.assignCourier(adminA, {
+      bookingId: booking.id,
+      courierId: courier.id,
+    });
+    await pickup.confirmPickup(adminA, booking.id);
+    const taken = await pickup.recordPickupResult(adminA, {
+      bookingId: booking.id,
+      result: "SUCCESS",
+    });
+    expect(taken.status).toBe("SUCCESS PICKUP");
+    await expect(
+      pickup.recordPickupResult(adminA, {
+        bookingId: booking.id,
+        result: "MISS",
+        note: "lagi",
+      }),
+    ).rejects.toThrow("PROGRESS PICKUP");
   });
 
   it("cancels a waiting booking with a reason", async () => {

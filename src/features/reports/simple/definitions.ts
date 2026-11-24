@@ -137,31 +137,53 @@ export const simpleReports: Record<string, ReportDef> = {
     },
   },
   courier: {
-    title: "Laporan Kurir",
+    title: "Harian Kurir",
     resource: "delivery_report",
     definition:
-      "Satu baris per kurir manifest dari lembar pengantaran (DRS) dalam periode tanggal DRS: total AWB diantar, berhasil, gagal, retur dan belum ada hasil.",
+      "Satu baris per kurir aktif cabang (seperti Harian Kurir aplikasi lama): Jumlah Terambil = booking SUCCESS PICKUP dan Jumlah Miss Pickup = booking MISS PICKUP yang hasilnya dicatat kurir dalam periode. Kolom antar menghitung AWB di lembar pengantaran (DRS manifest atau DRS Kurir Kota) dengan tanggal DRS dalam periode: berhasil, gagal, retur dan belum ada hasil.",
     async run(actor, f, tx) {
       const rows = await tx.$queryRaw<Row[]>`
-        SELECT COALESCE(co.name, 'Tanpa kurir') AS kurir,
-               count(DISTINCT ds.id)::int AS drs,
-               count(*)::int AS awb,
-               count(*) FILTER (WHERE i.outcome = 'DELIVERED')::int AS berhasil,
-               count(*) FILTER (WHERE i.outcome = 'FAILED_DELIVERY')::int AS gagal,
-               count(*) FILTER (WHERE i.outcome = 'RETURNED')::int AS retur,
-               count(*) FILTER (WHERE i.outcome IS NULL)::int AS proses
-        FROM delivery_sheet_items i
-        JOIN delivery_sheets ds ON ds.id = i.delivery_sheet_id
-        JOIN manifests m ON m.id = ds.manifest_id AND m.deleted_at IS NULL
-        LEFT JOIN couriers co ON co.id = m.courier_id
-        WHERE i.deleted_at IS NULL AND ${branchScope(actor, f, Prisma.sql`m.branch_id`)}
-          AND ds.delivery_date >= ${f.from} AND ds.delivery_date < ${f.toExclusive}
-        GROUP BY m.courier_id, co.name ORDER BY 3 DESC, 1`;
+        WITH p AS (
+          SELECT b.courier_id,
+                 count(*) FILTER (WHERE b.status = 'SUCCESS PICKUP')::int AS terambil,
+                 count(*) FILTER (WHERE b.status = 'MISS PICKUP')::int AS miss
+          FROM bookings b
+          WHERE b.deleted_at IS NULL AND b.courier_id IS NOT NULL
+            AND b.pickup_result_at >= ${f.from} AND b.pickup_result_at < ${f.toExclusive}
+          GROUP BY 1),
+        d AS (
+          SELECT COALESCE(ds.courier_id, m.courier_id) AS courier_id,
+                 count(DISTINCT ds.id)::int AS drs,
+                 count(*)::int AS awb,
+                 count(*) FILTER (WHERE i.outcome = 'DELIVERED')::int AS berhasil,
+                 count(*) FILTER (WHERE i.outcome = 'FAILED_DELIVERY')::int AS gagal,
+                 count(*) FILTER (WHERE i.outcome = 'RETURNED')::int AS retur,
+                 count(*) FILTER (WHERE i.outcome IS NULL)::int AS proses
+          FROM delivery_sheet_items i
+          JOIN delivery_sheets ds ON ds.id = i.delivery_sheet_id
+          LEFT JOIN manifests m ON m.id = ds.manifest_id
+          WHERE i.deleted_at IS NULL AND (m.id IS NULL OR m.deleted_at IS NULL)
+            AND ds.delivery_date >= ${f.from} AND ds.delivery_date < ${f.toExclusive}
+          GROUP BY 1)
+        SELECT co.name AS kurir,
+               COALESCE(p.terambil, 0) AS terambil, COALESCE(p.miss, 0) AS miss,
+               COALESCE(d.drs, 0) AS drs, COALESCE(d.awb, 0) AS awb,
+               COALESCE(d.berhasil, 0) AS berhasil, COALESCE(d.gagal, 0) AS gagal,
+               COALESCE(d.retur, 0) AS retur, COALESCE(d.proses, 0) AS proses
+        FROM couriers co
+        LEFT JOIN p ON p.courier_id = co.id
+        LEFT JOIN d ON d.courier_id = co.id
+        WHERE co.deleted_at IS NULL
+          AND ${branchScope(actor, f, Prisma.sql`co.branch_id`)}
+          AND (co.status = 'ACTIVE' OR p.courier_id IS NOT NULL OR d.courier_id IS NOT NULL)
+        ORDER BY 1`;
       return {
         columns: [
-          { key: "kurir", label: "Kurir" },
+          { key: "kurir", label: "Nama Kurir" },
+          count("Jumlah Terambil", "terambil"),
+          count("Jumlah Miss Pickup", "miss"),
           count("DRS", "drs"),
-          count("Total AWB", "awb"),
+          count("AWB diantar", "awb"),
           count("Berhasil", "berhasil"),
           count("Gagal", "gagal"),
           count("Retur", "retur"),
@@ -170,7 +192,16 @@ export const simpleReports: Record<string, ReportDef> = {
         rows,
         totals: sumColumns(
           rows,
-          ["drs", "awb", "berhasil", "gagal", "retur", "proses"],
+          [
+            "terambil",
+            "miss",
+            "drs",
+            "awb",
+            "berhasil",
+            "gagal",
+            "retur",
+            "proses",
+          ],
           { kurir: "Total" },
         ),
       };
