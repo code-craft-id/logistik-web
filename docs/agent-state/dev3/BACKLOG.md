@@ -61,7 +61,7 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 | S3 | ~~Transaksi Agent~~ DONE 2026-11-24 (D-41) `/agent-awb`, `/agent-deposit`, Manifest Agent = `/manifest?view=agent` | Modul |
 | S4 | ~~Laporan Agen~~ DONE 2026-11-24 `/agent-reports` | Laporan |
 | S5 | ~~Laporan Keuntungan~~ DONE 2026-11-24 `/financial-reports/profit` (D-42) | Laporan Keuangan |
-| S6 | Share Truck: Dashboard, Charter (Order Masuk, List Order Keluar), Status (Update, Cek), Invoice Keluar / Masuk, Ready Truck | New top menu |
+| S6 | ~~Share Truck~~ DONE 2026-11-24 (D-43) `/share-truck/*`: Dashboard, Charter (Order Masuk, List Order Keluar), Status (Update, Cek), Invoice Keluar / Masuk, Ready Truck | New top menu |
 
 ### Group 3: Akunting details not yet like the sandbox
 

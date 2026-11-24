@@ -11,6 +11,7 @@ import {
   PanelsTopLeft,
   Settings,
   Ticket,
+  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -44,6 +45,7 @@ const groupIcons = {
   Accounting: ChartNoAxesCombined,
   Reports: ChartNoAxesCombined,
   Ticketing: Ticket,
+  "Share Truck": Truck,
   "System Tutorial": BookOpen,
 };
 

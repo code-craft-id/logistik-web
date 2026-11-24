@@ -285,6 +285,11 @@ export const permissionResources = [
     label: "Scan AWB (ubah status lewat scan)",
     actions: ["use"],
   },
+  {
+    resource: "share_truck",
+    label: "Share Truck (charter truk)",
+    actions: ["view", "manage"],
+  },
 ] as const;
 
 export const permissionGrantCount = permissionResources.reduce(
@@ -319,6 +324,7 @@ export function permissionRestriction(resource: string): string | undefined {
       "vendor_process",
       "debt_payment",
       "awb_scan",
+      "share_truck",
       "ticket",
       "transaction_report",
       "manifest_report",

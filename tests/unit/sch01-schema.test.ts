@@ -51,6 +51,8 @@ describe("SCH-01 preservation and adapter contract", () => {
       "ManifestScan",
       // Append-only agent deposit history (D-41).
       "AgentDepositMovement",
+      // Append-only charter trip status history (D-43).
+      "CharterStatusLog",
     ];
     const noSoftDelete = [
       ...parentOwned,
@@ -58,6 +60,8 @@ describe("SCH-01 preservation and adapter contract", () => {
       "FinInvoice",
       "FinJournal",
       "FinCostState",
+      // Ready Truck offer: 1:1 with a vehicle, withdrawn via active=false.
+      "VehicleShare",
     ];
     expect(source).not.toMatch(/\bBigInt\b|\/\/\/ (?:Prototype:|PII)/);
     for (const [, name, body] of models) {

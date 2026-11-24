@@ -49,6 +49,7 @@ model Office {
 }
 
 model Branch {
+  charterOrders         CharterOrder[]
   manifestScans         ManifestScan[]      @relation("ManifestScanBranch")
   finAccounts           FinAccount[]        @relation("FinAccountBranch")
   bookingsInbound       Booking[]           @relation("BookingDestinationBranch")

@@ -47,6 +47,7 @@ const all = [
   ["manifest", ["view", "update"]],
   ["payment", ["view", "create"]],
   ["agent", ["view", "update"]],
+  ["share_truck", ["view", "manage"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -921,6 +922,107 @@ describe("Agent deposit (D-41)", () => {
       data: { agentId: null },
     });
     await db.agent.delete({ where: { id: agent.id } });
+  });
+});
+
+describe("Share Truck (D-43)", () => {
+  it("shares a truck, runs an incoming charter to DONE and invoices it once", async () => {
+    const st = await import("../../src/features/share-truck/server");
+    const vehicle = await db.vehicle.create({
+      data: {
+        name: `${tag} Box`,
+        year: 2020,
+        licensePlate: `${tag}-P`.slice(0, 20),
+        registrationHolderName: "-",
+        registrationNumber: "-",
+        cylinderCapacity: "-",
+        color: "-",
+        insuranceName: "-",
+        description: "-",
+        chassisNumber: "-",
+        engineNumber: "-",
+        status: "ACTIVE",
+        serviceTrucking: true,
+        branchId: ids.a,
+      },
+    });
+    const customer = await db.customer.create({
+      data: { name: `${tag} Penyewa`, branchId: ids.a },
+    });
+    const adminA = actor(ids.approver, [ids.a]);
+    await expect(
+      st.shareTruck(adminA, {
+        vehicleId: vehicle.id,
+        origin: "JAKARTA",
+        destination: "BANDUNG",
+        leadTimeDays: "1",
+        availableFrom: "2026-11-30",
+        availableTo: "2026-11-01",
+        price: "500000",
+      }),
+    ).rejects.toThrow("Tgl Berakhir");
+    await st.shareTruck(adminA, {
+      vehicleId: vehicle.id,
+      origin: "JAKARTA",
+      destination: "BANDUNG",
+      leadTimeDays: "1",
+      availableFrom: "2026-01-01",
+      availableTo: "2099-12-31",
+      price: "500000",
+    });
+    const share = await db.vehicleShare.findUniqueOrThrow({
+      where: { vehicleId: vehicle.id },
+    });
+    const { rows } = await st.searchSharedTrucks(adminA, {});
+    expect(rows.some((r) => r.id === share.id)).toBe(true);
+    const order = await st.createIncomingOrder(adminA, {
+      shareId: share.id,
+      customerId: customer.id,
+      branchId: ids.a,
+      loadDate: "2026-11-25",
+      origin: "JAKARTA",
+      destination: "BANDUNG",
+      totalCost: "500000",
+    });
+    await expect(
+      st.createCharterInvoice(adminA, { orderId: order.id, invoiceNo: "X" }),
+    ).rejects.toThrow("sudah diterima");
+    await st.decideIncomingOrder(adminA, {
+      orderId: order.id,
+      decision: "ACCEPT",
+    });
+    await expect(
+      st.advanceOrderStatus(adminA, { orderId: order.id, status: "DONE" }),
+    ).rejects.toThrow("tidak bisa diubah");
+    for (const status of ["LOADING", "ON THE WAY", "ARRIVED", "DONE"])
+      await st.advanceOrderStatus(adminA, { orderId: order.id, status });
+    await st.createCharterInvoice(adminA, {
+      orderId: order.id,
+      invoiceNo: `${tag}-INV`,
+    });
+    await expect(
+      st.createCharterInvoice(adminA, { orderId: order.id, invoiceNo: "Y" }),
+    ).rejects.toThrow("sudah punya invoice");
+    const { invoices } = await st.listCharterInvoices(adminA, "IN", tag);
+    expect(invoices[0]).toMatchObject({ status: "UNPAID" });
+    expect(invoices[0].amount.toString()).toBe("500000");
+    await st.payCharterInvoice(adminA, { invoiceId: invoices[0].id });
+    await expect(
+      st.payCharterInvoice(adminA, { invoiceId: invoices[0].id }),
+    ).rejects.toThrow("sudah lunas");
+    const logs = await db.charterStatusLog.count({
+      where: { orderId: order.id },
+    });
+    expect(logs).toBe(6);
+    await expect(
+      st.listOrders(actor(ids.approver, [ids.b]), { direction: "IN" }),
+    ).resolves.toMatchObject({ rows: [] });
+    await db.charterInvoice.deleteMany({ where: { orderId: order.id } });
+    await db.charterStatusLog.deleteMany({ where: { orderId: order.id } });
+    await db.charterOrder.deleteMany({ where: { id: order.id } });
+    await db.vehicleShare.deleteMany({ where: { vehicleId: vehicle.id } });
+    await db.vehicle.delete({ where: { id: vehicle.id } });
+    await db.customer.delete({ where: { id: customer.id } });
   });
 });
 

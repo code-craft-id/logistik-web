@@ -66,6 +66,7 @@ describe("FND-03 local interaction contracts", () => {
       "Modul",
       "Akunting",
       "Laporan",
+      "Share Truck",
       "Ticketing",
       "More",
     ]);

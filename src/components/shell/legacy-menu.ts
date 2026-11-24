@@ -260,6 +260,32 @@ export const legacyMenu = [
     ],
   },
   {
+    label: "Share Truck",
+    children: [
+      { label: "Dashboard Share Truck", href: "/share-truck" },
+      {
+        label: "Charter",
+        children: [
+          { label: "Order Masuk Charter", href: "/share-truck/orders" },
+          {
+            label: "List Order Keluar Charter",
+            href: "/share-truck/orders?dir=out",
+          },
+        ],
+      },
+      {
+        label: "Status",
+        children: [
+          { label: "Update Status", href: "/share-truck/status" },
+          { label: "Cek Status", href: "/share-truck/status?view=check" },
+        ],
+      },
+      { label: "Invoice Keluar", href: "/share-truck/invoices" },
+      { label: "Invoice Masuk", href: "/share-truck/invoices?type=masuk" },
+      { label: "Ready Truck", href: "/share-truck/ready" },
+    ],
+  },
+  {
     label: "Ticketing",
     children: [
       { label: "Tiket Support", href: "/ticketting" },

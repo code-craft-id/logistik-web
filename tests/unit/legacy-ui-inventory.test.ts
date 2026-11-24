@@ -34,6 +34,8 @@ describe("legacy inventory coverage and presentation routing", () => {
       .map((group) => group.label)
       .filter((label) => label !== "Akunting");
     source.splice(source.indexOf("Modul") + 1, 0, "Akunting");
+    // Share Truck (sandbox-only top menu, D-43) sits before Ticketing.
+    source.splice(source.indexOf("Ticketing"), 0, "Share Truck");
     expect(
       navigation
         .slice(0, legacyMenu.length)

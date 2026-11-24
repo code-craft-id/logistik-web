@@ -157,6 +157,26 @@ export const helpEntries: HelpEntry[] = [
     href: "/agent-awb",
   },
   {
+    id: "share-truck",
+    title: "Share Truck (charter truk)",
+    keywords: [
+      "share truck",
+      "charter",
+      "sewa truk",
+      "ready truck",
+      "order masuk",
+      "order keluar",
+      "update status",
+      "cek status",
+      "invoice keluar",
+      "invoice masuk",
+      "truk",
+    ],
+    answer:
+      "Menu Share Truck untuk sewa truk utuh (charter). 1) Ready Truck: daftar kendaraan dari Master Data; Share mengisi Asal, Tujuan, Lead Time, Tgl Tersedia, Tgl Berakhir dan Harga, Unshare menarik tawaran. 2) Dashboard Share Truck: cari truk yang di-share per Jenis, urutkan Termurah atau Tercepat, lalu Order untuk customer penyewa (isi Tanggal Muat, muatan dan Total Biaya). 3) Charter > Order Masuk Charter: order customer berstatus Menunggu, klik Terima atau Tolak. Charter > List Order Keluar Charter: Tambah Order Keluar saat kita menyewa truk vendor (vendor, nopol, rute, Total Biaya); langsung Diterima. 4) Status > Update Status: majukan status satu langkah Diterima, Muat, Dalam Perjalanan, Tiba, Selesai (boleh dengan catatan); Cek Status menampilkan riwayat siapa dan kapan. 5) Invoice Keluar: tagihan ke customer untuk Order Masuk yang diterima; Invoice Masuk: tagihan vendor untuk Order Keluar. Satu invoice per order, nilainya Total Biaya order, tandai Lunas saat dibayar. Belum membuat jurnal akunting. Melihat butuh hak Share Truck: lihat, mengubah butuh Share Truck: kelola.",
+    href: "/share-truck",
+  },
+  {
     id: "awb-tertunda-termanifest",
     title: "AWB Tertunda dan AWB Termanifest",
     keywords: [
