@@ -74,12 +74,14 @@ const optNum = z
   .union([z.literal(""), z.coerce.number().nonnegative()])
   .optional()
   .transform((v) => (typeof v === "number" ? v : null));
+/** Date-only columns (@db.Date) store the calendar day at UTC midnight. */
 const date = (v: string) => {
   try {
-    return businessDateStartUtc(v);
+    businessDateStartUtc(v); // validates the calendar date
   } catch {
     throw new ModulError("Tanggal tidak valid.");
   }
+  return new Date(`${v}T00:00:00.000Z`);
 };
 const parse = <T extends z.ZodTypeAny>(schema: T, raw: unknown): z.infer<T> => {
   const r = schema.safeParse(raw);

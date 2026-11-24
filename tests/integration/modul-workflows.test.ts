@@ -973,6 +973,8 @@ describe("Share Truck (D-43)", () => {
     const share = await db.vehicleShare.findUniqueOrThrow({
       where: { vehicleId: vehicle.id },
     });
+    // Date-only columns keep the chosen calendar day.
+    expect(share.availableFrom.toISOString().slice(0, 10)).toBe("2026-01-01");
     const { rows } = await st.searchSharedTrucks(adminA, {});
     expect(rows.some((r) => r.id === share.id)).toBe(true);
     const order = await st.createIncomingOrder(adminA, {
