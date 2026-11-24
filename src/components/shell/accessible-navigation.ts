@@ -131,13 +131,20 @@ export function accessibleNavigation(
   actor: AccessActor | null,
 ): NavigationGroup[] {
   const showInventory = isAdministrator(actor);
-  const allowed = (href?: string) =>
-    !!href &&
-    !!routeResources[href.split("?")[0]]?.some(
+  const allowed = (href?: string) => {
+    if (!href) return false;
+    const [path, query] = href.split("?");
+    // A Master Data item menu (?kind=) needs the right for that item only.
+    const kind = new URLSearchParams(query).get("kind");
+    const resources = routeResources[path]?.filter(
+      (resource) => !kind || resource === kind,
+    );
+    return !!resources?.some(
       (resource) =>
         permits(actor, "view", resource) &&
         (resource !== "vendor_tax" || isAdministrator(actor)),
     );
+  };
   const visibleLeaf = (item: NavigationLeaf): NavigationLeaf => {
     const { href, ...presentation } = item;
     return allowed(href) ? item : presentation;

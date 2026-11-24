@@ -5,12 +5,19 @@ import { currentIdentity } from "@/features/identity/server/context";
 import { type MasterKind, masterForms } from "../contracts";
 import { MasterDataWorkspace } from "./master-data-workspace";
 export async function MasterDataPage({
-  kinds,
-  title,
+  kinds: all,
+  title: groupTitle,
+  searchParams,
 }: {
   kinds: MasterKind[];
   title: string;
+  /** `?kind=` opens one item as its own menu page, like the real web. */
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const requested = (await searchParams)?.kind;
+  const one = all.find((kind) => kind === requested);
+  const kinds = one ? [one] : all;
+  const title = one ? masterForms[one].label : groupTitle;
   const current = await currentIdentity();
   if (!current) redirect("/login");
   const allowed = kinds.filter((kind) => permits(current.actor, "view", kind));
