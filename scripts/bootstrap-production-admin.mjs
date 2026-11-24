@@ -124,11 +124,19 @@ export async function bootstrapAdmin(prisma, input, hash = hashPassword) {
 }
 
 async function main() {
-  if (process.env.CONFIRM_EMPTY_DATABASE !== "yes")
+  // BOOTSTRAP_ADMIN=yes: run from the Vercel production build (vercel.json);
+  // the build already has the database URL. Otherwise run by hand with
+  // CONFIRM_EMPTY_DATABASE=yes and TARGET_DATABASE_URL.
+  const fromBuild = process.env.BOOTSTRAP_ADMIN === "yes";
+  if (!fromBuild && process.env.CONFIRM_EMPTY_DATABASE !== "yes")
     throw new Error(
       "Set CONFIRM_EMPTY_DATABASE=yes setelah memastikan target benar.",
     );
-  const connectionString = process.env.TARGET_DATABASE_URL;
+  const connectionString = fromBuild
+    ? process.env.DIRECT_URL ||
+      process.env.DATABASE_NEON_DATABASE_URL_UNPOOLED ||
+      process.env.DATABASE_URL
+    : process.env.TARGET_DATABASE_URL;
   if (!connectionString?.startsWith("postgres"))
     throw new Error("Set TARGET_DATABASE_URL (URL direct database tujuan).");
   const input = validateAdminInput(process.env);
@@ -144,6 +152,17 @@ async function main() {
     console.log(
       `Admin siap: username=${user.username}, id=${user.id}, cabang=${user.branches}. Segera ganti password setelah login.`,
     );
+  } catch (error) {
+    // In the build, an already initialised database is fine: skip quietly.
+    if (
+      fromBuild &&
+      error instanceof Error &&
+      error.message === "REFUSED_NOT_EMPTY"
+    ) {
+      console.log("Bootstrap admin dilewati: database sudah punya user.");
+      return;
+    }
+    throw error;
   } finally {
     await prisma.$disconnect();
   }

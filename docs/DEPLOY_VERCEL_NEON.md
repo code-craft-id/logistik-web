@@ -50,3 +50,5 @@ Referensi resmi [Vercel CLI](https://vercel.com/docs/cli/deploy), [Node.js di Ve
 ## Admin pertama di database Production kosong (2026-11-24)
 
 `scripts/bootstrap-production-admin.mjs` (Node 24) membuat 1 perusahaan, Kantor Pusat, 2 cabang, grup `ADMINISTRATOR` (`system_admin:manage`) dan 1 akun admin dalam satu transaksi. Script menolak bila database sudah punya user. Variabel: `CONFIRM_EMPTY_DATABASE=yes`, `TARGET_DATABASE_URL` (URL direct), `ADMIN_USERNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`, `COMPANY_NAME`, `BRANCH_1`, `BRANCH_2`. Ganti password segera setelah login pertama.
+
+Alternatif tanpa menyalin URL database: isi env Production `BOOTSTRAP_ADMIN=yes` beserta variabel admin/perusahaan/cabang di Vercel, lalu Redeploy. Build Production menjalankan script setelah migrasi memakai URL database build. Bila database sudah punya user, langkah ini dilewati. Hapus `BOOTSTRAP_ADMIN` dan `ADMIN_PASSWORD` setelah login pertama.
