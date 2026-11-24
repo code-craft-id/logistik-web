@@ -1,3 +1,10 @@
+## 2026-11-24 — menu parity handoff
+
+- Resume on `dev3/ready-for-review` (local commits not pushed). Read STATE.md first.
+- Before any deploy: apply the four new migrations on Neon staging (`prisma migrate deploy`), then smoke-test Share Truck, COD, Agen, Report Customer, Laporan Keuntungan, booking pickup result.
+- Grant new permission `share_truck` (view/manage) to the groups that use it; Akunting/Kasir rights to FINANCE-type groups only.
+- Courier pickup result needs `FEATURE_AWB_SCAN` on (D3 still open).
+
 ## 2026-11-21 17:11 UTC — REL-01 Preview verified
 
 - Ready and verified protected Preview with Neon staging. Read `STATE.md` and [deployment guide](../../DEPLOY_VERCEL_NEON.md). Preserve the private backup and use only the Vercel Preview target and canonical alias on subsequent releases.

@@ -1,3 +1,13 @@
+## Latest checkpoint: 2026-11-24 — menu parity queue done (real web + sandbox)
+
+- Branch `dev3/ready-for-review`, HEAD after `38f9a19`, NOT pushed (pushing this branch triggers Vercel Production; needs owner go-ahead). Never stage `.github/`, `docs/visualisasi-pribadi-logistik.html`, `logistik_web-demo.sql`.
+- Done today: M1 Rekap Transaksi Harian, M2 AWB Tertunda/Termanifest, M3 Report Customer, M4 Harian Kurir by pickup + D-39 courier pickup result, S1/S2 COD (D-40), S3/S4 Agen deposit/komisi (D-41), S5 Laporan Keuntungan (D-42), S6 Share Truck (D-43), action inputs moved into modal dialogs.
+- User decisions: M5 Tutorial and M6 Feature Update dropped; M7 Master Data stays one page per group with tabs; M8 Umur Piutang kept.
+- New migrations: `20261124000300_booking_pickup_result`, `20261124000400_cod_kas_terima`, `20261124000500_agent_deposit`, `20261124000600_share_truck` (applied to dev and test DBs; not to Neon staging).
+- Checks: lint, typecheck, unit 737/737, integration 217/217 (+ modul-workflows 26/26 after last change), `npm run build` pass. 375px checked via 375px iframes in Chrome for the new pages (window resize does not change the viewport).
+- Observed real web roles: 14 groups; ADMINISTRATOR has all 228 menu rights and FINANCE has Akunting/Kasir/agent/trucking rights, yet the Akunting menu is hidden even for ADMINISTRATOR, so it is switched off at system/package level, not by role.
+- Next: owner approval to push/deploy (staging migrations on Neon first); provider menus not yet in LMS: sewa gudang, inventory/manage resi, SMU/airways/airport, komoditi, transfer tunai approve, global parameter, daily report cashier, Rekap Pengantaran.
+
 ## Latest checkpoint: 2026-11-24 — D-37 WhatsApp, D-38 Akunting (sandbox)
 
 - Branch `dev3/ready-for-review`, HEAD `799e027`, pushed. Working tree clean except the unrelated untracked `.github/`, `docs/visualisasi-pribadi-logistik.html`, `logistik_web-demo.sql` (never stage).

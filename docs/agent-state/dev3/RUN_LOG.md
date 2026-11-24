@@ -859,3 +859,9 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - User dropped Tutorial and Feature Update (M5/M6); their uncommitted tables were dropped from dev/test DBs. User kept Master Data as one page per group with tabs (M7 reverted `5d72242`).
 - Sandbox agent pages (On Site Agent, Print Agent, History Deposit Agent, Manifest Agent, Transaksi Agen, Rekap Komisi Agen) rely on Agent.balance / commissionRate, which are DRAFT (D-11, D-24). Laporan Keuntungan needs P&L rules. Share Truck has no approved model. Asked the user before building.
 - Checks: lint, typecheck, unit 737+, integration modul-workflows 24/24, simple-reports 5/5.
+
+## 2026-11-24 — S3–S6, modals, release checks
+
+- D-41 agent deposit/commission (`f35f926`), D-42 Laporan Keuntungan (`7704a48`), D-43 Share Truck (`0acf69f`, date fix `cce2ef1`), modal dialogs for action inputs (`38f9a19`).
+- Real web role check (read-only): Grup User 14 levels; Hak Akses Menu ADMINISTRATOR 228/228, FINANCE 92 incl. accounting/Kasir/agent/trucking. Akunting hidden for ADMINISTRATOR too: module switched off by the provider, not a role rule.
+- lint, typecheck, unit 737/737, integration 217/217, build pass. Not pushed.
