@@ -45,7 +45,7 @@ Referensi resmi [Vercel CLI](https://vercel.com/docs/cli/deploy), [Node.js di Ve
 
 ## Migrasi otomatis saat deploy Production (2026-11-24)
 
-`vercel.json` menjalankan `prisma migrate deploy` hanya bila `VERCEL_ENV=production`, sebelum `next build`. URL yang dipakai: `DIRECT_URL`, lalu `DATABASE_NEON_DATABASE_URL_UNPOOLED`, lalu `DATABASE_URL`. Deploy Preview tidak memigrasi. Bila migrasi gagal, build gagal dan deployment lama tetap aktif. Seed tidak pernah dijalankan otomatis.
+`vercel.json` memanggil `scripts/vercel-build.sh`, yang menjalankan `prisma migrate deploy` hanya bila `VERCEL_ENV=production`, sebelum `next build`. URL yang dipakai: `DIRECT_URL`, lalu `DATABASE_NEON_DATABASE_URL_UNPOOLED`, lalu `DATABASE_URL`. Deploy Preview tidak memigrasi. Bila migrasi gagal, build gagal dan deployment lama tetap aktif. Seed tidak pernah dijalankan otomatis.
 
 ## Admin pertama di database Production kosong (2026-11-24)
 
