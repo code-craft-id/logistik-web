@@ -77,6 +77,35 @@ export const helpEntries: HelpEntry[] = [
     href: "/branch-reports/rekap-transaksi",
   },
   {
+    id: "rekap-transaksi-harian",
+    title: "Rekap Transaksi Harian (cetak)",
+    keywords: [
+      "rekap transaksi harian",
+      "rekap harian",
+      "pendapatan harian",
+      "tunai onhand",
+      "tunai transfer",
+      "tagih tujuan",
+      "cetak rekap",
+    ],
+    answer:
+      "Laporan > Laporan Cabang > Rekap Transaksi Harian. Pilih Tanggal dan Cabang asal lalu klik Cetak: tab baru membuka lembar PENDAPATAN siap cetak. Baris dikelompokkan per Kategori (Layanan) lalu Kiriman Via (Moda) dan CS (pembuat AWB), dengan Total Resi dan Grand Total AWB menurut jenis pembayaran: Tunai-Onhand = CASH, Tunai-Transfer = TRF, Kredit = KREDIT, Tagih Tujuan = COD (FOC tidak masuk kolom uang tetapi tetap dihitung di Total Resi). Tiap Kategori ditutup SUB TOTAL dan REKAP SUB TOTAL (jumlah keempat kolom uang), lalu GRAND TOTAL dan REKAP GRAND TOTAL. AWB yang di-void tidak dihitung. Bagian bawah berisi Di buat oleh (nama Anda), Di periksa oleh dan Mengetahui. Butuh hak Laporan Transaksi: lihat dan akses ke cabang yang dipilih.",
+    href: "/branch-reports/rekap-transaksi-harian",
+  },
+  {
+    id: "awb-tertunda-termanifest",
+    title: "AWB Tertunda dan AWB Termanifest",
+    keywords: [
+      "awb tertunda",
+      "awb pending",
+      "awb termanifest",
+      "belum manifest",
+    ],
+    answer:
+      "Laporan > Laporan Cabang punya dua menu terpisah seperti aplikasi lama: AWB Tertunda (AWB yang belum masuk manifest) dan AWB Termanifest (AWB yang sudah masuk manifest). Keduanya halaman laporan AWB yang sama dengan tampilan berbeda; butuh hak Laporan Transaksi: lihat.",
+    href: "/branch-reports/awb?view=pending",
+  },
+  {
     id: "report-ar-aging",
     title: "Report AR (Rekap Aging Pelanggan, Belum Lunas)",
     keywords: [

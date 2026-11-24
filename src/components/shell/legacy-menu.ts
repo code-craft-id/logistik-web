@@ -177,6 +177,10 @@ export const legacyMenu = [
             href: "/branch-reports/gross-profit",
           },
           {
+            label: "Rekap Transaksi Harian",
+            href: "/branch-reports/rekap-transaksi-harian",
+          },
+          {
             label: "Rekap Gross Profit",
             href: "/branch-reports/rekap-gross-profit",
           },
@@ -185,8 +189,12 @@ export const legacyMenu = [
             href: "/branch-reports/manifest-vendor",
           },
           {
-            label: "AWB",
-            href: "/branch-reports/awb",
+            label: "AWB Tertunda",
+            href: "/branch-reports/awb?view=pending",
+          },
+          {
+            label: "AWB Termanifest",
+            href: "/branch-reports/awb?view=manifested",
           },
           {
             label: "Rekap Customer BUlanan",

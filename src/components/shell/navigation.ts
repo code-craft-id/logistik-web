@@ -260,6 +260,10 @@ export const liveRoutes = [
   "/branch-reports/delivery?view=items",
   "/customer-service/status-pengantaran",
   "/branch-reports/rekap-transaksi",
+  // Real web Laporan Cabang leaves (2026-11-24).
+  "/branch-reports/rekap-transaksi-harian",
+  "/branch-reports/awb?view=pending",
+  "/branch-reports/awb?view=manifested",
   "/financial-reports/aging",
   "/financial-reports/ap-aging",
   "/akunting/rugi-laba",
@@ -514,7 +518,9 @@ export const navigation: readonly NavigationGroup[] = [
                 (child) =>
                   child.href === item.href ||
                   child.children?.some(
-                    (grandchild) => grandchild.href === item.href,
+                    // AWB Tertunda / Termanifest are ?view= menus of one page.
+                    (grandchild) =>
+                      grandchild.href?.split("?")[0] === item.href,
                   ),
               ),
           ),

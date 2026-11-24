@@ -845,3 +845,10 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Observed (read-only) real web Perusahaan > WA Notifikasi > Pesan Whatsapp: four messages, fixed recipients, all ON; list of customers with WA Notif active. Built D-37 (`4a64dc2`).
 - Observed sandbox Akunting (24 pages, GET only). Built D-38 (`799e027`). Real web has no Akunting menu, so the sandbox is the reference (user rule).
 - Compared full menus of real web, sandbox and LMS; remaining gaps recorded in BACKLOG section A3. User asked to save the remaining list first before continuing.
+
+## 2026-11-24 — M1 Rekap Transaksi Harian, M2 AWB menus
+
+- Observed (read-only) real web `rekap-omzet-harian`: Tanggal + Cabang + Cetak opens `print_rekap_omset.php` PDF (PENDAPATAN per Kategori / Kiriman Via, Total Resi, Tunai-Onhand, Tunai-Transfer, Kredit, Tagih Tujuan, CS, Keterangan; SUB TOTAL, REKAP SUB TOTAL, GRAND TOTAL, REKAP GRAND TOTAL; three sign-offs). Master Tipe Pembayaran: CASH, KREDIT, COD, TRF, FOC.
+- Built `/branch-reports/rekap-transaksi-harian` and `/print/rekap-transaksi-harian`. Column mapping by name (Onhand = CASH, Transfer = TRF, Kredit = KREDIT, Tagih Tujuan = COD) is OBSERVED, pending finance confirmation; sample amounts were zero.
+- Laporan Cabang now lists AWB Tertunda and AWB Termanifest as two menus (`/branch-reports/awb?view=`).
+- Checks: lint, typecheck, unit 738 pass (incl. new daily-recap-groups), `npm run build` pass; print page verified in Chrome on local dev.

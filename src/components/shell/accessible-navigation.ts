@@ -41,6 +41,7 @@ const routeResources: Record<string, readonly string[]> = {
   "/customer-service/cek-ongkir": ["tariff"],
   "/customer-service/status-pengantaran": ["transaction"],
   "/branch-reports/rekap-transaksi": ["transaction_report"],
+  "/branch-reports/rekap-transaksi-harian": ["transaction_report"],
   "/financial-reports/aging": ["invoice"],
   "/financial-reports/ap-aging": ["debt_payment"],
   "/akunting/rugi-laba": ["financial_report"],

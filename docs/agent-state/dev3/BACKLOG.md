@@ -43,8 +43,8 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 
 | # | Item | Real web | LMS now |
 |---|---|---|---|
-| M1 | Rekap Transaksi Harian | Laporan Cabang (`rekap-omzet-harian`) | No menu of its own |
-| M2 | AWB Tertunda and AWB Termanifest as two menus | `awb-pending`, `awb-termanifest` | Combined into one "AWB" menu |
+| M1 | ~~Rekap Transaksi Harian~~ DONE 2026-11-24: `/branch-reports/rekap-transaksi-harian` + print | Laporan Cabang (`rekap-omzet-harian`) | Payment column mapping by name (CASH/TRF/KREDIT/COD) pending finance |
+| M2 | ~~AWB Tertunda and AWB Termanifest as two menus~~ DONE 2026-11-24 | `awb-pending`, `awb-termanifest` | Combined into one "AWB" menu |
 | M3 | Report Customer | Laporan (`report-customer`) | Missing |
 | M4 | Harian Kurir by pickup (Nama Kurir, Jumlah Terambil, Jumlah Miss Pickup) | `daily-report-courier`, OBSERVED as courier 2026-11-24 | Counts deliveries, not pickups |
 | M5 | Tutorial System > List Tutorial | `list-tutorial` | Not in the main menu |

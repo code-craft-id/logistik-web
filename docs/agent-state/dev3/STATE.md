@@ -4,6 +4,7 @@
 - `4a64dc2` D-37: four provider WhatsApp messages (Transaksi to sender/receiver, Shipment Status on Delivered, Delivery Sheet on DRS) with on/off, sent only for customers with WA Notif active, via `whatsapp_outbox` dispatched after commit to the paced gateway (`~/lms-wa-gateway`, 10 s per branch number).
 - `799e027` D-38: Akunting menu and features like the sandbox (the real web has no Akunting). Migration `20261124000200_akunting_sandbox` (cost centres, asset categories, assets, bank statements, journal cost centre / customer / vendor, line memo). Menu order Modul, Akunting, Laporan; Invoice under Modul > Keuangan.
 - Checks: lint and typecheck pass; unit/UI 734/734; integration finance + akunting + sch01 + whatsapp 29/29; `npm run build` passes; pages verified in Chrome on a local production server (port 3001).
+- M1 Rekap Transaksi Harian and M2 AWB Tertunda / Termanifest menus done 2026-11-24.
 - Next: menu parity queue in `BACKLOG.md` section A3 (Group 1 first, then Group 2, then Group 3). User rule: real web first, sandbox for the rest; never change the real web.
 
 ## 2026-11-21 17:11 UTC — REL-01 Preview verified

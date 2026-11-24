@@ -63,7 +63,9 @@ describe("available navigation", () => {
       "/financial-reports",
       "/branch-reports/gross-profit",
       "/customer-reports/pod",
-      "/branch-reports/awb",
+      "/branch-reports/awb?view=pending",
+      "/branch-reports/awb?view=manifested",
+      "/branch-reports/rekap-transaksi-harian",
       "/customer-reports/all-status",
     ])
       expect(paths).toContain(path);
@@ -100,7 +102,9 @@ describe("available navigation", () => {
     expect(hrefs(["transaction_report"])).toEqual([
       "/branch-reports/transaction-details",
       "/branch-reports/rekap-transaksi",
-      "/branch-reports/awb",
+      "/branch-reports/rekap-transaksi-harian",
+      "/branch-reports/awb?view=pending",
+      "/branch-reports/awb?view=manifested",
       "/branch-reports/customer-monthly-summary",
       "/branch-reports/daily-turnover-summary",
       "/branch-reports/inbound-transaction-details",
