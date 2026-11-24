@@ -21,6 +21,8 @@ export type TransactionFormOptions = {
   deliveryServices: Option[];
   goodsTypes: Option[];
   costTypes: Option[];
+  /** On Site Agent (D-41): agents whose deposit pays this AWB. */
+  agents?: Option[];
   couriers: Option[];
   marketing: Option[];
   consignees: (Option & {
@@ -313,6 +315,8 @@ export function TransactionForm({
         } else {
           if (res.error === "REQUIRED") {
             setError(`Wajib diisi: ${res.missing.join(", ")}.`);
+          } else if (res.error === "AGENT") {
+            setError(res.message);
           } else if (res.error === "VALIDATION") {
             setError(
               "Data belum lengkap atau tidak valid. Periksa Asal (wajib), angka koli/berat/volume/biaya, dan pilihan master yang aktif.",
@@ -525,6 +529,15 @@ export function TransactionForm({
             text="Pembayaran"
             options={options.costTypes}
           />
+          {options.agents && (
+            <Choice
+              name="agentId"
+              required
+              text="Agen"
+              empty="Pilih agen…"
+              options={options.agents}
+            />
+          )}
           <Text name="description" text="Isi Barang" maxLength={500} />
           <Text name="remarks" text="Keterangan" maxLength={500} />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

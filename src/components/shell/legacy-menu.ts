@@ -108,6 +108,15 @@ export const legacyMenu = [
         ],
       },
       {
+        label: "Transaksi Agent",
+        children: [
+          { label: "On Site Agent", href: "/agent-awb" },
+          { label: "Print Agent", href: "/agent-awb?view=print" },
+          { label: "History Deposit Agent", href: "/agent-deposit" },
+          { label: "Manifest Agent", href: "/manifest?view=agent" },
+        ],
+      },
+      {
         label: "Operasional / Manifest",
         children: [
           { label: "Manifest", href: "/manifest" },
@@ -218,6 +227,13 @@ export const legacyMenu = [
         children: [
           { label: "Harian Kurir", href: "/courier-reports" },
           { label: "Laporan Detail Kurir", href: "/courier-reports/detail" },
+        ],
+      },
+      {
+        label: "Laporan Agen",
+        children: [
+          { label: "Transaksi Agen", href: "/agent-reports" },
+          { label: "Laporan Komisi Agen", href: "/agent-reports?tab=komisi" },
         ],
       },
       {

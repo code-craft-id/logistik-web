@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { AccessActor } from "../../src/features/identity/permissions";
-import { PrismaClient } from "../../src/lib/db/generated/client";
+import { Prisma, PrismaClient } from "../../src/lib/db/generated/client";
 import { testDatabaseUrl } from "../support/test-database-url";
 
 const url = testDatabaseUrl(
@@ -46,6 +46,7 @@ const all = [
   ["transaction_report", ["view", "export"]],
   ["manifest", ["view", "update"]],
   ["payment", ["view", "create"]],
+  ["agent", ["view", "update"]],
 ] as const;
 const actor = (id: number, branchIds: number[]): AccessActor => ({
   id,
@@ -852,6 +853,74 @@ describe("Cod List / Kas Terima", () => {
     expect(received.rows).toEqual([
       expect.objectContaining({ id: done.id, codReceivedNote: "Tunai" }),
     ]);
+  });
+});
+
+describe("Agent deposit (D-41)", () => {
+  it("charges Grand Total minus commission, refuses a low balance and refunds on void", async () => {
+    const deposit = await import(
+      "../../src/features/organization/server/agent-deposit"
+    );
+    const agent = await db.agent.create({
+      data: {
+        branchId: ids.a,
+        code: `${tag}AG`,
+        initials: "AG",
+        name: `${tag} Agen`,
+        category: "Kantor",
+        balance: "0",
+        commissionRate: "5",
+        status: "ACTIVE",
+      },
+    });
+    const adminA = actor(ids.approver, [ids.a]);
+    await expect(
+      deposit.topUpAgent(actor(ids.approver, [ids.b]), {
+        agentId: agent.id,
+        amount: "100000",
+      }),
+    ).rejects.toThrow("bukan cabang Anda");
+    await deposit.topUpAgent(adminA, { agentId: agent.id, amount: "100000" });
+    const t = await awb("AG1");
+    await db.transaction.update({
+      where: { id: t.id },
+      data: { agentId: agent.id, biaya: "80000" },
+    });
+    await db.$transaction((tx) =>
+      deposit.chargeAgentForAwb(tx, adminA, {
+        id: t.id,
+        agentId: agent.id,
+        biaya: new Prisma.Decimal("80000"),
+        awbNo: t.awbNo,
+      }),
+    );
+    // 80.000 - 5% (4.000) = 76.000 charged.
+    expect(
+      (
+        await db.agent.findUniqueOrThrow({ where: { id: agent.id } })
+      ).balance.toString(),
+    ).toBe("24000");
+    const big = await awb("AG2");
+    await expect(
+      db.$transaction((tx) =>
+        deposit.chargeAgentForAwb(tx, adminA, {
+          id: big.id,
+          agentId: agent.id,
+          biaya: new Prisma.Decimal("80000"),
+          awbNo: big.awbNo,
+        }),
+      ),
+    ).rejects.toThrow("tidak cukup");
+    await db.$transaction((tx) => deposit.refundAgentForAwb(tx, adminA, t.id));
+    const history = await deposit.depositHistory(adminA, agent.id);
+    expect(history.agent?.balance.toString()).toBe("100000");
+    expect(history.rows.map((r) => r.kind)).toEqual(["VOID", "AWB", "TOPUP"]);
+    await db.agentDepositMovement.deleteMany({ where: { agentId: agent.id } });
+    await db.transaction.updateMany({
+      where: { agentId: agent.id },
+      data: { agentId: null },
+    });
+    await db.agent.delete({ where: { id: agent.id } });
   });
 });
 

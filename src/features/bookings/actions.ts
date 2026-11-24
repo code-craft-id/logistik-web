@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
+import { ModulError } from "@/features/modul/server/common";
 import { requirePermission } from "@/lib/auth/session";
 import type { Transaction } from "@/lib/db/generated/client";
 import { missingAwbFields, missingBookingFields } from "./required-fields";
@@ -49,6 +50,7 @@ export type CreateTransactionActionResult =
       matchedBy?: string;
     }
   | { ok: false; error: "REQUIRED"; missing: string[] }
+  | { ok: false; error: "AGENT"; message: string }
   | {
       ok: false;
       error:
@@ -138,6 +140,9 @@ export async function createTransactionAction(
       matchedBy: result.matchedBy,
     };
   } catch (e: unknown) {
+    // Agent deposit refusal (D-41): show its message as is.
+    if (e instanceof ModulError)
+      return { ok: false, error: "AGENT", message: e.message };
     if (e instanceof IdentityError) {
       if (e.code === "UNAUTHENTICATED")
         return { ok: false, error: "UNAUTHENTICATED" };

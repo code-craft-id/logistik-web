@@ -5,6 +5,7 @@ import {
   permitsBranch,
 } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
+import { chargeAgentForAwb } from "@/features/organization/server/agent-deposit";
 import { enqueueWhatsApp } from "@/features/whatsapp/server/notifications";
 import { prisma } from "@/lib/db";
 import type { Transaction } from "@/lib/db/generated/client";
@@ -928,12 +929,14 @@ export async function createTransaction(
           deliveryServiceId: rest.deliveryServiceId ?? null,
           goodsTypeId: rest.goodsTypeId ?? null,
           costTypeId: rest.costTypeId ?? null,
+          agentId: rest.agentId ?? null,
           description: rest.description ?? null,
           remarks: rest.remarks ?? null,
           status: "Open",
           createdById: actor.id,
         },
       });
+      await chargeAgentForAwb(tx, actor, created);
       await tx.transactionStatusHistory.create({
         data: {
           transactionId: created.id,

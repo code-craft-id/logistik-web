@@ -58,6 +58,7 @@ model User {
   bookingsCreated          Booking[]                  @relation("BookingCreatedBy")
   transactionsCreated      Transaction[]              @relation("TransactionCreatedBy")
   transactionsCodReceived  Transaction[]              @relation("TransactionCodReceivedBy")
+  agentDepositMovements    AgentDepositMovement[]     @relation("AgentDepositMovementCreatedBy")
   transactionStatusChanges TransactionStatusHistory[] @relation("TransactionStatusChangedBy")
   manifestsCreated         Manifest[]                 @relation("ManifestCreatedBy")
   manifestItemsAssigned    ManifestItem[]             @relation("ManifestItemAssignedBy")

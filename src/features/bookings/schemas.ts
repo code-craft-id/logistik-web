@@ -205,6 +205,7 @@ export const createTransactionSchema = withDimensionClaim({
   deliveryServiceId: optionalPositiveInt,
   goodsTypeId: optionalPositiveInt,
   costTypeId: optionalPositiveInt,
+  agentId: optionalPositiveInt,
   description: z.preprocess(
     emptyToUndefined,
     z.string().trim().max(500).optional().nullable(),

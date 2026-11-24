@@ -58,8 +58,8 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 |---|---|---|
 | S1 | ~~Cod List, Kas Terima~~ DONE 2026-11-24 `/cod` (D-40) | Modul > Layanan Pelanggan > Transaksi |
 | S2 | ~~Report Cod~~ DONE 2026-11-24 `/branch-reports/report-cod` | Laporan Cabang |
-| S3 | Transaksi Agent: On Site Agent, Print Agent, History Deposit Agent, Manifest Agent | Modul |
-| S4 | Laporan Agen: Transaksi Agen, Laporan Komisi Agen | Laporan |
+| S3 | ~~Transaksi Agent~~ DONE 2026-11-24 (D-41) `/agent-awb`, `/agent-deposit`, Manifest Agent = `/manifest?view=agent` | Modul |
+| S4 | ~~Laporan Agen~~ DONE 2026-11-24 `/agent-reports` | Laporan |
 | S5 | ~~Laporan Keuntungan~~ DONE 2026-11-24 `/financial-reports/profit` (D-42) | Laporan Keuangan |
 | S6 | Share Truck: Dashboard, Charter (Order Masuk, List Order Keluar), Status (Update, Cek), Invoice Keluar / Masuk, Ready Truck | New top menu |
 

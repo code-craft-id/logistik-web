@@ -49,6 +49,8 @@ describe("SCH-01 preservation and adapter contract", () => {
       "FinClosedPeriod",
       // Append-only koli scan log (Cek Transit / Cek Inbound).
       "ManifestScan",
+      // Append-only agent deposit history (D-41).
+      "AgentDepositMovement",
     ];
     const noSoftDelete = [
       ...parentOwned,

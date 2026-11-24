@@ -6,6 +6,7 @@ import {
   isAdministrator,
 } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
+import { refundAgentForAwb } from "@/features/organization/server/agent-deposit";
 import {
   businessDateAfterUtc,
   businessDateStartUtc,
@@ -254,6 +255,7 @@ export async function decideAwbChange(actor: AccessActor, input: unknown) {
       });
       if (deleted.count !== 1)
         throw new ModulError("AWB sudah dihapus sebelumnya.");
+      await refundAgentForAwb(tx, actor, request.transactionId);
     }
     return tx.awbChangeRequest.update({
       where: { id: request.id },
@@ -372,6 +374,15 @@ export async function applyApprovedEdit(actor: AccessActor, input: unknown) {
           "Koli, berat, volume dan biaya tidak bisa diubah karena AWB sudah masuk invoice atau jurnal.",
         );
     }
+    if (
+      "biaya" in changes &&
+      (await tx.agentDepositMovement.count({
+        where: { transactionId: request.transactionId },
+      }))
+    )
+      throw new ModulError(
+        "Biaya AWB agen tidak bisa diubah karena sudah memotong deposit agen. Void AWB lalu buat ulang.",
+      );
     await tx.transaction.update({
       where: { id: request.transactionId },
       data: update,

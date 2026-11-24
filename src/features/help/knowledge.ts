@@ -138,6 +138,25 @@ export const helpEntries: HelpEntry[] = [
     href: "/financial-reports/profit",
   },
   {
+    id: "agen-deposit-komisi",
+    title: "Transaksi Agent: On Site Agent, deposit dan komisi agen",
+    keywords: [
+      "agen",
+      "agent",
+      "on site agent",
+      "print agent",
+      "deposit agen",
+      "saldo agen",
+      "debit saldo",
+      "komisi agen",
+      "manifest agent",
+      "transaksi agen",
+    ],
+    answer:
+      "Modul > Transaksi Agent. On Site Agent menampilkan AWB yang dibuat untuk agen; Tambah AWB membuka Entry AWB dengan pilihan Agen (terlihat saldo dan komisi %). Saat AWB disimpan, saldo deposit agen dipotong Grand Total dikurangi komisi (komisi = komisi % agen x Grand Total, dibulatkan ke rupiah); bila saldo kurang AWB ditolak dengan pesan saldo tidak cukup. Void AWB (Persetujuan Edit/delete AWB) mengembalikan potongan; biaya AWB agen tidak bisa diedit (void lalu buat ulang). Print Agent: centang AWB lalu Print terpilih. History Deposit Agent: pilih agen untuk melihat Saldo Akhir dan riwayat (Saldo Sebelumnya, Jumlah, Komisi Agent, Saldo Akhir, Status, Keterangan, tanggal, pembuat); admin dengan hak Agen: ubah bisa Debit Saldo (isi deposit). Manifest Agent membuka Cek Inbound Agen di Manifest. Laporan > Laporan Agen: Transaksi Agen (filter periode, Destination, Agent, Billing Type) dan Laporan Komisi Agen (Outbound, Inbound, Agent, Customer) dengan Export Excel.",
+    href: "/agent-awb",
+  },
+  {
     id: "awb-tertunda-termanifest",
     title: "AWB Tertunda dan AWB Termanifest",
     keywords: [

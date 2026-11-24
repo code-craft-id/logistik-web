@@ -92,6 +92,10 @@ describe("available navigation", () => {
       "/transactions/lookup",
       "/transactions/history",
       "/transactions/void?view=deleted",
+      "/agent-awb",
+      "/agent-awb?view=print",
+      "/agent-reports",
+      "/agent-reports?tab=komisi",
     ]);
     expect(hrefs(["booking"])).toEqual(["/bookings", "/bookings?tab=inbound"]);
     expect(hrefs(["awb_change"])).toEqual(["/transactions/approvals"]);

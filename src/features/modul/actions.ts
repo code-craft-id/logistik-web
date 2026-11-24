@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import type { AccessActor } from "@/features/identity/permissions";
 import { IdentityError } from "@/features/identity/server/access";
 import { currentIdentity } from "@/features/identity/server/context";
+import { topUpAgent } from "@/features/organization/server/agent-deposit";
 import { Prisma } from "@/lib/db/generated/client";
 import {
   applyApprovedEdit,
@@ -217,5 +218,15 @@ export async function receiveCodAction(formData: FormData) {
       return { ok: true, message: "Kas COD diterima (pindah ke Kas Terima)." };
     },
     ["/cod"],
+  );
+}
+
+export async function topUpAgentAction(formData: FormData) {
+  return run(
+    async (actor) => {
+      await topUpAgent(actor, fields(formData));
+      return { ok: true, message: "Saldo deposit agen bertambah." };
+    },
+    ["/agent-deposit"],
   );
 }

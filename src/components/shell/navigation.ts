@@ -270,6 +270,12 @@ export const liveRoutes = [
   "/cod?tab=received",
   "/branch-reports/report-cod",
   "/financial-reports/profit",
+  // Agent deposit and commission (D-41).
+  "/agent-awb",
+  "/agent-awb?view=print",
+  "/agent-deposit",
+  "/agent-reports",
+  "/agent-reports?tab=komisi",
   "/financial-reports/aging",
   "/financial-reports/ap-aging",
   "/akunting/rugi-laba",
