@@ -38,21 +38,19 @@ export function MasterDataWorkspace({
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">{title}</h1>
-      {kinds.length > 1 && (
-        <nav aria-label={title} className="flex flex-wrap gap-2">
-          {kinds.map((value) => (
-            <Button
-              className="min-h-11"
-              key={value}
-              variant={value === kind ? "default" : "outline"}
-              aria-pressed={value === kind}
-              onClick={() => setKind(value)}
-            >
-              {masterForms[value].label}
-            </Button>
-          ))}
-        </nav>
-      )}
+      <nav aria-label={title} className="flex flex-wrap gap-2">
+        {kinds.map((value) => (
+          <Button
+            className="min-h-11"
+            key={value}
+            variant={value === kind ? "default" : "outline"}
+            aria-pressed={value === kind}
+            onClick={() => setKind(value)}
+          >
+            {masterForms[value].label}
+          </Button>
+        ))}
+      </nav>
       {personnelImportKind.safeParse(kind).success &&
         capabilities[kind]?.create && (
           <PersonnelImportTools

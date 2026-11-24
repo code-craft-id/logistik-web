@@ -48,7 +48,7 @@ describe("available navigation", () => {
     ])
       expect(paths).toContain(path);
     expect(paths).toContain("/office/company");
-    expect(paths).toContain("/logistics/services?kind=transport_mode");
+    expect(paths).toContain("/logistics/services");
     for (const path of [
       "/dashboard",
       "/branch-reports/manifest-outbound",
@@ -118,7 +118,7 @@ describe("available navigation", () => {
     const groups = accessibleNavigation(actor(["driver"]));
     expect(groups.map((group) => group.label)).toEqual(["Master Data"]);
     expect(navigationDestinations(groups).map(({ item }) => item.href)).toEqual(
-      ["/logistics/division?kind=driver"],
+      ["/logistics/division"],
     );
     expect(accessibleNavigation(null)).toEqual([]);
     expect(
@@ -130,12 +130,12 @@ describe("available navigation", () => {
       navigationDestinations(
         accessibleNavigation(actor(["vendor_service"])),
       ).map(({ item }) => item.href),
-    ).toEqual(["/vendor", "/vendor/services"]);
+    ).toEqual(["/vendor"]);
     expect(
       navigationDestinations(
         accessibleNavigation(actor(["marketing_person"])),
       ).map(({ item }) => item.href),
-    ).toEqual(["/logistics/division?kind=marketing_person"]);
+    ).toEqual(["/logistics/division"]);
   });
   it("honors configuration-only readers without requiring company view", () => {
     expect(

@@ -122,7 +122,7 @@ describe("legacy dashboard supported presentation", () => {
     await act(async () => master?.click());
     expect(master?.getAttribute("aria-expanded")).toBe("true");
     const section = Array.from(nav?.querySelectorAll("button") ?? []).find(
-      (button) => button.textContent === "Area Logistik5",
+      (button) => button.textContent === "Logistik4",
     );
     await act(async () => section?.click());
     expect(section?.getAttribute("aria-expanded")).toBe("true");

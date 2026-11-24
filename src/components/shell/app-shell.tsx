@@ -465,12 +465,6 @@ const segmentLabels: Record<string, string> = {
   approvals: "Persetujuan",
   history: "Riwayat",
   lookup: "Cari AWB",
-  // Master Data group pages; each item menu adds ?kind= to these paths.
-  logistics: "Master Data",
-  areas: "Area Logistik",
-  division: "Divisi Logistik",
-  services: "Layanan Logistik",
-  vehicles: "Kendaraan Logistik",
 };
 
 /**

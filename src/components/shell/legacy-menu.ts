@@ -29,73 +29,36 @@ export const legacyMenu = [
     label: "Master Data",
     children: [
       {
-        label: "Area Logistik",
-        children: [
-          { label: "Provinsi", href: "/logistics/areas?kind=province" },
-          { label: "Kabupaten", href: "/logistics/areas?kind=regency" },
-          { label: "Kecamatan", href: "/logistics/areas?kind=district" },
-          { label: "Kelurahan", href: "/logistics/areas?kind=village" },
-          { label: "Kode Pos", href: "/logistics/areas?kind=postal_code" },
-        ],
-      },
-      {
-        label: "Divisi Logistik",
+        label: "Logistik",
         children: [
           {
-            label: "Pemasaran",
-            href: "/logistics/division?kind=marketing_person",
-          },
-          { label: "Driver", href: "/logistics/division?kind=driver" },
-          { label: "Kurir", href: "/logistics/division?kind=courier" },
-        ],
-      },
-      {
-        label: "Layanan Logistik",
-        children: [
-          { label: "Moda", href: "/logistics/services?kind=transport_mode" },
-          {
-            label: "Kategori Layanan",
-            href: "/logistics/services?kind=service_category",
+            label: "Area Logistik",
+            href: "/logistics/areas",
           },
           {
-            label: "Layanan Pengantaran",
-            href: "/logistics/services?kind=delivery_service",
+            label: "Divisi Logistik",
+            href: "/logistics/division",
           },
           {
-            label: "Jenis Barang",
-            href: "/logistics/services?kind=goods_type",
+            label: "Layanan Logistik",
+            href: "/logistics/services",
           },
-          { label: "Jenis Biaya", href: "/logistics/services?kind=cost_type" },
-          { label: "Termin", href: "/logistics/services?kind=term" },
-        ],
-      },
-      {
-        label: "Kendaraan Logistik",
-        children: [
           {
-            label: "Jenis Kendaraan",
-            href: "/logistics/vehicles?kind=vehicle_type",
-          },
-          { label: "Kendaraan", href: "/logistics/vehicles?kind=vehicle" },
-          {
-            label: "Jenis Trucking",
-            href: "/logistics/vehicles?kind=trucking_type",
+            label: "Kendaraan Logistik",
+            href: "/logistics/vehicles",
           },
         ],
       },
       {
-        label: "M. Vendor",
-        children: [
-          { label: "Vendor", href: "/vendor" },
-          { label: "Layanan Vendor", href: "/vendor/services" },
-        ],
+        label: "Vendor",
+        href: "/vendor",
       },
       {
         label: "Perkiraan",
         href: "/finance/accounting/accounts",
       },
       {
-        label: "M.Shipment Status",
+        label: "Shipment Status",
         href: "/shipment-status",
       },
     ],
