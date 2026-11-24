@@ -272,6 +272,7 @@ export const liveRoutes = [
   "/courier-reports?view=city",
   "/branch-reports/manifest-vendor?view=process",
   "/finance/invoices?from=modul",
+  "/finance/invoices",
   // D-35 simplified provider workflows (2026-11-23).
   "/delivery-sheets",
   "/delivery-sheets?tab=print",
@@ -280,6 +281,28 @@ export const liveRoutes = [
   "/courier-reports/detail",
   "/ticketting",
   "/ticketting?tab=approval",
+  // Akunting following the sandbox (2026-11-24).
+  "/akunting/assets",
+  "/akunting/general-ledger",
+  "/akunting/kategori-akun",
+  "/akunting/kategori-rugi-laba",
+  "/akunting/master-cashflow",
+  "/akunting/master-rugi-laba",
+  "/akunting/cost-centre",
+  "/akunting/kategori-assets",
+  "/akunting/buku-bank",
+  "/akunting/kasir-penerimaan",
+  "/akunting/kasir-penerimaan-invoice",
+  "/akunting/kasir-pembayaran",
+  "/akunting/kasir-pembayaran-vendor",
+  "/akunting/bukti-jurnal-umum",
+  "/akunting/rekonsiliasi-bank",
+  "/akunting/posting",
+  "/akunting/memorial",
+  "/akunting/penyesuaian-penjualan",
+  "/akunting/neraca",
+  "/akunting/buku-besar",
+  "/akunting/neraca-saldo",
 ];
 const implemented = new Set<string>([
   ...implementedPreviewRoutes.map((item) => item.href),
@@ -300,46 +323,162 @@ export const navigation: readonly NavigationGroup[] = [
         ? {
             label: item.label,
             providerLabel: item.label,
+            // Sandbox Akunting menu (OBSERVED newapps 2026-11-24); Biaya Aktual
+            // and Arus Kas & Gross Profit are LMS additions kept reachable.
             entries: [
               {
-                label: "Ikhtisar akuntansi",
-                providerLabel: "Ikhtisar akuntansi",
-                href: "/finance/accounting",
-              },
-              {
-                label: "Invoice",
-                providerLabel: "Invoice",
-                href: "/finance/invoices",
-              },
-              {
-                label: "Akun & kategori",
-                providerLabel: "Akun & kategori",
+                label: "Data Akun",
+                providerLabel: "Data Akun",
                 href: "/finance/accounting/accounts",
               },
               {
-                label: "Jurnal",
-                providerLabel: "Jurnal",
-                href: "/finance/accounting/journals",
+                label: "Assets",
+                providerLabel: "Assets",
+                href: "/akunting/assets",
               },
               {
-                label: "Biaya aktual",
-                providerLabel: "Biaya aktual",
-                href: "/finance/accounting/costs",
+                label: "Master",
+                providerPath: ["Master"],
+                items: [
+                  {
+                    label: "General Ledger",
+                    providerLabel: "General Ledger",
+                    href: "/akunting/general-ledger",
+                  },
+                  {
+                    label: "Kategori Akun",
+                    providerLabel: "Kategori Akun",
+                    href: "/akunting/kategori-akun",
+                  },
+                  {
+                    label: "Kategori Rugi Laba",
+                    providerLabel: "Kategori Rugi Laba",
+                    href: "/akunting/kategori-rugi-laba",
+                  },
+                  {
+                    label: "Master Arus Kas",
+                    providerLabel: "Master Arus Kas",
+                    href: "/akunting/master-cashflow",
+                  },
+                  {
+                    label: "Master Rugi Laba",
+                    providerLabel: "Master Rugi Laba",
+                    href: "/akunting/master-rugi-laba",
+                  },
+                  {
+                    label: "Cost Centre",
+                    providerLabel: "Cost Centre",
+                    href: "/akunting/cost-centre",
+                  },
+                  {
+                    label: "Kategori Assets",
+                    providerLabel: "Kategori Assets",
+                    href: "/akunting/kategori-assets",
+                  },
+                ],
               },
               {
-                label: "Periode",
-                providerLabel: "Periode",
-                href: "/finance/accounting/periods",
+                label: "Kas Bank",
+                providerPath: ["Kas Bank"],
+                items: [
+                  {
+                    label: "Buku Bank",
+                    providerLabel: "Buku Bank",
+                    href: "/akunting/buku-bank",
+                  },
+                  {
+                    label: "Kasir Penerimaan Lainnya",
+                    providerLabel: "Kasir Penerimaan Lainnya",
+                    href: "/akunting/kasir-penerimaan",
+                  },
+                  {
+                    label: "Kasir Penerimaan Invoice",
+                    providerLabel: "Kasir Penerimaan Invoice",
+                    href: "/akunting/kasir-penerimaan-invoice",
+                  },
+                  {
+                    label: "Kasir Pembayaran Lainnya",
+                    providerLabel: "Kasir Pembayaran Lainnya",
+                    href: "/akunting/kasir-pembayaran",
+                  },
+                  {
+                    label: "Kasir Pembayaran Vendor",
+                    providerLabel: "Kasir Pembayaran Vendor",
+                    href: "/akunting/kasir-pembayaran-vendor",
+                  },
+                  {
+                    label: "Bukti Jurnal Umum",
+                    providerLabel: "Bukti Jurnal Umum",
+                    href: "/akunting/bukti-jurnal-umum",
+                  },
+                  {
+                    label: "Rekonsiliasi Bank",
+                    providerLabel: "Rekonsiliasi Bank",
+                    href: "/akunting/rekonsiliasi-bank",
+                  },
+                ],
               },
               {
-                label: "Hitung Rugi Laba",
-                providerLabel: "Hitung Rugi Laba",
-                href: "/akunting/rugi-laba",
+                label: "Penyesuaian",
+                providerPath: ["Penyesuaian"],
+                items: [
+                  {
+                    label: "Kasir",
+                    providerLabel: "Kasir",
+                    href: "/akunting/posting",
+                  },
+                  {
+                    label: "Memorial",
+                    providerLabel: "Memorial",
+                    href: "/akunting/memorial",
+                  },
+                  {
+                    label: "Penyesuaian Penjualan",
+                    providerLabel: "Penyesuaian Penjualan",
+                    href: "/akunting/penyesuaian-penjualan",
+                  },
+                  {
+                    label: "Biaya Aktual",
+                    providerLabel: "Biaya Aktual",
+                    href: "/finance/accounting/costs",
+                  },
+                ],
               },
               {
-                label: "P&L, GP & arus kas",
-                providerLabel: "P&L, GP & arus kas",
-                href: "/finance/accounting/reports",
+                label: "Laporan",
+                providerPath: ["Laporan"],
+                items: [
+                  {
+                    label: "Neraca",
+                    providerLabel: "Neraca",
+                    href: "/akunting/neraca",
+                  },
+                  {
+                    label: "Buku Besar",
+                    providerLabel: "Buku Besar",
+                    href: "/akunting/buku-besar",
+                  },
+                  {
+                    label: "Rugi Laba",
+                    providerLabel: "Rugi Laba",
+                    href: "/akunting/rugi-laba",
+                  },
+                  {
+                    label: "Neraca Saldo",
+                    providerLabel: "Neraca Saldo",
+                    href: "/akunting/neraca-saldo",
+                  },
+                  {
+                    label: "Cover",
+                    providerLabel: "Cover",
+                    href: "/finance/accounting/periods",
+                  },
+                  {
+                    label: "Arus Kas & Gross Profit",
+                    providerLabel: "Arus Kas & Gross Profit",
+                    href: "/finance/accounting/reports",
+                  },
+                ],
               },
             ],
           }

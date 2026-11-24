@@ -175,11 +175,15 @@ export function createFinanceService(
       const [resource, action] = data.action.split(".");
       const permission =
         resource === "journal" &&
-        ["expense", "transfer", "opening"].includes(action)
+        ["expense", "transfer", "opening", "bank_statement"].includes(action)
           ? "post"
-          : data.action === "invoice.handover"
-            ? "update"
-            : action;
+          : resource === "journal" && ["cash", "discard"].includes(action)
+            ? "create"
+            : resource === "finance_account"
+              ? "manage"
+              : data.action === "invoice.handover"
+                ? "update"
+                : action;
       const initial = await actor(db, resource, permission);
       return db.$transaction(
         async (tx) => {

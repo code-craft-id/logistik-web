@@ -64,10 +64,6 @@ export const legacyMenu = [
     ],
   },
   {
-    label: "Akunting",
-    href: "/akunting",
-  },
-  {
     label: "Modul",
     children: [
       {
@@ -138,10 +134,17 @@ export const legacyMenu = [
         label: "Keuangan",
         children: [
           { label: "Invoice (New)", href: "/finance/invoices?from=modul" },
+          // Sandbox Piutang Dagang > Invoice (not in the real web menu).
+          { label: "Invoice", href: "/finance/invoices" },
           { label: "Pembayaran Hutang", href: "/finance/debt-payments" },
         ],
       },
     ],
+  },
+  {
+    // Sandbox order (2026-11-24): Modul, Akunting, Laporan.
+    label: "Akunting",
+    href: "/akunting",
   },
   {
     label: "Laporan",

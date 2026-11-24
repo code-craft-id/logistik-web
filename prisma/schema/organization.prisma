@@ -58,6 +58,9 @@ model Branch {
   podReturnDestinations PodReturn[]         @relation("PodReturnDestination")
   finMappings           FinMapping[]
   finJournals           FinJournal[]
+  finCostCentres        FinCostCentre[]     @relation("FinCostCentreBranch")
+  finAssets             FinAsset[]          @relation("FinAssetBranch")
+  finBankStatements     FinBankStatement[]  @relation("FinBankStatementBranch")
   finCostStates         FinCostState[]
   finClosedPeriods      FinClosedPeriod[]
   finInvoices           FinInvoice[]

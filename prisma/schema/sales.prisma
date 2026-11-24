@@ -22,6 +22,7 @@ model MarketingPerson {
 /// Approved provider form inventory. Workflows remain D-10; requiredness D-25/D-30.
 model Customer {
   finInvoices                 FinInvoice[]
+  finJournals                 FinJournal[]                   @relation("FinJournalCustomer")
   id                          Int                            @id @default(autoincrement())
   name                        String
   address                     String?

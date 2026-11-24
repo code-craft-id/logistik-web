@@ -29,13 +29,14 @@ describe("adopted finance input", () => {
     const hrefs = navigationDestinations(groups)
       .map(({ item }) => item.href)
       .filter((p) => p?.startsWith("/finance/"));
-    // Akunting > Invoice and the Modul > Keuangan > Invoice (new) shortcut.
+    // Modul > Keuangan > Invoice (New) and Invoice (sandbox Piutang Dagang).
     expect(hrefs).toEqual([
-      "/finance/invoices",
       "/finance/invoices?from=modul",
+      "/finance/invoices",
     ]);
     expect(navigationPath("/finance/invoices/123", groups)?.labels).toEqual([
-      "Akunting",
+      "Modul",
+      "Keuangan",
       "Invoice",
       "Detail invoice",
     ]);
@@ -45,7 +46,7 @@ describe("adopted finance input", () => {
     const reports = accessibleNavigation(actor);
     expect(
       navigationPath("/finance/accounting/reports", reports)?.labels,
-    ).toEqual(["Akunting", "P&L, GP & arus kas"]);
+    ).toEqual(["Akunting", "Laporan", "Arus Kas & Gross Profit"]);
     expect(
       navigationDestinations(accessibleNavigation(null)).some(({ item }) =>
         item.href?.startsWith("/finance/"),

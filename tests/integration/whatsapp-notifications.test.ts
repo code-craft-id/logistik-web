@@ -148,7 +148,7 @@ describe("WhatsApp notifications (D-37)", () => {
     expect(row?.lastError).toBe("not_connected");
 
     await db.whatsAppOutbox.update({
-      where: { id: row!.id },
+      where: { id: row?.id ?? 0 },
       data: { branchId: 900002, updatedAt: new Date(Date.now() - 120_000) },
     });
     send.mockClear();
@@ -161,7 +161,7 @@ describe("WhatsApp notifications (D-37)", () => {
     expect(call[1].text).toContain("Dear Pengirim Uji");
     expect(call[1].text).toContain("sudah di terima oleh Satpam");
     expect(call[1].text).toContain("pada tanggal 24-11-2026, pukul 09:05");
-    expect(call[1].idempotencyKey).toBe(`lms-wa-outbox-${row!.id}`);
+    expect(call[1].idempotencyKey).toBe(`lms-wa-outbox-${row?.id ?? 0}`);
     const [done] = await outbox(t.id);
     expect(done?.status).toBe("SENT");
     expect(done?.sentBranchId).toBe(900002);

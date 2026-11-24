@@ -11,11 +11,18 @@ import type { FinAccount, Prisma } from "@/lib/db/generated/client";
 import {
   accountInput,
   accountingCommand,
+  CASH_VOUCHERS,
   categoryInput,
+  MANUAL_SOURCES,
   mappingInput,
   plCategoryInput,
 } from "../accounting-contracts";
 import { asDate, day, sum } from "../contracts";
+import {
+  akuntingWrite,
+  isAkuntingCommand,
+  nonControlAccounts,
+} from "./akunting";
 
 type Tx = Prisma.TransactionClient;
 const fail = (message: string): never => {
@@ -25,7 +32,11 @@ export function scoped(current: AccessActor, branchId: number) {
   if (!permitsBranch(current, branchId))
     throw new IdentityError("FORBIDDEN_BRANCH", 403);
 }
-async function activeBranch(tx: Tx, current: AccessActor, branchId: number) {
+export async function activeBranch(
+  tx: Tx,
+  current: AccessActor,
+  branchId: number,
+) {
   scoped(current, branchId);
   if (
     !(await tx.branch.findFirst({
@@ -55,7 +66,12 @@ export async function openPeriod(
   )
     fail("Periode sudah ditutup. Gunakan tanggal periode terbuka.");
 }
-async function account(tx: Tx, id: number, kind?: string, cash?: boolean) {
+export async function account(
+  tx: Tx,
+  id: number,
+  kind?: string,
+  cash?: boolean,
+) {
   const row = await tx.finAccount.findFirst({
     where: {
       id,
@@ -89,15 +105,16 @@ async function mapping(tx: Tx, branchId: number) {
   await account(tx, m.liabilityId, "LIABILITY", false);
   return m;
 }
-type Line = {
+export type Line = {
   accountId: number;
   debit?: string;
   credit?: string;
   transactionId?: number | null;
   cashflowCategoryId?: number | null;
+  memo?: string | null;
   snapshot?: Prisma.InputJsonValue;
 };
-type Journal = {
+export type Journal = {
   branchId: number;
   accountingDate: string;
   reference: string;
@@ -107,9 +124,17 @@ type Journal = {
   sourceKey?: string;
   reversalOfId?: number;
   mappingId?: number;
+  costCentreId?: number | null;
+  customerId?: number | null;
+  vendorId?: number | null;
   lines: Line[];
 };
-async function journal(tx: Tx, data: Journal, posted = true, preserve = false) {
+export async function journal(
+  tx: Tx,
+  data: Journal,
+  posted = true,
+  preserve = false,
+) {
   await openPeriod(tx, data.branchId, data.accountingDate);
   const debit = sum(data.lines.map((l) => l.debit ?? "0")),
     credit = sum(data.lines.map((l) => l.credit ?? "0"));
@@ -136,6 +161,7 @@ async function journal(tx: Tx, data: Journal, posted = true, preserve = false) {
       credit: line.credit ?? "0",
       transactionId: line.transactionId ?? null,
       cashflowCategoryId: line.cashflowCategoryId ?? null,
+      memo: line.memo ?? null,
       snapshot,
     });
   }
@@ -182,7 +208,11 @@ async function reverse(
       sourceId,
       reversalOfId: row.id,
       ...(row.mappingId ? { mappingId: row.mappingId } : {}),
+      costCentreId: row.costCentreId,
+      customerId: row.customerId,
+      vendorId: row.vendorId,
       lines: row.lines.map((l) => ({
+        memo: l.memo,
         accountId: l.accountId,
         debit: l.credit.toFixed(2),
         credit: l.debit.toFixed(2),
@@ -361,6 +391,7 @@ export async function accountingWrite(
   input: unknown,
 ): Promise<{ id: number; branchId: number | null }> {
   const d = accountingCommand.parse(input);
+  if (isAkuntingCommand(d)) return akuntingWrite(tx, current, d);
   if (d.action === "finance_account.manage") {
     if (d.entity === "category") {
       const data = categoryInput.parse(d);
@@ -575,14 +606,21 @@ export async function accountingWrite(
     });
     scoped(current, row.branchId);
     if (d.action === "journal.post") {
-      if (row.status !== "DRAFT" || row.sourceType !== "MANUAL")
-        fail("Hanya draft manual dapat diposting.");
+      const voucher = row.sourceType in CASH_VOUCHERS;
+      if (row.status !== "DRAFT" || (row.sourceType !== "MANUAL" && !voucher))
+        fail("Hanya draft manual atau kasir dapat diposting.");
       await activeBranch(tx, current, row.branchId);
       await openPeriod(tx, row.branchId, day(row.accountingDate));
-      await manualAccounts(
-        tx,
-        row.lines.map((l) => l.accountId),
-      );
+      if (voucher)
+        await nonControlAccounts(
+          tx,
+          row.lines.map((l) => l.accountId),
+        );
+      else
+        await manualAccounts(
+          tx,
+          row.lines.map((l) => l.accountId),
+        );
       for (const l of row.lines) {
         const a = await account(tx, l.accountId);
         await tx.finLine.update({
@@ -605,11 +643,7 @@ export async function accountingWrite(
       });
       return { id: row.id, branchId: row.branchId };
     }
-    if (
-      !["MANUAL", "CASH_EXPENSE", "TRANSFER", "OPENING"].includes(
-        row.sourceType,
-      )
-    )
+    if (!MANUAL_SOURCES.includes(row.sourceType))
       fail("Balikkan dokumen sumber, bukan jurnal kontrol.");
     const reversed = await reverse(
       tx,

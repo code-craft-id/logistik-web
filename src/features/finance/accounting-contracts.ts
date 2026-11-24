@@ -63,7 +63,114 @@ const line = z.object({
   side: z.enum(["DEBIT", "CREDIT"]),
   amount: money,
 });
+/** Sandbox Kas Bank vouchers (OBSERVED newapps 2026-11-24). */
+export const CASH_VOUCHERS = {
+  CASH_IN: { prefix: "BKM", label: "Kasir Penerimaan Lainnya" },
+  CASH_OUT: { prefix: "BKK", label: "Kasir Pembayaran Lainnya" },
+  VENDOR_PAYMENT: { prefix: "BKV", label: "Kasir Pembayaran Vendor" },
+  GENERAL: { prefix: "BJU", label: "Bukti Jurnal Umum" },
+} as const;
+export type CashVoucher = keyof typeof CASH_VOUCHERS;
+/** Journals created and posted from Akunting screens (not source documents). */
+export const MANUAL_SOURCES = [
+  "MANUAL",
+  "CASH_EXPENSE",
+  "TRANSFER",
+  "OPENING",
+  ...(Object.keys(CASH_VOUCHERS) as CashVoucher[]),
+];
+const optionalText = (max: number) =>
+  z.preprocess(
+    (v) => (v === "" || v === null ? undefined : v),
+    z.string().trim().max(max).optional(),
+  );
+/** Signed amount for a bank statement balance (may be zero or negative). */
+const signedMoney = z
+  .string()
+  .trim()
+  .regex(/^-?(0|[1-9]\d{0,12})(\.\d{1,2})?$/)
+  .transform((v) => Number(v).toFixed(2));
+const wholeMonths = z.coerce.number().int().min(1).max(1200);
+const nonNegative = z
+  .string()
+  .trim()
+  .regex(/^(0|[1-9]\d{0,12})(\.\d{1,2})?$/)
+  .transform((v) => Number(v).toFixed(2));
+export const akuntingCommands = [
+  z.object({
+    ...base,
+    action: z.literal("journal.cash"),
+    voucher: z.enum(["CASH_IN", "CASH_OUT", "VENDOR_PAYMENT", "GENERAL"]),
+    branchId: id,
+    accountingDate: date,
+    /** Nomor Bukti; generated when empty. */
+    reference: optionalText(160),
+    reason,
+    cashAccountId: id,
+    costCentreId: optionalId,
+    customerId: optionalId,
+    vendorId: optionalId,
+    lines: z
+      .array(
+        z.object({
+          accountId: id,
+          side: z.enum(["DEBIT", "CREDIT"]),
+          amount: money,
+          memo: optionalText(500),
+        }),
+      )
+      .min(1)
+      .max(100),
+  }),
+  /** Hapus Nomor Bukti: delete a draft voucher or manual journal. */
+  z.object({ ...base, action: z.literal("journal.discard"), id }),
+  z.object({
+    ...base,
+    action: z.literal("journal.bank_statement"),
+    branchId: id,
+    accountId: id,
+    statementDate: date,
+    bankBalance: signedMoney,
+    note: optionalText(500),
+  }),
+  z.object({
+    ...base,
+    action: z.literal("finance_account.cost_centre"),
+    id: optionalId,
+    code: z.string().trim().min(1).max(30),
+    name: z.string().trim().min(1).max(100),
+    branchId: id,
+    active: boolean.default(true),
+  }),
+  z.object({
+    ...base,
+    action: z.literal("finance_account.asset_category"),
+    id: optionalId,
+    name: z.string().trim().min(1).max(100),
+    accountId: id,
+    counterAccountId: id,
+    active: boolean.default(true),
+  }),
+  z.object({
+    ...base,
+    action: z.literal("finance_account.asset"),
+    id: optionalId,
+    name: z.string().trim().min(1).max(150),
+    categoryId: id,
+    branchId: optionalId,
+    units: z.coerce.number().int().min(1).max(1_000_000).default(1),
+    acquiredOn: date,
+    cost: nonNegative,
+    groupLabel: optionalText(30),
+    additions: nonNegative.default("0"),
+    reductions: nonNegative.default("0"),
+    lifeMonths: wholeMonths,
+    note: optionalText(500),
+  }),
+  z.object({ ...base, action: z.literal("finance_account.asset_remove"), id }),
+] as const;
 export const accountingCommand = z.discriminatedUnion("action", [
+  ...akuntingCommands,
   z.object({
     ...base,
     action: z.literal("finance_account.manage"),

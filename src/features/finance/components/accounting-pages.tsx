@@ -441,7 +441,12 @@ export async function AccountsPage({ query }: { query: Query }) {
         </section>
       )}
       <section className="space-y-4 border-t pt-5">
-        <h2 className="text-lg font-semibold">Kategori Rugi Laba</h2>
+        <h2
+          id="kategori-rugi-laba"
+          className="scroll-mt-20 text-lg font-semibold"
+        >
+          Kategori Rugi Laba
+        </h2>
         <p className="text-sm text-muted-foreground">
           Pengelompokan akun pendapatan dan beban pada laporan Hitung Rugi Laba.
         </p>
@@ -503,7 +508,9 @@ export async function AccountsPage({ query }: { query: Query }) {
         )}
       </section>
       <section className="space-y-4 border-t pt-5">
-        <h2 className="text-lg font-semibold">Kategori</h2>
+        <h2 id="kategori" className="scroll-mt-20 text-lg font-semibold">
+          Kategori
+        </h2>
         {catalog.categories.map((c) => (
           <div key={c.id}>
             <p>

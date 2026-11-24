@@ -283,6 +283,7 @@ model ShipmentStatus {
 }
 
 model Vendor {
+  finJournals     FinJournal[]      @relation("FinJournalVendor")
   vendorProcesses VendorProcess[]
   vendorBills     VendorBill[]
   manifests       Manifest[]

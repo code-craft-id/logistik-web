@@ -28,11 +28,17 @@ describe("legacy inventory coverage and presentation routing", () => {
     expect(implementedPreviewRoutes).toHaveLength(43);
   });
   it("preserves source menu ordering and only links concrete implemented pages", () => {
+    // Source ordering, except Akunting after Modul as in the sandbox menu
+    // (user rule 2026-11-24: real web first, sandbox for the rest).
+    const source = inventory.navigation
+      .map((group) => group.label)
+      .filter((label) => label !== "Akunting");
+    source.splice(source.indexOf("Modul") + 1, 0, "Akunting");
     expect(
       navigation
         .slice(0, legacyMenu.length)
         .map((group) => group.providerLabel),
-    ).toEqual(inventory.navigation.map((group) => group.label));
+    ).toEqual(source);
     const available = new Set<string>([
       "/ui-examples",
       ...implementedPreviewRoutes.map((item) => item.href),
@@ -41,9 +47,9 @@ describe("legacy inventory coverage and presentation routing", () => {
     const finance = navigationDestinations().filter(({ item }) =>
       item.href?.startsWith("/finance/"),
     );
-    // Seven Akunting entries, Master Data > Perkiraan and Modul > Invoice (New)
-    // and Pembayaran Hutang.
-    expect(finance).toHaveLength(10);
+    // Akunting: Data Akun, Biaya Aktual, Cover, Arus Kas & GP; Master Data >
+    // Perkiraan; Modul > Keuangan: Invoice (New), Invoice, Pembayaran Hutang.
+    expect(finance).toHaveLength(8);
     for (const { item } of finance) {
       expect(
         existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),
