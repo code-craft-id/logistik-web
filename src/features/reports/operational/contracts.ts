@@ -50,6 +50,26 @@ export type DashboardReportCounts = {
   items: number;
 };
 /** Legacy dashboard widgets with an approved source (D-12, D-22 2026-11-17). */
+/** Decimal strings; see server/dashboard-analytics.ts for the OBSERVED rules. */
+export type DashboardAnalytics = {
+  amount: string;
+  payments: {
+    cash: string;
+    kredit: string;
+    cod: string;
+    transfer: string;
+    other: string;
+  };
+  awb: number;
+  average: string;
+  activeCustomers: number;
+  previous: { amount: string; awb: number };
+  topCustomers: { name: string; amount: string; previous: string }[];
+  podOutstanding: {
+    total: number;
+    rows: { destination: string; count: number }[];
+  };
+};
 export type DashboardInsights = {
   /** Legacy Quick Action entries that have an implemented, permitted route. */
   actions: { label: string; href: string }[];
@@ -68,6 +88,8 @@ export type DashboardInsights = {
         createdAt: string;
       }[]
     | null;
+  /** Money / customer / POD figures; null without transaction_report:view. */
+  analytics: DashboardAnalytics | null;
   /** Current ISSUED invoice balances (FIN-01 derivation); null without invoice:view. */
   invoices: {
     unpaid: number;

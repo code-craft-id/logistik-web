@@ -13,6 +13,7 @@ import { businessDateString } from "@/lib/date/business-date";
 import { Prisma, type PrismaClient } from "@/lib/db/generated/client";
 import type { OperationalReportResult } from "../contracts";
 import { type OperationalKind, parseOperationalFilters } from "../filters";
+import { dashboardAnalytics } from "./dashboard-analytics";
 import { quantitySelect, quantityTotals } from "./quantities";
 
 const resources = {
@@ -492,6 +493,16 @@ export function createOperationalReportService(
             const invoices = permits(actor, "view", "invoice")
               ? await invoiceBalances(tx, actor, f.branchId)
               : null;
+            const span = f.toExclusive.getTime() - f.from.getTime();
+            const analytics = permits(actor, "view", "transaction_report")
+              ? await dashboardAnalytics(tx, inPeriod, {
+                  ...inPeriod,
+                  transactionDate: {
+                    gte: new Date(f.from.getTime() - span),
+                    lt: f.from,
+                  },
+                })
+              : null;
             return {
               ...base,
               kind: "dashboard",
@@ -510,6 +521,7 @@ export function createOperationalReportService(
                 statuses,
                 recent,
                 invoices,
+                analytics,
               },
             };
           }

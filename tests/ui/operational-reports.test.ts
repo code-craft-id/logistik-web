@@ -167,6 +167,7 @@ it("renders legacy dashboard widgets from sources and hides gated detail", () =>
         },
       ],
       invoices: null,
+      analytics: null,
     },
   });
   expect(html.indexOf("Quick Action")).toBeLessThan(
@@ -176,12 +177,60 @@ it("renders legacy dashboard widgets from sources and hides gated detail", () =>
   expect(html).toContain("AWB Pending");
   expect(html).toContain("1 (25.00%)");
   expect(html).toContain("&lt;b&gt;FAKE&lt;/b&gt;");
-  expect(html).toContain("hanya tampil bagi pengguna dengan hak lihat invoice");
-  expect(html).not.toContain("IDR");
-  expect(html).toContain("Belum tersedia");
+  expect(html).not.toContain("Invoice Outstanding");
+  expect(html).not.toContain("Analytics &amp; Nominal");
+  expect(html).toContain("Ringkasan Eksekutif");
+  expect(html).toContain("Total 4 AWB dalam periode ini.");
+  expect(html).toContain("Delivery success mencapai 25%.");
   expect(html).toContain("Grafik Transaksi Harian");
   expect(html).toContain("2026-11-02: 4 AWB");
   expect(html).toContain("Tertinggi 4 AWB pada 2026-11-02");
+});
+it("renders money analytics, top customers and POD outstanding", () => {
+  const html = render({
+    ...base,
+    kind: "dashboard",
+    items: [],
+    counts: { transactions: 2, manifests: 0, sheets: 0, items: 0 },
+    insights: {
+      actions: [],
+      awbPending: 0,
+      daily: [{ date: "2026-11-01", count: 2 }],
+      statuses: [{ status: "Delivered", count: 2 }],
+      recent: [],
+      invoices: { unpaid: 1, partial: 0, paid: 0, outstanding: "1500.00" },
+      analytics: {
+        amount: "300000.00",
+        payments: {
+          cash: "100000.00",
+          kredit: "200000.00",
+          cod: "0.00",
+          transfer: "0.00",
+          other: "0.00",
+        },
+        awb: 2,
+        average: "150000",
+        activeCustomers: 1,
+        previous: { amount: "150000.00", awb: 1 },
+        topCustomers: [
+          { name: "FAKE Customer", amount: "300000.00", previous: "0.00" },
+        ],
+        podOutstanding: {
+          total: 2,
+          rows: [{ destination: "FAKE Branch", count: 2 }],
+        },
+      },
+    },
+  });
+  expect(html).toContain("Rp 300.000");
+  expect(html).toContain("+100% vs");
+  expect(html).toContain("Rata-rata / AWB");
+  expect(html).toContain("1. FAKE Customer");
+  expect(html).toContain("Tidak ada data sebelumnya");
+  expect(html).toContain("FAKE Branch");
+  expect(html).toContain("Prioritaskan follow up 2 POD outstanding.");
+  expect(html).toContain("Tagih 1 invoice yang belum lunas.");
+  expect(html).toContain("Rp 1.500");
 });
 it("distinguishes unavailable vendor, initial, empty and invalid states", () => {
   const vendor = render({

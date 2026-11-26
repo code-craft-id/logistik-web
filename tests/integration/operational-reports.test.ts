@@ -439,6 +439,14 @@ describe("guarded operational report real sources", () => {
     expect(admin.insights?.invoices).toMatchObject({
       outstanding: expect.stringMatching(/^\d+\.\d{2}$/),
     });
+    // Money analytics (OBSERVED provider dashboard) need transaction_report.
+    expect(insights?.analytics).toBeNull();
+    expect(dashOnly.insights?.analytics).toBeNull();
+    expect(admin.insights?.analytics?.awb).toBe(2);
+    expect(admin.insights?.analytics?.amount).toMatch(/^\d+\.\d{2}$/);
+    expect(admin.insights?.analytics?.topCustomers.length).toBeLessThanOrEqual(
+      5,
+    );
   });
   it("reloads grants, memberships and ACTIVE hierarchy on every request", async () => {
     await db.permission.deleteMany({

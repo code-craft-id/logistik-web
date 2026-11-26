@@ -35,8 +35,7 @@ export function DashboardDailyChart({
         <span className="block text-sm text-muted-foreground">
           {monthly
             ? "Jumlah AWB per bulan transaksi (Asia/Jakarta)."
-            : "Jumlah AWB per tanggal transaksi (Asia/Jakarta)."}{" "}
-          Nominal per kategori bayar belum tersedia.
+            : "Jumlah AWB per tanggal transaksi (Asia/Jakarta)."}
         </span>
       </figcaption>
       <div className="flex gap-2">
