@@ -69,17 +69,26 @@ describe("PLT-01 server and request boundaries", () => {
     expect(await api.json()).toEqual({ message: "Silakan masuk kembali." });
   });
 
-  it("forwards the original headers for a live check without returning identity headers", async () => {
-    sessionForHeaders.mockResolvedValueOnce({ actor: { id: 10 } });
+  it("passes a request with a session cookie without a DB lookup or identity headers", async () => {
     const request = new NextRequest("http://localhost:3000/user-management", {
-      headers: { Cookie: "FAKE-session-only" },
+      headers: { Cookie: "better-auth.session_token=FAKE-session-only" },
     });
     const response = await proxy(request);
-    expect(sessionForHeaders).toHaveBeenCalledExactlyOnceWith(request.headers);
+    // Entry points re-validate the session; the proxy only checks the cookie.
+    expect(sessionForHeaders).not.toHaveBeenCalled();
     expect(response.headers.get("x-middleware-next")).toBe("1");
     expect([...response.headers.values()].join(" ")).not.toContain(
       "FAKE-session",
     );
+  });
+
+  it("treats an unrelated cookie as anonymous", async () => {
+    const response = await proxy(
+      new NextRequest("http://localhost:3000/group-user", {
+        headers: { Cookie: "FAKE-session-only" },
+      }),
+    );
+    expect(response.status).toBe(307);
   });
 
   it.each([

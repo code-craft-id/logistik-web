@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
 import { accessibleNavigation } from "@/components/shell/accessible-navigation";
 import { AppShell } from "@/components/shell/app-shell";
@@ -21,13 +22,13 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
 }
 async function AuthorizedShell({ children }: { children: ReactNode }) {
   const current = await currentIdentity();
+  // The proxy only checks cookie presence; a revoked or expired session lands here.
+  if (!current) redirect("/login");
   return (
     <>
       <AppShell
-        groups={accessibleNavigation(current?.actor ?? null)}
-        headerActions={
-          current ? <NotificationBell key="notifications" /> : null
-        }
+        groups={accessibleNavigation(current.actor)}
+        headerActions={<NotificationBell key="notifications" />}
         accountContent={
           <Suspense
             fallback={
@@ -42,7 +43,7 @@ async function AuthorizedShell({ children }: { children: ReactNode }) {
       >
         {children}
       </AppShell>
-      {current && <HelpChat />}
+      <HelpChat />
     </>
   );
 }

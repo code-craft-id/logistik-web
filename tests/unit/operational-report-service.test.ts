@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AccessActor } from "../../src/features/identity/permissions";
 import { createOperationalReportService } from "../../src/features/reports/operational/server/service";
 import type { PrismaClient } from "../../src/lib/db/generated/client";
+import { serveActorQuery } from "../support/actor-query";
 
 const period = { startDate: "2026-11-01", endDate: "2026-11-15" };
 let current: AccessActor | null;
@@ -23,6 +24,7 @@ const read = () =>
   );
 beforeEach(() => {
   vi.resetAllMocks();
+  serveActorQuery(db);
   current = {
     id: 1,
     status: "ACTIVE",
@@ -181,7 +183,7 @@ describe("operational report boundaries", () => {
     db.manifest.count.mockResolvedValue(3);
     db.deliverySheet.count.mockResolvedValue(2);
     db.deliverySheetItem.count.mockResolvedValue(1);
-    db.$queryRaw.mockResolvedValue([]);
+    serveActorQuery(db);
     db.transaction.groupBy.mockResolvedValue([
       { status: "Open", _count: { _all: 4 } },
     ]);

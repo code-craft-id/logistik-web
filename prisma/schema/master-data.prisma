@@ -25,6 +25,7 @@ model Regency {
   status     RecordStatus @default(ACTIVE)
 
   @@index([status])
+  @@index([name])
   @@map("regencies")
 }
 
@@ -39,6 +40,7 @@ model District {
   status    RecordStatus @default(ACTIVE)
 
   @@index([status])
+  @@index([name])
   @@map("districts")
 }
 
@@ -53,6 +55,7 @@ model Village {
   status    RecordStatus @default(ACTIVE)
 
   @@index([status])
+  @@index([name])
   @@map("villages")
 }
 
@@ -67,6 +70,7 @@ model PostalCode {
   status    RecordStatus @default(ACTIVE)
 
   @@index([status])
+  @@index([code])
   @@map("postal_codes")
 }
 
@@ -310,6 +314,7 @@ model Vendor {
   updatedAt       DateTime          @updatedAt @map("updated_at")
 
   @@index([status])
+  @@index([name])
   @@map("vendors")
 }
 

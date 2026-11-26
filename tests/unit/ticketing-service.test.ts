@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AccessActor } from "../../src/features/identity/permissions";
 import { createTicketService } from "../../src/features/ticketing/server/service";
 import type { PrismaClient } from "../../src/lib/db/generated/client";
+import { serveActorQuery } from "../support/actor-query";
 
 const input = {
   branchId: 10,
@@ -63,6 +64,7 @@ const service = () =>
   createTicketService(db as unknown as PrismaClient, async () => current);
 beforeEach(() => {
   vi.resetAllMocks();
+  serveActorQuery(db);
   current = actor();
   db.user.findUnique.mockImplementation(
     async () =>
@@ -185,7 +187,7 @@ describe("ticket server authorization and atomic creation", () => {
     await expect(service().create(input)).rejects.toHaveProperty("status", 403);
   });
   it("reloads memberships after acquiring the mutation lock before any write", async () => {
-    db.$queryRaw.mockImplementation(async () => {
+    serveActorQuery(db, async () => {
       fixture().branchIds = [];
       return [];
     });

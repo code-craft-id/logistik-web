@@ -60,6 +60,7 @@ model Customer {
   @@index([branchId])
   @@index([termId])
   @@index([costTypeId])
+  @@index([name])
   @@map("customers")
 }
 
@@ -88,6 +89,7 @@ model Consignee {
   @@index([customerId])
   @@index([branchId])
   @@index([status])
+  @@index([name])
   @@map("consignees")
 }
 

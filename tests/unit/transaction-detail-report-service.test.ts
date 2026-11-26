@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AccessActor } from "../../src/features/identity/permissions";
 import { createTransactionReportService } from "../../src/features/reports/transaction-details/server/service";
 import type { PrismaClient } from "../../src/lib/db/generated/client";
+import { serveActorQuery } from "../support/actor-query";
 
 const period = { startDate: "2026-11-01", endDate: "2026-11-15" };
 let current: AccessActor | null;
@@ -40,6 +41,7 @@ const db = {
   branch: { findMany: vi.fn() },
   transaction: { findMany: vi.fn(), count: vi.fn() },
   $transaction: vi.fn(),
+  $queryRaw: vi.fn(),
 };
 const service = () =>
   createTransactionReportService(
@@ -48,6 +50,7 @@ const service = () =>
   );
 beforeEach(() => {
   vi.resetAllMocks();
+  serveActorQuery(db);
   current = actor();
   db.user.findUnique.mockImplementation(
     async () =>
