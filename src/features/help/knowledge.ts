@@ -61,6 +61,22 @@ export const helpEntries: HelpEntry[] = [
     href: "/customer-service/status-pengantaran",
   },
   {
+    id: "menu-ringkas",
+    title: "Menu ringkas: tab di dalam halaman",
+    keywords: [
+      "menu",
+      "tab",
+      "inbound",
+      "print",
+      "approval",
+      "kas terima",
+      "cek transit",
+      "persetujuan",
+    ],
+    answer:
+      "Menu digabung per halaman; pilihan lama ada sebagai tab di bagian atas halaman. Contoh: AWB punya tab Outbound / Inbound (Print lewat centang AWB lalu Print terpilih); Booking: Outbound / Inbound; Manifest: Outbound / Transit / Inbound / Inbound Agen; Kurir Kota: DRS / Print DRS; COD: Cod List / Kas Terima; POD Kembali: daftar / Approval; Customer: Customer / Penerima; Laporan AWB: Tertunda / Termanifest; Laporan Agen: Transaksi / Komisi; Share Truck: Order Masuk / Keluar, Update / Cek Status, Invoice Keluar / Masuk; Ticketing: Tiket / Persetujuan; Void AWB juga menampilkan History Delete Resi.",
+  },
+  {
     id: "input-rupiah-kode-unik",
     title: "Input harga (format rupiah) dan kode yang tidak boleh sama",
     keywords: [

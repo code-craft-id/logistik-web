@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
 import { FormDialog } from "@/components/patterns/form-dialog";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
   day,
@@ -49,6 +50,22 @@ export default async function Page({
             ? "Semua order charter (masuk dan keluar) dengan riwayat status: siapa dan kapan status diubah."
             : "Order charter yang sedang berjalan. Status maju satu langkah: Diterima → Muat → Dalam Perjalanan → Tiba → Selesai; setiap perubahan dicatat di Cek Status."
         }
+      />
+      <PageTabs
+        label="Status Charter"
+        active={check ? "check" : "update"}
+        tabs={[
+          {
+            key: "update",
+            label: "Update Status",
+            href: "/share-truck/status",
+          },
+          {
+            key: "check",
+            label: "Cek Status",
+            href: "/share-truck/status?view=check",
+          },
+        ]}
       />
       <ListFilter
         action="/share-truck/status"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -65,6 +66,14 @@ export default async function Page({
         searchLabel="AWB No. / DO No."
         values={{ search: filters.search, from: filters.from, to: filters.to }}
         hidden={print ? { view: "print" } : undefined}
+      />
+      <PageTabs
+        label="Transaksi Agent"
+        active={print ? "print" : "onsite"}
+        tabs={[
+          { key: "onsite", label: "On Site Agent", href: "/agent-awb" },
+          { key: "print", label: "Print Agent", href: "/agent-awb?view=print" },
+        ]}
       />
       {rows.length === 0 ? (
         <EmptyState

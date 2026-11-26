@@ -65,24 +65,27 @@ export const legacyMenu = [
       {
         label: "Pemasaran/Penjualan",
         children: [
-          { label: "Customer", href: "/marketing?tab=customer" },
-          { label: "Penerima", href: "/marketing?tab=consignee" },
+          // Fitur 2 (2026-11-27): one item per page; tabs inside the page.
+          { label: "Customer & Penerima", href: "/marketing?tab=customer" },
           { label: "Pendapatan Pelanggan", href: "/marketing/revenue" },
         ],
       },
       {
         label: "Layanan Pelanggan / Transaksi",
         children: [
-          { label: "On Site Outbound", href: "/transactions" },
-          { label: "On Site Inbound", href: "/transactions?tab=inbound" },
-          { label: "Print AWB", href: "/transactions?print=1" },
+          {
+            label: "AWB (Outbound, Inbound, Print)",
+            href: "/transactions",
+          },
           {
             label: "Persetujuan Edit/delete AWB",
             href: "/transactions/approvals",
           },
-          { label: "Void Awb", href: "/transactions/void" },
-          { label: "Cod List", href: "/cod" },
-          { label: "Kas Terima", href: "/cod?tab=received" },
+          {
+            label: "Void AWB & History Delete Resi",
+            href: "/transactions/void",
+          },
+          { label: "COD (Cod List, Kas Terima)", href: "/cod" },
         ],
       },
       {
@@ -95,53 +98,41 @@ export const legacyMenu = [
           { label: "Cek Ongkir", href: "/customer-service/cek-ongkir" },
           { label: "Cek Resi", href: "/transactions/lookup" },
           { label: "Histori Edit Resi", href: "/transactions/history" },
-          { label: "Booking", href: "/bookings" },
-          { label: "Inbound Booking", href: "/bookings?tab=inbound" },
-          {
-            label: "History Delete Resi",
-            href: "/transactions/void?view=deleted",
-          },
+          { label: "Booking (Outbound, Inbound)", href: "/bookings" },
         ],
       },
       {
         label: "Transaksi Agent",
         children: [
-          { label: "On Site Agent", href: "/agent-awb" },
-          { label: "Print Agent", href: "/agent-awb?view=print" },
+          { label: "AWB Agent (On Site, Print)", href: "/agent-awb" },
           { label: "History Deposit Agent", href: "/agent-deposit" },
-          { label: "Manifest Agent", href: "/manifest?view=agent" },
         ],
       },
       {
         label: "Operasional / Manifest",
         children: [
-          { label: "Manifest", href: "/manifest" },
-          { label: "Cek Transit", href: "/manifest?type=Transit" },
-          { label: "Cek Inbound", href: "/manifest?type=Inbound" },
-          { label: "Cek Inbound Agen", href: "/manifest?view=agent" },
-          { label: "Print Manifest", href: "/manifest?type=Outbound" },
+          {
+            label: "Manifest (Outbound, Transit, Inbound, Agen, Print)",
+            href: "/manifest",
+          },
         ],
       },
       {
         label: "Operasional / Lembar Pengantaran",
         children: [
-          { label: "Kurir Kota", href: "/delivery-sheets" },
-          { label: "Print DRS", href: "/delivery-sheets?tab=print" },
+          { label: "Kurir Kota & Print DRS", href: "/delivery-sheets" },
         ],
       },
       {
         label: "Operasional",
         children: [
-          { label: "POD Kembali", href: "/pod-returns" },
-          { label: "Approval Pod Kembali", href: "/pod-returns?tab=approval" },
+          { label: "POD Kembali & Approval", href: "/pod-returns" },
           { label: "Proses Vendor", href: "/vendor-processes" },
         ],
       },
       {
         label: "Keuangan",
         children: [
-          { label: "Invoice (New)", href: "/finance/invoices?from=modul" },
-          // Sandbox Piutang Dagang > Invoice (not in the real web menu).
           { label: "Invoice", href: "/finance/invoices" },
           { label: "Pembayaran Hutang", href: "/finance/debt-payments" },
         ],
@@ -196,12 +187,8 @@ export const legacyMenu = [
             href: "/branch-reports/manifest-vendor",
           },
           {
-            label: "AWB Tertunda",
+            label: "AWB Tertunda & Termanifest",
             href: "/branch-reports/awb?view=pending",
-          },
-          {
-            label: "AWB Termanifest",
-            href: "/branch-reports/awb?view=manifested",
           },
           {
             label: "Rekap Customer BUlanan",
@@ -228,8 +215,7 @@ export const legacyMenu = [
       {
         label: "Laporan Agen",
         children: [
-          { label: "Transaksi Agen", href: "/agent-reports" },
-          { label: "Laporan Komisi Agen", href: "/agent-reports?tab=komisi" },
+          { label: "Transaksi & Komisi Agen", href: "/agent-reports" },
         ],
       },
       {
@@ -259,33 +245,14 @@ export const legacyMenu = [
     label: "Share Truck",
     children: [
       { label: "Dashboard Share Truck", href: "/share-truck" },
-      {
-        label: "Charter",
-        children: [
-          { label: "Order Masuk Charter", href: "/share-truck/orders" },
-          {
-            label: "List Order Keluar Charter",
-            href: "/share-truck/orders?dir=out",
-          },
-        ],
-      },
-      {
-        label: "Status",
-        children: [
-          { label: "Update Status", href: "/share-truck/status" },
-          { label: "Cek Status", href: "/share-truck/status?view=check" },
-        ],
-      },
-      { label: "Invoice Keluar", href: "/share-truck/invoices" },
-      { label: "Invoice Masuk", href: "/share-truck/invoices?type=masuk" },
+      { label: "Order Charter (Masuk, Keluar)", href: "/share-truck/orders" },
+      { label: "Status (Update, Cek)", href: "/share-truck/status" },
+      { label: "Invoice (Keluar, Masuk)", href: "/share-truck/invoices" },
       { label: "Ready Truck", href: "/share-truck/ready" },
     ],
   },
   {
     label: "Ticketing",
-    children: [
-      { label: "Tiket Support", href: "/ticketting" },
-      { label: "Persetujuan Tiketing", href: "/ticketting?tab=approval" },
-    ],
+    children: [{ label: "Tiket Support & Persetujuan", href: "/ticketting" }],
   },
 ] as const;

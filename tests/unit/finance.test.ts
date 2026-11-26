@@ -29,11 +29,8 @@ describe("adopted finance input", () => {
     const hrefs = navigationDestinations(groups)
       .map(({ item }) => item.href)
       .filter((p) => p?.startsWith("/finance/"));
-    // Modul > Keuangan > Invoice (New) and Invoice (sandbox Piutang Dagang).
-    expect(hrefs).toEqual([
-      "/finance/invoices?from=modul",
-      "/finance/invoices",
-    ]);
+    // Modul > Keuangan > Invoice (Invoice (New) merged in Fitur 2).
+    expect(hrefs).toEqual(["/finance/invoices"]);
     expect(navigationPath("/finance/invoices/123", groups)?.labels).toEqual([
       "Modul",
       "Keuangan",

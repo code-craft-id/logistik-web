@@ -41,9 +41,10 @@ describe("available navigation", () => {
     for (const path of [
       "/transactions/approvals",
       "/customer-service/cek-ongkir",
-      "/bookings?tab=inbound",
-      "/manifest?view=agent",
-      "/pod-returns?tab=approval",
+      // Fitur 2: merged menu, tabs open the other views.
+      "/bookings",
+      "/manifest",
+      "/pod-returns",
       "/finance/debt-payments",
     ])
       expect(paths).toContain(path);
@@ -64,7 +65,6 @@ describe("available navigation", () => {
       "/branch-reports/gross-profit",
       "/customer-reports/pod",
       "/branch-reports/awb?view=pending",
-      "/branch-reports/awb?view=manifested",
       "/branch-reports/rekap-transaksi-harian",
       "/customer-reports/all-status",
     ])
@@ -84,31 +84,22 @@ describe("available navigation", () => {
       );
     expect(hrefs(["transaction"])).toEqual([
       "/transactions",
-      "/transactions?tab=inbound",
-      "/transactions?print=1",
       "/transactions/void",
       // Status Pengantaran = Kelola Status Pengiriman (provider /shipment-status).
       "/customer-service/status-pengantaran",
       "/transactions/lookup",
       "/transactions/history",
-      "/transactions/void?view=deleted",
       "/agent-awb",
-      "/agent-awb?view=print",
       "/agent-reports",
-      "/agent-reports?tab=komisi",
     ]);
-    expect(hrefs(["booking"])).toEqual(["/bookings", "/bookings?tab=inbound"]);
+    expect(hrefs(["booking"])).toEqual(["/bookings"]);
     expect(hrefs(["awb_change"])).toEqual(["/transactions/approvals"]);
-    expect(hrefs(["pod_return"])).toEqual([
-      "/pod-returns",
-      "/pod-returns?tab=approval",
-    ]);
+    expect(hrefs(["pod_return"])).toEqual(["/pod-returns"]);
     expect(hrefs(["transaction_report"])).toEqual([
       "/branch-reports/transaction-details",
       "/branch-reports/rekap-transaksi",
       "/branch-reports/rekap-transaksi-harian",
       "/branch-reports/awb?view=pending",
-      "/branch-reports/awb?view=manifested",
       "/branch-reports/customer-monthly-summary",
       "/branch-reports/daily-turnover-summary",
       "/branch-reports/inbound-transaction-details",

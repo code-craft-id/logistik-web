@@ -49,9 +49,9 @@ describe("legacy inventory coverage and presentation routing", () => {
     const finance = navigationDestinations().filter(({ item }) =>
       item.href?.startsWith("/finance/"),
     );
-    // Modul > Keuangan: Invoice (New), Invoice, Pembayaran Hutang. Akunting
-    // pages live under /akunting since 2026-11-27.
-    expect(finance).toHaveLength(3);
+    // Modul > Keuangan: Invoice, Pembayaran Hutang (Fitur 2 merged menu).
+    // Akunting pages live under /akunting since 2026-11-27.
+    expect(finance).toHaveLength(2);
     for (const { item } of finance) {
       expect(
         existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),

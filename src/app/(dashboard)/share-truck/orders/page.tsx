@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
 import { FormDialog } from "@/components/patterns/form-dialog";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { ActionForm } from "@/features/modul/components/action-form";
@@ -57,6 +58,22 @@ export default async function Page({
             ? "Order customer untuk truk kita yang di-share (dibuat dari Dashboard Share Truck). Status Menunggu: Terima atau Tolak. Order yang diterima lanjut di Update Status dan bisa dibuatkan Invoice Keluar."
             : "Order kita untuk menyewa truk vendor. Tambah Order mencatat vendor, nopol, rute, muatan dan Total Biaya; order langsung Diterima, lanjut di Update Status dan Invoice Masuk dari vendor."
         }
+      />
+      <PageTabs
+        label="Order Charter"
+        active={incoming ? "in" : "out"}
+        tabs={[
+          {
+            key: "in",
+            label: "Order Masuk Charter",
+            href: "/share-truck/orders",
+          },
+          {
+            key: "out",
+            label: "List Order Keluar Charter",
+            href: "/share-truck/orders?dir=out",
+          },
+        ]}
       />
       {!incoming && canManage && (
         <div>

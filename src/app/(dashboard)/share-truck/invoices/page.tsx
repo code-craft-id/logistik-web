@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/patterns/content-state";
 import { FormDialog } from "@/components/patterns/form-dialog";
+import { PageTabs } from "@/components/patterns/page-tabs";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { ActionForm } from "@/features/modul/components/action-form";
@@ -55,6 +56,22 @@ export default async function Page({
             ? "Tagihan vendor untuk Order Keluar Charter (kita menyewa truk vendor). Catat No. Invoice vendor lalu tandai Lunas saat dibayar. Nilai = Total Biaya order; belum membuat jurnal."
             : "Tagihan ke customer untuk Order Masuk Charter yang sudah diterima. Pilih No. Order, isi Invoice No lalu tandai Lunas saat dibayar. Nilai = Total Biaya order; belum membuat jurnal."
         }
+      />
+      <PageTabs
+        label="Invoice Charter"
+        active={incoming ? "masuk" : "keluar"}
+        tabs={[
+          {
+            key: "keluar",
+            label: "Invoice Keluar",
+            href: "/share-truck/invoices",
+          },
+          {
+            key: "masuk",
+            label: "Invoice Masuk",
+            href: "/share-truck/invoices?type=masuk",
+          },
+        ]}
       />
       {canManage &&
         (uninvoiced.length === 0 ? (
