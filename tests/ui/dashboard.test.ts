@@ -72,7 +72,6 @@ describe("legacy dashboard supported presentation", () => {
         link.getAttribute("href"),
       ),
     ).toEqual([
-      "/ui-examples",
       "/bookings",
       "/transactions",
       "/shipment-status",

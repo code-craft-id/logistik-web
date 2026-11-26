@@ -220,11 +220,7 @@ export const providerNavigation: readonly NavigationGroup[] = [
   },
   { label: "Ticketing", providerLabel: "Ticketing" },
   { label: "System Tutorial", providerLabel: "Tutorial System" },
-  {
-    label: "UI examples",
-    providerLabel: "Local foundation example",
-    href: "/ui-examples",
-  },
+  // UI examples (/ui-examples) is hidden from the menu before release (user 2026-11-26).
 ];
 
 type LegacyItem = {
@@ -565,11 +561,7 @@ export const navigation: readonly NavigationGroup[] = [
     ),
   },
   { label: "System Tutorial", providerLabel: "Tutorial System" },
-  {
-    label: "UI examples",
-    providerLabel: "Local foundation example",
-    href: "/ui-examples",
-  },
+  // UI examples (/ui-examples) is hidden from the menu before release (user 2026-11-26).
 ];
 
 // Both surfaces derive their partition from the verified inventory, never a

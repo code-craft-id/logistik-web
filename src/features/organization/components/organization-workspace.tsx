@@ -472,102 +472,109 @@ function OrganizationList({
         className="space-y-5"
       >
         <div className="grid max-w-5xl gap-4 lg:grid-cols-2">
-          {formFields.map((field) => (
-            <div
-              className={`grid min-w-0 gap-2 sm:grid-cols-3 sm:items-center sm:gap-5 ${["name", "address", "logo"].includes(field.key) ? "lg:col-span-2" : ""}`}
-              key={field.key}
-            >
-              <Label
-                htmlFor={`org-${field.key}`}
-                className={
-                  field.type === "checkbox"
-                    ? "flex min-h-11 items-center"
-                    : undefined
-                }
+          {formFields.map((field) => {
+            // Wide rows span both columns; 6 tracks keep the label as wide as a normal row's.
+            const wide = ["name", "address", "logo"].includes(field.key);
+            const span = wide ? "sm:col-span-2 lg:col-span-5" : "sm:col-span-2";
+            return (
+              <div
+                className={`grid min-w-0 gap-2 sm:grid-cols-3 sm:items-center sm:gap-5 ${wide ? "lg:col-span-2 lg:grid-cols-6" : ""}`}
+                key={field.key}
               >
-                {field.label}
-                {field.required ? " *" : ""}
-              </Label>
-              {field.key === "logo" ? (
-                <CompanyLogoField
-                  key={editing?.id ?? "new"}
-                  value={String(editing?.logo ?? "")}
-                  disabled={busy || !writable}
-                />
-              ) : field.key === "address" ? (
-                <Textarea
-                  className="min-h-20 sm:col-span-2"
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  defaultValue={String(editing?.[field.key] ?? "")}
-                  maxLength={1000}
-                  required={field.required}
-                  disabled={busy || !writable}
-                />
-              ) : field.type === "checkbox" ? (
-                <input
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  type="checkbox"
-                  defaultChecked={Boolean(editing?.[field.key])}
-                  disabled={busy || !writable}
-                  className="size-5 accent-primary"
-                />
-              ) : field.type === "parent" ? (
-                <div className="sm:col-span-2">
-                  <SearchSelect
+                <Label
+                  htmlFor={`org-${field.key}`}
+                  className={
+                    field.type === "checkbox"
+                      ? "flex min-h-11 items-center"
+                      : undefined
+                  }
+                >
+                  {field.label}
+                  {field.required ? " *" : ""}
+                </Label>
+                {field.key === "logo" ? (
+                  <div className={span}>
+                    <CompanyLogoField
+                      key={editing?.id ?? "new"}
+                      value={String(editing?.logo ?? "")}
+                      disabled={busy || !writable}
+                    />
+                  </div>
+                ) : field.key === "address" ? (
+                  <Textarea
+                    className={`min-h-20 ${span}`}
                     id={`org-${field.key}`}
                     name={field.key}
-                    label={field.label}
-                    value={parentSelection}
-                    selectedLabel={parentLabel}
-                    options={parents}
-                    search={parentSearch}
-                    onSearchChange={(value) => {
-                      setParentSearch(value);
-                      setParentPage(1);
-                    }}
-                    onValueChange={(value, label) => {
-                      setParentSelection(value);
-                      setParentLabel(label);
-                    }}
-                    disabled={busy || !writable}
-                    loading={parentLoading}
-                    error={parentError}
+                    defaultValue={String(editing?.[field.key] ?? "")}
+                    maxLength={1000}
                     required={field.required}
-                    page={parentPage}
-                    pages={parentPages}
-                    onPageChange={setParentPage}
+                    disabled={busy || !writable}
                   />
-                </div>
-              ) : field.type === "status" ? (
-                <ComboSelect
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  defaultValue={String(editing?.[field.key] ?? "ACTIVE")}
-                  required={field.required}
-                  disabled={busy || !writable}
-                  className="min-h-11 w-full rounded-md border border-input bg-background px-3 sm:col-span-2"
-                >
-                  <option value="ACTIVE">Aktif</option>
-                  <option value="INACTIVE">Tidak aktif</option>
-                </ComboSelect>
-              ) : (
-                <Input
-                  className="min-h-11 sm:col-span-2"
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  type={field.type === "email" ? "email" : "text"}
-                  defaultValue={String(editing?.[field.key] ?? "")}
-                  maxLength={
-                    field.key === "name" || field.key === "code" ? 100 : 1000
-                  }
-                  required={field.required}
-                  disabled={busy || !writable}
-                />
-              )}
-            </div>
-          ))}
+                ) : field.type === "checkbox" ? (
+                  <input
+                    id={`org-${field.key}`}
+                    name={field.key}
+                    type="checkbox"
+                    defaultChecked={Boolean(editing?.[field.key])}
+                    disabled={busy || !writable}
+                    className="size-5 accent-primary"
+                  />
+                ) : field.type === "parent" ? (
+                  <div className={span}>
+                    <SearchSelect
+                      id={`org-${field.key}`}
+                      name={field.key}
+                      label={field.label}
+                      value={parentSelection}
+                      selectedLabel={parentLabel}
+                      options={parents}
+                      search={parentSearch}
+                      onSearchChange={(value) => {
+                        setParentSearch(value);
+                        setParentPage(1);
+                      }}
+                      onValueChange={(value, label) => {
+                        setParentSelection(value);
+                        setParentLabel(label);
+                      }}
+                      disabled={busy || !writable}
+                      loading={parentLoading}
+                      error={parentError}
+                      required={field.required}
+                      page={parentPage}
+                      pages={parentPages}
+                      onPageChange={setParentPage}
+                    />
+                  </div>
+                ) : field.type === "status" ? (
+                  <ComboSelect
+                    id={`org-${field.key}`}
+                    name={field.key}
+                    defaultValue={String(editing?.[field.key] ?? "ACTIVE")}
+                    required={field.required}
+                    disabled={busy || !writable}
+                    className={`min-h-11 w-full rounded-md border border-input bg-background px-3 ${span}`}
+                  >
+                    <option value="ACTIVE">Aktif</option>
+                    <option value="INACTIVE">Tidak aktif</option>
+                  </ComboSelect>
+                ) : (
+                  <Input
+                    className={`min-h-11 ${span}`}
+                    id={`org-${field.key}`}
+                    name={field.key}
+                    type={field.type === "email" ? "email" : "text"}
+                    defaultValue={String(editing?.[field.key] ?? "")}
+                    maxLength={
+                      field.key === "name" || field.key === "code" ? 100 : 1000
+                    }
+                    required={field.required}
+                    disabled={busy || !writable}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
         {error && (
           <p role="alert" className="text-sm text-destructive">

@@ -865,3 +865,15 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - D-41 agent deposit/commission (`f35f926`), D-42 Laporan Keuntungan (`7704a48`), D-43 Share Truck (`0acf69f`, date fix `cce2ef1`), modal dialogs for action inputs (`38f9a19`).
 - Real web role check (read-only): Grup User 14 levels; Hak Akses Menu ADMINISTRATOR 228/228, FINANCE 92 incl. accounting/Kasir/agent/trucking. Akunting hidden for ADMINISTRATOR too: module switched off by the provider, not a role rule.
 - lint, typecheck, unit 737/737, integration 217/217, build pass. Not pushed.
+
+## 2026-11-26 — parity re-audit, D-44 dashboard, speed, responsive sweep
+
+- Menu re-audit (real web read-only + sandbox): every leaf present except Feature Update / List Tutorial (dropped by user again; a started Tutorial table was removed from the dev DB). Kantor submenus already come from accessible-navigation.
+- D-44 dashboard (rule-based summary, rekomendasi, notifikasi, nominal by Jenis Biaya, top 5 customer, POD outstanding, previous-period trend). See PRD D-44.
+- Speed: proxy cookie-only check, `cache()` on currentIdentity, workspace loading.tsx, list sort indexes. Measured on `next start` before the change: pages 300-700 ms HTML on local DB; dev log showed proxy 276-400 ms per request, now 11-130 ms in dev.
+- Responsive sweep: 113 static workspace routes at 375 px and 768 px in same-origin iframes (window resize does not work in the browser tool): 0 horizontal page overflow, 0 render errors. New dashboard checked at 1366 px; 375 px of the new dashboard checked only via the same rules (grid-cols-2 tiles), not visually.
+- Production build not rerun: the user's `next start` on :3000 holds `.next`; stopping it was declined.
+- Later the same day: UI examples hidden from the menu and from the overview dashboard (route kept for developers). Agen / Kantor form: wide fields (Nama Agen, Alamat, Logo, company setting wide fields) use 6 tracks at `lg` so the input lines up with normal rows (was shifted far right).
+- Speed A/B on the same machine and DB, production builds: baseline HEAD (webpack, :3002) vs new (:3000), second run: /office 536-690 vs 317-321 ms, /transactions 959-1001 vs 543-597 ms, /manifest 783-1147 vs 412-556 ms, /dashboard 776-1217 vs 620 ms (with the extra D-44 queries).
+- Dashboard at 375 px checked in an iframe: no overflow.
+- Hot path: `loadAccessActor` was four sequential Prisma relation queries (user, group, permissions, allowed branches), median 23 ms on the local DB and four DB round trips on Neon, run by every page, action and service. Now one SQL query with json_agg / array_agg (median 6.4 ms locally, one round trip). Unit mocks route that query through `tests/support/actor-query.ts`. lint, typecheck, unit 745/745, integration 217/217 pass.

@@ -80,3 +80,18 @@ as-is. No new business decision is inferred from the user's feature list.
 ## 2026-11-21 16:49 UTC — REL-01 Vercel Preview staging
 
 - Technical target selected under the user’s Preview deployment authorization. Preserve the verified source backup and existing administrator; require Vercel Authentication when connecting imported identity data. Existing business decision statuses remain unchanged.
+
+## 2026-11-26 — D-44 dashboard like the real web
+
+- User: "kerjakan yang belum, dashboard juga boleh jadi lebih baik". Built the provider dashboard parts (Ringkasan Eksekutif, Rekomendasi, Notifikasi Penting, Analytics nominal, Top 5 Customer, POD Outstanding) with the OBSERVED rules recorded in PRD D-44. Finance confirmation of D-07/D-09/D-11/D-15 is still open.
+- User confirmed Feature Update and List Tutorial stay dropped.
+
+## 2026-11-26 — speed: proxy cookie check, per-request identity cache, list indexes
+
+- User asked for a faster web and waived Dev1/Dev2 approval for this push ("SEKARANG TANPA HARUS IZIN DEV1 SAMA DEV2").
+- `src/proxy.ts` now checks only session-cookie presence (`getSessionCookie`, no DB). Every page, Server Action and route handler still validates the session and rights itself; the workspace layout redirects a revoked/expired session to `/login`. Better Auth `cookieCache` stays disabled. Dev 1 should still look at this when convenient.
+- `currentIdentity()` is wrapped in React `cache()` (one session + actor lookup per request instead of one per caller).
+- `src/app/(dashboard)/loading.tsx` gives every workspace page instant navigation feedback.
+- Migration `20261126000100_list_sort_indexes`: name / code indexes for paged master lists (regencies, districts, villages, postal_codes, vendors, customers, consignees). Index-only; rollback = DROP INDEX.
+
+- User (2026-11-26): dashboard money figures are acceptable as long as they come from the database; D-44 accepted for release.
