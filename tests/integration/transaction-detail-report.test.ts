@@ -134,7 +134,8 @@ beforeAll(async () => {
   );
   await record(
     {
-      awbNo: `${tag}-dup`,
+      // AWB numbers are unique across branches (2026-11-27).
+      awbNo: `${tag}-dup-b`,
       transactionDate: new Date("2026-11-01T00:00:00Z"),
       originBranchId: branches[1],
     },
@@ -215,7 +216,7 @@ describe("RPT-01A guarded real PostgreSQL report", () => {
       new Set(["Open", "In Transit", "Delivered", "Cancelled"]),
     );
     expect(
-      result.items.filter((row) => row.awbNo === `${tag}-dup`),
+      result.items.filter((row) => row.awbNo?.startsWith(`${tag}-dup`)),
     ).toHaveLength(2);
     expect(result.items.find((row) => row.awbNo === `${tag}-0`)?.kilo).toBe(
       "0",

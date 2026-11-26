@@ -1,7 +1,11 @@
 import "server-only";
 
+import * as XLSX from "xlsx";
 import type { AccessActor } from "@/features/identity/permissions";
-import { assertPermission } from "@/features/identity/server/access";
+import {
+  assertPermission,
+  IdentityError,
+} from "@/features/identity/server/access";
 import { transactionScope } from "@/features/modul/server/common";
 import { businessDateString } from "@/lib/date/business-date";
 import { prisma } from "@/lib/db";
@@ -10,6 +14,8 @@ import { slaLabel, slaTargetDays } from "../sla";
 import { firstInboundScans } from "./manifest-scan";
 
 export const SHIPMENT_STATUS_PAGE_SIZE = 50;
+/** Export Excel limit; wider results must be narrowed by search / status. */
+export const SHIPMENT_STATUS_EXPORT_MAX = 5000;
 
 export type ShipmentStatusRow = {
   id: number;
@@ -41,7 +47,7 @@ const day = (d: Date) => Date.parse(`${businessDateString(d)}T00:00:00Z`);
  */
 export async function listShipmentStatus(
   actor: AccessActor,
-  params: { search?: string; status?: string; page?: number },
+  params: { search?: string; status?: string; page?: number; all?: boolean },
 ) {
   assertPermission(actor, "view", "transaction");
   const search = (params.search ?? "").trim().slice(0, 60);
@@ -69,8 +75,10 @@ export async function listShipmentStatus(
     prisma.transaction.findMany({
       where,
       orderBy: [{ transactionDate: "desc" }, { id: "desc" }],
-      skip: (page - 1) * SHIPMENT_STATUS_PAGE_SIZE,
-      take: SHIPMENT_STATUS_PAGE_SIZE,
+      skip: params.all ? 0 : (page - 1) * SHIPMENT_STATUS_PAGE_SIZE,
+      take: params.all
+        ? SHIPMENT_STATUS_EXPORT_MAX + 1
+        : SHIPMENT_STATUS_PAGE_SIZE,
       select: {
         id: true,
         awbNo: true,
@@ -193,4 +201,57 @@ export async function listShipmentStatus(
       };
     }),
   };
+}
+
+/** Status Pengantaran Export Excel (provider button): same rows and filters as the page. */
+export async function shipmentStatusWorkbook(
+  actor: AccessActor,
+  params: { search?: string; status?: string },
+) {
+  const data = await listShipmentStatus(actor, { ...params, all: true });
+  if (data.rows.length > SHIPMENT_STATUS_EXPORT_MAX)
+    throw new IdentityError("TOO_MANY", 422);
+  const when = (iso: string | null) =>
+    iso
+      ? new Date(iso).toLocaleString("id-ID", {
+          dateStyle: "short",
+          timeStyle: "short",
+          timeZone: "Asia/Jakarta",
+        })
+      : "";
+  const sheet = XLSX.utils.aoa_to_sheet([
+    [
+      "AWB No.",
+      "Tanggal",
+      "Asal",
+      "Tujuan",
+      "Pengirim",
+      "Layanan",
+      "Status",
+      "Penerima",
+      "Diterima Oleh",
+      "Tanggal Diterima",
+      "Acc. In",
+      "L.Time",
+      "SLA",
+    ],
+    ...data.rows.map((r) => [
+      r.awbNo,
+      r.date,
+      r.origin ?? "",
+      r.destination ?? "",
+      r.sender ?? "",
+      r.service ?? "",
+      r.status,
+      r.receiver ?? "",
+      r.receivedBy ?? "",
+      when(r.receivedAt),
+      when(r.accIn),
+      r.leadTimeDays ?? "",
+      r.sla,
+    ]),
+  ]);
+  const book = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(book, sheet, "Status Pengantaran");
+  return XLSX.write(book, { type: "buffer", bookType: "xlsx" }) as Buffer;
 }

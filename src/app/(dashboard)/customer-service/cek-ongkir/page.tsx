@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MoneyInput } from "@/components/ui/money-input";
 import {
   Table,
   TableBody,
@@ -273,12 +274,9 @@ export default async function Page({
               </div>
               <div className="min-w-0 space-y-2">
                 <Label htmlFor="t-price">Tarif per Kg (Rp)</Label>
-                <Input
+                <MoneyInput
                   id="t-price"
                   name="pricePerKg"
-                  type="number"
-                  min="0"
-                  step="0.01"
                   required
                   className="min-h-11"
                 />

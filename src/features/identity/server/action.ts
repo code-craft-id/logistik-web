@@ -20,7 +20,7 @@ export async function identityAction<T>(work: () => Promise<T>): Promise<T> {
       throw new IdentityError(
         "DUPLICATE",
         409,
-        "Username, email, atau nama grup sudah digunakan.",
+        "Kode, nomor, username, email atau nama tersebut sudah digunakan. Gunakan nilai lain.",
       );
     if (code === "P2025")
       throw new IdentityError("NOT_FOUND", 404, "Data tidak ditemukan.");

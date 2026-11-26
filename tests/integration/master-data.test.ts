@@ -27,6 +27,8 @@ const records: { kind: MasterKind; id: number }[] = [];
 let companyId: number, officeId: number, adminId: number, operatorId: number;
 const service = (id: number) =>
   createMasterDataService(db, () => loadAccessActor(db, id));
+// License plates are unique (2026-11-27): every fixture vehicle gets its own.
+let plate = 0;
 function input(kind: MasterKind): Record<string, unknown> {
   return {
     ...Object.fromEntries(
@@ -34,17 +36,19 @@ function input(kind: MasterKind): Record<string, unknown> {
         field.key,
         field.key === "name"
           ? `FAKE MASTER ${tag} ${kind}`
-          : field.type === "boolean"
-            ? false
-            : field.type === "date" || field.type === "choice"
-              ? null
-              : field.type === "integer"
-                ? 2026
-                : field.type === "email"
-                  ? `${tag}@example.invalid`
-                  : kind === "postal_code"
-                    ? `F${tag}`
-                    : "INVALID-FAKE",
+          : field.key === "licensePlate"
+            ? `FK${Date.now() % 1e9}${++plate}`.slice(0, 20)
+            : field.type === "boolean"
+              ? false
+              : field.type === "date" || field.type === "choice"
+                ? null
+                : field.type === "integer"
+                  ? 2026
+                  : field.type === "email"
+                    ? `${tag}@example.invalid`
+                    : kind === "postal_code"
+                      ? `F${tag}`
+                      : "INVALID-FAKE",
       ]),
     ),
     status: "ACTIVE",

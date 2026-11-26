@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { ComboSelect } from "@/components/ui/combo-select";
+import { MoneyInput } from "@/components/ui/money-input";
+import { isMoneyField } from "@/lib/format/money-fields";
 import { formatRupiah } from "@/lib/format/rupiah";
 import {
   type CreateTransactionActionResult,
@@ -96,6 +98,45 @@ function Text({
   name: string;
   text: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
+  if (isMoneyField(name)) {
+    // Rupiah fields: formatted while typing, plain number submitted.
+    const {
+      value,
+      defaultValue,
+      onChange,
+      type: _t,
+      min: _m,
+      step: _s,
+      ...other
+    } = rest;
+    return (
+      <div className={row}>
+        <label htmlFor={name} className={label}>
+          {text}
+          {rest.required ? " *" : ""}
+        </label>
+        <MoneyInput
+          {...other}
+          id={name}
+          name={name}
+          className={field}
+          value={value === undefined ? undefined : String(value)}
+          defaultValue={
+            defaultValue === undefined ? undefined : String(defaultValue)
+          }
+          onValueChange={
+            onChange
+              ? (raw) =>
+                  onChange({
+                    target: { value: raw },
+                    currentTarget: { value: raw },
+                  } as React.ChangeEvent<HTMLInputElement>)
+              : undefined
+          }
+        />
+      </div>
+    );
+  }
   return (
     <div className={row}>
       <label htmlFor={name} className={label}>
@@ -333,7 +374,7 @@ export function TransactionForm({
             );
           } else if (res.error === "CONFLICT") {
             setError(
-              "Nomor AWB sudah dipakai di cabang asal ini. Gunakan nomor AWB lain.",
+              "Nomor AWB sudah dipakai (termasuk di cabang lain atau AWB yang sudah dihapus). Gunakan nomor AWB lain atau kosongkan agar dibuat otomatis.",
             );
           } else {
             setError(
@@ -724,14 +765,15 @@ export function TransactionForm({
               {priceLabel}
             </label>
             <div className="grid grid-cols-[1fr_auto_6rem] items-center gap-2">
-              <input
+              <MoneyInput
                 id="pricePerKg"
                 name="pricePerKg"
-                type="number"
-                min="0"
-                step="0.01"
                 value={price.pricePerKg}
-                onChange={set("pricePerKg")}
+                onValueChange={(raw) =>
+                  set("pricePerKg")({
+                    target: { value: raw },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                }
                 disabled={manualPrice}
                 className={field}
               />
@@ -839,12 +881,9 @@ export function TransactionForm({
             </label>
             <div className="grid grid-cols-[1fr_auto] gap-2">
               {manualPrice ? (
-                <input
+                <MoneyInput
                   id="biaya"
                   name="biaya"
-                  type="number"
-                  min="0"
-                  step="0.01"
                   required
                   className={field}
                 />

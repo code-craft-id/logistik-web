@@ -9,13 +9,13 @@ Keep this file current: move items to "Done" with the commit when finished.
 
 | # | Item | Provider evidence | Notes |
 |---|---|---|---|
-| A1 | Export Excel on Status Pengantaran | `/shipment-status` has search / refresh / export | Same rows and filters as the page |
-| A2 | Export Excel on Hitung Rugi Laba | `/rugi-laba` has Search / Export / Refresh | Same layout as the page |
-| A3 | Perkiraan Export Excel, Template Import, Import Data | `/perkiraan` buttons | Import must validate like the account form (Induk loops, Kategori Rugi Laba only on revenue/expense) |
+| A1 | ~~Export Excel on Status Pengantaran~~ DONE 2026-11-27 | `/shipment-status` has search / refresh / export | Same rows and filters as the page |
+| A2 | ~~Export Excel on Hitung Rugi Laba~~ DONE 2026-11-27 | `/rugi-laba` has Search / Export / Refresh | Same layout as the page |
+| A3 | ~~Perkiraan Export Excel, Template Import, Import Data~~ DONE 2026-11-27 (columns follow the LMS account form; sandbox template not re-observed, session expired) | `/perkiraan` buttons | Import must validate like the account form (Induk loops, Kategori Rugi Laba only on revenue/expense) |
 | A4 | ~~Delivery Sheet list page~~ DONE locally 2026-11-23 (uncommitted): `/delivery-sheets` standalone DRS (Kurir Kota) with courier/driver/nopol/agent, Print DRS | `/delivery-sheet` | D-35; needs Dev 2 review |
-| A5 | Quick Action "Atur Menu" (per-user favourite menu) and "Refresh Quick Action" | Provider dashboard | Per-user setting; only links the user may open |
-| A6 | Mobile check at 375px of all pages | AGENTS.md definition of done | Never done properly (window resize did not work in the browser tool) |
-| A7 | Full menu-by-menu re-audit (Sistem Setting, Kantor, Master Data, Modul, Laporan) | Provider navigation | Only Quick Action and the hidden accounting pages were compared one by one in this session |
+| A5 | ~~Quick Action "Atur Menu"~~ DONE earlier (DASH-01 browser-local selection) | Provider dashboard | Per-user setting; only links the user may open |
+| A6 | ~~Mobile check at 375px of all pages~~ DONE 2026-11-26 (iframe sweep, 0 overflow) | AGENTS.md definition of done | Never done properly (window resize did not work in the browser tool) |
+| A7 | ~~Full menu-by-menu re-audit~~ DONE 2026-11-26 at menu level (page fields not compared one by one) | Provider navigation | Only Quick Action and the hidden accounting pages were compared one by one in this session |
 | A8 | ~~Dashboard insight cards~~ DONE 2026-11-26 (D-44, rule-based, uncommitted) | Provider dashboard | Pengumuman not built (Feature Update dropped) |
 | A9 | Not yet checked: Tutorial System pages | Provider menu "Tutorial System" | We have the in-app help chat (`knowledge.ts`), not tutorial pages |
 | A10 | Not yet checked: customer self-service portal (Report Customer Member: shipments, POD return, invoices, all status) | Digitalindo feature list, provider menu "Report Customer" | Staff-side customer reports exist; customer login not decided |
@@ -68,8 +68,8 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 | # | Item | Notes |
 |---|---|---|
 | K1 | Asset depreciation journal posting | Rule TBD (which account debit / credit); now display only |
-| K2 | Lampiran (attachment upload) on Kasir vouchers | Cloudinary exists for POD photos |
-| K3 | Import / Export Excel (Perkiraan, Assets, Kasir, reports) | Overlaps A1-A3 above |
+| K2 | ~~Lampiran on Kasir vouchers~~ DONE 2026-11-27 (images, max 5 per voucher, migration 20261126000200) | Cloudinary exists for POD photos |
+| K3 | Import / Export Excel: Perkiraan done (A3); Assets / Kasir still open | Overlaps A1-A3 above |
 
 ### Also open from this session
 

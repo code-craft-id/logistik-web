@@ -13,6 +13,13 @@ vi.mock("@/features/finance/actions", () => ({
   financeCommand: vi.fn(),
   financeOptions: vi.fn(),
 }));
+vi.mock("@/features/finance/account-excel-actions", () => ({
+  importAccountsAction: vi.fn(),
+}));
+vi.mock("@/features/finance/voucher-attachment-actions", () => ({
+  addVoucherAttachmentAction: vi.fn(),
+  removeVoucherAttachmentAction: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({
   redirect: (path: string) => {
     throw new Error(`redirect:${path}`);

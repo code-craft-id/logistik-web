@@ -1138,6 +1138,21 @@ describe("Kelola Status Pengiriman", () => {
         })
       ).total,
     ).toBe(0);
+    // Export Excel: same filters as the page, one header row plus data.
+    const XLSX = await import("xlsx");
+    const book = XLSX.read(
+      await list.shipmentStatusWorkbook(inA, {
+        search: `${tag}-STS`,
+        status: "Delivered",
+      }),
+    );
+    const sheetRows = XLSX.utils.sheet_to_json<string[]>(
+      book.Sheets[book.SheetNames[0]],
+      { header: 1 },
+    );
+    expect(sheetRows[0][0]).toBe("AWB No.");
+    expect(sheetRows).toHaveLength(2);
+    expect(sheetRows[1][8]).toBe("Pak Penerima");
     await db.deliveryProof.deleteMany({ where: { transactionId: done.id } });
     await db.branch.delete({ where: { id: stranger.id } });
   });
@@ -1311,6 +1326,29 @@ describe("Import Status Excel", () => {
     expect(() =>
       imp.parseStatusFile(new Uint8Array([1, 2, 3]), "x.png"),
     ).toThrow("file Excel");
+    // Guide sheet first and a note above the header: still parsed.
+    const XL = await import("xlsx");
+    const guided = XL.utils.book_new();
+    XL.utils.book_append_sheet(
+      guided,
+      XL.utils.aoa_to_sheet([["Petunjuk"], ["Status 2 = diterima"]]),
+      "Petunjuk",
+    );
+    XL.utils.book_append_sheet(
+      guided,
+      XL.utils.aoa_to_sheet([
+        ["Catatan di atas judul"],
+        ["AWB No.", "Date", "Received", "Status", "Remarks"],
+        ["FAKE-AWB", "2026-11-18", "Ryan", 2, ""],
+      ]),
+      "Import Status",
+    );
+    const noted = imp.parseStatusFile(
+      new Uint8Array(XL.write(guided, { type: "buffer", bookType: "xlsx" })),
+      "x.xlsx",
+    );
+    expect(noted).toHaveLength(1);
+    expect(noted[0]).toMatchObject({ awbNo: "FAKE-AWB", line: 3 });
   });
 });
 

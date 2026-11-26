@@ -877,3 +877,15 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Speed A/B on the same machine and DB, production builds: baseline HEAD (webpack, :3002) vs new (:3000), second run: /office 536-690 vs 317-321 ms, /transactions 959-1001 vs 543-597 ms, /manifest 783-1147 vs 412-556 ms, /dashboard 776-1217 vs 620 ms (with the extra D-44 queries).
 - Dashboard at 375 px checked in an iframe: no overflow.
 - Hot path: `loadAccessActor` was four sequential Prisma relation queries (user, group, permissions, allowed branches), median 23 ms on the local DB and four DB round trips on Neon, run by every page, action and service. Now one SQL query with json_agg / array_agg (median 6.4 ms locally, one round trip). Unit mocks route that query through `tests/support/actor-query.ts`. lint, typecheck, unit 745/745, integration 217/217 pass.
+
+## 2026-11-27 — remaining buildable parity items
+
+- A1 Status Pengantaran Export Excel (same search / status filters, max 5000 AWB). A2 Hitung Rugi Laba Export (same table layout). A3 Perkiraan Export Excel, Template Import and Import Data (upsert by Kode Akun, one transaction through the account form rules; any bad row saves nothing). K2 Kasir Lampiran (images compressed to WebP in the browser, Cloudinary folder lms/kasir, max 5 per voucher, soft removal; new table fin_journal_attachments, migration 20261126000200).
+- Sandbox session expired, so the Perkiraan template columns were not re-observed; they follow the LMS account form.
+- Still open and needing observation or a business decision: B1-B8, N7, K1, Assets / Kasir Excel (K3), E1 (deferred by owner).
+- Akunting pages moved under /akunting (data-akun, biaya-aktual, cover, arus-kas); old /finance/accounting/* URLs redirect with their query. "Perkiraan" removed from Master Data (not in the real web or sandbox Master Data).
+- Dashboard quick period links: the filter form now remounts per period (it kept old dates with defaultValue on client navigation). Prisma client transaction defaults raised to maxWait 10 s / timeout 20 s (dashboard failed with "Unable to start a transaction" on a busy host; same risk on a waking Neon).
+- Unique business identifiers (migration 20261127000100 with a duplicate guard): agents.code, branches.code, offices.code, departments.code, bookings.booking_no, transactions.awb_no (all branches), charter_invoices.invoice_no, shipment_statuses.code, vehicles.license_plate. Entry AWB refuses a number used by any branch, deleted AWBs included.
+- Rupiah inputs: shared MoneyInput (formats while typing, submits the plain number) on finance fields, Share Truck, AWB / booking prices and fees, Cek Ongkir tariff, debt payment, agent deposit; journal / voucher / invoice line amounts format through moneyText / moneyRaw.
+- Skeleton loading replaces text loaders (menu, profile, master data lists, organization, configuration, WhatsApp).
+- Excel templates: Perkiraan template has a Petunjuk sheet; Perkiraan and Status imports find the header on any sheet within the first 20 rows, so guide sheets and notes may stay.

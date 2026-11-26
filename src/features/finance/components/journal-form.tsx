@@ -4,6 +4,7 @@ import { FormField } from "@/components/patterns/form-field";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
+import { moneyRaw, moneyText } from "@/components/ui/money-input";
 import { CommandForm } from "./command-form";
 
 type Choice = { id: number; name: string };
@@ -116,11 +117,13 @@ export function JournalForm({
               required
               id={`journal-amount-${line.row}`}
               inputMode="decimal"
-              value={line.amount}
+              value={moneyText(line.amount)}
               onChange={(e) =>
                 setLines(
                   lines.map((l) =>
-                    l.row === line.row ? { ...l, amount: e.target.value } : l,
+                    l.row === line.row
+                      ? { ...l, amount: moneyRaw(e.target.value) }
+                      : l,
                   ),
                 )
               }

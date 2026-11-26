@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createAkuntingQueries } from "../../src/features/finance/server/akunting-queries";
 import { createFinanceService } from "../../src/features/finance/server/service";
 import { loadAccessActor } from "../../src/features/identity/server/access";
@@ -16,6 +16,15 @@ process.env.DATABASE_URL = url;
 const db = new PrismaClient({
   adapter: new PrismaPg({ connectionString: url }),
 });
+// Kasir Lampiran tests never upload to Cloudinary.
+vi.mock("../../src/lib/cloudinary", async (actual) => ({
+  ...(await actual<typeof import("../../src/lib/cloudinary")>()),
+  uploadWebp: vi.fn(async () => ({
+    url: "https://example.invalid/fake.webp",
+    publicId: `fake/${Math.random()}`,
+  })),
+  destroyImage: vi.fn(async () => undefined),
+}));
 const tag = `FAKE AKT ${randomUUID().slice(0, 8)}`;
 const ids = {
   company: 0,
@@ -180,6 +189,7 @@ afterAll(async () => {
         `ALTER TABLE ${table} DISABLE TRIGGER ${trigger}`,
       );
     const scope = { branchId: { in: [ids.branch, ids.other] } };
+    await tx.finJournalAttachment.deleteMany({ where: { journal: scope } });
     await tx.finLine.deleteMany({ where: { journal: scope } });
     await tx.finJournal.deleteMany({
       where: { ...scope, reversalOfId: { not: null } },
@@ -251,6 +261,45 @@ describe("Akunting (sandbox) Kas Bank and reports", () => {
     expect(j.lines[0]).toMatchObject({ accountId: acc.cash });
     expect(j.lines[0]?.debit.toFixed(2)).toBe("100000.00");
     expect(j.lines[1]?.memo).toBe("Modal");
+  });
+
+  it("keeps Kasir Lampiran per voucher: branch-scoped, at most 5, soft removal", async () => {
+    const att = await import(
+      "../../src/features/finance/server/voucher-attachments"
+    );
+    const writer = await loadAccessActor(db, ids.users[0]);
+    if (!writer?.group) throw new Error("actor not found");
+    const file = new File([new Uint8Array([1])], "nota.webp", {
+      type: "image/webp",
+    });
+    const first = await att.addVoucherAttachment(writer, cashIn, file);
+    for (let i = 1; i < att.MAX_ATTACHMENTS; i++)
+      await att.addVoucherAttachment(writer, cashIn, file);
+    await expect(
+      att.addVoucherAttachment(writer, cashIn, file),
+    ).rejects.toMatchObject({ status: 409 });
+    const outsider = {
+      ...writer,
+      branchIds: [ids.other],
+      group: {
+        ...writer.group,
+        permissions: writer.group.permissions.filter(
+          (p) => p.resource !== "system_admin",
+        ),
+      },
+    };
+    await expect(
+      att.addVoucherAttachment(outsider, cashIn, file),
+    ).rejects.toMatchObject({ status: 403 });
+    await expect(
+      att.addVoucherAttachment(writer, Number.NaN, file),
+    ).rejects.toMatchObject({ status: 404 });
+    await att.removeVoucherAttachment(writer, first.id);
+    expect(
+      await db.finJournalAttachment.count({
+        where: { journalId: cashIn, deletedAt: null },
+      }),
+    ).toBe(att.MAX_ATTACHMENTS - 1);
   });
 
   it("rejects control accounts, unbalanced direction, missing vendor and another branch's cost centre", async () => {

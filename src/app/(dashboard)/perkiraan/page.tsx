@@ -4,5 +4,5 @@ import { redirect } from "next/navigation";
 // account without Induk; Kategori Akun, Kategori Cashflow and Perkiraan are
 // managed on Akun & kategori.
 export default function Page() {
-  redirect("/finance/accounting/accounts");
+  redirect("/akunting/data-akun");
 }

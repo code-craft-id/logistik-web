@@ -121,7 +121,8 @@ describe("identity server input contracts", () => {
     ).rejects.toMatchObject({
       code: "DUPLICATE",
       status: 409,
-      message: "Username, email, atau nama grup sudah digunakan.",
+      message:
+        "Kode, nomor, username, email atau nama tersebut sudah digunakan. Gunakan nilai lain.",
     });
     await expect(
       identityAction(async () => {

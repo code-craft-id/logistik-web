@@ -863,13 +863,12 @@ export async function createTransaction(
             matchedBy: "awb",
           } as const;
         }
+        // AWB numbers are unique across all branches, deleted AWBs included.
         const existingByAwbAny = await tx.transaction.findFirst({
-          where: {
-            originBranchId: data.originBranchId,
-            awbNo: data.awbNo,
-          },
+          where: { awbNo: data.awbNo },
+          select: { id: true },
         });
-        if (existingByAwbAny?.deletedAt) {
+        if (existingByAwbAny) {
           throw new Error("AWB_ALREADY_USED");
         }
       }

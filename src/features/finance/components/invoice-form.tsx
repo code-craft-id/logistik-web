@@ -5,6 +5,7 @@ import { FormLayout } from "@/components/patterns/form-layout";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
+import { moneyRaw, moneyText } from "@/components/ui/money-input";
 import { financeOptions } from "../actions";
 import { CommandForm } from "./command-form";
 
@@ -246,12 +247,12 @@ export function InvoiceForm({
                         required
                         id={`amount-${index}`}
                         inputMode="decimal"
-                        value={item.amount}
+                        value={moneyText(item.amount)}
                         onChange={(e) =>
                           setItems(
                             items.map((i, n) =>
                               n === index
-                                ? { ...i, amount: e.target.value }
+                                ? { ...i, amount: moneyRaw(e.target.value) }
                                 : i,
                             ),
                           )

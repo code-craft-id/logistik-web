@@ -390,7 +390,12 @@ export function OperationalReportView({
         aria-label="Filter laporan"
         className="rounded-lg border bg-background p-4 sm:p-6"
       >
-        <Form action={route} className="space-y-4">
+        <Form
+          // Remount on a new period so quick links refresh the date fields.
+          key={`${display.startDate}|${display.endDate}|${display.branchId ?? ""}`}
+          action={route}
+          className="space-y-4"
+        >
           {delivery && <input type="hidden" name="view" value={view} />}
           <p
             id="operational-period-hint"

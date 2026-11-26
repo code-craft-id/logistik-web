@@ -93,12 +93,19 @@ export default async function Page({
             </option>
           ))}
         </select>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button type="submit" className="min-h-11">
             Cari
           </Button>
           <Button asChild variant="outline" className="min-h-11">
             <Link href="/customer-service/status-pengantaran">Refresh</Link>
+          </Button>
+          <Button asChild variant="outline" className="min-h-11">
+            <a
+              href={`/customer-service/status-pengantaran/export?${new URLSearchParams({ q: search, status })}`}
+            >
+              Export Excel
+            </a>
           </Button>
         </div>
       </Form>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { EmptyState } from "@/components/patterns/content-state";
 import { FormDialog } from "@/components/patterns/form-dialog";
 import { Button } from "@/components/ui/button";
+import { MoneyInput } from "@/components/ui/money-input";
 import {
   Table,
   TableBody,
@@ -103,15 +104,17 @@ export default async function Page({
                 submitLabel="Tambah Saldo"
               >
                 <input type="hidden" name="agentId" value={agent.id} />
-                <label className="grid gap-1 text-sm font-medium">
-                  Jumlah (Rp)
-                  <input
+                <div className="grid gap-1 text-sm font-medium">
+                  <label htmlFor={`deposit-amount-${agent.id}`}>
+                    Jumlah (Rp)
+                  </label>
+                  <MoneyInput
+                    id={`deposit-amount-${agent.id}`}
                     name="amount"
-                    inputMode="decimal"
                     required
                     className="min-h-11 rounded-md border bg-background px-3"
                   />
-                </label>
+                </div>
                 <label className="grid gap-1 text-sm font-medium">
                   Keterangan
                   <input

@@ -4,6 +4,7 @@ import { FormField } from "@/components/patterns/form-field";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
+import { moneyRaw, moneyText } from "@/components/ui/money-input";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { CommandForm } from "./command-form";
 
@@ -162,8 +163,10 @@ export function VoucherForm({
                 required
                 id={id(`amount-${line.row}`)}
                 inputMode="decimal"
-                value={line.amount}
-                onChange={(e) => update(line.row, { amount: e.target.value })}
+                value={moneyText(line.amount)}
+                onChange={(e) =>
+                  update(line.row, { amount: moneyRaw(e.target.value) })
+                }
               />
             </FormField>
             <FormField id={id(`side-${line.row}`)} label="Posisi">

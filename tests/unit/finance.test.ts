@@ -44,9 +44,11 @@ describe("adopted finance input", () => {
       { resource: "financial_report", action: "view" },
     ];
     const reports = accessibleNavigation(actor);
-    expect(
-      navigationPath("/finance/accounting/reports", reports)?.labels,
-    ).toEqual(["Akunting", "Laporan", "Arus Kas & Gross Profit"]);
+    expect(navigationPath("/akunting/arus-kas", reports)?.labels).toEqual([
+      "Akunting",
+      "Laporan",
+      "Arus Kas & Gross Profit",
+    ]);
     expect(
       navigationDestinations(accessibleNavigation(null)).some(({ item }) =>
         item.href?.startsWith("/finance/"),

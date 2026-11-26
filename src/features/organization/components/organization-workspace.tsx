@@ -2,6 +2,7 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { SearchSelect } from "@/components/patterns/search-select";
 import { Button } from "@/components/ui/button";
 import { ComboSelect } from "@/components/ui/combo-select";
@@ -770,7 +771,7 @@ function OrganizationList({
       )}
       {notice && <output className="text-sm">{notice}</output>}
       {loading ? (
-        <output>Memuat data…</output>
+        <LoadingState label="Memuat data…" />
       ) : error && editing === undefined && !removing ? (
         <Button
           className="min-h-11"

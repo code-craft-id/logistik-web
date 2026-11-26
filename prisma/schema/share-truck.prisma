@@ -99,6 +99,7 @@ model CharterInvoice {
   updatedAt   DateTime     @updatedAt @map("updated_at")
   deletedAt   DateTime?    @map("deleted_at")
 
+  @@unique([invoiceNo])
   @@index([status])
   @@index([createdById])
   @@map("charter_invoices")

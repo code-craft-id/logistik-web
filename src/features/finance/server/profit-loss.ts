@@ -1,5 +1,6 @@
 import "server-only";
 
+import * as XLSX from "xlsx";
 import { z } from "zod";
 import {
   type AccessActor,
@@ -145,4 +146,46 @@ export async function profitLoss(actor: AccessActor, raw: unknown) {
     groups: list,
     total: { month: totalMonth, percent: pct(totalMonth), year: totalYear },
   };
+}
+
+/** Hitung Rugi Laba Export Excel (sandbox button): same layout as the page table. */
+export function profitLossWorkbook(
+  report: Awaited<ReturnType<typeof profitLoss>>,
+  monthLabel: string,
+  year: number,
+) {
+  const n = (v: number) => Number(v.toFixed(2));
+  const pct = (v: number | null) => (v === null ? "nan %" : `${v} %`);
+  const rows: (string | number)[][] = [
+    ["Daftar Rugi Laba"],
+    [`Cost Centre: ${report.costCentre}`],
+    [],
+    ["KODE AKUN", "INDUK", `HASIL ${monthLabel}`, "%", `Current Year ${year}`],
+  ];
+  for (const g of report.groups) {
+    rows.push([g.code ? `${g.code} | ${g.name}` : g.name]);
+    for (const r of g.rows)
+      rows.push([
+        `${r.code} ${r.name}`,
+        r.parent ?? "-",
+        n(r.month),
+        pct(r.percent),
+        n(r.year),
+      ]);
+    rows.push([`TOTAL ${g.name}`, "", n(g.month), pct(g.percent), n(g.year)]);
+  }
+  rows.push([
+    "LABA (RUGI) BERSIH",
+    "",
+    n(report.total.month),
+    pct(report.total.percent),
+    n(report.total.year),
+  ]);
+  const book = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(
+    book,
+    XLSX.utils.aoa_to_sheet(rows),
+    "Rugi Laba",
+  );
+  return XLSX.write(book, { type: "buffer", bookType: "xlsx" }) as Buffer;
 }

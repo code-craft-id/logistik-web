@@ -55,6 +55,7 @@ export function imageKind(bytes: Uint8Array) {
 
 export async function uploadWebp(
   file: File,
+  folder?: string,
 ): Promise<{ url: string; publicId: string }> {
   const cfg = config();
   if (!cfg)
@@ -73,7 +74,7 @@ export async function uploadWebp(
       "File bukan gambar yang didukung (WebP, JPEG atau PNG).",
     );
   const params = {
-    folder: cfg.folder,
+    folder: folder ?? cfg.folder,
     format: "webp",
     timestamp: String(Math.floor(Date.now() / 1000)),
   };

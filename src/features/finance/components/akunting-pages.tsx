@@ -24,6 +24,7 @@ import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
 import { JournalForm } from "./journal-form";
 import { financeEntry, financeLink } from "./pages";
+import { VoucherAttachments } from "./voucher-attachments";
 import { VoucherForm } from "./voucher-form";
 
 /**
@@ -331,6 +332,11 @@ export async function VoucherPage({
               </TableBody>
             </Table>
           </div>
+          <VoucherAttachments
+            journalId={j.id}
+            attachments={j.attachments}
+            canEdit={canCreate}
+          />
           <JournalActions
             journal={j}
             canPost={canPost}
@@ -1643,7 +1649,7 @@ export async function GeneralLedgerMasterPage() {
     >
       {permits(actor, "manage", "finance_account") && (
         <Button asChild className="min-h-11">
-          <Link href="/finance/accounting/accounts">Tambah di Data Akun</Link>
+          <Link href="/akunting/data-akun">Tambah di Data Akun</Link>
         </Button>
       )}
       <div className="overflow-x-auto">
@@ -1698,9 +1704,7 @@ export async function ProfitLossMasterPage() {
     >
       {permits(actor, "manage", "finance_account") && (
         <Button asChild className="min-h-11">
-          <Link href="/finance/accounting/accounts">
-            Tambah / ubah di Data Akun
-          </Link>
+          <Link href="/akunting/data-akun">Tambah / ubah di Data Akun</Link>
         </Button>
       )}
       <div className="overflow-x-auto">

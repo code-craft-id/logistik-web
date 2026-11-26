@@ -54,10 +54,6 @@ export const legacyMenu = [
         href: "/vendor",
       },
       {
-        label: "Perkiraan",
-        href: "/finance/accounting/accounts",
-      },
-      {
         label: "Shipment Status",
         href: "/shipment-status",
       },

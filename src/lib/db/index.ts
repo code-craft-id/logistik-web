@@ -14,6 +14,8 @@ function createClient(): PrismaClient {
 
   return new PrismaClient({
     adapter: new PrismaPg({ connectionString }),
+    // Defaults (2 s wait / 5 s run) fail reports on a waking Neon or a busy host.
+    transactionOptions: { maxWait: 10_000, timeout: 20_000 },
   });
 }
 

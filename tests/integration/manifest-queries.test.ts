@@ -135,23 +135,18 @@ afterAll(async () => {
 });
 
 describe("manifest list/detail queries", () => {
-  it("refuses an AWB number shared by two origin branches", async () => {
+  it("cannot store one AWB number in two origin branches", async () => {
     const [a, b] = ids.branches;
-    const twin = await db.transaction.create({
-      data: { awbNo: `${tag}-1`, originBranchId: b, destinationBranchId: a },
-    });
-    ids.transactions.push(twin.id);
-    try {
-      expect(
-        await queries.findAssignableTransaction(actor([a, b]), `${tag}-1`),
-      ).toBe("AMBIGUOUS");
-      expect(
-        await queries.findAssignableTransaction(actor([a]), `${tag}-2`),
-      ).toMatchObject({ id: ids.transactions[1] });
-    } finally {
-      await db.transaction.delete({ where: { id: twin.id } });
-      ids.transactions.pop();
-    }
+    // AWB numbers are unique across branches (2026-11-27): the database
+    // refuses the twin, so manifest lookups never meet an ambiguous AWB.
+    await expect(
+      db.transaction.create({
+        data: { awbNo: `${tag}-1`, originBranchId: b, destinationBranchId: a },
+      }),
+    ).rejects.toMatchObject({ code: "P2002" });
+    expect(
+      await queries.findAssignableTransaction(actor([a]), `${tag}-2`),
+    ).toMatchObject({ id: ids.transactions[1] });
   });
 
   it("scopes manifests to the actor's branches", async () => {

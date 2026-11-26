@@ -95,3 +95,9 @@ as-is. No new business decision is inferred from the user's feature list.
 - Migration `20261126000100_list_sort_indexes`: name / code indexes for paged master lists (regencies, districts, villages, postal_codes, vendors, customers, consignees). Index-only; rollback = DROP INDEX.
 
 - User (2026-11-26): dashboard money figures are acceptable as long as they come from the database; D-44 accepted for release.
+
+## 2026-11-27 — user requests while away
+
+- Unique codes / numbers listed in RUN_LOG; deleted rows keep their value (existing convention, no partial indexes). Production migration stops before any change if duplicates exist.
+- Akunting submenus live under /akunting; Master Data no longer lists Perkiraan.
+- Menu simplification: proposal only, not applied without the user's approval.

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { EmptyState } from "@/components/patterns/content-state";
+import { MoneyInput } from "@/components/ui/money-input";
 import {
   Table,
   TableBody,
@@ -11,6 +12,7 @@ import {
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
 import { selectClass } from "@/features/modul/components/page-bits";
+import { isMoneyField } from "@/lib/format/money-fields";
 
 /** Signed-in actor with Share Truck view right, or a denial element. */
 export async function shareTruckActor() {
@@ -88,6 +90,19 @@ export function Field({
           ))}
         </select>
       </label>
+    );
+  if (isMoneyField(name))
+    return (
+      <div className={labelClass}>
+        <label htmlFor={`st-${name}`}>{label}</label>
+        <MoneyInput
+          id={`st-${name}`}
+          name={name}
+          required={required}
+          defaultValue={defaultValue}
+          className={selectClass}
+        />
+      </div>
     );
   return (
     <label className={labelClass}>

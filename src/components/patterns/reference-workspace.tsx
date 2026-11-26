@@ -1,6 +1,7 @@
 "use client";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { SearchSelect } from "@/components/patterns/search-select";
 import { Button } from "@/components/ui/button";
 import {
@@ -376,7 +377,7 @@ export function ReferenceWorkspace({
         </p>
       )}
       {loading ? (
-        <output>Memuat data…</output>
+        <LoadingState label="Memuat data…" />
       ) : error && editing === undefined && !removing ? (
         <Button
           className="min-h-11"

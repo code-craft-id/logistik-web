@@ -242,6 +242,7 @@ model Vehicle {
   branch                 Branch?         @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   manifests              Manifest[]
 
+  @@unique([licensePlate])
   @@index([truckingTypeId])
   @@index([branchId])
   @@index([status])
@@ -284,6 +285,7 @@ model ShipmentStatus {
   name      String       @db.VarChar(100)
   status    RecordStatus @default(ACTIVE)
 
+  @@unique([code])
   @@index([status])
   @@map("shipment_statuses")
 }

@@ -1,6 +1,8 @@
 import { FormField } from "@/components/patterns/form-field";
 import { ComboSelect } from "@/components/ui/combo-select";
 import { Input } from "@/components/ui/input";
+import { MoneyInput } from "@/components/ui/money-input";
+import { isMoneyField } from "@/lib/format/money-fields";
 
 export type Choice = { id: number | string; name: string };
 export function FinanceField({
@@ -43,6 +45,14 @@ export function FinanceField({
             </option>
           ))}
         </ComboSelect>
+      ) : isMoneyField(name) ? (
+        <MoneyInput
+          className="min-h-11"
+          id={id}
+          name={name}
+          defaultValue={value}
+          required={!optional}
+        />
       ) : (
         <Input
           className="min-h-11"

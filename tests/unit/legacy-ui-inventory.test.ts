@@ -49,9 +49,9 @@ describe("legacy inventory coverage and presentation routing", () => {
     const finance = navigationDestinations().filter(({ item }) =>
       item.href?.startsWith("/finance/"),
     );
-    // Akunting: Data Akun, Biaya Aktual, Cover, Arus Kas & GP; Master Data >
-    // Perkiraan; Modul > Keuangan: Invoice (New), Invoice, Pembayaran Hutang.
-    expect(finance).toHaveLength(8);
+    // Modul > Keuangan: Invoice (New), Invoice, Pembayaran Hutang. Akunting
+    // pages live under /akunting since 2026-11-27.
+    expect(finance).toHaveLength(3);
     for (const { item } of finance) {
       expect(
         existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),

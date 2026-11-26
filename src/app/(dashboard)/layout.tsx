@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { accessibleNavigation } from "@/components/shell/accessible-navigation";
 import { AppShell } from "@/components/shell/app-shell";
 import { HelpChat } from "@/features/help/components/help-chat";
@@ -12,7 +13,7 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
     <Suspense
       fallback={
         <AppShell groups={[]}>
-          <output>Memuat menu…</output>
+          <LoadingState label="Memuat menu…" />
         </AppShell>
       }
     >

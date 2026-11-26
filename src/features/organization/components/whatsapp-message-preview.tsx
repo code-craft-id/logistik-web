@@ -1,6 +1,7 @@
 "use client";
 import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -204,7 +205,7 @@ function WhatsAppMessages() {
               diisi otomatis dari AWB.
             </DialogDescription>
           </DialogHeader>
-          {!settings && !error && <output>Memuat…</output>}
+          {!settings && !error && <LoadingState label="Memuat…" />}
           {settings && (
             <Tabs.Root defaultValue="transaction">
               <Tabs.List

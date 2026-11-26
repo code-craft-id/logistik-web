@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import {
   type ReferenceApi,
   type ReferenceCapabilities,
@@ -94,7 +95,7 @@ function ConfigurationLoader({
         </Button>
       </div>
     );
-  if (!capabilities) return <output>Memuat konfigurasi…</output>;
+  if (!capabilities) return <LoadingState label="Memuat konfigurasi…" />;
   return (
     <div className="space-y-4">
       {kind !== "vendor_tax" && (
@@ -235,7 +236,7 @@ function CompanySelector({
           onPageChange={setPage}
         />
       </div>
-      {loading && <output>Memuat perusahaan…</output>}
+      {loading && <LoadingState label="Memuat perusahaan…" />}
       {error && (
         <div className="space-y-2">
           <p role="alert" className="text-sm text-destructive">

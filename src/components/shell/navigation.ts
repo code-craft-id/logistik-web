@@ -234,7 +234,7 @@ export const liveRoutes = [
   "/customer-reports/shipments",
   "/customer-reports/pod",
   // Perkiraan (chart of accounts) is served by the FIN-02 accounts page.
-  "/finance/accounting/accounts", // Modul menu entries mirroring the reference; query variants keep each
+  "/akunting/data-akun", // Modul menu entries mirroring the reference; query variants keep each
   // legacy item distinct while landing on the live page that serves it.
   "/marketing?tab=customer",
   "/marketing?tab=consignee",
@@ -324,6 +324,10 @@ export const liveRoutes = [
   "/akunting/neraca",
   "/akunting/buku-besar",
   "/akunting/neraca-saldo",
+  // Akunting pages moved from /finance/accounting (2026-11-27).
+  "/akunting/biaya-aktual",
+  "/akunting/cover",
+  "/akunting/arus-kas",
 ];
 const implemented = new Set<string>([
   ...implementedPreviewRoutes.map((item) => item.href),
@@ -350,7 +354,7 @@ export const navigation: readonly NavigationGroup[] = [
               {
                 label: "Data Akun",
                 providerLabel: "Data Akun",
-                href: "/finance/accounting/accounts",
+                href: "/akunting/data-akun",
               },
               {
                 label: "Assets",
@@ -461,7 +465,7 @@ export const navigation: readonly NavigationGroup[] = [
                   {
                     label: "Biaya Aktual",
                     providerLabel: "Biaya Aktual",
-                    href: "/finance/accounting/costs",
+                    href: "/akunting/biaya-aktual",
                   },
                 ],
               },
@@ -492,12 +496,12 @@ export const navigation: readonly NavigationGroup[] = [
                   {
                     label: "Cover",
                     providerLabel: "Cover",
-                    href: "/finance/accounting/periods",
+                    href: "/akunting/cover",
                   },
                   {
                     label: "Arus Kas & Gross Profit",
                     providerLabel: "Arus Kas & Gross Profit",
-                    href: "/finance/accounting/reports",
+                    href: "/akunting/arus-kas",
                   },
                 ],
               },

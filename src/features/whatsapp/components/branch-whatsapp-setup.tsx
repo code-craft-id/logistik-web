@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,7 +109,7 @@ export function BranchWhatsAppSetupPanel({ companyId }: { companyId: number }) {
         </Button>
       </form>
       {loading ? (
-        <output>Memuat cabang WhatsApp…</output>
+        <LoadingState label="Memuat cabang WhatsApp…" />
       ) : error ? (
         <div className="space-y-3">
           <p role="alert" className="text-sm text-destructive">

@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { ComboSelect } from "@/components/ui/combo-select";
+import { MoneyInput } from "@/components/ui/money-input";
 import { businessDateString } from "@/lib/date/business-date";
+import { isMoneyField } from "@/lib/format/money-fields";
 import { formatRupiah } from "@/lib/format/rupiah";
 import { createBookingAction } from "../actions";
 import { DimensionDialog, modeDivider } from "./dimension-dialog";
@@ -109,6 +111,45 @@ function Text({
   name: string;
   text: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
+  if (isMoneyField(name)) {
+    // Rupiah fields: formatted while typing, plain number submitted.
+    const {
+      value,
+      defaultValue,
+      onChange,
+      type: _t,
+      min: _m,
+      step: _s,
+      ...other
+    } = rest;
+    return (
+      <div className={row}>
+        <label htmlFor={`booking-${name}`} className={label}>
+          {text}
+          {rest.required ? " *" : ""}
+        </label>
+        <MoneyInput
+          {...other}
+          id={`booking-${name}`}
+          name={name}
+          className={field}
+          value={value === undefined ? undefined : String(value)}
+          defaultValue={
+            defaultValue === undefined ? undefined : String(defaultValue)
+          }
+          onValueChange={
+            onChange
+              ? (raw) =>
+                  onChange({
+                    target: { value: raw },
+                    currentTarget: { value: raw },
+                  } as React.ChangeEvent<HTMLInputElement>)
+              : undefined
+          }
+        />
+      </div>
+    );
+  }
   return (
     <div className={row}>
       <label htmlFor={`booking-${name}`} className={label}>
@@ -610,12 +651,9 @@ export function BookingForm({
             </label>
             <div className="grid grid-cols-[1fr_auto] gap-2">
               {manualPrice ? (
-                <input
+                <MoneyInput
                   id="booking-biaya"
                   name="biaya"
-                  type="number"
-                  min="0"
-                  step="0.01"
                   required
                   className={field}
                 />

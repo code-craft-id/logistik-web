@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { currentIdentity } from "@/features/identity/server/context";
 import { ProfilePageClient } from "./profile-client";
 
@@ -13,7 +14,7 @@ async function AuthenticatedProfile() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<output>Memuat profil...</output>}>
+    <Suspense fallback={<LoadingState label="Memuat profil..." />}>
       <AuthenticatedProfile />
     </Suspense>
   );

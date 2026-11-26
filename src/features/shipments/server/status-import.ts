@@ -81,22 +81,37 @@ export function parseStatusFile(bytes: Uint8Array, name: string) {
   } catch {
     throw new ModulError("File tidak bisa dibaca sebagai spreadsheet.");
   }
-  const sheet = book.Sheets[book.SheetNames[0] ?? ""];
-  if (!sheet) throw new ModulError("Sheet pertama tidak ditemukan.");
-  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
-    header: 1,
-    defval: "",
-    raw: true,
-  });
-  const header = (rows[0] ?? []).map((v) => String(v).trim().toLowerCase());
+  // Smart read: any sheet, header within the first 20 rows, so the
+  // Petunjuk sheet and note lines above the header can stay in the file.
   const want = IMPORT_HEADERS.map((h) => h.toLowerCase());
-  if (want.some((h, i) => header[i] !== h))
+  let rows: unknown[][] = [];
+  let at = -1;
+  for (const name of book.SheetNames) {
+    const sheetRows = XLSX.utils.sheet_to_json<unknown[]>(book.Sheets[name], {
+      header: 1,
+      defval: "",
+      raw: true,
+    });
+    at = sheetRows.slice(0, 20).findIndex((r) =>
+      want.every(
+        (h, i) =>
+          String(r[i] ?? "")
+            .trim()
+            .toLowerCase() === h,
+      ),
+    );
+    if (at >= 0) {
+      rows = sheetRows;
+      break;
+    }
+  }
+  if (at < 0)
     throw new ModulError(
       `Kolom harus persis: ${IMPORT_HEADERS.join(" | ")} (unduh Template Import).`,
     );
   const body = rows
-    .slice(1)
-    .map((r, i) => ({ r, line: i + 2 }))
+    .map((r, i) => ({ r, line: i + 1 }))
+    .slice(at + 1)
     .filter(({ r }) => r.some((v) => String(v).trim() !== ""));
   if (body.length > MAX_ROWS)
     throw new ModulError(`Maksimal ${MAX_ROWS} baris per file.`);
@@ -252,12 +267,21 @@ export function statusTemplate() {
   ]);
   sheet["!cols"] = [18, 12, 22, 8, 32].map((wch) => ({ wch }));
   const guide = XLSX.utils.aoa_to_sheet([
-    ["Kode Status", "Arti"],
-    [2, "ACCEPTED / DITERIMA (AWB menjadi Delivered, Received wajib)"],
-    [1, "BACK TO OFFICE / RETUR (AWB menjadi Returned)"],
+    ["Kolom", "Cara mengisi"],
+    ["AWB No.", "Nomor AWB yang sudah ada di sistem (cabang Anda)."],
     [
-      "",
-      "Date = tanggal diterima, format YYYY-MM-DD. Hapus baris contoh sebelum import.",
+      "Date",
+      "Tanggal diterima, format YYYY-MM-DD (contoh 2026-11-19); tidak boleh tanggal masa depan.",
+    ],
+    ["Received", "Nama penerima. Wajib bila Status = 2."],
+    [
+      "Status",
+      "Isi angka: 2 = ACCEPTED / DITERIMA (AWB menjadi Delivered), 1 = BACK TO OFFICE / RETUR (AWB menjadi Returned).",
+    ],
+    ["Remarks", "Catatan, boleh kosong."],
+    [],
+    [
+      "Baris contoh di sheet Import Status boleh diganti. Sheet Petunjuk ini tidak perlu dihapus.",
     ],
   ]);
   guide["!cols"] = [{ wch: 12 }, { wch: 70 }];

@@ -1,6 +1,7 @@
 "use client";
 import { Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import type {
   ReferenceCapabilities,
   ReferenceRow,
@@ -210,7 +211,7 @@ export function CompanySettingEditor({
         </div>
       )}
       {loading ? (
-        <output>Memuat konfigurasi…</output>
+        <LoadingState label="Memuat konfigurasi…" />
       ) : (
         <form
           key={`${selected}:${record?.updatedAt ?? "new"}`}

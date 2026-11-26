@@ -325,6 +325,11 @@ export function createAkuntingQueries(
               orderBy: { id: "asc" },
               include: { account: { select: { code: true, name: true } } },
             },
+            attachments: {
+              where: { deletedAt: null },
+              orderBy: { id: "asc" },
+              select: { id: true, url: true, fileName: true },
+            },
           },
         }),
         db.finJournal.count({ where }),

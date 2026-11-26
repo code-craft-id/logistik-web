@@ -17,6 +17,7 @@ import { formatRupiah } from "@/lib/format/rupiah";
 import { reportInput } from "../accounting-contracts";
 import { costListInput, listInput } from "../contracts";
 import { accountingQueries } from "../server/context";
+import { AccountExcelTools } from "./account-excel-tools";
 import { FinanceBranchField, journalFormChoices } from "./branch-field";
 import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
@@ -46,11 +47,11 @@ const flows = ["OPERATING", "INVESTING", "FINANCING"].map((id) => ({
   name: id,
 }));
 const links = [
-  ["accounts", "Akun & kategori"],
-  ["journals", "Jurnal"],
-  ["costs", "Biaya aktual"],
-  ["periods", "Periode"],
-  ["reports", "P&L, GP & arus kas"],
+  ["/akunting/data-akun", "Akun & kategori"],
+  ["/finance/accounting/journals", "Jurnal"],
+  ["/akunting/biaya-aktual", "Biaya aktual"],
+  ["/akunting/cover", "Periode"],
+  ["/akunting/arus-kas", "P&L, GP & arus kas"],
 ];
 function Workspace({
   title,
@@ -70,11 +71,7 @@ function Workspace({
           Invoice
         </Link>
         {links.map(([path, label]) => (
-          <Link
-            key={path}
-            className={financeLink}
-            href={`/finance/accounting/${path}`}
-          >
+          <Link key={path} className={financeLink} href={path}>
             {label}
           </Link>
         ))}
@@ -307,6 +304,7 @@ export async function AccountsPage({ query }: { query: Query }) {
         ID akun dipakai pada formulir jurnal dan pemetaan. Klasifikasi/kode yang
         dipakai tetap terlindungi; nonaktifkan tanpa menghapus sejarah.
       </p>
+      <AccountExcelTools manage={manage} />
       <Table>
         <TableHeader>
           <TableRow>

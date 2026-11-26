@@ -182,6 +182,7 @@ model Booking {
   deletedAt           DateTime?        @map("deleted_at")
   transactions        Transaction[]
 
+  @@unique([bookingNo])
   @@index([branchId])
   @@index([customerId])
   @@index([status])
@@ -290,6 +291,7 @@ model Transaction {
   whatsappOutbox        WhatsAppOutbox[]
 
   @@unique([originBranchId, awbNo])
+  @@unique([awbNo])
   @@index([originBranchId])
   @@index([destinationBranchId])
   @@index([bookingId])

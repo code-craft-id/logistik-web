@@ -560,6 +560,161 @@ describe("FIN-01 guarded persistence", () => {
   });
 });
 
+describe("Perkiraan Excel export / template / import", () => {
+  it("upserts by Kode Akun in one transaction and rejects a bad row without saving", async () => {
+    const XLSX = await import("xlsx");
+    const excel = await import(
+      "../../src/features/finance/server/account-excel"
+    );
+    const reader = await loadAccessActor(db, users[0]);
+    if (!reader) throw new Error("actor not found");
+    const categoryCode = (
+      await db.finCategory.findUniqueOrThrow({ where: { id: accountCategory } })
+    ).code;
+    const code = `X${randomUUID().slice(0, 8)}`;
+    const file = (rows: (string | number)[][]) => {
+      const book = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(
+        book,
+        XLSX.utils.aoa_to_sheet([[...excel.ACCOUNT_COLUMNS], ...rows]),
+        "Perkiraan",
+      );
+      return new Uint8Array(
+        XLSX.write(book, { type: "buffer", bookType: "xlsx" }) as Buffer,
+      );
+    };
+    const parent = [
+      `${code}-P`,
+      "FAKE Induk",
+      "",
+      "ASSET",
+      categoryCode,
+      "",
+      "",
+      "",
+      "N",
+      "Y",
+      "Y",
+    ];
+    const child = [
+      `${code}-C`,
+      "FAKE Kas",
+      "",
+      "ASSET",
+      categoryCode,
+      `${code}-P`,
+      "",
+      "",
+      "Y",
+      "Y",
+      "Y",
+    ];
+    expect(await excel.importAccounts(reader, file([parent, child]))).toEqual({
+      created: 2,
+      updated: 0,
+    });
+    const saved = await db.finAccount.findMany({
+      where: { code: { startsWith: code } },
+      orderBy: { code: "asc" },
+    });
+    accounts.push(...saved.map((a) => a.id));
+    expect(saved.find((a) => a.code === `${code}-C`)?.parentId).toBe(
+      saved.find((a) => a.code === `${code}-P`)?.id,
+    );
+    expect(
+      await excel.importAccounts(
+        reader,
+        file([[...parent.slice(0, 1), "FAKE Induk Baru", ...parent.slice(2)]]),
+      ),
+    ).toEqual({ created: 0, updated: 1 });
+    // Kas/Bank on a revenue account fails the form rule: nothing is saved.
+    await expect(
+      excel.importAccounts(
+        reader,
+        file([
+          [
+            `${code}-N`,
+            "FAKE Baru",
+            "",
+            "ASSET",
+            categoryCode,
+            "",
+            "",
+            "",
+            "N",
+            "Y",
+            "Y",
+          ],
+          [
+            `${code}-R`,
+            "FAKE Pend",
+            "",
+            "REVENUE",
+            categoryCode,
+            "",
+            "",
+            "",
+            "Y",
+            "Y",
+            "Y",
+          ],
+        ]),
+      ),
+    ).rejects.toThrow("Baris 3: Kas/bank harus akun aset.");
+    expect(
+      await db.finAccount.count({ where: { code: { startsWith: code } } }),
+    ).toBe(2);
+    await expect(
+      excel.importAccounts(reader, file([]).slice(0, 0)),
+    ).rejects.toThrow();
+    // The template keeps its guide sheet and note lines; import still finds the header.
+    const template = XLSX.read(excel.accountTemplate());
+    expect(template.SheetNames).toEqual(["Perkiraan", "Petunjuk"]);
+    const noted = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(noted, template.Sheets.Petunjuk, "Petunjuk");
+    XLSX.utils.book_append_sheet(
+      noted,
+      XLSX.utils.aoa_to_sheet([
+        ["Catatan: isi mulai baris di bawah judul"],
+        [...excel.ACCOUNT_COLUMNS],
+        [
+          `${code}-G`,
+          "FAKE Guide",
+          "",
+          "ASSET",
+          categoryCode,
+          "",
+          "",
+          "",
+          "1",
+          "1",
+          "0",
+        ],
+      ]),
+      "Perkiraan",
+    );
+    expect(
+      await excel.importAccounts(
+        reader,
+        new Uint8Array(
+          XLSX.write(noted, { type: "buffer", bookType: "xlsx" }) as Buffer,
+        ),
+      ),
+    ).toEqual({ created: 1, updated: 0 });
+    const guided = await db.finAccount.findFirstOrThrow({
+      where: { code: `${code}-G` },
+    });
+    accounts.push(guided.id);
+    expect(guided).toMatchObject({ isCash: true, active: false });
+    const exported = XLSX.read(await excel.accountsWorkbook(reader));
+    const rows = XLSX.utils.sheet_to_json<string[]>(exported.Sheets.Perkiraan, {
+      header: 1,
+    });
+    expect(rows[0]).toEqual([...excel.ACCOUNT_COLUMNS]);
+    expect(rows.find((r) => r[0] === `${code}-C`)?.[5]).toBe(`${code}-P`);
+  });
+});
+
 describe("FIN-02 guarded ledger and reconciliation", () => {
   it("serializes issue versus void and rechecks authority inside the critical section", async () => {
     const created = await service().execute(draft(sources[7]));
@@ -850,7 +1005,7 @@ describe("FIN-02 guarded ledger and reconciliation", () => {
     await editAsset({ parentId: "" });
 
     // Hitung Rugi Laba matches the reconciled P&L of the same month.
-    const { profitLoss } = await import(
+    const { profitLoss, profitLossWorkbook } = await import(
       "../../src/features/finance/server/profit-loss"
     );
     const reader = await loadAccessActor(db, users[0]);
@@ -866,6 +1021,27 @@ describe("FIN-02 guarded ledger and reconciliation", () => {
     const group = plReport.groups.find((g) => g.code !== null);
     expect(group).toMatchObject({ name: "FAKE TRX LabaRugi", month: 150000 });
     expect(group?.rows[0]).toMatchObject({ code: revenue.code, percent: 100 });
+    // Export Excel mirrors the table: header row, group rows, net total last.
+    const XLSX = await import("xlsx");
+    const sheet = XLSX.read(profitLossWorkbook(plReport, "Nov'26", 2026))
+      .Sheets["Rugi Laba"];
+    const sheetRows = XLSX.utils.sheet_to_json<(string | number)[]>(sheet, {
+      header: 1,
+    });
+    expect(sheetRows[3]).toEqual([
+      "KODE AKUN",
+      "INDUK",
+      "HASIL Nov'26",
+      "%",
+      "Current Year 2026",
+    ]);
+    expect(sheetRows.at(-1)).toEqual([
+      "LABA (RUGI) BERSIH",
+      "",
+      50000,
+      "33.33 %",
+      50000,
+    ]);
 
     // Opening balance: cash account against equity; once per account and
     // branch until reversed; the P&L is untouched.

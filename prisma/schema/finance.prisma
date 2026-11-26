@@ -178,35 +178,56 @@ model FinMapping {
 }
 
 model FinJournal {
-  id             Int            @id @default(autoincrement())
+  id             Int                    @id @default(autoincrement())
   branchId       Int
-  branch         Branch         @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  accountingDate DateTime       @db.Date
-  status         String         @default("DRAFT") @db.VarChar(6)
-  reference      String         @db.VarChar(160)
-  reason         String         @db.VarChar(500)
-  sourceType     String         @db.VarChar(30)
+  branch         Branch                 @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountingDate DateTime               @db.Date
+  status         String                 @default("DRAFT") @db.VarChar(6)
+  reference      String                 @db.VarChar(160)
+  reason         String                 @db.VarChar(500)
+  sourceType     String                 @db.VarChar(30)
   sourceId       Int?
-  sourceKey      String?        @unique @db.VarChar(100)
-  reversalOfId   Int?           @unique
-  original       FinJournal?    @relation("JournalReversal", fields: [reversalOfId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  reversal       FinJournal?    @relation("JournalReversal")
+  sourceKey      String?                @unique @db.VarChar(100)
+  reversalOfId   Int?                   @unique
+  original       FinJournal?            @relation("JournalReversal", fields: [reversalOfId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reversal       FinJournal?            @relation("JournalReversal")
   mappingId      Int?
-  mapping        FinMapping?    @relation(fields: [mappingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  mapping        FinMapping?            @relation(fields: [mappingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   /// Sandbox Kas Bank / Bukti Jurnal Umum (OBSERVED 2026-11-24): Cost Centre
   /// and the customer / vendor of a cash receipt or payment.
   costCentreId   Int?
-  costCentre     FinCostCentre? @relation(fields: [costCentreId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  costCentre     FinCostCentre?         @relation(fields: [costCentreId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   customerId     Int?
-  customer       Customer?      @relation("FinJournalCustomer", fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  customer       Customer?              @relation("FinJournalCustomer", fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   vendorId       Int?
-  vendor         Vendor?        @relation("FinJournalVendor", fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vendor         Vendor?                @relation("FinJournalVendor", fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   lines          FinLine[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  attachments    FinJournalAttachment[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 
   @@index([branchId, accountingDate, status])
   @@map("fin_journals")
+}
+
+/// Kasir Lampiran (sandbox voucher attachment, OBSERVED 2026-11-24): an
+/// image of the receipt or note stored on Cloudinary. Kept beside the journal
+/// so posted journals stay immutable; removal is a soft delete.
+model FinJournalAttachment {
+  id          Int        @id @default(autoincrement())
+  journalId   Int
+  journal     FinJournal @relation(fields: [journalId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  url         String     @db.VarChar(1024)
+  publicId    String     @db.VarChar(255)
+  fileName    String     @db.VarChar(200)
+  createdById Int
+  createdBy   User       @relation("FinJournalAttachmentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  @@index([journalId])
+  @@map("fin_journal_attachments")
 }
 
 model FinLine {

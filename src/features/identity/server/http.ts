@@ -31,7 +31,10 @@ export async function identityResponse(
       error && typeof error === "object" && "code" in error ? error.code : null;
     if (code === "P2002")
       return privateJson(
-        { message: "Username, email, atau nama grup sudah digunakan." },
+        {
+          message:
+            "Kode, nomor, username, email atau nama tersebut sudah digunakan. Gunakan nilai lain.",
+        },
         409,
       );
     if (code === "P2025")
