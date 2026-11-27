@@ -174,6 +174,7 @@ export function UserManagementPageClient({
     status: "ACTIVE" as Status,
   });
   const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -217,6 +218,7 @@ export function UserManagementPageClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+    setFieldErrors({});
     setSubmitting(true);
 
     try {
@@ -239,6 +241,7 @@ export function UserManagementPageClient({
 
       if (!res.ok) {
         const data = await res.json();
+        setFieldErrors(data.fields ?? {});
         throw new Error(data.message || "Gagal menyimpan");
       }
 
@@ -299,6 +302,7 @@ export function UserManagementPageClient({
       status: "ACTIVE",
     });
     setFormError("");
+    setFieldErrors({});
     setDialogOpen(true);
   };
 
@@ -324,6 +328,7 @@ export function UserManagementPageClient({
     });
     setSelectedGroupLabel(user.group?.name ?? "");
     setFormError("");
+    setFieldErrors({});
     setDialogOpen(true);
   };
 
@@ -572,16 +577,22 @@ export function UserManagementPageClient({
                 : "Buat user dengan username, password, dan grup yang menentukan perannya."}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="space-y-4 py-4">
               {formError && (
                 <div className="text-sm text-destructive" role="alert">
                   {formError}
                 </div>
               )}
-              <FormField id="name" label="Nama Lengkap" error={formError}>
+              <FormField
+                id="name"
+                label="Nama Lengkap"
+                error={fieldErrors.name}
+              >
                 <Input
                   id="name"
+                  aria-invalid={!!fieldErrors.name}
+                  aria-describedby={fieldErrors.name ? "name-error" : undefined}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -591,9 +602,17 @@ export function UserManagementPageClient({
                   disabled={submitting}
                 />
               </FormField>
-              <FormField id="username" label="Username">
+              <FormField
+                id="username"
+                label="Username"
+                error={fieldErrors.username}
+              >
                 <Input
                   id="username"
+                  aria-invalid={!!fieldErrors.username}
+                  aria-describedby={
+                    fieldErrors.username ? "username-error" : undefined
+                  }
                   value={formData.username}
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
@@ -606,9 +625,13 @@ export function UserManagementPageClient({
                   disabled={submitting}
                 />
               </FormField>
-              <FormField id="email" label="Email">
+              <FormField id="email" label="Email" error={fieldErrors.email}>
                 <Input
                   id="email"
+                  aria-invalid={!!fieldErrors.email}
+                  aria-describedby={
+                    fieldErrors.email ? "email-error" : undefined
+                  }
                   type="email"
                   value={formData.email}
                   onChange={(e) =>
@@ -621,6 +644,7 @@ export function UserManagementPageClient({
               </FormField>
               <FormField
                 id="password"
+                error={fieldErrors.password}
                 label={
                   editingUser
                     ? "Password Baru (kosongkan jika tidak diubah)"
@@ -630,6 +654,10 @@ export function UserManagementPageClient({
                 <div className="relative">
                   <Input
                     id="password"
+                    aria-invalid={!!fieldErrors.password}
+                    aria-describedby={
+                      fieldErrors.password ? "password-error" : undefined
+                    }
                     minLength={8}
                     maxLength={128}
                     autoComplete="new-password"
@@ -677,7 +705,7 @@ export function UserManagementPageClient({
                   pages={groupOptions.pages}
                   onPageChange={groupOptions.setPage}
                   loading={groupOptions.loading}
-                  error={groupOptions.error}
+                  error={fieldErrors.groupId || groupOptions.error}
                   onValueChange={(value, label) => {
                     setSelectedGroupLabel(label);
                     setFormData((previous) => ({

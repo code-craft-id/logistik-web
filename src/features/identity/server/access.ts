@@ -24,6 +24,8 @@ export class IdentityError extends Error {
     public status: number,
     message = messages[code] ??
       "Permintaan tidak dapat diproses. Coba lagi; jika berulang, hubungi admin.",
+    /** Message per input field, for showing under the input. */
+    public fields?: Record<string, string>,
   ) {
     super(message);
   }
@@ -98,9 +100,27 @@ export function assertPermission(
 }
 
 /** Lists and direct record lookups use the same bounded branch predicate. */
+/**
+ * The HELP_AI_ADMIN account is hidden from every other user in user
+ * management, so they cannot list, edit, disable or reset it.
+ */
+function notHidden(actor: AccessActor): Prisma.UserWhereInput {
+  const hidden = process.env.HELP_AI_ADMIN?.trim().toLowerCase();
+  return hidden
+    ? {
+        // Keep users without a username: NOT alone would drop them.
+        OR: [
+          { id: actor.id },
+          { username: null },
+          { username: { not: hidden } },
+        ],
+      }
+    : {};
+}
 export function visibleUsers(actor: AccessActor): Prisma.UserWhereInput {
-  if (isAdministrator(actor)) return {};
+  if (isAdministrator(actor)) return notHidden(actor);
   return {
+    AND: [notHidden(actor)],
     allowedBranches: {
       some: { branchId: { in: actor.branchIds } },
       every: { branchId: { in: actor.branchIds } },

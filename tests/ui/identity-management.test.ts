@@ -253,6 +253,35 @@ describe("existing identity frontend wired to persistent data", () => {
     expect(payload).not.toHaveProperty("password");
     expect(payload).not.toHaveProperty("role");
   });
+  it("marks the wrong input and shows its message under it", async () => {
+    await act(async () =>
+      root.render(createElement(UserManagementPageClient, { capabilities })),
+    );
+    await act(async () => button("Edit user").click());
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        message: "FAKE pesan.",
+        fields: { username: "Username minimal 3 karakter" },
+      }),
+    });
+    await act(async () =>
+      document
+        .querySelector("form")
+        ?.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        ),
+    );
+    const input = document.querySelector("input#username");
+    expect(input?.getAttribute("aria-invalid")).toBe("true");
+    expect(document.querySelector("#username-error")?.textContent).toBe(
+      "Username minimal 3 karakter",
+    );
+    expect(
+      document.querySelector("input#name")?.getAttribute("aria-invalid"),
+    ).toBe("false");
+    expect(document.querySelector("#name-error")).toBeNull();
+  });
   it("loads configurable group rights without Refresh and saves a changed action", async () => {
     await act(async () =>
       root.render(createElement(PermissionMatrixPageClient, { capabilities })),

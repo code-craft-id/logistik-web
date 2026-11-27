@@ -2,6 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { IdentityError } from "./access";
+import { inputError } from "./input-error";
 
 function privateJson(body: unknown, status: number) {
   return NextResponse.json(body, {
@@ -17,12 +18,13 @@ export async function identityResponse(
   try {
     return privateJson(await work(), status);
   } catch (error) {
-    if (error instanceof IdentityError)
+    const known = error instanceof ZodError ? inputError(error) : error;
+    if (known instanceof IdentityError)
       return privateJson(
-        { code: error.code, message: error.message },
-        error.status,
+        { code: known.code, message: known.message, fields: known.fields },
+        known.status,
       );
-    if (error instanceof ZodError || error instanceof SyntaxError)
+    if (error instanceof SyntaxError)
       return privateJson(
         { message: "Input tidak valid. Periksa kolom dan pilihan Anda." },
         400,

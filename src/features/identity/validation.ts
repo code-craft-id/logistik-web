@@ -6,15 +6,29 @@ export const identityId = z
   .transform((value) => Number(value))
   .pipe(z.number().int().positive().max(2_147_483_647));
 const status = z.enum(["ACTIVE", "INACTIVE"]);
-const name = z.string().trim().min(1, "Nama wajib diisi").max(100);
+const name = z
+  .string()
+  .trim()
+  .min(1, "Nama wajib diisi")
+  .max(100, "Nama maksimal 100 karakter");
 const username = z
   .string()
   .trim()
-  .min(3)
-  .max(30)
-  .regex(/^[a-zA-Z0-9_.]+$/)
+  .min(3, "Username minimal 3 karakter")
+  .max(30, "Username maksimal 30 karakter")
+  .regex(
+    /^[a-zA-Z0-9_.]+$/,
+    "Username hanya huruf, angka, titik atau garis bawah (tanpa spasi)",
+  )
   .toLowerCase();
-const password = z.string().min(8, "Password minimal 8 karakter").max(128);
+const password = z
+  .string()
+  .min(8, "Password minimal 8 karakter")
+  .max(128, "Password maksimal 128 karakter");
+const email = z
+  .email("Email tidak valid, contoh nama@perusahaan.com")
+  .max(254, "Email maksimal 254 karakter")
+  .toLowerCase();
 const branchIds = z
   .array(identityId)
   .max(100)
@@ -36,7 +50,7 @@ export const userGroupUpdateSchema = z.strictObject({
 export const userCreateSchema = z.strictObject({
   name,
   username,
-  email: z.email().max(254).toLowerCase(),
+  email,
   password,
   groupId: identityId,
   branchIds: branchIds.default([]),
@@ -45,7 +59,7 @@ export const userCreateSchema = z.strictObject({
 export const userUpdateSchema = z.strictObject({
   name: name.optional(),
   username: username.optional(),
-  email: z.email().max(254).toLowerCase().optional(),
+  email: email.optional(),
   password: password.optional(),
   groupId: identityId.optional(),
   branchIds: branchIds.optional(),

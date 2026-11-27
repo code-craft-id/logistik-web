@@ -269,6 +269,32 @@ describe("PLT-01 persistent groups and permission inheritance", () => {
       branchIds: [branches[0]],
     });
   });
+  it("hides the HELP_AI_ADMIN account from other administrators but not from itself", async () => {
+    const hidden = await db.user.findUniqueOrThrow({
+      where: { id: readerId },
+      select: { username: true },
+    });
+    process.env.HELP_AI_ADMIN = String(hidden.username);
+    try {
+      const search = { search: String(hidden.username) };
+      expect((await service(adminId).getUsers(search)).items).toEqual([]);
+      await expect(
+        service(adminId).getUserById(readerId),
+      ).rejects.toMatchObject({ status: 404 });
+      await expect(
+        service(adminId).updateUser(readerId, { password: "FAKE-password-1" }),
+      ).rejects.toMatchObject({ status: 404 });
+      await expect(service(adminId).deleteUser(readerId)).rejects.toMatchObject(
+        {
+          status: 404,
+        },
+      );
+      process.env.HELP_AI_ADMIN = "";
+      expect((await service(adminId).getUsers(search)).items).toHaveLength(1);
+    } finally {
+      delete process.env.HELP_AI_ADMIN;
+    }
+  });
   it("revokes an entire group's permission live and does not infer privileges from its name", async () => {
     await service(adminId).updateUserGroup(readerGroupId, {
       name: `Administrator-${randomUUID().slice(0, 8)}`,
