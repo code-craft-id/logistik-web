@@ -37,13 +37,28 @@ function save(messages: ChatMessage[]) {
     // Storage unavailable (private mode): the chat still works in memory.
   }
 }
+/** AI answer, or null when AI is off or failing. */
+async function askAi(question: string): Promise<string | null> {
+  try {
+    const response = await fetch("/api/help", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+    return response.ok ? ((await response.json()).answer ?? null) : null;
+  } catch {
+    return null;
+  }
+}
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-/** Floating feature-help chat; answers come from the local knowledge file. */
+/** Floating feature-help chat: AI answer, else the local knowledge file. */
 export function HelpChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [pending, setPending] = useState(false);
+  const busy = useRef(false);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLOListElement>(null);
 
@@ -66,12 +81,21 @@ export function HelpChat() {
       list.current?.lastElementChild?.scrollIntoView({ block: "end" });
   }, [open, count]);
 
-  function ask(question: string) {
+  async function ask(question: string) {
     const text = question.trim().slice(0, 300);
-    if (!text) return;
+    if (!text || busy.current) return;
+    busy.current = true;
+    setPending(true);
+    setDraft("");
+    const asked = Date.now();
+    setMessages((current) => [
+      ...freshMessages(current, asked),
+      { id: newId(), role: "user", text, at: asked },
+    ]);
+    const ai = await askAi(text);
     const now = Date.now();
     const matches = searchHelp(text);
-    const reply: ChatMessage = matches.length
+    const local: ChatMessage = matches.length
       ? {
           id: newId(),
           role: "assistant",
@@ -92,12 +116,12 @@ export function HelpChat() {
           at: now,
           text: "Maaf, saya belum menemukan penjelasannya. Coba kata lain, misalnya: AWB, manifest, DRS, invoice, laporan, customer, hak akses.",
         };
-    setMessages((current) => [
-      ...freshMessages(current, now),
-      { id: newId(), role: "user", text, at: now },
-      reply,
-    ]);
-    setDraft("");
+    const reply: ChatMessage = ai
+      ? { id: newId(), role: "assistant", at: now, text: ai }
+      : local;
+    setMessages((current) => [...freshMessages(current, now), reply]);
+    busy.current = false;
+    setPending(false);
   }
 
   return (
@@ -136,7 +160,10 @@ export function HelpChat() {
           >
             {messages.length === 0 && (
               <li className="space-y-2 text-muted-foreground">
-                <p>Tanyakan cara memakai fitur LMS. Contoh pertanyaan:</p>
+                <p>
+                  Tanyakan cara memakai fitur LMS (jangan tulis data pribadi).
+                  Contoh pertanyaan:
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTIONS.map((s) => (
                     <button
@@ -174,6 +201,11 @@ export function HelpChat() {
                 )}
               </li>
             ))}
+            {pending && (
+              <li className="mr-4 rounded-lg bg-muted px-3 py-2 text-muted-foreground">
+                Mengetik…
+              </li>
+            )}
           </ol>
           <form
             className="flex gap-2 border-t p-3"
@@ -195,6 +227,7 @@ export function HelpChat() {
               type="submit"
               size="icon"
               aria-label="Kirim"
+              disabled={pending}
               className="min-h-10 min-w-10"
             >
               <Send className="size-4" aria-hidden="true" />

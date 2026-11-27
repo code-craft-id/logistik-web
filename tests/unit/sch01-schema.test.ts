@@ -109,6 +109,8 @@ describe("SCH-01 preservation and adapter contract", () => {
           // never deleted); the outbox is a delivery log.
           "WhatsAppTemplate",
           "WhatsAppOutbox",
+          // Single configuration row, edited in place.
+          "HelpAiSetting",
           ...noSoftDelete,
         ].includes(name)
       ) {

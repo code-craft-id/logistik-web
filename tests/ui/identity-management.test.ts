@@ -275,6 +275,20 @@ describe("existing identity frontend wired to persistent data", () => {
       ],
     });
   });
+  it("ticks and clears every action of one menu with the Semua checkbox", async () => {
+    await act(async () =>
+      root.render(createElement(PermissionMatrixPageClient, { capabilities })),
+    );
+    const box = (label: string) =>
+      document.querySelector<HTMLButtonElement>(
+        `[aria-label="${label} Manajemen User — FAKE Viewer"]`,
+      );
+    for (const state of ["true", "false"]) {
+      await act(async () => box("Semua")?.click());
+      expect(box("Lihat")?.getAttribute("aria-checked")).toBe(state);
+      expect(box("Tambah")?.getAttribute("aria-checked")).toBe(state);
+    }
+  });
   it("does not show mutation controls to a read-only group", async () => {
     await act(async () => root.render(createElement(UserGroupPageClient)));
     expect(

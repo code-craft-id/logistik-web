@@ -13,6 +13,13 @@ export type HelpEntry = {
 
 export const helpEntries: HelpEntry[] = [
   {
+    id: "help-chat",
+    title: "Bantuan fitur (chat)",
+    keywords: ["bantuan", "chat", "asisten", "tanya ai"],
+    answer:
+      "Tombol headset di kanan bawah membuka Bantuan fitur. Bila admin server mengaktifkan AI, jawaban disusun AI sesuai hak akses grup Anda; bila AI tidak aktif atau gagal, jawaban diambil dari penjelasan bawaan. Pertanyaan dikirim ke penyedia AI, jadi jangan tulis data pribadi. Riwayat chat terhapus otomatis setelah 10 menit.",
+  },
+  {
     id: "dashboard",
     title: "Dashboard",
     keywords: [
@@ -489,7 +496,7 @@ export const helpEntries: HelpEntry[] = [
       "lonceng",
     ],
     answer:
-      "Menu dan halaman mengikuti hak grup di Sistem Setting > Hak Akses Menu (kolom Lihat, Tambah, Ubah, Hapus, Setujui, Ajukan, Ekspor, Pakai, dll). Bila hak kurang, halaman menampilkan Akses ditolak beserta hak yang dibutuhkan; data cabang lain tampil sebagai Data tidak ditemukan. Lonceng di kanan atas menunjukkan jumlah Persetujuan Edit/delete AWB dan POD Kembali yang menunggu keputusan Anda (diperbarui tiap pindah halaman dan setiap menit).",
+      "Menu dan halaman mengikuti hak grup di Sistem Setting > Hak Akses Menu (kolom Lihat, Tambah, Ubah, Hapus, Setujui, Ajukan, Ekspor, Pakai, dll). Bila hak kurang, halaman menampilkan Akses ditolak beserta hak yang dibutuhkan; data cabang lain tampil sebagai Data tidak ditemukan. Lonceng di kanan atas menunjukkan jumlah Persetujuan Edit/delete AWB dan POD Kembali yang menunggu keputusan Anda (diperbarui saat pindah halaman, paling sering tiap 15 detik, dan setiap menit).",
     href: "/hak-akses-menu",
   },
   {
@@ -887,7 +894,7 @@ export const helpEntries: HelpEntry[] = [
       "akses ditolak",
     ],
     answer:
-      "Sistem Setting: Grup User, Manajemen User dan Hak Akses Menu. Hak akses diberikan per grup (lihat, tambah, ubah, hapus, export) dan dibatasi cabang yang ditugaskan ke user. Menu yang tidak boleh dibuka tidak tampil; 'Akses ditolak' berarti grup Anda belum punya hak tersebut.",
+      "Sistem Setting: Grup User, Manajemen User dan Hak Akses Menu. Hak akses diberikan per grup (lihat, tambah, ubah, hapus, export) dan dibatasi cabang yang ditugaskan ke user. Di Hak Akses Menu, centang kolom Semua pada baris menu untuk langsung memberi Lihat, Tambah, Ubah dan Hapus (yang tersedia untuk menu itu), lalu klik Simpan Perubahan. Menu yang tidak boleh dibuka tidak tampil; 'Akses ditolak' berarti grup Anda belum punya hak tersebut.",
     href: "/group-user",
   },
   {

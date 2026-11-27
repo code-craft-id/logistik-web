@@ -138,17 +138,20 @@ const routeResources: Record<string, readonly string[]> = {
   "/shipment-status": ["shipment_status"],
 };
 
+/** Whether the actor may view the page behind a menu href. */
+export function canViewPath(actor: AccessActor | null, href: string) {
+  return !!routeResources[href.split("?")[0]]?.some(
+    (resource) =>
+      permits(actor, "view", resource) &&
+      (resource !== "vendor_tax" || isAdministrator(actor)),
+  );
+}
+
 export function accessibleNavigation(
   actor: AccessActor | null,
 ): NavigationGroup[] {
   const showInventory = isAdministrator(actor);
-  const allowed = (href?: string) =>
-    !!href &&
-    !!routeResources[href.split("?")[0]]?.some(
-      (resource) =>
-        permits(actor, "view", resource) &&
-        (resource !== "vendor_tax" || isAdministrator(actor)),
-    );
+  const allowed = (href?: string) => !!href && canViewPath(actor, href);
   const visibleLeaf = (item: NavigationLeaf): NavigationLeaf => {
     const { href, ...presentation } = item;
     return allowed(href) ? item : presentation;

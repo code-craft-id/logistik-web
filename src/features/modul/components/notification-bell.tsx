@@ -3,7 +3,7 @@
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,28 +14,31 @@ import {
 import { pendingApprovalsAction } from "../notification-actions";
 
 const REFRESH_MS = 60_000;
+// Page changes refetch at most this often.
+const NAV_MIN_MS = 15_000;
 
 /**
- * Header bell with pending approval counts. Refreshed on every page change
- * and every minute while the tab is visible (no websocket needed).
+ * Header bell with pending approval counts. Refreshed on page change (at
+ * most every 15 s) and every minute while the tab is visible (no websocket needed).
  */
 export function NotificationBell() {
   const pathname = usePathname();
   const [counts, setCounts] = useState({ awbChanges: 0, podReturns: 0 });
+  const lastLoad = useRef(0);
   // biome-ignore lint/correctness/useExhaustiveDependencies: refetch on navigation
   useEffect(() => {
-    let alive = true;
     const load = () => {
       if (document.visibilityState !== "visible") return;
+      lastLoad.current = Date.now();
+      // No cancel on navigation: the throttle would not refetch a dropped result.
       pendingApprovalsAction()
-        .then((next) => alive && setCounts(next))
+        .then(setCounts)
         .catch(() => undefined);
     };
-    load();
+    if (Date.now() - lastLoad.current >= NAV_MIN_MS) load();
     const timer = window.setInterval(load, REFRESH_MS);
     document.addEventListener("visibilitychange", load);
     return () => {
-      alive = false;
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", load);
     };
