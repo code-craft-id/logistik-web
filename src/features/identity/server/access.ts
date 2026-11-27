@@ -13,7 +13,8 @@ const messages: Record<string, string> = {
   FORBIDDEN_BRANCH: "Cabang berada di luar cakupan Anda.",
   NOT_FOUND: "Data tidak ditemukan.",
   CONFLICT: "Data telah berubah. Muat data terbaru dan coba kembali.",
-  INVALID_PARENT: "Induk data tidak tersedia.",
+  INVALID_PARENT:
+    "Data induk (misalnya kantor atau perusahaan) tidak ditemukan atau tidak aktif.",
   INVALID_REFERENCE: "Pilihan terkait tidak tersedia.",
   IN_USE: "Data masih digunakan oleh data lain.",
 };
@@ -21,7 +22,8 @@ export class IdentityError extends Error {
   constructor(
     public code: string,
     public status: number,
-    message = messages[code] ?? "Permintaan tidak dapat diproses.",
+    message = messages[code] ??
+      "Permintaan tidak dapat diproses. Coba lagi; jika berulang, hubungi admin.",
   ) {
     super(message);
   }
@@ -32,42 +34,51 @@ export async function loadAccessActor(
   db: Prisma.TransactionClient,
   userId: number,
 ): Promise<AccessActor | null> {
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      status: true,
-      group: {
-        select: {
-          id: true,
-          name: true,
-          status: true,
-          deletedAt: true,
-          permissions: { select: { resource: true, action: true } },
-        },
-      },
-      allowedBranches: {
-        where: {
-          branch: {
-            status: "ACTIVE",
-            deletedAt: null,
-            office: {
-              status: "ACTIVE",
-              deletedAt: null,
-              company: { deletedAt: null },
-            },
-          },
-        },
-        select: { branchId: true },
-      },
-    },
-  });
-  if (!user) return null;
+  // One round trip (was four sequential Prisma relation queries); runs on every request.
+  const [row] = await db.$queryRaw<
+    {
+      id: number;
+      status: string;
+      group_id: number | null;
+      group_name: string | null;
+      group_status: string | null;
+      group_deleted_at: Date | null;
+      permissions: { resource: string; action: string }[];
+      branch_ids: number[];
+    }[]
+  >`
+    SELECT u.id, u.status::text AS status,
+           g.id AS group_id, g.name AS group_name,
+           g.status::text AS group_status, g.deleted_at AS group_deleted_at,
+           COALESCE((SELECT json_agg(json_build_object('resource', p.resource, 'action', p.action) ORDER BY p.id)
+                     FROM permissions p WHERE p.group_id = g.id), '[]'::json) AS permissions,
+           COALESCE((SELECT array_agg(ub.branch_id ORDER BY ub.id)
+                     FROM user_allowed_branches ub
+                     JOIN branches b ON b.id = ub.branch_id
+                     JOIN offices o ON o.id = b.office_id
+                     JOIN companies c ON c.id = o.company_id
+                     WHERE ub.user_id = u.id
+                       AND b.status = 'ACTIVE' AND b.deleted_at IS NULL
+                       AND o.status = 'ACTIVE' AND o.deleted_at IS NULL
+                       AND c.deleted_at IS NULL), '{}') AS branch_ids
+    FROM auth_users u
+    LEFT JOIN user_groups g ON g.id = u.group_id
+    WHERE u.id = ${userId}`;
+  if (!row) return null;
   return {
-    id: user.id,
-    status: user.status,
-    group: user.group,
-    branchIds: user.allowedBranches.map((entry) => entry.branchId),
+    id: row.id,
+    status: row.status,
+    group:
+      row.group_id === null
+        ? null
+        : {
+            id: row.group_id,
+            name: row.group_name ?? "",
+            status: row.group_status ?? "",
+            deletedAt: row.group_deleted_at,
+            permissions: row.permissions,
+          },
+    branchIds: row.branch_ids,
   };
 }
 

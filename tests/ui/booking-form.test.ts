@@ -7,6 +7,11 @@ const { createBookingActionMock } = vi.hoisted(() => ({
   createBookingActionMock: vi.fn(),
 }));
 
+// The form refreshes server data (next suggested number) after saving.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+}));
+
 vi.mock("../../src/features/bookings/actions", () => ({
   createBookingAction: (...args: unknown[]) => createBookingActionMock(...args),
 }));
@@ -57,7 +62,7 @@ describe("BookingForm", () => {
       expect(createBookingActionMock).toHaveBeenCalled();
       const alert = host.querySelector('[role="alert"]');
       expect(alert?.textContent).toContain(
-        "Anda tidak memiliki akses ke cabang yang dipilih.",
+        "Anda tidak punya akses ke cabang atau customer yang dipilih.",
       );
     });
     expect(host.querySelector("output")).toBeNull();

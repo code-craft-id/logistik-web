@@ -1,0 +1,377 @@
+// Adopted FIN-01/FIN-02 target. Posted history is immutable, not soft-deleted.
+model FinInvoice {
+  id           Int              @id @default(autoincrement())
+  branchId     Int
+  branch       Branch           @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  customerId   Int
+  customer     Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status       String           @default("DRAFT") @db.VarChar(10)
+  revision     Int              @default(1)
+  currency     String           @default("IDR") @db.VarChar(3)
+  invoiceDate  DateTime         @db.Date
+  dueDate      DateTime         @db.Date
+  total        Decimal          @db.Decimal(15, 2)
+  number       String?          @unique
+  snapshot     Json?
+  /// Serah terima faktur (owner decision 2026-11-19): when and to whom the
+  /// customer received the invoice; feeds Report AR. Not a financial field.
+  handoverDate DateTime?        @db.Date
+  handoverTo   String?          @db.VarChar(150)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  items        FinInvoiceItem[]
+  reservations FinReservation[]
+  receipts     FinReceipt[]
+
+  @@index([branchId, invoiceDate, status])
+  @@map("fin_invoices")
+}
+
+model FinInvoiceItem {
+  id            Int         @id @default(autoincrement())
+  invoiceId     Int
+  invoice       FinInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transactionId Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount        Decimal     @db.Decimal(15, 2)
+
+  @@unique([invoiceId, transactionId])
+  @@map("fin_invoice_items")
+}
+
+model FinReservation {
+  transactionId Int         @id
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  invoiceId     Int
+  invoice       FinInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([invoiceId])
+  @@map("fin_reservations")
+}
+
+model FinReceipt {
+  id           Int         @id @default(autoincrement())
+  invoiceId    Int
+  invoice      FinInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount       Decimal     @db.Decimal(15, 2)
+  receivedDate DateTime    @db.Date
+  method       String      @db.VarChar(80)
+  reference    String      @db.VarChar(160)
+  note         String      @db.VarChar(500)
+  reversalOfId Int?        @unique
+  original     FinReceipt? @relation("ReceiptReversal", fields: [reversalOfId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reversal     FinReceipt? @relation("ReceiptReversal")
+  createdAt    DateTime    @default(now())
+
+  @@index([invoiceId])
+  @@map("fin_receipts")
+}
+
+// Immutable actor-scoped idempotency and audit record, committed with its result.
+model FinCommand {
+  id        Int      @id @default(autoincrement())
+  actorId   Int
+  actor     User     @relation(fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  key       String   @db.VarChar(64)
+  action    String   @db.VarChar(60)
+  branchId  Int?
+  branch    Branch?  @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  payload   Json
+  result    Json
+  createdAt DateTime @default(now())
+
+  @@unique([actorId, key])
+  @@index([branchId, createdAt])
+  @@map("fin_commands")
+}
+
+model FinCategory {
+  id        Int          @id @default(autoincrement())
+  code      String       @unique @db.VarChar(30)
+  name      String       @db.VarChar(100)
+  kind      String       @db.VarChar(10)
+  flowClass String?      @db.VarChar(12)
+  active    Boolean      @default(true)
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  accounts  FinAccount[]
+  lines     FinLine[]
+
+  @@map("fin_categories")
+}
+
+model FinAccount {
+  id                 Int                @id @default(autoincrement())
+  code               String             @unique @db.VarChar(30)
+  name               String             @db.VarChar(100)
+  kind               String             @db.VarChar(10)
+  normalBalance      String             @db.VarChar(6)
+  isCash             Boolean            @default(false)
+  categoryId         Int
+  category           FinCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Perkiraan fields as in the provider's hidden Edit Perkiraan form
+  /// (OBSERVED 2026-11-19), simplified by owner decision: Induk replaces
+  /// Ledger and Parent/Child; Posisi and Operator Rugi Laba follow kind.
+  initial            String?            @db.VarChar(20)
+  parentId           Int?
+  parent             FinAccount?        @relation("AccountParent", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  children           FinAccount[]       @relation("AccountParent")
+  visible            Boolean            @default(true)
+  plCategoryId       Int?
+  plCategory         FinPlCategory?     @relation(fields: [plCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Cost centre; null = Nasional.
+  branchId           Int?
+  branch             Branch?            @relation("FinAccountBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  active             Boolean            @default(true)
+  deletedAt          DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  lines              FinLine[]
+  assetCategories    FinAssetCategory[] @relation("AssetCategoryAccount")
+  assetCounterparts  FinAssetCategory[] @relation("AssetCategoryCounter")
+  bankStatements     FinBankStatement[]
+  receivableMappings FinMapping[]       @relation("MappingReceivable")
+  revenueMappings    FinMapping[]       @relation("MappingRevenue")
+  costMappings       FinMapping[]       @relation("MappingCost")
+  liabilityMappings  FinMapping[]       @relation("MappingLiability")
+
+  @@index([kind, active])
+  @@index([parentId])
+  @@index([plCategoryId])
+  @@map("fin_accounts")
+}
+
+/// Kategori Rugi Laba (provider "Rugi Laba" master, e.g. Test | TRX
+/// LabaRugi): groups revenue and expense accounts in Hitung Rugi Laba.
+model FinPlCategory {
+  id        Int          @id @default(autoincrement())
+  code      String       @unique @db.VarChar(30)
+  name      String       @db.VarChar(100)
+  active    Boolean      @default(true)
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  accounts  FinAccount[]
+
+  @@map("fin_pl_categories")
+}
+
+// Append-only mapping versions. Journals pin the version used.
+model FinMapping {
+  id           Int          @id @default(autoincrement())
+  branchId     Int
+  branch       Branch       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  receivableId Int
+  receivable   FinAccount   @relation("MappingReceivable", fields: [receivableId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  revenueId    Int
+  revenue      FinAccount   @relation("MappingRevenue", fields: [revenueId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  costId       Int
+  cost         FinAccount   @relation("MappingCost", fields: [costId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  liabilityId  Int
+  liability    FinAccount   @relation("MappingLiability", fields: [liabilityId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt    DateTime     @default(now())
+  journals     FinJournal[]
+
+  @@index([branchId, id])
+  @@map("fin_mappings")
+}
+
+model FinJournal {
+  id             Int                    @id @default(autoincrement())
+  branchId       Int
+  branch         Branch                 @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountingDate DateTime               @db.Date
+  status         String                 @default("DRAFT") @db.VarChar(6)
+  reference      String                 @db.VarChar(160)
+  reason         String                 @db.VarChar(500)
+  sourceType     String                 @db.VarChar(30)
+  sourceId       Int?
+  sourceKey      String?                @unique @db.VarChar(100)
+  reversalOfId   Int?                   @unique
+  original       FinJournal?            @relation("JournalReversal", fields: [reversalOfId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reversal       FinJournal?            @relation("JournalReversal")
+  mappingId      Int?
+  mapping        FinMapping?            @relation(fields: [mappingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Sandbox Kas Bank / Bukti Jurnal Umum (OBSERVED 2026-11-24): Cost Centre
+  /// and the customer / vendor of a cash receipt or payment.
+  costCentreId   Int?
+  costCentre     FinCostCentre?         @relation(fields: [costCentreId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  customerId     Int?
+  customer       Customer?              @relation("FinJournalCustomer", fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vendorId       Int?
+  vendor         Vendor?                @relation("FinJournalVendor", fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  lines          FinLine[]
+  attachments    FinJournalAttachment[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([branchId, accountingDate, status])
+  @@map("fin_journals")
+}
+
+/// Kasir Lampiran (sandbox voucher attachment, OBSERVED 2026-11-24): an
+/// image of the receipt or note stored on Cloudinary. Kept beside the journal
+/// so posted journals stay immutable; removal is a soft delete.
+model FinJournalAttachment {
+  id          Int        @id @default(autoincrement())
+  journalId   Int
+  journal     FinJournal @relation(fields: [journalId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  url         String     @db.VarChar(1024)
+  publicId    String     @db.VarChar(255)
+  fileName    String     @db.VarChar(200)
+  createdById Int
+  createdBy   User       @relation("FinJournalAttachmentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  @@index([journalId])
+  @@map("fin_journal_attachments")
+}
+
+model FinLine {
+  id                 Int          @id @default(autoincrement())
+  journalId          Int
+  journal            FinJournal   @relation(fields: [journalId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  accountId          Int
+  account            FinAccount   @relation(fields: [accountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  debit              Decimal      @default(0) @db.Decimal(15, 2)
+  credit             Decimal      @default(0) @db.Decimal(15, 2)
+  transactionId      Int?
+  transaction        Transaction? @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  cashflowCategoryId Int?
+  cashflowCategory   FinCategory? @relation(fields: [cashflowCategoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  /// Per-line Keterangan of the sandbox cash vouchers.
+  memo               String?      @db.VarChar(500)
+  snapshot           Json
+
+  @@index([accountId])
+  @@index([transactionId])
+  @@map("fin_lines")
+}
+
+model FinCostState {
+  transactionId Int         @id
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  branchId      Int
+  branch        Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  finalized     Boolean     @default(false)
+  evidence      String      @db.VarChar(500)
+  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime    @default(now())
+  costs         FinCost[]
+
+  @@index([branchId, finalized])
+  @@map("fin_cost_states")
+}
+
+model FinCost {
+  id                Int          @id @default(autoincrement())
+  transactionId     Int
+  source            FinCostState @relation(fields: [transactionId], references: [transactionId], onDelete: Restrict, onUpdate: Restrict)
+  amount            Decimal      @db.Decimal(15, 2)
+  accountingDate    DateTime     @db.Date
+  supplierReference String       @db.VarChar(160)
+  reason            String       @db.VarChar(500)
+  reversalOfId      Int?         @unique
+  original          FinCost?     @relation("CostReversal", fields: [reversalOfId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  reversal          FinCost?     @relation("CostReversal")
+  createdAt         DateTime     @default(now())
+
+  @@index([transactionId, accountingDate])
+  @@map("fin_costs")
+}
+
+model FinClosedPeriod {
+  id        Int      @id @default(autoincrement())
+  branchId  Int
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  month     String   @db.VarChar(7)
+  createdAt DateTime @default(now())
+
+  @@unique([branchId, month])
+  @@map("fin_closed_periods")
+}
+
+/// Sandbox Akunting > Master > Cost Centre (OBSERVED 2026-11-24):
+/// Kode, Nama, Cabang, Status.
+model FinCostCentre {
+  id        Int          @id @default(autoincrement())
+  code      String       @unique @db.VarChar(30)
+  name      String       @db.VarChar(100)
+  branchId  Int
+  branch    Branch       @relation("FinCostCentreBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  active    Boolean      @default(true)
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  journals  FinJournal[]
+
+  @@index([branchId])
+  @@map("fin_cost_centres")
+}
+
+/// Sandbox Akunting > Master > Kategori Assets: Nama, COA, COA Lawan.
+model FinAssetCategory {
+  id               Int        @id @default(autoincrement())
+  name             String     @db.VarChar(100)
+  accountId        Int
+  account          FinAccount @relation("AssetCategoryAccount", fields: [accountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  counterAccountId Int
+  counterAccount   FinAccount @relation("AssetCategoryCounter", fields: [counterAccountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  active           Boolean    @default(true)
+  deletedAt        DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  assets           FinAsset[]
+
+  @@map("fin_asset_categories")
+}
+
+/// Sandbox Akunting > Assets: Jenis Aktiva, Kategori, Unit, Tgl Perolehan,
+/// Hrg Perolehan, Kel, Penambahan, Pengurangan, Masa (Bulan), Keterangan.
+/// Register only: straight-line depreciation is computed for display.
+model FinAsset {
+  id         Int              @id @default(autoincrement())
+  name       String           @db.VarChar(150)
+  categoryId Int
+  category   FinAssetCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  branchId   Int?
+  branch     Branch?          @relation("FinAssetBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  units      Int              @default(1)
+  acquiredOn DateTime         @db.Date
+  cost       Decimal          @db.Decimal(15, 2)
+  groupLabel String?          @db.VarChar(30)
+  additions  Decimal          @default(0) @db.Decimal(15, 2)
+  reductions Decimal          @default(0) @db.Decimal(15, 2)
+  lifeMonths Int
+  note       String?          @db.VarChar(500)
+  deletedAt  DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([categoryId])
+  @@index([branchId])
+  @@map("fin_assets")
+}
+
+/// Sandbox Akunting > Kas Bank > Rekonsiliasi Bank (Kas & Bank): the bank
+/// statement balance entered per cash/bank account and date, compared with
+/// the system balance.
+model FinBankStatement {
+  id            Int        @id @default(autoincrement())
+  accountId     Int
+  account       FinAccount @relation(fields: [accountId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  branchId      Int
+  branch        Branch     @relation("FinBankStatementBranch", fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  statementDate DateTime   @db.Date
+  bankBalance   Decimal    @db.Decimal(15, 2)
+  note          String?    @db.VarChar(500)
+  deletedAt     DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([accountId, branchId, statementDate])
+  @@map("fin_bank_statements")
+}

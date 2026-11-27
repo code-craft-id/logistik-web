@@ -105,4 +105,4 @@ Existing local `.agents/`, `.codex/`, `.impeccable/config.local.json` and hook a
 
 ## Remaining acceptance work
 
-Supply provider menu evidence and verify navigation parity under D-29. Resolve existing repository-wide lint failures in separate maintenance scope. Perform staging smoke test and obtain human feature-owner review. D-19 remains open without blocking these policy-neutral presentation examples. No other roadmap ticket was started; no commit, push or deployment was performed.
+Supply provider menu evidence and verify navigation parity under D-29. Resolve existing repository-wide lint failures in separate maintenance scope. Perform staging smoke test and obtain human feature-owner review. At the time of this note, D-19 was open and did not block these presentation examples; project owner later confirmed the system-wide Asia/Jakarta policy on 2026-11-21. No other roadmap ticket was started; no commit, push or deployment was performed.

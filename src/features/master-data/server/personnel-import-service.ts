@@ -65,7 +65,11 @@ export function createPersonnelImportService(
     const branches = await tx.branch.findMany({
       where: {
         ...branchScope(current),
+        // The branch column accepts the branch ID, code or name.
         OR: branchNames.flatMap((name) => [
+          ...(/^\d{1,9}$/.test(name.trim())
+            ? [{ id: Number(name.trim()) }]
+            : []),
           { code: { equals: name, mode: "insensitive" as const } },
           { name: { equals: name, mode: "insensitive" as const } },
         ]),
@@ -79,6 +83,7 @@ export function createPersonnelImportService(
     for (const line of lines) {
       const matches = branches.filter(
         (branch) =>
+          String(branch.id) === line.branch.trim() ||
           normalized(branch.code) === normalized(line.branch) ||
           normalized(branch.name) === normalized(line.branch),
       );
@@ -86,8 +91,8 @@ export function createPersonnelImportService(
         issues.push({
           row: line.row,
           message: matches.length
-            ? "Kode/nama cabang ambigu. Gunakan kode cabang yang unik."
-            : "Cabang tidak ditemukan, tidak aktif, atau di luar akses Anda.",
+            ? "Kode/nama cabang cocok dengan lebih dari satu cabang. Isi dengan ID cabang dari sheet Keterangan."
+            : "Cabang tidak ditemukan, tidak aktif, atau di luar akses Anda. Isi dengan ID, kode atau nama cabang dari sheet Keterangan.",
         });
         continue;
       }
@@ -171,7 +176,7 @@ export function createPersonnelImportService(
       const current = await actor(kind);
       const branches = await db.branch.findMany({
         where: branchScope(current),
-        select: { code: true, name: true },
+        select: { id: true, code: true, name: true },
         orderBy: [{ code: "asc" }, { id: "asc" }],
         take: 1000,
       });

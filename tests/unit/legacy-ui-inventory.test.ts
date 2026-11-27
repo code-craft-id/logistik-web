@@ -5,6 +5,7 @@ import screenMap from "../../docs/experiments/legacy-ui-screen-map.json";
 import { implementedPreviewRoutes } from "../../src/components/shell/implemented-preview-routes";
 import { legacyMenu } from "../../src/components/shell/legacy-menu";
 import {
+  liveRoutes,
   navigation,
   navigationDestinations,
   providerNavigation,
@@ -27,15 +28,43 @@ describe("legacy inventory coverage and presentation routing", () => {
     expect(implementedPreviewRoutes).toHaveLength(43);
   });
   it("preserves source menu ordering and only links concrete implemented pages", () => {
+    // Source ordering, except Akunting after Modul as in the sandbox menu
+    // (user rule 2026-11-24: real web first, sandbox for the rest).
+    const source = inventory.navigation
+      .map((group) => group.label)
+      .filter((label) => label !== "Akunting");
+    source.splice(source.indexOf("Modul") + 1, 0, "Akunting");
+    // Share Truck (sandbox-only top menu, D-43) sits before Ticketing.
+    source.splice(source.indexOf("Ticketing"), 0, "Share Truck");
     expect(
       navigation
         .slice(0, legacyMenu.length)
         .map((group) => group.providerLabel),
-    ).toEqual(inventory.navigation.map((group) => group.label));
+    ).toEqual(source);
     const available = new Set<string>([
       "/ui-examples",
       ...implementedPreviewRoutes.map((item) => item.href),
     ]);
+    // FIN is an adopted live workflow, outside the frozen 43-screen preview inventory.
+    const finance = navigationDestinations().filter(({ item }) =>
+      item.href?.startsWith("/finance/"),
+    );
+    // Modul > Keuangan: Invoice, Pembayaran Hutang (Fitur 2 merged menu).
+    // Akunting pages live under /akunting since 2026-11-27.
+    expect(finance).toHaveLength(2);
+    for (const { item } of finance) {
+      expect(
+        existsSync(`src/app/(dashboard)${item.href?.split("?")[0]}/page.tsx`),
+      ).toBe(true);
+      if (item.href) available.add(item.href);
+    }
+    // Live report workflows added after the preview inventory must exist on disk.
+    for (const href of liveRoutes) {
+      expect(
+        existsSync(`src/app/(dashboard)${href.split("?")[0]}/page.tsx`),
+      ).toBe(true);
+      available.add(href);
+    }
     for (const { item } of navigationDestinations())
       if (item.href) expect(available.has(item.href)).toBe(true);
     for (const { href } of implementedPreviewRoutes)

@@ -18,7 +18,6 @@ import {
 import Link from "next/link";
 import { DashboardPanel } from "@/components/patterns/dashboard-panel";
 import { PageHeading } from "@/components/patterns/page-heading";
-import { Button } from "@/components/ui/button";
 import { DashboardChart } from "./dashboard-chart";
 import { DashboardFilters } from "./dashboard-filters";
 
@@ -121,14 +120,6 @@ export function DashboardOverview() {
       <PageHeading
         title="Dashboard"
         description="Ringkasan aktivitas cabang & operasional"
-        action={
-          <Button asChild variant="outline" className="min-h-11">
-            <Link href="/ui-examples">
-              UI examples
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
-        }
       />
       <p className="rounded-lg border bg-background px-4 py-3 text-sm leading-6 text-muted-foreground">
         UI preview · Legacy dashboard layout. Operational data, account access

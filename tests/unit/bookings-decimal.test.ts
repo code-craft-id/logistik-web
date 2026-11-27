@@ -74,4 +74,27 @@ describe("bookings decimal validation", () => {
     expect(booking.volume).toBeUndefined();
     expect(booking.biaya).toBeUndefined();
   });
+
+  it("requires per-piece dimensions when a chargeable weight is supplied", () => {
+    expect(
+      createTransactionSchema.safeParse({
+        originBranchId: 1,
+        chargeableWeight: "50.00",
+      }).success,
+    ).toBe(false);
+    const parsed = createTransactionSchema.safeParse({
+      originBranchId: 1,
+      chargeableWeight: "50.00",
+      dimensionRows: JSON.stringify([
+        {
+          length: "100",
+          width: "50",
+          height: "40",
+          kilo: "2",
+          packed: false,
+        },
+      ]),
+    });
+    expect(parsed.success).toBe(true);
+  });
 });

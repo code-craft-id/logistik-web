@@ -39,10 +39,38 @@ describe("SCH-01 preservation and adapter contract", () => {
   });
 
   it("keeps domain lifecycles, narrow keys, draft guards and auth exceptions", () => {
+    // FIN parent-owned rows and immutable events use their audited document lifecycle.
+    const parentOwned = ["FinInvoiceItem", "FinReservation", "FinLine"];
+    const immutable = [
+      "FinReceipt",
+      "FinCommand",
+      "FinMapping",
+      "FinCost",
+      "FinClosedPeriod",
+      // Append-only koli scan log (Cek Transit / Cek Inbound).
+      "ManifestScan",
+      // Append-only agent deposit history (D-41).
+      "AgentDepositMovement",
+      // Append-only charter trip status history (D-43).
+      "CharterStatusLog",
+    ];
+    const noSoftDelete = [
+      ...parentOwned,
+      ...immutable,
+      "FinInvoice",
+      "FinJournal",
+      "FinCostState",
+      // Ready Truck offer: 1:1 with a vehicle, withdrawn via active=false.
+      "VehicleShare",
+    ];
     expect(source).not.toMatch(/\bBigInt\b|\/\/\/ (?:Prototype:|PII)/);
     for (const [, name, body] of models) {
-      expect(body, name).toMatch(/\bid\s+Int\s+@id/);
-      if (!["IdentityAuditEvent"].includes(name)) {
+      expect(body, name).toMatch(
+        ["FinReservation", "FinCostState"].includes(name)
+          ? /\btransactionId\s+Int\s+@id/
+          : /\bid\s+Int\s+@id/,
+      );
+      if (!["IdentityAuditEvent", ...parentOwned].includes(name)) {
         expect(body, name).toMatch(
           /\bcreatedAt\s+DateTime\s+@default\(now\(\)\)/,
         );
@@ -58,6 +86,8 @@ describe("SCH-01 preservation and adapter contract", () => {
           "IdentityAuditEvent",
           "ManifestItem",
           "DeliverySheetItem",
+          ...parentOwned,
+          ...immutable,
         ].includes(name)
       ) {
         expect(body, name).toMatch(/\bupdatedAt\s+DateTime\s+@updatedAt/);
@@ -75,6 +105,13 @@ describe("SCH-01 preservation and adapter contract", () => {
           "DeliverySheetItem",
           "TransactionStatusHistory",
           "DeliverySheet",
+          // D-37: one template row per kind is edited in place (switched off,
+          // never deleted); the outbox is a delivery log.
+          "WhatsAppTemplate",
+          "WhatsAppOutbox",
+          // Single configuration row, edited in place.
+          "HelpAiSetting",
+          ...noSoftDelete,
         ].includes(name)
       ) {
         expect(body, name).toMatch(/\bdeletedAt\s+DateTime\?/);

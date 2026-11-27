@@ -220,11 +220,7 @@ export const providerNavigation: readonly NavigationGroup[] = [
   },
   { label: "Ticketing", providerLabel: "Ticketing" },
   { label: "System Tutorial", providerLabel: "Tutorial System" },
-  {
-    label: "UI examples",
-    providerLabel: "Local foundation example",
-    href: "/ui-examples",
-  },
+  // UI examples (/ui-examples) is hidden from the menu before release (user 2026-11-26).
 ];
 
 type LegacyItem = {
@@ -232,9 +228,111 @@ type LegacyItem = {
   href?: string;
   children?: readonly LegacyItem[];
 };
-const implemented = new Set<string>(
-  implementedPreviewRoutes.map((item) => item.href),
-);
+// Live workflows added after the frozen preview inventory (outside its 43 screens).
+export const liveRoutes = [
+  "/customer-reports/all-status",
+  "/customer-reports/shipments",
+  "/customer-reports/pod",
+  // Perkiraan (chart of accounts) is served by the FIN-02 accounts page.
+  "/akunting/data-akun", // Modul menu entries mirroring the reference; query variants keep each
+  // legacy item distinct while landing on the live page that serves it.
+  "/marketing?tab=customer",
+  "/marketing?tab=consignee",
+  "/marketing/revenue",
+  "/transactions",
+  "/transactions?tab=inbound",
+  "/transactions?print=1",
+  "/transactions/approvals",
+  "/transactions/new",
+  "/customer-service/cek-ongkir",
+  "/bookings",
+  "/bookings?tab=inbound",
+  "/manifest",
+  "/manifest?view=agent",
+  "/pod-returns",
+  "/pod-returns?tab=approval",
+  "/finance/debt-payments",
+  "/transactions/void",
+  "/branch-reports/delivery?view=items",
+  "/customer-service/status-pengantaran",
+  "/branch-reports/rekap-transaksi",
+  // Real web Laporan Cabang leaves (2026-11-24).
+  "/branch-reports/rekap-transaksi-harian",
+  "/branch-reports/awb?view=pending",
+  "/branch-reports/awb?view=manifested",
+  "/report-customer",
+  // Sandbox COD (2026-11-24).
+  "/cod",
+  "/cod?tab=received",
+  "/branch-reports/report-cod",
+  "/financial-reports/profit",
+  // Agent deposit and commission (D-41).
+  "/agent-awb",
+  "/agent-awb?view=print",
+  "/agent-deposit",
+  "/agent-reports",
+  "/agent-reports?tab=komisi",
+  // Share Truck (D-43).
+  "/share-truck",
+  "/share-truck/orders",
+  "/share-truck/orders?dir=out",
+  "/share-truck/status",
+  "/share-truck/status?view=check",
+  "/share-truck/invoices",
+  "/share-truck/invoices?type=masuk",
+  "/share-truck/ready",
+  "/financial-reports/aging",
+  "/financial-reports/ap-aging",
+  "/akunting/rugi-laba",
+  "/transactions/lookup",
+  "/transactions/history",
+  "/transactions/void?view=deleted",
+  "/manifest?type=Transit",
+  "/manifest?type=Inbound",
+  "/manifest?type=Outbound",
+  "/courier-reports?view=city",
+  "/branch-reports/manifest-vendor?view=process",
+  "/finance/invoices?from=modul",
+  "/finance/invoices",
+  // D-35 simplified provider workflows (2026-11-23).
+  "/delivery-sheets",
+  "/delivery-sheets?tab=print",
+  "/vendor-processes",
+  "/branch-reports/rekap-manifest",
+  "/courier-reports/detail",
+  "/ticketting",
+  "/ticketting?tab=approval",
+  // Akunting following the sandbox (2026-11-24).
+  "/akunting/assets",
+  "/akunting/general-ledger",
+  "/akunting/kategori-akun",
+  "/akunting/kategori-rugi-laba",
+  "/akunting/master-cashflow",
+  "/akunting/master-rugi-laba",
+  "/akunting/cost-centre",
+  "/akunting/kategori-assets",
+  "/akunting/buku-bank",
+  "/akunting/kasir-penerimaan",
+  "/akunting/kasir-penerimaan-invoice",
+  "/akunting/kasir-pembayaran",
+  "/akunting/kasir-pembayaran-vendor",
+  "/akunting/bukti-jurnal-umum",
+  "/akunting/rekonsiliasi-bank",
+  "/akunting/posting",
+  "/akunting/memorial",
+  "/akunting/penyesuaian-penjualan",
+  "/akunting/neraca",
+  "/akunting/buku-besar",
+  "/akunting/neraca-saldo",
+  // Akunting pages moved from /finance/accounting (2026-11-27).
+  "/akunting/biaya-aktual",
+  "/akunting/cover",
+  "/akunting/arus-kas",
+];
+const implemented = new Set<string>([
+  ...implementedPreviewRoutes.map((item) => item.href),
+  ...liveRoutes,
+]);
 const leaf = (item: LegacyItem): NavigationLeaf => {
   const href = item.href ? applicationPreviewPath(item.href) : undefined;
   return {
@@ -245,22 +343,186 @@ const leaf = (item: LegacyItem): NavigationLeaf => {
 };
 export const navigation: readonly NavigationGroup[] = [
   ...legacyMenu.map(
-    (item: LegacyItem): NavigationGroup => ({
-      ...leaf(item),
-      ...(item.children
+    (item: LegacyItem): NavigationGroup =>
+      item.label === "Akunting"
         ? {
-            entries: item.children.map((child) =>
-              child.children
-                ? {
-                    label: child.label,
-                    providerPath: [child.label],
-                    items: child.children.map(leaf),
-                  }
-                : leaf(child),
-            ),
+            label: item.label,
+            providerLabel: item.label,
+            // Sandbox Akunting menu (OBSERVED newapps 2026-11-24); Biaya Aktual
+            // and Arus Kas & Gross Profit are LMS additions kept reachable.
+            entries: [
+              {
+                label: "Data Akun",
+                providerLabel: "Data Akun",
+                href: "/akunting/data-akun",
+              },
+              {
+                label: "Assets",
+                providerLabel: "Assets",
+                href: "/akunting/assets",
+              },
+              {
+                label: "Master",
+                providerPath: ["Master"],
+                items: [
+                  {
+                    label: "General Ledger",
+                    providerLabel: "General Ledger",
+                    href: "/akunting/general-ledger",
+                  },
+                  {
+                    label: "Kategori Akun",
+                    providerLabel: "Kategori Akun",
+                    href: "/akunting/kategori-akun",
+                  },
+                  {
+                    label: "Kategori Rugi Laba",
+                    providerLabel: "Kategori Rugi Laba",
+                    href: "/akunting/kategori-rugi-laba",
+                  },
+                  {
+                    label: "Master Arus Kas",
+                    providerLabel: "Master Arus Kas",
+                    href: "/akunting/master-cashflow",
+                  },
+                  {
+                    label: "Master Rugi Laba",
+                    providerLabel: "Master Rugi Laba",
+                    href: "/akunting/master-rugi-laba",
+                  },
+                  {
+                    label: "Cost Centre",
+                    providerLabel: "Cost Centre",
+                    href: "/akunting/cost-centre",
+                  },
+                  {
+                    label: "Kategori Assets",
+                    providerLabel: "Kategori Assets",
+                    href: "/akunting/kategori-assets",
+                  },
+                ],
+              },
+              {
+                label: "Kas Bank",
+                providerPath: ["Kas Bank"],
+                items: [
+                  {
+                    label: "Buku Bank",
+                    providerLabel: "Buku Bank",
+                    href: "/akunting/buku-bank",
+                  },
+                  {
+                    label: "Kasir Penerimaan Lainnya",
+                    providerLabel: "Kasir Penerimaan Lainnya",
+                    href: "/akunting/kasir-penerimaan",
+                  },
+                  {
+                    label: "Kasir Penerimaan Invoice",
+                    providerLabel: "Kasir Penerimaan Invoice",
+                    href: "/akunting/kasir-penerimaan-invoice",
+                  },
+                  {
+                    label: "Kasir Pembayaran Lainnya",
+                    providerLabel: "Kasir Pembayaran Lainnya",
+                    href: "/akunting/kasir-pembayaran",
+                  },
+                  {
+                    label: "Kasir Pembayaran Vendor",
+                    providerLabel: "Kasir Pembayaran Vendor",
+                    href: "/akunting/kasir-pembayaran-vendor",
+                  },
+                  {
+                    label: "Bukti Jurnal Umum",
+                    providerLabel: "Bukti Jurnal Umum",
+                    href: "/akunting/bukti-jurnal-umum",
+                  },
+                  {
+                    label: "Rekonsiliasi Bank",
+                    providerLabel: "Rekonsiliasi Bank",
+                    href: "/akunting/rekonsiliasi-bank",
+                  },
+                ],
+              },
+              {
+                label: "Penyesuaian",
+                providerPath: ["Penyesuaian"],
+                items: [
+                  {
+                    label: "Kasir",
+                    providerLabel: "Kasir",
+                    href: "/akunting/posting",
+                  },
+                  {
+                    label: "Memorial",
+                    providerLabel: "Memorial",
+                    href: "/akunting/memorial",
+                  },
+                  {
+                    label: "Penyesuaian Penjualan",
+                    providerLabel: "Penyesuaian Penjualan",
+                    href: "/akunting/penyesuaian-penjualan",
+                  },
+                  {
+                    label: "Biaya Aktual",
+                    providerLabel: "Biaya Aktual",
+                    href: "/akunting/biaya-aktual",
+                  },
+                ],
+              },
+              {
+                label: "Laporan",
+                providerPath: ["Laporan"],
+                items: [
+                  {
+                    label: "Neraca",
+                    providerLabel: "Neraca",
+                    href: "/akunting/neraca",
+                  },
+                  {
+                    label: "Buku Besar",
+                    providerLabel: "Buku Besar",
+                    href: "/akunting/buku-besar",
+                  },
+                  {
+                    label: "Rugi Laba",
+                    providerLabel: "Rugi Laba",
+                    href: "/akunting/rugi-laba",
+                  },
+                  {
+                    label: "Neraca Saldo",
+                    providerLabel: "Neraca Saldo",
+                    href: "/akunting/neraca-saldo",
+                  },
+                  {
+                    label: "Cover",
+                    providerLabel: "Cover",
+                    href: "/akunting/cover",
+                  },
+                  {
+                    label: "Arus Kas & Gross Profit",
+                    providerLabel: "Arus Kas & Gross Profit",
+                    href: "/akunting/arus-kas",
+                  },
+                ],
+              },
+            ],
           }
-        : {}),
-    }),
+        : {
+            ...leaf(item),
+            ...(item.children
+              ? {
+                  entries: item.children.map((child) =>
+                    child.children
+                      ? {
+                          label: child.label,
+                          providerPath: [child.label],
+                          items: child.children.map(leaf),
+                        }
+                      : leaf(child),
+                  ),
+                }
+              : {}),
+          },
   ),
   {
     label: "More previews",
@@ -268,6 +530,7 @@ export const navigation: readonly NavigationGroup[] = [
     entries: implementedPreviewRoutes
       .filter(
         (item) =>
+          !item.href.startsWith("/finance/") &&
           !legacyMenu.some(
             (group: LegacyItem) =>
               (group.href &&
@@ -276,7 +539,9 @@ export const navigation: readonly NavigationGroup[] = [
                 (child) =>
                   child.href === item.href ||
                   child.children?.some(
-                    (grandchild) => grandchild.href === item.href,
+                    // AWB Tertunda / Termanifest are ?view= menus of one page.
+                    (grandchild) =>
+                      grandchild.href?.split("?")[0] === item.href,
                   ),
               ),
           ),
@@ -300,11 +565,7 @@ export const navigation: readonly NavigationGroup[] = [
     ),
   },
   { label: "System Tutorial", providerLabel: "Tutorial System" },
-  {
-    label: "UI examples",
-    providerLabel: "Local foundation example",
-    href: "/ui-examples",
-  },
+  // UI examples (/ui-examples) is hidden from the menu before release (user 2026-11-26).
 ];
 
 // Both surfaces derive their partition from the verified inventory, never a
@@ -361,12 +622,39 @@ export function navigationPath(
   pathname: string,
   groups: readonly NavigationGroup[] = navigation,
 ) {
+  const financeRoot = !navigationDestinations(groups).some(
+    ({ item }) => item.href === pathname,
+  )
+    ? ["/finance/invoices", "/finance/accounting", "/customer-reports"].find(
+        (root) => pathname.startsWith(`${root}/`),
+      )
+    : undefined;
+  const financeLabels: Record<string, string> = {
+    accounts: "Akun & kategori",
+    journals: "Jurnal",
+    costs: "Biaya aktual",
+    periods: "Periode",
+    reports: "Laporan keuangan",
+    new: "Buat invoice",
+    "all-status": "Semua Status",
+  };
+  const suffix = financeRoot
+    ? [
+        financeLabels[pathname.slice(financeRoot.length + 1)] ??
+          "Detail invoice",
+      ]
+    : [];
+  if (financeRoot) pathname = financeRoot;
   for (const group of groups) {
-    if (group.href === pathname) return { group, labels: [group.label] };
+    if (group.href === pathname)
+      return { group, labels: [group.label, ...suffix] };
     for (const entry of navigationEntries(group)) {
       if (!isNavigationSection(entry)) {
         if (entry.href === pathname)
-          return { group, labels: [group.providerLabel, entry.providerLabel] };
+          return {
+            group,
+            labels: [group.providerLabel, entry.providerLabel, ...suffix],
+          };
         continue;
       }
       const section = entry;
@@ -379,6 +667,7 @@ export function navigationPath(
             group.providerLabel,
             ...section.providerPath,
             leaf.providerLabel,
+            ...suffix,
           ],
         };
     }

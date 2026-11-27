@@ -63,13 +63,15 @@ describe("FND-03 local interaction contracts", () => {
       "Sistem Setting",
       "Kantor",
       "Master Data",
-      "Akunting",
       "Modul",
+      "Akunting",
       "Laporan",
+      "Share Truck",
       "Ticketing",
       "More",
     ]);
-    expect(button("More").getAttribute("data-active")).toBe("true");
+    // UI examples is hidden from the menu, so its route no longer marks More active.
+    expect(button("More").getAttribute("data-active")).toBeNull();
     await act(async () => button("More").click());
     const additional = container.querySelector(
       'nav[aria-label="Additional navigation"]',
@@ -77,9 +79,7 @@ describe("FND-03 local interaction contracts", () => {
     expect(additional?.textContent).toContain("More previews");
     expect(additional?.textContent).toContain("Provider inventory");
     expect(additional?.textContent).toContain("Tutorial System");
-    expect(
-      additional?.querySelector('[aria-current="page"]')?.getAttribute("href"),
-    ).toBe("/ui-examples");
+    expect(additional?.querySelector('a[href="/ui-examples"]')).toBeNull();
     expect(
       container.querySelector('main#main-content[tabindex="-1"]'),
     ).not.toBeNull();
@@ -218,7 +218,7 @@ describe("FND-03 local interaction contracts", () => {
       Array.from(nav?.querySelectorAll("a") ?? []).map((a) =>
         a.getAttribute("href"),
       ),
-    ).toEqual(["/dashboard", "/ui-examples"]);
+    ).toEqual(["/dashboard"]);
   });
 
   it("opens only one group and section at a time and keeps their controlled lists hidden otherwise", async () => {

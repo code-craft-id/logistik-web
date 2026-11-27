@@ -17,7 +17,7 @@ try {
   );
   const result = spawnSync(process.execPath, [cliPath, "migrate", "deploy"], {
     stdio: "inherit",
-    env: { ...process.env, DATABASE_URL: connectionString },
+    env: { ...process.env, DIRECT_URL: connectionString },
   });
   if (result.error) {
     console.error("Could not start the installed Prisma CLI.");

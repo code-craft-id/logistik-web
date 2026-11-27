@@ -653,43 +653,31 @@ export function createIdentityService(
             })
           ).map((grant) => `${grant.resource}:${grant.action}`),
         );
-        for (const grant of permissions) {
-          if (
-            grant.granted &&
-            !permits(current, grant.action, grant.resource)
-          ) {
-            throw new IdentityError(
-              "FORBIDDEN",
-              403,
-              "Tidak boleh memberikan hak akses melebihi peran Anda.",
-            );
-          }
-          if (grant.granted) {
-            await tx.permission.upsert({
-              where: {
-                action_resource_groupId: {
-                  action: grant.action,
-                  resource: grant.resource,
-                  groupId,
-                },
-              },
-              update: {},
-              create: {
-                action: grant.action,
-                resource: grant.resource,
-                groupId,
-              },
-            });
-          } else {
-            await tx.permission.deleteMany({
-              where: {
-                groupId,
-                resource: grant.resource,
-                action: grant.action,
-              },
-            });
-          }
+        if (
+          permissions.some(
+            (grant) =>
+              grant.granted && !permits(current, grant.action, grant.resource),
+          )
+        ) {
+          throw new IdentityError(
+            "FORBIDDEN",
+            403,
+            "Tidak boleh memberikan hak akses melebihi peran Anda.",
+          );
         }
+        // Two statements, not one per grant: the full matrix is ~200 rows and
+        // row-by-row writes exceed the transaction timeout on a distant database.
+        const revoked = permissions
+          .filter((grant) => !grant.granted)
+          .map(({ action, resource }) => ({ action, resource }));
+        if (revoked.length)
+          await tx.permission.deleteMany({ where: { groupId, OR: revoked } });
+        await tx.permission.createMany({
+          data: permissions
+            .filter((grant) => grant.granted)
+            .map(({ action, resource }) => ({ action, resource, groupId })),
+          skipDuplicates: true,
+        });
         await audit(tx, current, "PERMISSIONS_UPDATED", "group", groupId, {
           grants: permissions.map((grant) => ({
             ...grant,

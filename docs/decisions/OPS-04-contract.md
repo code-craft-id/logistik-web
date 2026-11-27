@@ -9,7 +9,7 @@
 Define a typed, branch-scoped shipment billing event **shape** to support future Dev 3 integration for reports/invoices without Dev 2 prescribing unapproved financial formulas. This document is a **contract proposal only**; no billing amounts/charges logic, event producer, event validator, persistence, or consumer workflow is implemented in the inspected Dev 2 codebase.
 
 ## Current implementation status (as observed)
-- **Implemented now:** Type definition only (`src/features/bookings/billing-events.ts` exports `ShipmentBillingEvent`).
+- **Implemented now:** Type definition only (`src/features/bookings/billing-contract.ts` exports `ShipmentBillingEvent`).
 - **Not implemented / not enforced in this scope:** event emission/producer, runtime validation/guard layer, duplicate-event prevention mechanism, vendor/service resolution rules, billing consumption pipeline, and any financial calculation/posting.
 - **Implication:** Dev 3 must not treat this as an enforced or emitted integration contract until producer, validation, and D-11-dependent rules are explicitly implemented and confirmed.
 

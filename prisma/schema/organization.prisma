@@ -21,6 +21,7 @@ model Company {
   invoiceSettings       CompanyInvoiceSettings[]
   digitalWallets        CompanyDigitalWallet[]
   whatsappNotifications CustomerWhatsAppNotification[]
+  whatsappTemplates     WhatsAppTemplate[]
 
   @@map("companies")
 }
@@ -42,45 +43,68 @@ model Office {
   deletedAt   DateTime?    @map("deleted_at")
   branches    Branch[]
 
+  @@unique([code])
   @@index([companyId])
   @@index([status])
   @@map("offices")
 }
 
 model Branch {
-  customers           Customer[]
-  consignees          Consignee[]
-  bookings            Booking[]
-  manifests           Manifest[]
-  transactionsOrigin  Transaction[]       @relation("TransactionOriginBranch")
-  transactionsDest    Transaction[]       @relation("TransactionDestinationBranch")
-  id                  Int                 @id @default(autoincrement())
-  officeId            Int                 @map("office_id")
-  code                String
-  name                String
-  address             String?
-  city                String?
-  phoneNumber         String?             @map("phone_number")
-  managerName         String?             @map("manager_name")
-  managerContact      String?             @map("manager_contact")
-  postalCode          String?             @map("postal_code")
-  faxNumber           String?             @map("fax_number")
-  email               String?
-  financeContactName  String?             @map("finance_contact_name")
-  marketingContactName String?            @map("marketing_contact_name")
-  taxId               String?             @map("tax_id")
-  status              RecordStatus
-  office              Office              @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt           DateTime            @default(now()) @map("created_at")
-  updatedAt           DateTime            @updatedAt @map("updated_at")
-  deletedAt           DateTime?           @map("deleted_at")
-  agents              Agent[]
-  drivers             Driver[]
-  couriers            Courier[]
-  vehicles            Vehicle[]
-  marketingPeople     MarketingPerson[]
-  userAllowedBranches UserAllowedBranch[]
+  charterOrders         CharterOrder[]
+  manifestScans         ManifestScan[]      @relation("ManifestScanBranch")
+  finAccounts           FinAccount[]        @relation("FinAccountBranch")
+  bookingsInbound       Booking[]           @relation("BookingDestinationBranch")
+  tariffOrigins         Tariff[]            @relation("TariffOrigin")
+  tariffDestinations    Tariff[]            @relation("TariffDestination")
+  podReturnOrigins      PodReturn[]         @relation("PodReturnOrigin")
+  podReturnDestinations PodReturn[]         @relation("PodReturnDestination")
+  finMappings           FinMapping[]
+  finJournals           FinJournal[]
+  finCostCentres        FinCostCentre[]     @relation("FinCostCentreBranch")
+  finAssets             FinAsset[]          @relation("FinAssetBranch")
+  finBankStatements     FinBankStatement[]  @relation("FinBankStatementBranch")
+  finCostStates         FinCostState[]
+  finClosedPeriods      FinClosedPeriod[]
+  finInvoices           FinInvoice[]
+  finCommands           FinCommand[]
+  customers             Customer[]
+  consignees            Consignee[]
+  bookings              Booking[]
+  manifests             Manifest[]
+  transactionsOrigin    Transaction[]       @relation("TransactionOriginBranch")
+  transactionsDest      Transaction[]       @relation("TransactionDestinationBranch")
+  vendorBills           VendorBill[]
+  id                    Int                 @id @default(autoincrement())
+  officeId              Int                 @map("office_id")
+  code                  String
+  name                  String
+  address               String?
+  city                  String?
+  phoneNumber           String?             @map("phone_number")
+  managerName           String?             @map("manager_name")
+  managerContact        String?             @map("manager_contact")
+  postalCode            String?             @map("postal_code")
+  faxNumber             String?             @map("fax_number")
+  email                 String?
+  financeContactName    String?             @map("finance_contact_name")
+  marketingContactName  String?             @map("marketing_contact_name")
+  taxId                 String?             @map("tax_id")
+  status                RecordStatus
+  office                Office              @relation(fields: [officeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+  deletedAt             DateTime?           @map("deleted_at")
+  agents                Agent[]
+  drivers               Driver[]
+  couriers              Courier[]
+  vehicles              Vehicle[]
+  marketingPeople       MarketingPerson[]
+  userAllowedBranches   UserAllowedBranch[]
+  tickets               Ticket[]
+  deliverySheets        DeliverySheet[]
+  vendorProcesses       VendorProcess[]
 
+  @@unique([code])
   @@index([officeId])
   @@index([status])
   @@map("branches")
@@ -98,34 +122,63 @@ model Department {
   deletedAt DateTime?    @map("deleted_at")
   agents    Agent[]
 
+  @@unique([code])
   @@index([status])
   @@map("departments")
 }
 
 model Agent {
-  id             Int          @id @default(autoincrement())
-  branchId       Int          @map("branch_id")
-  departmentId   Int?         @map("department_id")
-  code           String
-  initials       String
-  name           String
-  category       String
-  phoneNumber    String?      @map("phone_number")
-  managerName    String?      @map("manager_name")
-  mobileNumber   String?      @map("mobile_number")
-  /// DRAFT: currency, precision, and rounding TBD, D-11, D-24
-  balance        Decimal      @db.Decimal(19, 2)
-  /// DRAFT: rate unit, precision, and rounding TBD, D-11
-  commissionRate Decimal      @map("commission_rate") @db.Decimal(9, 4)
-  status         RecordStatus
-  branch         Branch       @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  department     Department?  @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
-  deletedAt      DateTime?    @map("deleted_at")
+  deliverySheets   DeliverySheet[]
+  transactions     Transaction[]
+  depositMovements AgentDepositMovement[]
+  id               Int                    @id @default(autoincrement())
+  branchId         Int                    @map("branch_id")
+  departmentId     Int?                   @map("department_id")
+  code             String
+  initials         String
+  name             String
+  category         String
+  phoneNumber      String?                @map("phone_number")
+  managerName      String?                @map("manager_name")
+  mobileNumber     String?                @map("mobile_number")
+  /// Deposit in IDR (D-41): changed only through AgentDepositMovement.
+  balance          Decimal                @db.Decimal(19, 2)
+  /// Commission in percent of the AWB Grand Total (D-41), e.g. 5 = 5%.
+  commissionRate   Decimal                @map("commission_rate") @db.Decimal(9, 4)
+  status           RecordStatus
+  branch           Branch                 @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  department       Department?            @relation(fields: [departmentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+  deletedAt        DateTime?              @map("deleted_at")
 
+  @@unique([code])
   @@index([branchId])
   @@index([departmentId])
   @@index([status])
   @@map("agents")
+}
+
+/// History Deposit Agent (sandbox, D-41): every deposit change. TOPUP adds
+/// the amount; AWB deducts Grand Total minus commission; VOID refunds it.
+model AgentDepositMovement {
+  id            Int          @id @default(autoincrement())
+  agentId       Int          @map("agent_id")
+  agent         Agent        @relation(fields: [agentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  kind          String       @db.VarChar(10)
+  transactionId Int?         @map("transaction_id")
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  balanceBefore Decimal      @map("balance_before") @db.Decimal(19, 2)
+  amount        Decimal      @db.Decimal(19, 2)
+  commission    Decimal      @default(0) @db.Decimal(19, 2)
+  balanceAfter  Decimal      @map("balance_after") @db.Decimal(19, 2)
+  note          String?      @db.VarChar(255)
+  createdById   Int?         @map("created_by_id")
+  createdBy     User?        @relation("AgentDepositMovementCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  @@unique([transactionId, kind])
+  @@index([agentId, createdAt])
+  @@index([createdById])
+  @@map("agent_deposit_movements")
 }

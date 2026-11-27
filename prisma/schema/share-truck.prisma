@@ -1,0 +1,106 @@
+/// Share Truck (sandbox, OBSERVED 2026-11-24; D-43). The sandbox is a
+/// marketplace between companies; LMS has one company, so Order Masuk is a
+/// customer chartering our shared truck and Order Keluar is us chartering a
+/// vendor truck. No journal is posted for charter invoices.
+
+/// Ready Truck: an own vehicle offered for charter on a route and period.
+model VehicleShare {
+  id            Int      @id @default(autoincrement())
+  vehicleId     Int      @unique @map("vehicle_id")
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  origin        String   @db.VarChar(100)
+  destination   String   @db.VarChar(100)
+  leadTimeDays  Int      @map("lead_time_days")
+  availableFrom DateTime @map("available_from") @db.Date
+  availableTo   DateTime @map("available_to") @db.Date
+  price         Decimal  @db.Decimal(15, 2)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([active, availableTo])
+  @@map("vehicle_shares")
+}
+
+/// Charter order. IN = Order Masuk (customer charters our truck);
+/// OUT = Order Keluar (we charter a vendor truck).
+model CharterOrder {
+  id          Int                @id @default(autoincrement())
+  direction   String             @db.VarChar(3)
+  orderNo     String             @unique @map("order_no") @db.VarChar(30)
+  branchId    Int                @map("branch_id")
+  branch      Branch             @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  loadDate    DateTime           @map("load_date") @db.Date
+  vehicleId   Int?               @map("vehicle_id")
+  vehicle     Vehicle?           @relation(fields: [vehicleId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  plateNumber String             @map("plate_number") @db.VarChar(20)
+  truckType   String?            @map("truck_type") @db.VarChar(100)
+  customerId  Int?               @map("customer_id")
+  customer    Customer?          @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vendorId    Int?               @map("vendor_id")
+  vendor      Vendor?            @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  origin      String             @db.VarChar(100)
+  destination String             @db.VarChar(100)
+  weight      Decimal?           @db.Decimal(10, 2)
+  koli        Int?
+  totalCost   Decimal            @map("total_cost") @db.Decimal(15, 2)
+  goods       String?            @db.VarChar(255)
+  remarks     String?            @db.VarChar(255)
+  status      String             @db.VarChar(20)
+  createdById Int?               @map("created_by_id")
+  createdBy   User?              @relation("CharterOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  deletedAt   DateTime?          @map("deleted_at")
+  statusLogs  CharterStatusLog[]
+  invoice     CharterInvoice?
+
+  @@index([direction, status])
+  @@index([branchId])
+  @@index([loadDate])
+  @@index([vehicleId])
+  @@index([customerId])
+  @@index([vendorId])
+  @@index([createdById])
+  @@map("charter_orders")
+}
+
+/// Append-only trip status history (Update Status / Cek Status).
+model CharterStatusLog {
+  id          Int          @id @default(autoincrement())
+  orderId     Int          @map("order_id")
+  order       CharterOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  priorStatus String?      @map("prior_status") @db.VarChar(20)
+  newStatus   String       @map("new_status") @db.VarChar(20)
+  note        String?      @db.VarChar(255)
+  actorId     Int?         @map("actor_id")
+  actor       User?        @relation("CharterStatusLogActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  @@index([orderId])
+  @@index([actorId])
+  @@map("charter_status_logs")
+}
+
+/// Invoice Keluar (IN order, billed to the customer) or Invoice Masuk (OUT
+/// order, billed by the vendor). One per order; amount = order Total Biaya.
+model CharterInvoice {
+  id          Int          @id @default(autoincrement())
+  orderId     Int          @unique @map("order_id")
+  order       CharterOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  invoiceNo   String       @map("invoice_no") @db.VarChar(50)
+  notes       String?      @db.VarChar(255)
+  amount      Decimal      @db.Decimal(15, 2)
+  status      String       @default("UNPAID") @db.VarChar(10)
+  paidAt      DateTime?    @map("paid_at")
+  createdById Int?         @map("created_by_id")
+  createdBy   User?        @relation("CharterInvoiceCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  deletedAt   DateTime?    @map("deleted_at")
+
+  @@unique([invoiceNo])
+  @@index([status])
+  @@index([createdById])
+  @@map("charter_invoices")
+}

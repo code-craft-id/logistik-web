@@ -1,0 +1,7 @@
+
+[*] Changed the `delivery_sheet_items` table
+  [*] Altered column `updated_at` (default changed from `Some(Now)` to `None`)
+
+[*] Changed the `manifest_items` table
+  [*] Altered column `updated_at` (default changed from `Some(Now)` to `None`)
+Loaded Prisma config from prisma.config.ts.

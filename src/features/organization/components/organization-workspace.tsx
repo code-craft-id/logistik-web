@@ -2,8 +2,10 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { SearchSelect } from "@/components/patterns/search-select";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import {
   Dialog,
   DialogContent,
@@ -471,102 +473,109 @@ function OrganizationList({
         className="space-y-5"
       >
         <div className="grid max-w-5xl gap-4 lg:grid-cols-2">
-          {formFields.map((field) => (
-            <div
-              className={`grid min-w-0 gap-2 sm:grid-cols-3 sm:items-center sm:gap-5 ${["name", "address", "logo"].includes(field.key) ? "lg:col-span-2" : ""}`}
-              key={field.key}
-            >
-              <Label
-                htmlFor={`org-${field.key}`}
-                className={
-                  field.type === "checkbox"
-                    ? "flex min-h-11 items-center"
-                    : undefined
-                }
+          {formFields.map((field) => {
+            // Wide rows span both columns; 6 tracks keep the label as wide as a normal row's.
+            const wide = ["name", "address", "logo"].includes(field.key);
+            const span = wide ? "sm:col-span-2 lg:col-span-5" : "sm:col-span-2";
+            return (
+              <div
+                className={`grid min-w-0 gap-2 sm:grid-cols-3 sm:items-center sm:gap-5 ${wide ? "lg:col-span-2 lg:grid-cols-6" : ""}`}
+                key={field.key}
               >
-                {field.label}
-                {field.required ? " *" : ""}
-              </Label>
-              {field.key === "logo" ? (
-                <CompanyLogoField
-                  key={editing?.id ?? "new"}
-                  value={String(editing?.logo ?? "")}
-                  disabled={busy || !writable}
-                />
-              ) : field.key === "address" ? (
-                <Textarea
-                  className="min-h-20 sm:col-span-2"
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  defaultValue={String(editing?.[field.key] ?? "")}
-                  maxLength={1000}
-                  required={field.required}
-                  disabled={busy || !writable}
-                />
-              ) : field.type === "checkbox" ? (
-                <input
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  type="checkbox"
-                  defaultChecked={Boolean(editing?.[field.key])}
-                  disabled={busy || !writable}
-                  className="size-5 accent-primary"
-                />
-              ) : field.type === "parent" ? (
-                <div className="sm:col-span-2">
-                  <SearchSelect
+                <Label
+                  htmlFor={`org-${field.key}`}
+                  className={
+                    field.type === "checkbox"
+                      ? "flex min-h-11 items-center"
+                      : undefined
+                  }
+                >
+                  {field.label}
+                  {field.required ? " *" : ""}
+                </Label>
+                {field.key === "logo" ? (
+                  <div className={span}>
+                    <CompanyLogoField
+                      key={editing?.id ?? "new"}
+                      value={String(editing?.logo ?? "")}
+                      disabled={busy || !writable}
+                    />
+                  </div>
+                ) : field.key === "address" ? (
+                  <Textarea
+                    className={`min-h-20 ${span}`}
                     id={`org-${field.key}`}
                     name={field.key}
-                    label={field.label}
-                    value={parentSelection}
-                    selectedLabel={parentLabel}
-                    options={parents}
-                    search={parentSearch}
-                    onSearchChange={(value) => {
-                      setParentSearch(value);
-                      setParentPage(1);
-                    }}
-                    onValueChange={(value, label) => {
-                      setParentSelection(value);
-                      setParentLabel(label);
-                    }}
-                    disabled={busy || !writable}
-                    loading={parentLoading}
-                    error={parentError}
+                    defaultValue={String(editing?.[field.key] ?? "")}
+                    maxLength={1000}
                     required={field.required}
-                    page={parentPage}
-                    pages={parentPages}
-                    onPageChange={setParentPage}
+                    disabled={busy || !writable}
                   />
-                </div>
-              ) : field.type === "status" ? (
-                <select
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  defaultValue={String(editing?.[field.key] ?? "ACTIVE")}
-                  required={field.required}
-                  disabled={busy || !writable}
-                  className="min-h-11 w-full rounded-md border border-input bg-background px-3 sm:col-span-2"
-                >
-                  <option value="ACTIVE">Aktif</option>
-                  <option value="INACTIVE">Tidak aktif</option>
-                </select>
-              ) : (
-                <Input
-                  className="min-h-11 sm:col-span-2"
-                  id={`org-${field.key}`}
-                  name={field.key}
-                  type={field.type === "email" ? "email" : "text"}
-                  defaultValue={String(editing?.[field.key] ?? "")}
-                  maxLength={
-                    field.key === "name" || field.key === "code" ? 100 : 1000
-                  }
-                  required={field.required}
-                  disabled={busy || !writable}
-                />
-              )}
-            </div>
-          ))}
+                ) : field.type === "checkbox" ? (
+                  <input
+                    id={`org-${field.key}`}
+                    name={field.key}
+                    type="checkbox"
+                    defaultChecked={Boolean(editing?.[field.key])}
+                    disabled={busy || !writable}
+                    className="size-5 accent-primary"
+                  />
+                ) : field.type === "parent" ? (
+                  <div className={span}>
+                    <SearchSelect
+                      id={`org-${field.key}`}
+                      name={field.key}
+                      label={field.label}
+                      value={parentSelection}
+                      selectedLabel={parentLabel}
+                      options={parents}
+                      search={parentSearch}
+                      onSearchChange={(value) => {
+                        setParentSearch(value);
+                        setParentPage(1);
+                      }}
+                      onValueChange={(value, label) => {
+                        setParentSelection(value);
+                        setParentLabel(label);
+                      }}
+                      disabled={busy || !writable}
+                      loading={parentLoading}
+                      error={parentError}
+                      required={field.required}
+                      page={parentPage}
+                      pages={parentPages}
+                      onPageChange={setParentPage}
+                    />
+                  </div>
+                ) : field.type === "status" ? (
+                  <ComboSelect
+                    id={`org-${field.key}`}
+                    name={field.key}
+                    defaultValue={String(editing?.[field.key] ?? "ACTIVE")}
+                    required={field.required}
+                    disabled={busy || !writable}
+                    className={`min-h-11 w-full rounded-md border border-input bg-background px-3 ${span}`}
+                  >
+                    <option value="ACTIVE">Aktif</option>
+                    <option value="INACTIVE">Tidak aktif</option>
+                  </ComboSelect>
+                ) : (
+                  <Input
+                    className={`min-h-11 ${span}`}
+                    id={`org-${field.key}`}
+                    name={field.key}
+                    type={field.type === "email" ? "email" : "text"}
+                    defaultValue={String(editing?.[field.key] ?? "")}
+                    maxLength={
+                      field.key === "name" || field.key === "code" ? 100 : 1000
+                    }
+                    required={field.required}
+                    disabled={busy || !writable}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
         {error && (
           <p role="alert" className="text-sm text-destructive">
@@ -604,7 +613,7 @@ function OrganizationList({
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-0 flex-1 space-y-2">
               <Label htmlFor="company-record">Perusahaan</Label>
-              <select
+              <ComboSelect
                 id="company-record"
                 className="min-h-11 w-full rounded-md border border-input bg-background px-3"
                 value={editing?.id ?? ""}
@@ -616,7 +625,7 @@ function OrganizationList({
                   )
                 }
               >
-                <option value="">Perusahaan baru</option>
+                {total === 0 && <option value="">Perusahaan baru</option>}
                 {editing?.id &&
                   !items.some((item) => item.id === editing.id) && (
                     <option value={editing.id}>{editing.name}</option>
@@ -626,18 +635,8 @@ function OrganizationList({
                     {item.name}
                   </option>
                 ))}
-              </select>
+              </ComboSelect>
             </div>
-            {writable && (
-              <Button
-                className="min-h-11"
-                variant="default"
-                onClick={() => setEditing(null)}
-              >
-                <Plus aria-hidden="true" />
-                Tambah Perusahaan
-              </Button>
-            )}
             <Button
               className="min-h-11"
               variant="outline"
@@ -664,29 +663,8 @@ function OrganizationList({
         )}
         {notice && <output>{notice}</output>}
         {editor}
-        {writable && total === 1 && editing?.id && (
-          <Button
-            className="min-h-11"
-            variant="default"
-            onClick={() => setEditing(null)}
-          >
-            <Plus aria-hidden="true" />
-            Tambah Perusahaan
-          </Button>
-        )}
-        {writable && editing?.id && (
-          <Button
-            className="min-h-11"
-            variant="destructive"
-            onClick={(event) => {
-              dialogTrigger.current = event.currentTarget;
-              setRemoving(editing);
-            }}
-          >
-            <Trash2 aria-hidden="true" />
-            Hapus perusahaan
-          </Button>
-        )}
+        {/* Single-company system: edit only; no add or delete once a
+            company exists (owner decision 2026-11-23). */}
         {deleteDialog}
       </div>
     );
@@ -734,7 +712,7 @@ function OrganizationList({
         {kind !== "company" && (
           <div className="space-y-2">
             <Label htmlFor={`status-${kind}`}>Status</Label>
-            <select
+            <ComboSelect
               id={`status-${kind}`}
               className="min-h-11 rounded-md border border-input bg-background px-3"
               value={status}
@@ -746,12 +724,12 @@ function OrganizationList({
               <option value="">Semua</option>
               <option value="ACTIVE">Aktif</option>
               <option value="INACTIVE">Tidak aktif</option>
-            </select>
+            </ComboSelect>
           </div>
         )}
         <div className="space-y-2">
           <Label htmlFor={`page-size-${kind}`}>Jumlah per halaman</Label>
-          <select
+          <ComboSelect
             id={`page-size-${kind}`}
             value={pageSize}
             className="min-h-11 rounded-md border border-input bg-background px-3"
@@ -765,11 +743,11 @@ function OrganizationList({
                 {size}
               </option>
             ))}
-          </select>
+          </ComboSelect>
         </div>
         <div className="space-y-2">
           <Label htmlFor={`sort-${kind}`}>Urutan</Label>
-          <select
+          <ComboSelect
             id={`sort-${kind}`}
             value={sortDirection}
             className="min-h-11 rounded-md border border-input bg-background px-3"
@@ -780,7 +758,7 @@ function OrganizationList({
           >
             <option value="asc">A–Z</option>
             <option value="desc">Z–A</option>
-          </select>
+          </ComboSelect>
         </div>
         <Button className="min-h-11" type="submit">
           Cari
@@ -793,7 +771,7 @@ function OrganizationList({
       )}
       {notice && <output className="text-sm">{notice}</output>}
       {loading ? (
-        <output>Memuat data…</output>
+        <LoadingState label="Memuat data…" />
       ) : error && editing === undefined && !removing ? (
         <Button
           className="min-h-11"

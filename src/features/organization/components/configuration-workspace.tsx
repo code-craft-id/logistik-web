@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import {
   type ReferenceApi,
   type ReferenceCapabilities,
@@ -94,7 +95,7 @@ function ConfigurationLoader({
         </Button>
       </div>
     );
-  if (!capabilities) return <output>Memuat konfigurasi…</output>;
+  if (!capabilities) return <LoadingState label="Memuat konfigurasi…" />;
   return (
     <div className="space-y-4">
       {kind !== "vendor_tax" && (
@@ -115,23 +116,20 @@ function ConfigurationLoader({
             capabilities={capabilities}
           />
         )}
-      {(kind === "vendor_tax" ||
-        (kind === "whatsapp_configuration" && companyId)) && (
-        <div
-          className={
-            kind === "whatsapp_configuration" ? "grid gap-6 xl:grid-cols-2" : ""
-          }
-        >
-          <ReferenceWorkspace
-            key={`${kind}:${companyId}`}
-            fixedValues={fixedValues}
-            kind={kind}
-            definition={configurationForms[kind]}
-            capabilities={capabilities}
-            api={api}
-          />
-          {kind === "whatsapp_configuration" && <WhatsAppMessagePreview />}
-        </div>
+      {kind === "vendor_tax" && (
+        <ReferenceWorkspace
+          key={`${kind}:${companyId}`}
+          fixedValues={fixedValues}
+          kind={kind}
+          definition={configurationForms[kind]}
+          capabilities={capabilities}
+          api={api}
+        />
+      )}
+      {/* Provider WA Notifikasi (D-37): active customers come from the
+          customer's WA Notif switch; messages are the company templates. */}
+      {kind === "whatsapp_configuration" && companyId && (
+        <WhatsAppMessagePreview />
       )}
       {kind === "whatsapp_configuration" && companyId && (
         <BranchWhatsAppSetupPanel
@@ -238,7 +236,7 @@ function CompanySelector({
           onPageChange={setPage}
         />
       </div>
-      {loading && <output>Memuat perusahaan…</output>}
+      {loading && <LoadingState label="Memuat perusahaan…" />}
       {error && (
         <div className="space-y-2">
           <p role="alert" className="text-sm text-destructive">

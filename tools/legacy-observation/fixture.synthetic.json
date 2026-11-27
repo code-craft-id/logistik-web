@@ -1,0 +1,9 @@
+{
+  "provenance": "SYNTHETIC_TEST_ONLY",
+  "title": "Synthetic observation harness demonstration",
+  "columns": ["Synthetic item", "Text value"],
+  "rows": [
+    ["Dummy alpha", "Inert fixture text"],
+    ["Dummy beta", "No provider records or business behavior"]
+  ]
+}

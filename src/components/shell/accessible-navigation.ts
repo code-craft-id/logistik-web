@@ -15,6 +15,94 @@ import {
 
 // A route enters this inventory only when its workflow is implemented.
 const routeResources: Record<string, readonly string[]> = {
+  "/finance/invoices": ["invoice"],
+  "/finance/accounting": [
+    "finance_account",
+    "journal",
+    "finance_cost",
+    "finance_period",
+    "financial_report",
+  ],
+  "/akunting/data-akun": ["finance_account"],
+  "/finance/accounting/journals": ["journal"],
+  "/akunting/biaya-aktual": ["finance_cost"],
+  "/akunting/cover": ["finance_period"],
+  "/akunting/arus-kas": ["financial_report"],
+  "/dashboard": ["dashboard_report"],
+  "/transactions": ["transaction"],
+  "/transactions/new": ["transaction"],
+  "/transactions/lookup": ["transaction"],
+  "/transactions/void": ["transaction"],
+  "/transactions/history": ["transaction"],
+  "/marketing/revenue": ["customer"],
+  "/bookings": ["booking"],
+  "/transactions/approvals": ["awb_change"],
+  "/transactions/scan": ["awb_scan"],
+  "/customer-service/cek-ongkir": ["tariff"],
+  "/customer-service/status-pengantaran": ["transaction"],
+  "/branch-reports/rekap-transaksi": ["transaction_report"],
+  "/branch-reports/rekap-transaksi-harian": ["transaction_report"],
+  "/report-customer": ["transaction_report"],
+  "/cod": ["payment"],
+  "/branch-reports/report-cod": ["payment"],
+  "/financial-reports/profit": ["debt_payment"],
+  "/agent-awb": ["transaction"],
+  "/agent-deposit": ["agent"],
+  "/agent-reports": ["transaction"],
+  "/share-truck": ["share_truck"],
+  "/share-truck/orders": ["share_truck"],
+  "/share-truck/status": ["share_truck"],
+  "/share-truck/invoices": ["share_truck"],
+  "/share-truck/ready": ["share_truck"],
+  "/financial-reports/aging": ["invoice"],
+  "/financial-reports/ap-aging": ["debt_payment"],
+  "/akunting/rugi-laba": ["financial_report"],
+  // Akunting following the sandbox (2026-11-24).
+  "/akunting/assets": ["finance_account"],
+  "/akunting/general-ledger": ["finance_account"],
+  "/akunting/kategori-akun": ["finance_account"],
+  "/akunting/kategori-rugi-laba": ["finance_account"],
+  "/akunting/master-cashflow": ["finance_account"],
+  "/akunting/master-rugi-laba": ["finance_account"],
+  "/akunting/cost-centre": ["finance_account"],
+  "/akunting/kategori-assets": ["finance_account"],
+  "/akunting/buku-bank": ["financial_report"],
+  "/akunting/kasir-penerimaan": ["journal"],
+  "/akunting/kasir-penerimaan-invoice": ["journal", "invoice"],
+  "/akunting/kasir-pembayaran": ["journal"],
+  "/akunting/kasir-pembayaran-vendor": ["journal"],
+  "/akunting/bukti-jurnal-umum": ["journal"],
+  "/akunting/rekonsiliasi-bank": ["journal"],
+  "/akunting/posting": ["journal"],
+  "/akunting/memorial": ["journal"],
+  "/akunting/penyesuaian-penjualan": ["journal"],
+  "/akunting/neraca": ["financial_report"],
+  "/akunting/buku-besar": ["financial_report"],
+  "/akunting/neraca-saldo": ["financial_report"],
+  "/pod-returns": ["pod_return"],
+  "/finance/debt-payments": ["debt_payment"],
+  "/manifest": ["manifest"],
+  "/marketing": ["customer", "consignee"],
+  "/branch-reports/awb": ["transaction_report"],
+  "/customer-reports/all-status": ["transaction_report"],
+  "/customer-reports/shipments": ["transaction_report"],
+  "/customer-reports/pod": ["transaction_report"],
+  "/branch-reports/customer-monthly-summary": ["transaction_report"],
+  "/branch-reports/daily-turnover-summary": ["transaction_report"],
+  "/branch-reports/inbound-transaction-details": ["transaction_report"],
+  "/branch-reports/manifest-vendor": ["manifest_report"],
+  "/branch-reports/gross-profit": ["financial_report"],
+  "/branch-reports/rekap-gross-profit": ["financial_report"],
+  "/courier-reports": ["delivery_report"],
+  "/financial-reports": ["invoice"],
+  "/branch-reports/manifest-outbound": ["manifest_report"],
+  "/branch-reports/delivery": ["delivery_report"],
+  "/branch-reports/transaction-details": ["transaction_report"],
+  "/ticketting": ["ticket"],
+  "/delivery-sheets": ["delivery"],
+  "/vendor-processes": ["vendor_process"],
+  "/branch-reports/rekap-manifest": ["manifest_report"],
+  "/courier-reports/detail": ["delivery_report"],
   "/group-user": ["user_group"],
   "/user-management": ["user"],
   "/hak-akses-menu": ["permission"],
@@ -50,17 +138,20 @@ const routeResources: Record<string, readonly string[]> = {
   "/shipment-status": ["shipment_status"],
 };
 
+/** Whether the actor may view the page behind a menu href. */
+export function canViewPath(actor: AccessActor | null, href: string) {
+  return !!routeResources[href.split("?")[0]]?.some(
+    (resource) =>
+      permits(actor, "view", resource) &&
+      (resource !== "vendor_tax" || isAdministrator(actor)),
+  );
+}
+
 export function accessibleNavigation(
   actor: AccessActor | null,
 ): NavigationGroup[] {
   const showInventory = isAdministrator(actor);
-  const allowed = (href?: string) =>
-    !!href &&
-    !!routeResources[href]?.some(
-      (resource) =>
-        permits(actor, "view", resource) &&
-        (resource !== "vendor_tax" || isAdministrator(actor)),
-    );
+  const allowed = (href?: string) => !!href && canViewPath(actor, href);
   const visibleLeaf = (item: NavigationLeaf): NavigationLeaf => {
     const { href, ...presentation } = item;
     return allowed(href) ? item : presentation;

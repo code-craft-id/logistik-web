@@ -53,26 +53,108 @@ const decimalField = (maxInt: number, scale: number) =>
     })
     .pipe(decimalString(maxInt, scale).nullable().optional());
 
-export const createBookingSchema = z
+const dimensionRowSchema = z
   .object({
-    bookingNo: z.string().trim().max(50).optional().nullable(),
-    bookingDate: z.coerce.date().optional(),
-    branchId: optionalPositiveInt,
-    customerId: optionalPositiveInt,
-    senderName: z.string().trim().max(150).optional().nullable(),
-    receiverName: z.string().trim().max(150).optional().nullable(),
-    doNo: z.string().trim().max(50).optional().nullable(),
-    destination: z.string().trim().max(150).optional().nullable(),
-    koli: z.preprocess(
-      emptyToUndefined,
-      z.coerce.number().int().min(0).optional(),
-    ),
+    length: decimalField(6, 2),
+    width: decimalField(6, 2),
+    height: decimalField(6, 2),
     kilo: decimalField(8, 2),
-    volume: decimalField(7, 3),
-    biaya: decimalField(13, 2),
-    status: z.never().optional(),
+    packed: z.boolean().optional(),
+    packing: decimalField(13, 2),
   })
   .strict();
+const dimensionRowsField = z.preprocess((value) => {
+  const cleaned = emptyToUndefined(value);
+  if (typeof cleaned !== "string") return cleaned;
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    return cleaned;
+  }
+}, z.array(dimensionRowSchema).max(100).optional());
+
+const withDimensionClaim = <T extends z.ZodRawShape>(shape: T) =>
+  z
+    .object({
+      ...shape,
+      dimensionRows: dimensionRowsField,
+    })
+    .strict()
+    .superRefine((data, ctx) => {
+      const record = data as Record<string, unknown>;
+      const rows = record.dimensionRows;
+      if (
+        "chargeableWeight" in record &&
+        record.chargeableWeight != null &&
+        !(Array.isArray(rows) && rows.length > 0)
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["chargeableWeight"],
+          message: "Berat terberat harus dihitung dari dimensi per koli.",
+        });
+      }
+    });
+
+export const createBookingSchema = withDimensionClaim({
+  bookingNo: z.string().trim().max(50).optional().nullable(),
+  bookingDate: z.coerce.date().optional(),
+  branchId: optionalPositiveInt,
+  customerId: optionalPositiveInt,
+  senderName: z.string().trim().max(150).optional().nullable(),
+  receiverName: z.string().trim().max(150).optional().nullable(),
+  doNo: z.string().trim().max(255).optional().nullable(),
+  destination: z.string().trim().max(150).optional().nullable(),
+  destinationBranchId: optionalPositiveInt,
+  senderAddress: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  senderPhone: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(30).optional().nullable(),
+  ),
+  consigneeId: optionalPositiveInt,
+  receiverAddress: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  receiverPhone: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(30).optional().nullable(),
+  ),
+  deliveryServiceId: optionalPositiveInt,
+  goodsTypeId: optionalPositiveInt,
+  transportModeId: optionalPositiveInt,
+  costTypeId: optionalPositiveInt,
+  /** Kurir chosen on the form: the booking is assigned right away. */
+  courierId: optionalPositiveInt,
+  description: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  remarks: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  pricePerKg: decimalField(13, 2),
+  minWeight: decimalField(8, 2),
+  /** Terberat from Dimensi (sum of per-koli max(volume, berat)). */
+  chargeableWeight: decimalField(8, 2),
+  koli: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(0).optional(),
+  ),
+  kilo: decimalField(8, 2),
+  volume: decimalField(7, 3),
+  biaya: decimalField(13, 2),
+  /** Generate the booking number when none is typed (like the AWB). */
+  autoBookingNo: z.preprocess(
+    (v) => v === true || v === "on" || v === "true",
+    z.boolean().optional(),
+  ),
+  status: z.never().optional(),
+});
 
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 
@@ -86,42 +168,132 @@ const normalizeAwbSchema = (v: unknown) => {
   return v;
 };
 
-export const createTransactionSchema = z
-  .object({
-    idempotencyKey: z.preprocess(
-      emptyToUndefined,
-      z.string().min(8).max(64).optional(),
-    ),
-    bookingId: optionalPositiveInt,
-    awbNo: z.preprocess(
-      normalizeAwbSchema,
-      z.string().min(1).max(50).nullable().optional(),
-    ),
-    transactionDate: z.coerce.date().optional(),
-    doNo: z.string().trim().max(50).optional().nullable(),
-    senderName: z.string().trim().max(150).optional().nullable(),
-    receiverName: z.string().trim().max(150).optional().nullable(),
-    originBranchId: z.preprocess((v) => {
-      const e = emptyToUndefined(v);
-      if (e === undefined || e === null) return e;
-      if (typeof e === "string") {
-        const t = e.trim();
-        if (t === "") return undefined;
-      }
-      return e;
-    }, z.coerce.number().int().positive()),
-    destinationBranchId: optionalPositiveInt,
-    koli: z.preprocess(
-      emptyToUndefined,
-      z.coerce.number().int().min(0).optional(),
-    ),
-    kilo: decimalField(8, 2),
-    volume: decimalField(7, 3),
-    biaya: decimalField(13, 2),
-    courierId: optionalPositiveInt,
-    status: z.never().optional(),
-  })
-  .strict();
+export const createTransactionSchema = withDimensionClaim({
+  idempotencyKey: z.preprocess(
+    emptyToUndefined,
+    z.string().min(8).max(64).optional(),
+  ),
+  bookingId: optionalPositiveInt,
+  awbNo: z.preprocess(
+    normalizeAwbSchema,
+    z.string().min(1).max(50).nullable().optional(),
+  ),
+  transactionDate: z.coerce.date().optional(),
+  doNo: z.string().trim().max(255).optional().nullable(),
+  senderName: z.string().trim().max(150).optional().nullable(),
+  receiverName: z.string().trim().max(150).optional().nullable(),
+  originBranchId: z.preprocess((v) => {
+    const e = emptyToUndefined(v);
+    if (e === undefined || e === null) return e;
+    if (typeof e === "string") {
+      const t = e.trim();
+      if (t === "") return undefined;
+    }
+    return e;
+  }, z.coerce.number().int().positive()),
+  destinationBranchId: optionalPositiveInt,
+  koli: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(0).optional(),
+  ),
+  kilo: decimalField(8, 2),
+  volume: decimalField(7, 3),
+  biaya: decimalField(13, 2),
+  courierId: optionalPositiveInt,
+  customerId: optionalPositiveInt,
+  transportModeId: optionalPositiveInt,
+  deliveryServiceId: optionalPositiveInt,
+  goodsTypeId: optionalPositiveInt,
+  costTypeId: optionalPositiveInt,
+  agentId: optionalPositiveInt,
+  description: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  remarks: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  pickupCourierId: optionalPositiveInt,
+  marketingPersonId: optionalPositiveInt,
+  consigneeId: optionalPositiveInt,
+  senderAddress: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  senderPhone: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(30).optional().nullable(),
+  ),
+  receiverAddress: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(500).optional().nullable(),
+  ),
+  receiverPhone: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(30).optional().nullable(),
+  ),
+  pricingType: z.preprocess(
+    emptyToUndefined,
+    z.enum(["KG", "KOLI", "TRUCKING"]).optional(),
+  ),
+  pricePerKg: decimalField(13, 2),
+  minWeight: decimalField(8, 2),
+  /** Terberat from Dimensi (sum of per-koli max(volume, berat)). */
+  chargeableWeight: decimalField(8, 2),
+  insured: z.preprocess(
+    (v) =>
+      v === "Y" || v === true
+        ? true
+        : v === "N" || v === false
+          ? false
+          : undefined,
+    z.boolean().optional(),
+  ),
+  otherFee: decimalField(13, 2),
+  packingFee: decimalField(13, 2),
+  pickupFee: decimalField(13, 2),
+  goodsValue: decimalField(13, 2),
+  insuranceFee: decimalField(13, 2),
+  codValue: decimalField(13, 2),
+  codFee: decimalField(13, 2),
+  pic1: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(100).optional().nullable(),
+  ),
+  pic2: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(100).optional().nullable(),
+  ),
+  leadTime: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(50).optional().nullable(),
+  ),
+  /** Per-AWB "Show Price Print AWB" (Y/N); absent follows the company. */
+  showPriceOnPrint: z.preprocess(
+    (v) =>
+      v === "Y" || v === true
+        ? true
+        : v === "N" || v === false
+          ? false
+          : undefined,
+    z.boolean().optional(),
+  ),
+  discountPercent: decimalField(3, 2).refine(
+    (v) => v == null || Number(v) <= 100,
+    "Discount maksimal 100%",
+  ),
+  ppnPercent: decimalField(3, 2).refine(
+    (v) => v == null || Number(v) <= 100,
+    "PPN maksimal 100%",
+  ),
+  /** Generate the AWB number when none is typed (legacy "Manual AWB" off). */
+  autoAwb: z.preprocess(
+    (v) => v === true || v === "on" || v === "true",
+    z.boolean().optional(),
+  ),
+  status: z.never().optional(),
+});
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 

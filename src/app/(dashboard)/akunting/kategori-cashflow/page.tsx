@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
-import { PreviewScreenPage } from "@/components/patterns/preview-screen";
-import { screens } from "@/features/accounting/preview/screens";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Kategori Cashflow" };
+// Simplified chart of accounts (owner decision 2026-11-19): Kategori Akun,
+// Master Arus Kas and Kategori Rugi Laba are managed on Data Akun.
 export default function Page() {
-  return <PreviewScreenPage screen={screens["/akunting/kategori-cashflow"]} />;
+  redirect("/akunting/data-akun#kategori");
 }

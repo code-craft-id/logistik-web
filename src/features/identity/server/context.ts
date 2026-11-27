@@ -1,5 +1,6 @@
 import "server-only";
 import { headers } from "next/headers";
+import { cache } from "react";
 import { getAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { activeActor } from "../permissions";
@@ -14,9 +15,10 @@ export async function sessionForHeaders(requestHeaders: Headers) {
   const actor = await loadAccessActor(prisma, userId);
   return activeActor(actor) ? { session, actor } : null;
 }
-export async function currentIdentity() {
-  return sessionForHeaders(await headers());
-}
+// Deduped per request: layout, page and services share one session + actor lookup.
+export const currentIdentity = cache(async () =>
+  sessionForHeaders(await headers()),
+);
 export const identityService = createIdentityService(
   prisma,
   async () => (await currentIdentity())?.actor ?? null,

@@ -271,6 +271,19 @@ export function createOrganizationService(
                 409,
                 "Data telah berubah. Tutup formulir dan muat data terbaru sebelum mengedit kembali.",
               );
+            if (id === null) {
+              // Single-company system (owner decision 2026-11-23): the first
+              // company may be created on an empty system; afterwards only
+              // edits are allowed. The advisory lock serializes concurrent
+              // first creations.
+              await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('lms-single-company'))`;
+              if (await tx.company.count({ where: { deletedAt: null } }))
+                throw new IdentityError(
+                  "CONFLICT",
+                  409,
+                  "Sistem hanya memakai satu perusahaan. Ubah data perusahaan yang sudah ada.",
+                );
+            }
             record =
               id === null
                 ? await tx.company.create({ data, select: { id: true } })
@@ -472,40 +485,14 @@ export function createOrganizationService(
         const data = { deletedAt: new Date() };
         let count: number;
         if (kind === "company") {
-          if (
-            await tx.company.findFirst({
-              where: {
-                id,
-                OR: [
-                  { banks: { some: { deletedAt: null } } },
-                  { invoiceSettings: { some: { deletedAt: null } } },
-                  { digitalWallets: { some: { deletedAt: null } } },
-                  { whatsappNotifications: { some: { deletedAt: null } } },
-                ],
-              },
-              select: { id: true },
-            })
-          )
-            throw new IdentityError(
-              "IN_USE",
-              409,
-              "Perusahaan masih mempunyai konfigurasi aktif.",
-            );
-          if (
-            await tx.office.count({ where: { companyId: id, deletedAt: null } })
-          )
-            throw new IdentityError(
-              "IN_USE",
-              409,
-              "Perusahaan masih mempunyai kantor.",
-            );
-          count = (
-            await tx.company.updateMany({
-              where: { id, deletedAt: null },
-              data,
-            })
-          ).count;
-        } else if (kind === "office") {
+          // Single-company system: the company is edited, never deleted.
+          throw new IdentityError(
+            "CONFLICT",
+            409,
+            "Perusahaan tidak bisa dihapus. Sistem hanya memakai satu perusahaan; ubah datanya saja.",
+          );
+        }
+        if (kind === "office") {
           if (
             await tx.branch.count({ where: { officeId: id, deletedAt: null } })
           )

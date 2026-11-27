@@ -21,6 +21,9 @@
   --sidebar: #ffffff;
   --workspace: #f8fafc;
   --overlay: #17233480;
+  /* Floating surfaces (select lists, tooltips) must be opaque. */
+  --popover: #ffffff;
+  --popover-foreground: #172334;
   /* Legacy chart palette; values are illustration tokens, never financial data. */
   --chart-1: #0f5c4c;
   --chart-2: #d99717;
@@ -47,6 +50,8 @@
   --color-sidebar: var(--sidebar);
   --color-workspace: var(--workspace);
   --color-overlay: var(--overlay);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);

@@ -1,11 +1,13 @@
 "use client";
 import { Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import type {
   ReferenceCapabilities,
   ReferenceRow,
 } from "@/components/patterns/reference-workspace";
 import { Button } from "@/components/ui/button";
+import { ComboSelect } from "@/components/ui/combo-select";
 import {
   Dialog,
   DialogContent,
@@ -176,7 +178,7 @@ export function CompanySettingEditor({
         <div className="flex flex-wrap items-end gap-3">
           <div className="space-y-2">
             <Label htmlFor="setting-record">Konfigurasi</Label>
-            <select
+            <ComboSelect
               id="setting-record"
               className="min-h-11 rounded-md border border-input bg-background px-3"
               value={selected ?? ""}
@@ -188,7 +190,7 @@ export function CompanySettingEditor({
                   {definition.label} {(page - 1) * 50 + index + 1}
                 </option>
               ))}
-            </select>
+            </ComboSelect>
           </div>
           <Button
             variant="outline"
@@ -209,7 +211,7 @@ export function CompanySettingEditor({
         </div>
       )}
       {loading ? (
-        <output>Memuat konfigurasi…</output>
+        <LoadingState label="Memuat konfigurasi…" />
       ) : (
         <form
           key={`${selected}:${record?.updatedAt ?? "new"}`}
@@ -221,49 +223,61 @@ export function CompanySettingEditor({
         >
           {definition.fields
             .filter((field) => field.key !== "companyId")
-            .map((field) => (
-              <div
-                className={`grid min-w-0 gap-2 sm:grid-cols-3 sm:items-center sm:gap-5 ${["invoiceMessage", "description", "provider", "verificationEmail"].includes(field.key) ? "lg:col-span-2" : ""}`}
-                key={field.key}
-              >
-                <Label htmlFor={`setting-${field.key}`}>
-                  {field.label}
-                  {field.required ? " *" : ""}
-                </Label>
-                {field.key === "invoiceMessage" ||
-                field.key === "description" ? (
-                  <Textarea
-                    id={`setting-${field.key}`}
-                    name={field.key}
-                    defaultValue={String(record?.[field.key] ?? "")}
-                    required={field.required}
-                    maxLength={field.maxLength}
-                    disabled={!writable || busy || !ready}
-                    className="sm:col-span-2"
-                  />
-                ) : (
-                  <Input
-                    id={`setting-${field.key}`}
-                    name={field.key}
-                    type={field.type === "email" ? "email" : "text"}
-                    defaultValue={
-                      field.private && !capabilities.update
-                        ? ""
-                        : String(record?.[field.key] ?? "")
-                    }
-                    placeholder={
-                      field.private && !capabilities.update
-                        ? "Data terbatas"
-                        : ""
-                    }
-                    required={field.required}
-                    maxLength={field.maxLength}
-                    disabled={!writable || busy || !ready}
-                    className="min-h-11 sm:col-span-2"
-                  />
-                )}
-              </div>
-            ))}
+            .map((field) => {
+              // Wide rows: 6 tracks keep the label as wide as a normal row's.
+              const wide = [
+                "invoiceMessage",
+                "description",
+                "provider",
+                "verificationEmail",
+              ].includes(field.key);
+              const span = wide
+                ? "sm:col-span-2 lg:col-span-5"
+                : "sm:col-span-2";
+              return (
+                <div
+                  className={`grid min-w-0 gap-2 sm:grid-cols-3 sm:items-center sm:gap-5 ${wide ? "lg:col-span-2 lg:grid-cols-6" : ""}`}
+                  key={field.key}
+                >
+                  <Label htmlFor={`setting-${field.key}`}>
+                    {field.label}
+                    {field.required ? " *" : ""}
+                  </Label>
+                  {field.key === "invoiceMessage" ||
+                  field.key === "description" ? (
+                    <Textarea
+                      id={`setting-${field.key}`}
+                      name={field.key}
+                      defaultValue={String(record?.[field.key] ?? "")}
+                      required={field.required}
+                      maxLength={field.maxLength}
+                      disabled={!writable || busy || !ready}
+                      className={span}
+                    />
+                  ) : (
+                    <Input
+                      id={`setting-${field.key}`}
+                      name={field.key}
+                      type={field.type === "email" ? "email" : "text"}
+                      defaultValue={
+                        field.private && !capabilities.update
+                          ? ""
+                          : String(record?.[field.key] ?? "")
+                      }
+                      placeholder={
+                        field.private && !capabilities.update
+                          ? "Data terbatas"
+                          : ""
+                      }
+                      required={field.required}
+                      maxLength={field.maxLength}
+                      disabled={!writable || busy || !ready}
+                      className={`min-h-11 ${span}`}
+                    />
+                  )}
+                </div>
+              );
+            })}
           <div className="flex flex-wrap gap-2 pt-2 lg:col-span-2">
             <Button className="min-h-11" disabled={!writable || busy || !ready}>
               {busy ? "Menyimpan…" : selected ? "Update" : "Simpan"}

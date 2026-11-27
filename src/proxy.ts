@@ -1,6 +1,6 @@
+import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { sessionForHeaders } from "@/features/identity/server/context";
 import { isPublicPath } from "@/lib/routes";
 
 export async function proxy(request: NextRequest) {
@@ -11,10 +11,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check session
-  const current = await sessionForHeaders(request.headers);
-
-  if (!current) {
+  // Optimistic cookie check only (no DB): every page, action and route handler
+  // re-validates the session and rights itself, so a DB lookup here was paid twice.
+  if (!getSessionCookie(request)) {
     if (pathname.split("/").includes("api")) {
       return NextResponse.json(
         { message: "Silakan masuk kembali." },

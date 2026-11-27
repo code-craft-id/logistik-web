@@ -1,15 +1,19 @@
+import { redirect } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
+import { LoadingState } from "@/components/patterns/content-state";
 import { accessibleNavigation } from "@/components/shell/accessible-navigation";
 import { AppShell } from "@/components/shell/app-shell";
+import { HelpChat } from "@/features/help/components/help-chat";
 import { WorkspaceAccount } from "@/features/identity/components/workspace-account";
 import { currentIdentity } from "@/features/identity/server/context";
+import { NotificationBell } from "@/features/modul/components/notification-bell";
 
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   return (
     <Suspense
       fallback={
         <AppShell groups={[]}>
-          <output>Memuat menu…</output>
+          <LoadingState label="Memuat menu…" />
         </AppShell>
       }
     >
@@ -19,22 +23,28 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
 }
 async function AuthorizedShell({ children }: { children: ReactNode }) {
   const current = await currentIdentity();
+  // The proxy only checks cookie presence; a revoked or expired session lands here.
+  if (!current) redirect("/login");
   return (
-    <AppShell
-      groups={accessibleNavigation(current?.actor ?? null)}
-      accountContent={
-        <Suspense
-          fallback={
-            <output className="px-3 py-2 text-sm text-muted-foreground">
-              Memuat akun...
-            </output>
-          }
-        >
-          <WorkspaceAccount />
-        </Suspense>
-      }
-    >
-      {children}
-    </AppShell>
+    <>
+      <AppShell
+        groups={accessibleNavigation(current.actor)}
+        headerActions={<NotificationBell key="notifications" />}
+        accountContent={
+          <Suspense
+            fallback={
+              <output className="px-3 py-2 text-sm text-muted-foreground">
+                Memuat akun...
+              </output>
+            }
+          >
+            <WorkspaceAccount />
+          </Suspense>
+        }
+      >
+        {children}
+      </AppShell>
+      <HelpChat />
+    </>
   );
 }

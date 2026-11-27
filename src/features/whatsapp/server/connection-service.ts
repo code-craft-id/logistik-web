@@ -14,7 +14,10 @@ import { createWhatsAppGateway } from "./gateway";
 export function createWhatsAppConnectionService(
   db: PrismaClient,
   resolveActor: () => Promise<AccessActor | null>,
-  gateway = createWhatsAppGateway(),
+  gateway: Pick<
+    ReturnType<typeof createWhatsAppGateway>,
+    "session" | "qr"
+  > = createWhatsAppGateway(),
 ) {
   async function authorize(input: unknown, manage: boolean) {
     const current = await resolveActor();

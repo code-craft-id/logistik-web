@@ -39,7 +39,19 @@ const actionLabels: Record<string, string> = {
   update: "Ubah",
   delete: "Hapus",
   manage: "Akses penuh",
+  export: "Ekspor",
+  approve: "Setujui",
+  request: "Ajukan",
+  issue: "Terbitkan",
+  void: "Batalkan",
+  reverse: "Balik",
+  post: "Posting",
+  finalize: "Finalisasi",
+  close: "Tutup",
+  use: "Pakai",
 };
+// Actions ticked together by the "Semua" checkbox of a menu row.
+const rowActions = ["view", "create", "update", "delete"];
 function fullAccess(group: GroupPermission) {
   return !!group.permissions.system_admin?.manage;
 }
@@ -171,6 +183,30 @@ export function PermissionMatrixPageClient({
     );
   };
 
+  const setRow = (
+    groupId: number,
+    resource: string,
+    actions: string[],
+    granted: boolean,
+  ) => {
+    setMatrix((prev) =>
+      prev.map((g) =>
+        g.group.id === groupId
+          ? {
+              ...g,
+              permissions: {
+                ...g.permissions,
+                [resource]: {
+                  ...g.permissions[resource],
+                  ...Object.fromEntries(actions.map((a) => [a, granted])),
+                },
+              },
+            }
+          : g,
+      ),
+    );
+  };
+
   const filteredResources = resources.filter(
     (r) =>
       r.label.toLowerCase().includes(search.toLowerCase()) ||
@@ -273,10 +309,11 @@ export function PermissionMatrixPageClient({
                 <TableHead>No</TableHead>
                 <TableHead>Menu</TableHead>
                 <TableHead>Grup User</TableHead>
+                <TableHead className="text-center">Semua</TableHead>
                 {["view", "create", "update", "delete", "manage"].map(
                   (action) => (
                     <TableHead key={action} className="text-center">
-                      {actionLabels[action]}
+                      {actionLabels[action] ?? action}
                     </TableHead>
                   ),
                 )}
@@ -286,6 +323,9 @@ export function PermissionMatrixPageClient({
               {filteredResources.map((resource, index) => {
                 const group = matrix.find(
                   (g) => g.group.id === selectedGroupId,
+                );
+                const row = rowActions.filter((a) =>
+                  resource.actions.includes(a),
                 );
                 return (
                   <TableRow key={resource.resource}>
@@ -299,6 +339,37 @@ export function PermissionMatrixPageClient({
                       )}
                     </TableCell>
                     <TableCell>{group?.group.name ?? "Pilih grup"}</TableCell>
+                    <TableCell className="text-center">
+                      {group && row.length ? (
+                        <span className="inline-flex min-h-11 min-w-11 items-center justify-center">
+                          <Checkbox
+                            checked={
+                              fullAccess(group) ||
+                              row.every(
+                                (a) =>
+                                  group.permissions[resource.resource]?.[a],
+                              )
+                            }
+                            disabled={
+                              !capabilities.update ||
+                              saving ||
+                              fullAccess(group)
+                            }
+                            onCheckedChange={(checked) =>
+                              setRow(
+                                group.group.id,
+                                resource.resource,
+                                row,
+                                checked === true,
+                              )
+                            }
+                            aria-label={`Semua ${resource.label} — ${group.group.name}`}
+                          />
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </TableCell>
                     {["view", "create", "update", "delete", "manage"].map(
                       (action) => (
                         <TableCell key={action} className="text-center">

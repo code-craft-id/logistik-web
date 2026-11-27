@@ -57,6 +57,8 @@ next-env.d.ts
 /.agents/
 /.codex/
 /.impeccable/
+/.serena/
 
+skills-lock.json
 
 .codex/dev-admin-accounts.txt

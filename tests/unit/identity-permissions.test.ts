@@ -47,7 +47,12 @@ describe("group-owned roles and deny-by-default access", () => {
       expect(
         permissionResources.find((entry) => entry.resource === resource)
           ?.actions,
-      ).toEqual(["view", "create", "update"]);
+      ).toEqual(
+        // Booking adds "approve" for assigning a courier / cancelling (✔/✖).
+        resource === "booking"
+          ? ["view", "create", "update", "approve"]
+          : ["view", "create", "update"],
+      );
       expect(validPermission({ resource, action: "delete" })).toBe(false);
       expect(permits(actor(), "view", resource)).toBe(false);
       expect(
@@ -116,7 +121,8 @@ describe("identity server input contracts", () => {
     ).rejects.toMatchObject({
       code: "DUPLICATE",
       status: 409,
-      message: "Username, email, atau nama grup sudah digunakan.",
+      message:
+        "Kode, nomor, username, email atau nama tersebut sudah digunakan. Gunakan nilai lain.",
     });
     await expect(
       identityAction(async () => {
@@ -125,7 +131,8 @@ describe("identity server input contracts", () => {
     ).rejects.toMatchObject({
       code: "INTERNAL_ERROR",
       status: 500,
-      message: "Permintaan tidak dapat diproses.",
+      message:
+        "Permintaan tidak dapat diproses. Coba lagi; jika berulang, hubungi admin.",
     });
   });
   const input = {

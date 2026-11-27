@@ -1,0 +1,12 @@
+/// Help chat AI provider, one row (id = 1), edited by administrators only.
+/// The key is stored encrypted. Configuration, so no soft delete.
+model HelpAiSetting {
+  id        Int      @id @default(1)
+  url       String   @db.VarChar(300)
+  model     String   @db.VarChar(100)
+  keyCipher String   @map("key_cipher")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("help_ai_settings")
+}

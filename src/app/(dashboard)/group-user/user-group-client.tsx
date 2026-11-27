@@ -3,6 +3,7 @@
 import { ChevronLeft, ChevronRight, Edit, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useConfirm } from "@/components/patterns/confirm-dialog";
 import { EmptyState, LoadingState } from "@/components/patterns/content-state";
 import { FormField } from "@/components/patterns/form-field";
 import { PageHeading } from "@/components/patterns/page-heading";
@@ -51,6 +52,7 @@ export function UserGroupPageClient({
   capabilities?: IdentityCapabilities;
 }) {
   const [groups, setGroups] = useState<UserGroup[]>([]);
+  const { confirm: confirmDialog, dialog: confirmDialogNode } = useConfirm();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -147,7 +149,14 @@ export function UserGroupPageClient({
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin ingin menghapus grup ini?")) return;
+    if (
+      !(await confirmDialog({
+        title: "Hapus grup ini?",
+        description:
+          "Grup yang dihapus tidak bisa dipakai lagi untuk user. Pastikan tidak ada user yang masih memakainya.",
+      }))
+    )
+      return;
 
     try {
       const res = await fetch(`/group-user/api/${id}`, { method: "DELETE" });
@@ -181,6 +190,7 @@ export function UserGroupPageClient({
 
   return (
     <div className="space-y-6">
+      {confirmDialogNode}
       <PageHeading
         title="Grup User"
         description="Grup menentukan peran user. Izin tiap grup diatur di Hak Akses Menu."
@@ -281,7 +291,9 @@ export function UserGroupPageClient({
                     <TableCell>{group._count.users}</TableCell>
                     <TableCell>{group._count.permissions}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(group.createdAt).toLocaleDateString("id-ID")}
+                      {new Date(group.createdAt).toLocaleDateString("id-ID", {
+                        timeZone: "Asia/Jakarta",
+                      })}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

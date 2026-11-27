@@ -7,6 +7,7 @@ export const createManifestSchema = z.object({
   branchId: z.coerce.number().int().positive().optional().nullable(),
   vehicleId: z.coerce.number().int().positive().optional().nullable(),
   courierId: z.coerce.number().int().positive().optional().nullable(),
+  vendorId: z.coerce.number().int().positive().optional().nullable(),
   originBranchId: z.coerce.number().int().positive().optional().nullable(),
   destinationBranchId: z.coerce.number().int().positive().optional().nullable(),
   transit1: z.string().trim().max(100).optional().nullable(),
