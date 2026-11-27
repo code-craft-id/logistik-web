@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { PageHeading } from "@/components/patterns/page-heading";
 import { HelpAiForm } from "@/features/help/components/help-ai-form";
-import { isAdministrator } from "@/features/identity/permissions";
+import { canManageHelpAi } from "@/features/help/settings";
 import { currentIdentity } from "@/features/identity/server/context";
 import { prisma } from "@/lib/db";
 
@@ -13,8 +13,9 @@ export const instant = false;
 export default async function Page() {
   const current = await currentIdentity();
   if (!current) redirect("/login");
-  // Hidden page: not in any menu, and "not found" for everyone but admins.
-  if (!isAdministrator(current.actor)) notFound();
+  // Hidden page: not in any menu, and "not found" for every other account.
+  if (!canManageHelpAi(current.actor, current.session.user.username))
+    notFound();
   // The key itself is never sent to the browser.
   const row = await prisma.helpAiSetting.findUnique({
     where: { id: 1 },

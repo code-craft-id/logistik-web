@@ -15,6 +15,7 @@ export async function saveHelpAiAction(
   if (!current) return { ok: false, message: "Silakan masuk kembali." };
   const error = await saveHelpAiSetting(
     current.actor,
+    current.session.user.username,
     Object.fromEntries(form),
   );
   if (error) return { ok: false, message: error };

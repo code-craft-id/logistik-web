@@ -35,9 +35,12 @@ function configure() {
 }
 
 describe("help chat AI", () => {
-  it("lets only administrators save, and never moves the old key to a new URL", async () => {
+  it("lets only the named administrator save, and never moves the old key to a new URL", async () => {
     const input = { url: "https://new.invalid/v1", model: "m", key: "" };
-    expect(await saveHelpAiSetting(actor, input)).toBe("Khusus administrator.");
+    vi.stubEnv("HELP_AI_ADMIN", "fake_owner");
+    expect(await saveHelpAiSetting(actor, "fake_owner", input)).toBe(
+      "Akses ditolak.",
+    );
     const admin = {
       ...actor,
       group: {
@@ -45,10 +48,19 @@ describe("help chat AI", () => {
         permissions: [{ resource: "system_admin", action: "manage" }],
       },
     };
+    for (const other of ["fake_other_admin", null])
+      expect(await saveHelpAiSetting(admin, other, input)).toBe(
+        "Akses ditolak.",
+      );
     row.value = { url: "https://old.invalid/v1", model: "m", keyCipher: "x" };
-    expect(await saveHelpAiSetting(admin, input)).toContain("API key");
+    expect(await saveHelpAiSetting(admin, "fake_owner", input)).toContain(
+      "API key",
+    );
     expect(
-      await saveHelpAiSetting(admin, { ...input, url: "http://new.invalid" }),
+      await saveHelpAiSetting(admin, "FAKE_OWNER", {
+        ...input,
+        url: "http://new.invalid",
+      }),
     ).toContain("https://");
     row.value = null;
   });

@@ -69,12 +69,25 @@ const schema = z.object({
   key: z.string().trim().max(500),
 });
 
-/** Administrator only. Returns an error message, or null when saved. */
+/**
+ * Only the one account named in HELP_AI_ADMIN, and only while it is an
+ * administrator. Unset means nobody.
+ */
+export function canManageHelpAi(
+  actor: AccessActor,
+  username: string | null | undefined,
+) {
+  const owner = process.env.HELP_AI_ADMIN?.trim().toLowerCase();
+  return !!owner && username?.toLowerCase() === owner && isAdministrator(actor);
+}
+
+/** Returns an error message, or null when saved. */
 export async function saveHelpAiSetting(
   actor: AccessActor,
+  username: string | null | undefined,
   input: unknown,
 ): Promise<string | null> {
-  if (!isAdministrator(actor)) return "Khusus administrator.";
+  if (!canManageHelpAi(actor, username)) return "Akses ditolak.";
   const parsed = schema.safeParse(input);
   if (!parsed.success) return "Periksa isian: URL harus diawali https://.";
   const { url, model, key } = parsed.data;
