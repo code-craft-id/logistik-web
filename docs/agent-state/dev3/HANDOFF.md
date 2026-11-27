@@ -1,3 +1,10 @@
+## 2026-11-27 — release handoff (HEAD 69697b8, deployed)
+
+- Live on Vercel production with all migrations through 20261127000200_pindah_manifest (log confirmed). Build script retries prisma migrate deploy while Neon wakes (P1001).
+- fitur1 = full provider menu (branch fitur1 / tag fitur1-snapshot, b218022); current branch = fitur2 merged menu with in-page tabs.
+- Done since 2026-11-26: D-44 dashboard, speed work (proxy cookie check, cached identity, one-query actor, list indexes), exports (Status Pengantaran, Rugi Laba, Perkiraan import/export/template), Kasir Lampiran, unique business codes (incl. AWB across branches), rupiah inputs, skeletons, Akunting under /akunting, Pindah Manifest (D-08).
+- Open: B2-B8, N7, K1, K3 (Assets / Kasir Excel), E1 (deferred). Vercel function region not checked (Neon is ap-southeast-1; prefer sin1). Cloudinary env needed for Kasir Lampiran. Rupiah inputs / lampiran / dashboard period fix not yet clicked through in a browser on a fresh server.
+
 ## 2026-11-24 — menu parity handoff
 
 - Resume on `dev3/ready-for-review` (local commits not pushed). Read STATE.md first.
