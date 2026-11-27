@@ -889,3 +889,5 @@ Legacy courier app Progi has "Tukar Poin Progi dan Withdraw Bank" (tutorial titl
 - Rupiah inputs: shared MoneyInput (formats while typing, submits the plain number) on finance fields, Share Truck, AWB / booking prices and fees, Cek Ongkir tariff, debt payment, agent deposit; journal / voucher / invoice line amounts format through moneyText / moneyRaw.
 - Skeleton loading replaces text loaders (menu, profile, master data lists, organization, configuration, WhatsApp).
 - Excel templates: Perkiraan template has a Petunjuk sheet; Perkiraan and Status imports find the header on any sheet within the first 20 rows, so guide sheets and notes may stay.
+- Menu merged (fitur 2, eef8dbe); full menu kept as branch fitur1 / tag fitur1-snapshot (b218022).
+- Pindah Manifest observed on the sandbox (scan AWB on Cek Transit detail, tick, Pilih Manifest with the same destination, Submit; source keeps the row with the target number; tracking "Paket dari manifest X berpindah ke manifest Y"). Built on the scan page: manifest_items moved_to / moved_from, partial unique active row, migration 20261127000200. One sandbox AWB (25351600030) was moved there as the observation.

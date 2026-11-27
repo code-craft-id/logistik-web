@@ -83,7 +83,7 @@ is the agreed work order. Done so far: D-37 WhatsApp notifications
 
 | # | Item | Decision | What is needed |
 |---|---|---|---|
-| B1 | Pindah Manifest on the transit / inbound scan page | D-08 (re-manifest rules) | Whether a released AWB may join another manifest; needs Dev 2 to relax the unique ManifestItem rule with a migration |
+| B1 | ~~Pindah Manifest~~ DONE 2026-11-27 (D-08 re-manifest, migration 20261127000200) | D-08 (re-manifest rules) | Whether a released AWB may join another manifest; needs Dev 2 to relax the unique ManifestItem rule with a migration |
 | B2 | Customer-specific tariffs (Marketing customer price) | Pricing rules (finance / marketing) | Which price wins (customer vs Cek Ongkir route), validity dates |
 | B3 | Area-based destination (province / city instead of branch) | D-27 | Which master the Tujuan uses and how tariffs map to it |
 | B4 | "Operator Rugi Laba" field | Simplified by owner (sign follows account kind) | Only if the provider uses it for something else: needs an explanation from finance |

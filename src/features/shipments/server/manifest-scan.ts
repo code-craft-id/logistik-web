@@ -3,6 +3,7 @@ import "server-only";
 import {
   type AccessActor,
   isAdministrator,
+  permits,
 } from "@/features/identity/permissions";
 import { assertPermission } from "@/features/identity/server/access";
 import { ModulError } from "@/features/modul/server/common";
@@ -113,7 +114,11 @@ export type ScanRow = {
   heaviest: string | null;
   koli: number;
   scanned: number;
+  /** Pindah Manifest: target manifest number once moved, else null. */
+  movedTo: string | null;
 };
+/** Manifest statuses that can still receive a moved AWB. */
+const MOVE_TARGET_STATUSES = ["Draft", "Loaded", "In Transit"];
 
 /** Detail page data: header and per-AWB scan progress. */
 export async function manifestScanView(
@@ -126,9 +131,14 @@ export async function manifestScanView(
   if (!manifest) throw new ModulError("Manifest tidak ditemukan.");
   const where = await scanBranch(actor, manifest, kind);
   const items = await prisma.manifestItem.findMany({
-    where: { manifestId, releasedAt: null, deletedAt: null },
+    where: {
+      manifestId,
+      deletedAt: null,
+      OR: [{ releasedAt: null }, { movedToManifestId: { not: null } }],
+    },
     orderBy: { id: "asc" },
     select: {
+      movedToManifest: { select: { manifestNo: true } },
       transaction: {
         select: {
           id: true,
@@ -150,7 +160,7 @@ export async function manifestScanView(
     _count: { _all: true },
   });
   const scanned = new Map(counts.map((c) => [c.transactionId, c._count._all]));
-  const rows: ScanRow[] = items.map(({ transaction: t }) => {
+  const rows: ScanRow[] = items.map(({ transaction: t, movedToManifest }) => {
     const kilo = t.kilo ? Number(t.kilo) : 0;
     const volume = t.volume ? Number(t.volume) : 0;
     return {
@@ -164,13 +174,18 @@ export async function manifestScanView(
         (kilo || volume ? String(Math.max(kilo, volume)) : null),
       koli: Math.max(1, t.koli ?? 1),
       scanned: scanned.get(t.id) ?? 0,
+      movedTo: movedToManifest?.manifestNo ?? null,
     };
   });
+  const targets = permits(actor, "update", "manifest")
+    ? await moveTargets(actor, manifest)
+    : [];
   return {
     manifest,
     kind,
     transitNo: where.transitNo,
     rows,
+    targets,
     totalKoli: rows.reduce((t, r) => t + r.koli, 0),
     totalScanned: rows.reduce((t, r) => t + Math.min(r.scanned, r.koli), 0),
   };
@@ -302,4 +317,118 @@ export async function firstInboundScans(transactionIds: number[]) {
     WHERE s.kind = 'INBOUND' AND s.transaction_id IN (${Prisma.join(transactionIds)})
     GROUP BY s.transaction_id`;
   return new Map(rows.map((r) => [r.transactionId, r.at]));
+}
+
+/** Pindah Manifest targets: other manifests to the same destination (OBSERVED). */
+async function moveTargets(actor: AccessActor, manifest: ScanManifest) {
+  if (!manifest.destinationBranchId) return [];
+  const [destination, targets] = await Promise.all([
+    prisma.branch.findUnique({
+      where: { id: manifest.destinationBranchId },
+      select: { name: true },
+    }),
+    prisma.manifest.findMany({
+      where: {
+        id: { not: manifest.id },
+        deletedAt: null,
+        destinationBranchId: manifest.destinationBranchId,
+        status: { in: MOVE_TARGET_STATUSES },
+        ...(isAdministrator(actor)
+          ? {}
+          : {
+              OR: [
+                { originBranchId: { in: actor.branchIds } },
+                { branchId: { in: actor.branchIds } },
+              ],
+            }),
+      },
+      orderBy: [{ manifestDate: "desc" }, { id: "desc" }],
+      take: 200,
+      select: { id: true, manifestNo: true },
+    }),
+  ]);
+  return targets.map((t) => ({
+    ...t,
+    destination: destination?.name ?? "-",
+  }));
+}
+
+/**
+ * Pindah Manifest (OBSERVED sandbox Cek Transit detail, 2026-11-27): scanned
+ * AWBs of this manifest move to another manifest with the same destination.
+ * The source row is released and records the target; the new row records
+ * the source. Serialized per manifest; the partial unique index keeps one
+ * active manifest row per AWB.
+ */
+export async function moveToManifest(
+  actor: AccessActor,
+  manifestId: number,
+  kind: ScanKind,
+  targetManifestId: number,
+  transactionIds: number[],
+) {
+  assertPermission(actor, "update", "manifest");
+  const ids = [...new Set(transactionIds)].filter(
+    (id) => Number.isSafeInteger(id) && id > 0,
+  );
+  if (!ids.length) throw new ModulError("Centang AWB yang akan dipindah.");
+  if (ids.length > 500) throw new ModulError("Maksimal 500 AWB sekali pindah.");
+  const manifest = await loadManifest(manifestId);
+  if (!manifest) throw new ModulError("Manifest tidak ditemukan.");
+  await scanBranch(actor, manifest, kind);
+  const target = (await moveTargets(actor, manifest)).find(
+    (m) => m.id === targetManifestId,
+  );
+  if (!target)
+    throw new ModulError(
+      "Pilih manifest tujuan dengan tujuan yang sama dan belum tiba.",
+    );
+  return prisma.$transaction(async (tx) => {
+    for (const id of [manifestId, targetManifestId].sort((a, b) => a - b))
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`manifest-move:${id}`}))`;
+    const items = await tx.manifestItem.findMany({
+      where: {
+        manifestId,
+        transactionId: { in: ids },
+        releasedAt: null,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        transactionId: true,
+        transaction: { select: { awbNo: true } },
+      },
+    });
+    if (items.length !== ids.length)
+      throw new ModulError(
+        "Sebagian AWB sudah tidak ada di manifest ini. Muat ulang halaman.",
+      );
+    const scans = await tx.manifestScan.groupBy({
+      by: ["transactionId"],
+      where: { manifestId, kind, transactionId: { in: ids } },
+      _count: { _all: true },
+    });
+    const scanned = new Set(scans.map((x) => x.transactionId));
+    const unscanned = items.filter((i) => !scanned.has(i.transactionId));
+    if (unscanned.length)
+      throw new ModulError(
+        `Scan dulu AWB ${unscanned.map((i) => i.transaction.awbNo ?? `#${i.transactionId}`).join(", ")} sebelum dipindah.`,
+      );
+    const now = new Date();
+    for (const item of items) {
+      await tx.manifestItem.update({
+        where: { id: item.id },
+        data: { releasedAt: now, movedToManifestId: targetManifestId },
+      });
+      await tx.manifestItem.create({
+        data: {
+          manifestId: targetManifestId,
+          transactionId: item.transactionId,
+          assignedById: actor.id,
+          movedFromManifestId: manifestId,
+        },
+      });
+    }
+    return { moved: items.length, target: target.manifestNo };
+  });
 }

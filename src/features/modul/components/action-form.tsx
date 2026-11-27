@@ -18,6 +18,7 @@ export function ActionForm({
   className,
   reset = false,
   onDone,
+  id,
 }: {
   action: (formData: FormData) => Promise<ModulResult>;
   children?: ReactNode;
@@ -27,6 +28,8 @@ export function ActionForm({
   reset?: boolean;
   /** Called after a successful action (for example to close a dialog). */
   onDone?: () => void;
+  /** Lets inputs outside the form (form="id") join it, e.g. table checkboxes. */
+  id?: string;
 }) {
   const router = useRouter();
   const form = useRef<HTMLFormElement>(null);
@@ -34,6 +37,7 @@ export function ActionForm({
   const [result, setResult] = useState<ModulResult | null>(null);
   return (
     <form
+      id={id}
       ref={form}
       className={cn("space-y-3", className)}
       onSubmit={(event) => {

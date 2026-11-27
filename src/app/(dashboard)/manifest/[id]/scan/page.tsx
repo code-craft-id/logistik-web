@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
+import { ActionForm } from "@/features/modul/components/action-form";
 import { ModulError } from "@/features/modul/server/common";
 import { ManifestScanBox } from "@/features/shipments/components/manifest-scan-box";
+import { moveToManifestAction } from "@/features/shipments/manifest-scan-actions";
 import {
   manifestScanView,
   SCAN_KINDS,
@@ -66,6 +68,7 @@ export default async function Page({
   }
   const canScan = permits(current.actor, "update", "manifest");
   const back = `/manifest?type=${kind === "INBOUND" ? "Inbound" : "Transit"}`;
+  const canMove = permits(current.actor, "update", "manifest");
   return (
     <div className="min-w-0 space-y-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -135,6 +138,7 @@ export default async function Page({
                   "Scan Koli",
                   "Sisa Koli",
                   "Pindah Manifest",
+                  "Pilih",
                 ].map((h) => (
                   <TableHead key={h} className="whitespace-nowrap">
                     {h}
@@ -146,7 +150,7 @@ export default async function Page({
               {view.rows.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={10}
+                    colSpan={11}
                     className="p-4 text-center text-muted-foreground"
                   >
                     Manifest ini belum berisi AWB.
@@ -179,8 +183,20 @@ export default async function Page({
                       <TableCell className="tabular-nums">
                         {r.koli - done}/{r.koli}
                       </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        Menunggu D-08
+                      <TableCell className="font-mono text-xs">
+                        {r.movedTo ?? ""}
+                      </TableCell>
+                      <TableCell>
+                        {canMove && !r.movedTo && r.scanned > 0 && (
+                          <input
+                            type="checkbox"
+                            name="transactionId"
+                            value={r.transactionId}
+                            form="move-manifest"
+                            aria-label={`Pilih AWB ${r.awbNo} untuk dipindah`}
+                            className="size-5 accent-primary"
+                          />
+                        )}
                       </TableCell>
                     </TableRow>
                   );
@@ -202,15 +218,56 @@ export default async function Page({
                   {view.totalKoli - view.totalScanned}/{view.totalKoli}
                 </TableCell>
                 <TableCell />
+                <TableCell />
               </TableRow>
             </TableFooter>
           </Table>
         </div>
       </section>
-      <p className="text-xs text-muted-foreground">
-        Pindah Manifest belum tersedia: AWB yang sudah keluar dari manifest
-        belum boleh masuk manifest lain sampai aturan D-08 diputuskan.
-      </p>
+      {canMove && (
+        <section
+          aria-label="Pindah Manifest"
+          className="rounded-lg border bg-background p-4"
+        >
+          <ActionForm
+            id="move-manifest"
+            action={moveToManifestAction}
+            className="grid gap-3 sm:grid-cols-[auto_minmax(0,20rem)_auto] sm:items-end"
+            submit={
+              <Button type="submit" className="min-h-11">
+                Submit
+              </Button>
+            }
+          >
+            <input type="hidden" name="manifestId" value={view.manifest.id} />
+            <input type="hidden" name="kind" value={kind} />
+            <p className="text-sm sm:pb-3">
+              Centang AWB yang sudah di-scan, pilih manifest tujuan.
+            </p>
+            <label className="grid gap-1 text-sm font-medium">
+              Pilih Manifest
+              <select
+                name="targetManifestId"
+                required
+                defaultValue=""
+                className="min-h-11 rounded-md border bg-background px-3"
+              >
+                <option value="">Pilih Manifest…</option>
+                {view.targets.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.manifestNo}/{t.destination}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </ActionForm>
+          {view.targets.length === 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Belum ada manifest lain ke tujuan yang sama yang belum tiba.
+            </p>
+          )}
+        </section>
+      )}
     </div>
   );
 }

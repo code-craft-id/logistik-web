@@ -1488,4 +1488,79 @@ describe("Scan koli transit / inbound", () => {
     ).rows.find((r) => r.id === t.id);
     expect(row?.accIn).not.toBeNull();
   });
+
+  it("moves scanned AWBs to another manifest with the same destination (Pindah Manifest)", async () => {
+    const scan = await import(
+      "../../src/features/shipments/server/manifest-scan"
+    );
+    const t = await awb("MV1");
+    const source = await db.manifest.create({
+      data: {
+        manifestNo: `${tag}-MVS`,
+        branchId: ids.a,
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+        transit1: `${tag}A`,
+        status: "In Transit",
+      },
+    });
+    const target = await db.manifest.create({
+      data: {
+        manifestNo: `${tag}-MVT`,
+        branchId: ids.a,
+        originBranchId: ids.a,
+        destinationBranchId: ids.b,
+        status: "Draft",
+      },
+    });
+    await db.manifestItem.create({
+      data: { manifestId: source.id, transactionId: t.id },
+    });
+    const inA = actor(ids.approver, [ids.a]);
+    try {
+      const before = await scan.manifestScanView(inA, source.id, "TRANSIT");
+      expect(before.targets.map((m) => m.id)).toContain(target.id);
+      expect(before.targets.map((m) => m.id)).not.toContain(source.id);
+      // Not scanned yet: refused.
+      await expect(
+        scan.moveToManifest(inA, source.id, "TRANSIT", target.id, [t.id]),
+      ).rejects.toThrow("Scan dulu");
+      await scan.scanKoli(inA, source.id, "TRANSIT", `${tag}-MV1`);
+      expect(
+        await scan.moveToManifest(inA, source.id, "TRANSIT", target.id, [t.id]),
+      ).toEqual({ moved: 1, target: `${tag}-MVT` });
+      // The source keeps the row with the target number; one active row remains.
+      const after = await scan.manifestScanView(inA, source.id, "TRANSIT");
+      expect(after.rows.find((r) => r.transactionId === t.id)?.movedTo).toBe(
+        `${tag}-MVT`,
+      );
+      const active = await db.manifestItem.findMany({
+        where: { transactionId: t.id, releasedAt: null, deletedAt: null },
+      });
+      expect(active).toHaveLength(1);
+      expect(active[0]).toMatchObject({
+        manifestId: target.id,
+        movedFromManifestId: source.id,
+      });
+      // A second active row for the same AWB is refused by the database.
+      await expect(
+        db.manifestItem.create({
+          data: { manifestId: source.id, transactionId: t.id },
+        }),
+      ).rejects.toMatchObject({ code: "P2002" });
+      await expect(
+        scan.moveToManifest(inA, source.id, "TRANSIT", target.id, [t.id]),
+      ).rejects.toThrow("sudah tidak ada");
+    } finally {
+      await db.manifestScan.deleteMany({
+        where: { manifestId: { in: [source.id, target.id] } },
+      });
+      await db.manifestItem.deleteMany({
+        where: { manifestId: { in: [source.id, target.id] } },
+      });
+      await db.manifest.deleteMany({
+        where: { id: { in: [source.id, target.id] } },
+      });
+    }
+  });
 });

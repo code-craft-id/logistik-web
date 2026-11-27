@@ -139,6 +139,7 @@ export async function awbForScan(
         select: {
           assignedAt: true,
           manifest: { select: { manifestNo: true } },
+          movedFromManifest: { select: { manifestNo: true } },
           assignedBy: { select: { name: true } },
         },
       },
@@ -186,7 +187,9 @@ export async function awbForScan(
     ...t.manifestItems.map((m) => ({
       at: m.assignedAt.toISOString(),
       by: m.assignedBy?.name ?? null,
-      text: `Masuk manifest ${m.manifest.manifestNo}`,
+      text: m.movedFromManifest
+        ? `Paket dari manifest ${m.movedFromManifest.manifestNo} berpindah ke manifest ${m.manifest.manifestNo}`
+        : `Masuk manifest ${m.manifest.manifestNo}`,
     })),
     ...t.manifestScans.map((m) => ({
       at: m.createdAt.toISOString(),

@@ -61,6 +61,13 @@ export const helpEntries: HelpEntry[] = [
     href: "/customer-service/status-pengantaran",
   },
   {
+    id: "pindah-manifest",
+    title: "Pindah Manifest di Cek Transit / Inbound",
+    keywords: ["pindah", "remanifest", "pindahkan awb"],
+    answer:
+      "Buka Manifest, tab Transit (atau Inbound), klik Scan pada manifest. Scan AWB yang akan dipindah; setelah ter-scan, AWB bisa dicentang di kolom Pilih. Di bagian Pindah Manifest pilih manifest tujuan (hanya manifest lain dengan cabang tujuan yang sama dan berstatus Draft, Loaded atau In Transit), lalu Submit. AWB keluar dari manifest asal (kolom Pindah Manifest menampilkan nomor manifest tujuan) dan masuk manifest tujuan; Tracking mencatat Paket dari manifest X berpindah ke manifest Y. Perlu hak Manifest: ubah.",
+  },
+  {
     id: "menu-ringkas",
     title: "Menu ringkas: tab di dalam halaman",
     keywords: [
