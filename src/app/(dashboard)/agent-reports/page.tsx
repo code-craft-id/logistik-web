@@ -216,7 +216,7 @@ export default async function Page({
         </Button>
         <Button
           type="submit"
-          variant="outline"
+          variant="export"
           className="min-h-11"
           formAction="/agent-reports/export"
         >

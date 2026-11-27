@@ -25,7 +25,7 @@ export async function VendorTariffPanel() {
     <div className={box}>
       <h2 className="font-semibold">Tarif Vendor</h2>
       <p className="text-sm">
-        Unique terakhir: <strong>{lastUniqueNo}</strong>
+        Nomor terakhir (kolom Unique): <strong>{lastUniqueNo}</strong>
       </p>
       <form
         action="/vendor/tariff-file"
@@ -46,7 +46,7 @@ export async function VendorTariffPanel() {
             ))}
           </select>
         </label>
-        <Button type="submit" variant="outline" className="min-h-11">
+        <Button type="submit" variant="export" className="min-h-11">
           Export
         </Button>
       </form>

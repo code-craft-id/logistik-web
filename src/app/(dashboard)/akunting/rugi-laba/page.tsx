@@ -146,7 +146,7 @@ export default async function Page({
             <Link href="/akunting/rugi-laba">Refresh</Link>
           </Button>
           {report && (
-            <Button asChild variant="outline" className="min-h-11">
+            <Button asChild variant="export" className="min-h-11">
               <a
                 href={`/akunting/rugi-laba/export?${new URLSearchParams({ month: String(month), year: String(year), branchId })}`}
               >

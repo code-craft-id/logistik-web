@@ -38,7 +38,7 @@ export function TariffImport({
       }}
     >
       <input type="hidden" name="pricing" value={pricing} />
-      <Button asChild variant="outline" className="min-h-11">
+      <Button asChild variant="template" className="min-h-11">
         <a href={`/marketing/tarif/file?pricing=${pricing}`} download>
           Template Import Tarif
         </a>

@@ -98,9 +98,9 @@ export default async function Page({
       </nav>
       <div className="space-y-3 rounded-lg border bg-background p-4">
         <p className="text-sm">
-          Unique terakhir: <strong>{lastUniqueNo}</strong>
+          Nomor terakhir (kolom Unique): <strong>{lastUniqueNo}</strong>
         </p>
-        <Button asChild variant="outline" className="min-h-11">
+        <Button asChild variant="export" className="min-h-11">
           <a
             href={`/marketing/tarif/file?pricing=${pricing}&data=1${customerId ? `&customerId=${customerId}` : ""}`}
             download

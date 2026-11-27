@@ -37,7 +37,7 @@ export function AccountExcelTools({
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
         {target === "accounts" && (
-          <Button asChild variant="outline" className="min-h-11">
+          <Button asChild variant="export" className="min-h-11">
             <a href={`${path}/export`} download>
               <Download aria-hidden="true" />
               Export Excel
@@ -45,7 +45,7 @@ export function AccountExcelTools({
           </Button>
         )}
         {manage && (
-          <Button asChild variant="outline" className="min-h-11">
+          <Button asChild variant="template" className="min-h-11">
             <a href={`${path}/template`} download>
               <Download aria-hidden="true" />
               Template Import

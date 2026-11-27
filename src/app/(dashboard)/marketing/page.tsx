@@ -223,7 +223,7 @@ export default async function Page({
       {kind === "consignee" && permits(actor, "create", "consignee") && (
         <div className="space-y-3 rounded-lg border bg-background p-4">
           <p className="text-sm">
-            Unique terakhir: <strong>{lastConsignee}</strong>
+            Nomor terakhir (kolom Unique): <strong>{lastConsignee}</strong>
           </p>
           <ExcelImport target="consignee" />
         </div>

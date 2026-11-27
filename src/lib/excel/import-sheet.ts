@@ -3,6 +3,8 @@ import "server-only";
 import * as XLSX from "xlsx";
 import { IdentityError } from "@/features/identity/server/access";
 
+/** Sample data (prisma/seed-data.mjs) uses ids from here up; not "last". */
+export const SAMPLE_ID_FLOOR = 9_000_000;
 export const IMPORT_MAX_BYTES = 2 * 1024 * 1024;
 const MAX_ROWS = 1000;
 

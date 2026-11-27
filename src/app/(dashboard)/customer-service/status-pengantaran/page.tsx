@@ -100,7 +100,7 @@ export default async function Page({
           <Button asChild variant="outline" className="min-h-11">
             <Link href="/customer-service/status-pengantaran">Refresh</Link>
           </Button>
-          <Button asChild variant="outline" className="min-h-11">
+          <Button asChild variant="export" className="min-h-11">
             <a
               href={`/customer-service/status-pengantaran/export?${new URLSearchParams({ q: search, status })}`}
             >
@@ -118,7 +118,7 @@ export default async function Page({
             <h2 className="font-medium">Daftar Status Pengiriman</h2>
             {canUpdate && (
               <>
-                <Button asChild variant="outline" className="min-h-11">
+                <Button asChild variant="template" className="min-h-11">
                   <a href="/customer-service/status-pengantaran/template">
                     Template Import
                   </a>

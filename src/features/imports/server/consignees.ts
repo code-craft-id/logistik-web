@@ -10,6 +10,7 @@ import {
   idSet,
   invalid,
   readRows,
+  SAMPLE_ID_FLOOR,
   workbook,
 } from "@/lib/excel/import-sheet";
 
@@ -106,9 +107,11 @@ export async function importConsignees(actor: AccessActor, bytes: Uint8Array) {
         ["districtId", "Kecamatan", idSet(districts)],
         ["villageId", "Kelurahan", idSet(villages)],
       ] as const;
-      const highest =
-        ((await tx.consignee.aggregate({ _max: { id: true } }))._max.id ?? 0) +
-        MAX_ID_JUMP;
+      const last = await tx.consignee.aggregate({
+        _max: { id: true },
+        where: { id: { lt: SAMPLE_ID_FLOOR } },
+      });
+      const highest = (last._max.id ?? 0) + MAX_ID_JUMP;
       let created = 0;
       for (const { line, id, values } of rows) {
         const bad = (message: string) => invalid(`Baris ${line}: ${message}`);
@@ -131,7 +134,7 @@ export async function importConsignees(actor: AccessActor, bytes: Uint8Array) {
         }
       }
       if (created)
-        await tx.$executeRaw`SELECT setval(pg_get_serial_sequence('consignees', 'id'), GREATEST((SELECT max(id) FROM consignees), nextval(pg_get_serial_sequence('consignees', 'id'))))`;
+        await tx.$executeRaw`SELECT setval(pg_get_serial_sequence('consignees', 'id'), GREATEST((SELECT max(id) FROM consignees WHERE id < ${SAMPLE_ID_FLOOR}), nextval(pg_get_serial_sequence('consignees', 'id'))))`;
       return `${created} penerima dibuat, ${rows.length - created} diperbarui.`;
     },
     { timeout: 60_000 },
@@ -140,9 +143,11 @@ export async function importConsignees(actor: AccessActor, bytes: Uint8Array) {
 
 export async function lastConsigneeId(actor: AccessActor) {
   assertPermission(actor, "view", "consignee");
-  return (
-    (await prisma.consignee.aggregate({ _max: { id: true } }))._max.id ?? 0
-  );
+  const last = await prisma.consignee.aggregate({
+    _max: { id: true },
+    where: { id: { lt: SAMPLE_ID_FLOOR } },
+  });
+  return last._max.id ?? 0;
 }
 
 export async function consigneeTemplate(actor: AccessActor) {

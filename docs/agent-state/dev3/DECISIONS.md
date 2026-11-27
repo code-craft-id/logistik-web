@@ -125,3 +125,8 @@ Owner delegated these to the team after the assistant proposed them. Not a finan
 - Kendaraan: "Kode" is the key; Jenis ID = Trucking Type; Type and Merk stored as text (no LMS master; Type ID / Merk ID ignored). Name = Merk + No. Polisi.
 - Vendor price list: Asal / Tujuan = LMS branches, Service = Delivery Service, flat price = Next Tarif only. Export follows "TARIF - <vendor>.xls". Not applied to vendor bills.
 - New columns are import-only; the consignee and vehicle forms do not edit them (saving a form keeps them).
+
+## 2026-11-27 — follow-up after release 8cb5d20
+
+- "Nomor terakhir (kolom Unique)" for Customer and Penerima ignores sample ids (>= 9,000,000), also when moving the id sequence after an import.
+- Button colors (user request): Export = blue (`--info`), Template = amber (`--template`), Import = primary. New tokens in globals.css, variants `export` / `template` on Button.

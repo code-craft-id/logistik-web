@@ -87,7 +87,7 @@ export function PersonnelImportTools({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        <Button asChild variant="outline" className="min-h-11">
+        <Button asChild variant="template" className="min-h-11">
           <a href={`/logistics/division/template/${kind}`} download>
             <Download aria-hidden="true" />
             Download Template {label}

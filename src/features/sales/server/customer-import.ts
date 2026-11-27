@@ -7,6 +7,7 @@ import {
   IdentityError,
 } from "@/features/identity/server/access";
 import { prisma } from "@/lib/db";
+import { SAMPLE_ID_FLOOR } from "@/lib/excel/import-sheet";
 import { customerInput, readable, writableBranch } from "./parties";
 
 /**
@@ -158,7 +159,10 @@ export async function importCustomers(actor: AccessActor, bytes: Uint8Array) {
         }),
         tx.branch.findMany({ where: live, select: { id: true } }),
         tx.term.findMany({ where: active, select: { id: true, name: true } }),
-        tx.customer.aggregate({ _max: { id: true } }),
+        tx.customer.aggregate({
+          _max: { id: true },
+          where: { id: { lt: SAMPLE_ID_FLOOR } },
+        }),
       ]);
       const [regency, marketer, branch] = [regencies, marketing, branches].map(
         (list) => new Set(list.map((x) => x.id)),
@@ -201,7 +205,7 @@ export async function importCustomers(actor: AccessActor, bytes: Uint8Array) {
       }
       // Ids were given by the file: move the sequence past them.
       if (created)
-        await tx.$executeRaw`SELECT setval(pg_get_serial_sequence('customers', 'id'), GREATEST((SELECT max(id) FROM customers), nextval(pg_get_serial_sequence('customers', 'id'))))`;
+        await tx.$executeRaw`SELECT setval(pg_get_serial_sequence('customers', 'id'), GREATEST((SELECT max(id) FROM customers WHERE id < ${SAMPLE_ID_FLOOR}), nextval(pg_get_serial_sequence('customers', 'id'))))`;
       return { created, updated: rows.length - created };
     },
     { timeout: 60_000 },
@@ -211,7 +215,11 @@ export async function importCustomers(actor: AccessActor, bytes: Uint8Array) {
 export async function lastCustomerId(actor: AccessActor) {
   assertPermission(actor, "view", "customer");
   // Numbering is shared by everyone, deleted rows included.
-  return (await prisma.customer.aggregate({ _max: { id: true } }))._max.id ?? 0;
+  const last = await prisma.customer.aggregate({
+    _max: { id: true },
+    where: { id: { lt: SAMPLE_ID_FLOOR } },
+  });
+  return last._max.id ?? 0;
 }
 
 /** Template (header only) or Export Customers (same layout, re-importable). */

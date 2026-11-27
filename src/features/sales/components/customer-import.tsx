@@ -18,16 +18,16 @@ export function CustomerImport({
   return (
     <div className="space-y-3 rounded-lg border bg-background p-4">
       <p className="text-sm">
-        Unique terakhir: <strong>{lastId}</strong>
+        Nomor terakhir (kolom Unique): <strong>{lastId}</strong>
       </p>
       <div className="flex flex-wrap gap-2">
-        <Button asChild variant="outline" className="min-h-11">
+        <Button asChild variant="export" className="min-h-11">
           <a href="/marketing/customer-file?data=1" download>
             Export Customers
           </a>
         </Button>
         {canImport && (
-          <Button asChild variant="outline" className="min-h-11">
+          <Button asChild variant="template" className="min-h-11">
             <a href="/marketing/customer-file" download>
               Template Import Customer
             </a>

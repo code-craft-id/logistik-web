@@ -55,7 +55,7 @@ export function ExcelImport({ target }: { target: keyof typeof targets }) {
         }
       }}
     >
-      <Button asChild variant="outline" className="min-h-11">
+      <Button asChild variant="template" className="min-h-11">
         <a href={template} download>
           Template Import
         </a>

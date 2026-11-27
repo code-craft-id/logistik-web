@@ -118,8 +118,7 @@ afterAll(async () => {
 describe("master imports", () => {
   it("consignee: file id, blank cells kept, other branch refused", async () => {
     const columns = m.consignees.CONSIGNEE_COLUMNS;
-    const top = await db.consignee.aggregate({ _max: { id: true } });
-    const id = (top._max.id ?? 0) + 3;
+    const id = (await m.consignees.lastConsigneeId(actor([ids.a]))) + 3;
     const make = (branch: number, phone: string, key = id) =>
       file([
         columns,

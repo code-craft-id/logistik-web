@@ -175,8 +175,7 @@ describe("customer import", () => {
   it("creates with the file's id, updates without wiping, keeps scope", async () => {
     const lib = await import("../../src/features/sales/server/customer-import");
     const a = actor([ids.a]);
-    const top = await db.customer.aggregate({ _max: { id: true } });
-    const id = (top._max.id ?? 0) + 5;
+    const id = (await lib.lastCustomerId(a)) + 5;
     const sheet = (rows: unknown[][]) => {
       const book = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(

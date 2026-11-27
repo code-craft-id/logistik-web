@@ -15,6 +15,10 @@
   --accent: #e8f2ef;
   --accent-foreground: #0f5c4c;
   --destructive: #b42332;
+  /* Excel actions: Export (blue) and Template (amber); Import uses primary. */
+  --info: #1d6a85;
+  --template: #fbeed3;
+  --template-foreground: #6b4a07;
   --border: #dce2ea;
   --input: #a6b2c2;
   --ring: #0f5c4c;
@@ -44,6 +48,9 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-info: var(--info);
+  --color-template: var(--template);
+  --color-template-foreground: var(--template-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
