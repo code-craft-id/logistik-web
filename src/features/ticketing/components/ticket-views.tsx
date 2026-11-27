@@ -14,7 +14,11 @@ import {
 } from "@/components/ui/table";
 import { ActionForm } from "@/features/modul/components/action-form";
 import { businessDateTimeString } from "@/lib/date/business-date";
-import { decideTicketAction, setTicketStatusAction } from "../actions";
+import {
+  decideTicketAction,
+  sendTicketMessageAction,
+  setTicketStatusAction,
+} from "../actions";
 import { TICKET_STATUSES, type TicketDTO } from "../contracts";
 
 const APPROVAL: Record<string, string> = {
@@ -372,6 +376,46 @@ export function TicketDetail({
           </ActionForm>
         </section>
       )}
+      <section
+        aria-label="Chat tiket"
+        className="space-y-3 rounded-lg border bg-background p-4 sm:p-6"
+      >
+        <h2 className="font-semibold">Chat</h2>
+        {ticket.messages?.length ? (
+          <ol className="space-y-3">
+            {ticket.messages.map((m) => (
+              <li key={m.id} className="rounded-lg bg-muted px-3 py-2 text-sm">
+                <p className="text-xs text-muted-foreground">
+                  {m.author} · {businessDateTimeString(m.createdAt)}
+                </p>
+                <p className="whitespace-pre-line">{m.body}</p>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-sm text-muted-foreground">Belum ada pesan.</p>
+        )}
+        <ActionForm
+          action={sendTicketMessageAction}
+          reset
+          submit={
+            <Button type="submit" className="min-h-11">
+              Kirim
+            </Button>
+          }
+        >
+          <input type="hidden" name="id" value={ticket.id} />
+          <Label htmlFor="ticket-message">Pesan</Label>
+          <textarea
+            id="ticket-message"
+            name="body"
+            required
+            maxLength={2000}
+            rows={3}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
+          />
+        </ActionForm>
+      </section>
       <Button asChild variant="outline" className="min-h-11">
         <Link href="/ticketting">Kembali ke daftar</Link>
       </Button>

@@ -312,6 +312,7 @@ export function createIdentityService(
         listQuerySchema.parse(input);
       const where: Prisma.UserWhereInput = {
         AND: [visibleUsers(current)],
+        deletedAt: null,
         ...(status ? { status } : {}),
         ...(groupId ? { groupId } : {}),
         ...(search
@@ -346,7 +347,7 @@ export function createIdentityService(
       const current = await actor("view", "user");
       const id = identityId.parse(input);
       const user = await db.user.findFirst({
-        where: { id, AND: [visibleUsers(current)] },
+        where: { id, deletedAt: null, AND: [visibleUsers(current)] },
         select: userSelect,
       });
       if (!user)
@@ -397,7 +398,7 @@ export function createIdentityService(
         : undefined;
       return mutate("update", "user", async (tx, current) => {
         const previous = await tx.user.findFirst({
-          where: { id, AND: [visibleUsers(current)] },
+          where: { id, deletedAt: null, AND: [visibleUsers(current)] },
           select: {
             id: true,
             groupId: true,
@@ -496,8 +497,12 @@ export function createIdentityService(
       const id = identityId.parse(input);
       return mutate("delete", "user", async (tx, current) => {
         const user = await tx.user.findFirst({
-          where: { id, AND: [visibleUsers(current)] },
-          select: { id: true },
+          where: { id, deletedAt: null, AND: [visibleUsers(current)] },
+          select: {
+            id: true,
+            groupId: true,
+            allowedBranches: { select: { branchId: true } },
+          },
         });
         if (!user)
           throw new IdentityError(
@@ -505,9 +510,18 @@ export function createIdentityService(
             404,
             "User tidak ditemukan.",
           );
-        await tx.user.update({ where: { id }, data: { status: "INACTIVE" } });
+        // Soft delete. Group and branches are released so a deleted user never
+        // counts as a member; the audit keeps what they were.
+        await tx.userAllowedBranch.deleteMany({ where: { userId: id } });
+        await tx.user.update({
+          where: { id },
+          data: { status: "INACTIVE", deletedAt: new Date(), groupId: null },
+        });
         await tx.session.deleteMany({ where: { userId: id } });
-        await audit(tx, current, "USER_DISABLED", "user", id);
+        await audit(tx, current, "USER_DELETED", "user", id, {
+          priorGroupId: user.groupId,
+          priorBranchIds: user.allowedBranches.map((entry) => entry.branchId),
+        });
         return { success: true };
       });
     },

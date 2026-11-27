@@ -18,6 +18,7 @@ import {
   ticketDecisionInput,
   ticketId,
   ticketListInput,
+  ticketMessageInput,
   ticketStatusInput,
 } from "../contracts";
 
@@ -185,7 +186,42 @@ export function createTicketService(
         where: { ...visible(current), id },
         select: publicSelect,
       });
-      return row ? dto(row) : null;
+      if (!row) return null;
+      // Newest 200, shown oldest first.
+      const messages = await db.ticketMessage.findMany({
+        where: { ticketId: id },
+        orderBy: { id: "desc" },
+        take: 200,
+        select: {
+          id: true,
+          body: true,
+          createdAt: true,
+          author: { select: { name: true } },
+        },
+      });
+      return {
+        ...dto(row),
+        messages: messages.reverse().map((m) => ({
+          id: m.id,
+          author: m.author.name,
+          body: m.body,
+          createdAt: m.createdAt.toISOString(),
+        })),
+      };
+    },
+    /** Anyone who can see the ticket (creator, support, admin) may reply. */
+    async sendMessage(input: unknown) {
+      const current = await actor("view");
+      const data = ticketMessageInput.parse(input);
+      const ticket = await db.ticket.findFirst({
+        where: { ...visible(current), id: data.id },
+        select: { id: true },
+      });
+      if (!ticket) throw new IdentityError("NOT_FOUND", 404);
+      await db.ticketMessage.create({
+        data: { ticketId: data.id, authorId: current.id, body: data.body },
+      });
+      return { id: data.id };
     },
     /** Support changes the status; an approved ticket is final. */
     async setStatus(input: unknown) {

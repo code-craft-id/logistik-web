@@ -1319,6 +1319,27 @@ describe("Import Status Excel", () => {
       (await db.transaction.findUniqueOrThrow({ where: { id: odd.id } }))
         .status,
     ).toBe("Open");
+    // A journey code from the master adds a tracking note, status unchanged.
+    const journey = await db.shipmentStatus.create({
+      data: { code: "093", name: "FAKE DEPARTED" },
+    });
+    try {
+      const [note] = await imp.applyStatusRows(inA, [
+        { ...parsed[0], awbNo: odd.awbNo as string, status: "93" },
+      ]);
+      expect(note).toMatchObject({ applied: true, error: null });
+      expect(
+        (await db.transaction.findUniqueOrThrow({ where: { id: odd.id } }))
+          .status,
+      ).toBe("Open");
+      const entry = await db.transactionStatusHistory.findFirstOrThrow({
+        where: { transactionId: odd.id, newStatus: "Open" },
+        orderBy: { id: "desc" },
+      });
+      expect(entry.reason).toContain("093 · FAKE DEPARTED");
+    } finally {
+      await db.shipmentStatus.delete({ where: { id: journey.id } });
+    }
     // Wrong header or file type is refused before any row is read.
     expect(() =>
       imp.parseStatusFile(new TextEncoder().encode("a,b\n1,2"), "x.csv"),

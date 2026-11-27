@@ -201,7 +201,11 @@ export async function awbForScan(
       .map((h) => ({
         at: h.changedAt.toISOString(),
         by: h.actor?.name ?? null,
-        text: `Status ${h.priorStatus} → ${h.newStatus}${h.reason ? ` (${h.reason})` : ""}`,
+        // Journey notes keep the status: show only what happened.
+        text:
+          h.priorStatus === h.newStatus
+            ? (h.reason ?? h.newStatus)
+            : `Status ${h.priorStatus} → ${h.newStatus}${h.reason ? ` (${h.reason})` : ""}`,
       })),
     ...t.deliveryProofs.map((p) => ({
       at: p.createdAt.toISOString(),

@@ -21,6 +21,7 @@ model MarketingPerson {
 
 /// Approved provider form inventory. Workflows remain D-10; requiredness D-25/D-30.
 model Customer {
+  customerTariffs             CustomerTariff[]
   charterOrders               CharterOrder[]
   finInvoices                 FinInvoice[]
   finJournals                 FinJournal[]                   @relation("FinJournalCustomer")
@@ -66,6 +67,13 @@ model Customer {
 
 /// Approved provider form inventory; branch authorization is PLT-01.
 model Consignee {
+  districtId   Int?          @map("district_id")
+  district     District?     @relation(fields: [districtId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  villageId    Int?          @map("village_id")
+  village      Village?      @relation(fields: [villageId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  postalCode   String?       @map("postal_code") @db.VarChar(10)
+  fax          String?       @db.VarChar(30)
+  email        String?       @db.VarChar(150)
   bookings     Booking[]     @relation("BookingConsignee")
   transactions Transaction[]
   id           Int           @id @default(autoincrement())
@@ -453,4 +461,36 @@ model DeliverySheetItem {
   @@unique([deliverySheetId, transactionId])
   @@index([transactionId])
   @@map("delivery_sheet_items")
+}
+
+/// Tariff per customer (provider Template Import Tarif Customers, OBSERVED
+/// 2026-11-27). pricing: KG, KOLI or TRUCKING (trucking type). uniqueNo is the file's "Unique" key.
+/// Reference data only: not applied to AWB pricing.
+model CustomerTariff {
+  id                  Int              @id @default(autoincrement())
+  pricing             String           @db.VarChar(8)
+  uniqueNo            Int              @map("unique_no")
+  customerId          Int              @map("customer_id")
+  customer            Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deliveryServiceId   Int?             @map("delivery_service_id")
+  deliveryService     DeliveryService? @relation(fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  truckingTypeId      Int?             @map("trucking_type_id")
+  truckingType        TruckingType?    @relation(fields: [truckingTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId     Int              @map("transport_mode_id")
+  transportMode       TransportMode    @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  originBranchId      Int              @map("origin_branch_id")
+  originBranch        Branch           @relation("CustomerTariffOrigin", fields: [originBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  destinationBranchId Int              @map("destination_branch_id")
+  destinationBranch   Branch           @relation("CustomerTariffDestination", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  minWeight           Decimal?         @map("min_weight") @db.Decimal(10, 2)
+  price               Decimal          @db.Decimal(15, 2)
+  nextPrice           Decimal?         @map("next_price") @db.Decimal(15, 2)
+  leadTimeDays        Int?             @map("lead_time_days")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+  deletedAt           DateTime?        @map("deleted_at")
+
+  @@unique([pricing, uniqueNo])
+  @@index([customerId])
+  @@map("customer_tariffs")
 }

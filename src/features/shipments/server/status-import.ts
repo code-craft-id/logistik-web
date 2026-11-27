@@ -12,8 +12,9 @@ import { prisma } from "@/lib/db";
  * Import status from Excel, provider template (OBSERVED 2026-11-19):
  * AWB No. | Date | Received | Status | Remarks, Status being the provider
  * M.Shipment Status code. Supported codes: 2 = ACCEPTED / DITERIMA and
- * 1 = BACK TO OFFICE / RETUR, applied like Scan & Konfirmasi. Codes 003-012
- * (journey states) have no counterpart here yet and are refused per row.
+ * 1 = BACK TO OFFICE / RETUR, applied like Scan & Konfirmasi. Other active
+ * M.Shipment Status codes (003-012 in the provider) are journey notes: they
+ * add a tracking entry and never change the AWB status (owner 2026-11-27).
  * Valid rows are applied; invalid rows are skipped and reported.
  */
 export const IMPORT_HEADERS = [
@@ -134,6 +135,48 @@ export function parseStatusFile(bytes: Uint8Array, name: string) {
   }));
 }
 
+// Excel turns "003" into 3: compare codes without leading zeros.
+const codeKey = (code: string) => code.trim().replace(/^0+(?=\d)/, "");
+
+async function journeyStatuses() {
+  const rows = await prisma.shipmentStatus.findMany({
+    where: { deletedAt: null, status: "ACTIVE" },
+    select: { code: true, name: true },
+  });
+  return new Map(
+    rows
+      .filter((r) => !CODES[codeKey(r.code)])
+      .map((r) => [codeKey(r.code), r]),
+  );
+}
+
+/** Tracking entry for a journey code; the AWB status stays as it is. */
+async function addJourneyNote(actor: AccessActor, row: ImportRow) {
+  await prisma.$transaction(async (tx) => {
+    const awb = await tx.transaction.findFirst({
+      where: {
+        id: row.transactionId as number,
+        deletedAt: null,
+        AND: [transactionScope(actor)],
+      },
+      select: { status: true },
+    });
+    if (!awb || awb.status === "Cancelled")
+      throw new ModulError("AWB tidak tersedia atau sudah dibatalkan.");
+    await tx.transactionStatusHistory.create({
+      data: {
+        transactionId: row.transactionId as number,
+        priorStatus: awb.status,
+        newStatus: awb.status,
+        reason: row.remarks ? `${row.status}: ${row.remarks}` : row.status,
+        actorId: actor.id,
+        // Noon Asia/Jakarta on the given day.
+        changedAt: new Date(`${row.date}T05:00:00Z`),
+      },
+    });
+  });
+}
+
 /** Validate parsed rows against the actor's AWBs (read-only). */
 export async function checkStatusRows(
   actor: AccessActor,
@@ -162,11 +205,13 @@ export async function checkStatusRows(
     const key = (t.awbNo ?? "").toUpperCase();
     byNo.set(key, [...(byNo.get(key) ?? []), t]);
   }
+  const journey = await journeyStatuses();
   const today = businessDateString();
   const seen = new Set<string>();
   return parsed.map((p) => {
     const matches = byNo.get(p.awbNo.toUpperCase()) ?? [];
     const code = CODES[p.status];
+    const note = code ? undefined : journey.get(codeKey(p.status));
     const key = p.awbNo.toUpperCase();
     const error = !p.awbNo
       ? "AWB No. kosong."
@@ -180,14 +225,14 @@ export async function checkStatusRows(
               ? `Date tidak valid (${p.rawDate || "kosong"}); pakai YYYY-MM-DD.`
               : p.date > today
                 ? "Date tidak boleh di masa depan."
-                : !code
-                  ? `Status ${p.status || "(kosong)"} belum didukung; pakai 2 (DITERIMA) atau 1 (RETUR).`
-                  : code.outcome === "DELIVERED" && !p.received
+                : !code && !note
+                  ? `Status ${p.status || "(kosong)"} belum didukung; pakai kode di M.Shipment Status.`
+                  : code?.outcome === "DELIVERED" && !p.received
                     ? "Received (nama penerima) wajib untuk status 2."
-                    : matches[0].status === "Delivered"
+                    : code && matches[0].status === "Delivered"
                       ? "AWB sudah DITERIMA."
                       : matches[0].status === "Returned" &&
-                          code.outcome === "RETURNED"
+                          code?.outcome === "RETURNED"
                         ? "AWB sudah RETUR."
                         : matches[0].status === "Cancelled"
                           ? "AWB sudah dibatalkan."
@@ -198,7 +243,11 @@ export async function checkStatusRows(
       awbNo: p.awbNo,
       date: p.date,
       received: p.received,
-      status: code ? `${p.status} · ${code.label}` : p.status,
+      status: code
+        ? `${p.status} · ${code.label}`
+        : note
+          ? `${note.code} · ${note.name}`
+          : p.status,
       remarks: p.remarks,
       transactionId: matches.length === 1 ? matches[0].id : null,
       error,
@@ -220,6 +269,11 @@ export async function applyStatusRows(
     }
     const code = CODES[row.status.split(" ")[0]];
     try {
+      if (!code) {
+        await addJourneyNote(actor, row);
+        results.push({ ...row, applied: true });
+        continue;
+      }
       await prisma.$transaction((tx) =>
         writeProof(
           tx,
@@ -276,7 +330,7 @@ export function statusTemplate() {
     ["Received", "Nama penerima. Wajib bila Status = 2."],
     [
       "Status",
-      "Isi angka: 2 = ACCEPTED / DITERIMA (AWB menjadi Delivered), 1 = BACK TO OFFICE / RETUR (AWB menjadi Returned).",
+      "Isi angka: 2 = ACCEPTED / DITERIMA (AWB menjadi Delivered), 1 = BACK TO OFFICE / RETUR (AWB menjadi Returned). Kode lain di M.Shipment Status (mis. 003-012) hanya menambah catatan tracking.",
     ],
     ["Remarks", "Catatan, boleh kosong."],
     [],

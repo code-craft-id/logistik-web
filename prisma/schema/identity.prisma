@@ -48,6 +48,8 @@ model User {
   emailVerified            Boolean                    @default(false) @map("email_verified")
   /// Application-managed account availability; not writable through provider public inputs.
   status                   RecordStatus               @default(ACTIVE)
+  /// Deleted (hidden for good), unlike INACTIVE. Row kept for history and audit.
+  deletedAt                DateTime?                  @map("deleted_at")
   image                    String?
   createdAt                DateTime                   @default(now()) @map("created_at")
   updatedAt                DateTime                   @updatedAt @map("updated_at")
@@ -69,6 +71,7 @@ model User {
   deliverySheetsDelivered  DeliverySheet[]            @relation("DeliverySheetDeliveredBy")
   ticketsCreated           Ticket[]                   @relation("TicketCreatedBy")
   ticketsApproved          Ticket[]                   @relation("TicketApprovedBy")
+  ticketMessages           TicketMessage[]            @relation("TicketMessageAuthor")
   deliverySheetsCreated    DeliverySheet[]            @relation("DeliverySheetCreatedBy")
   vendorProcessesCreated   VendorProcess[]            @relation("VendorProcessCreatedBy")
 

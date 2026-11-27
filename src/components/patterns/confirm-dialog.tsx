@@ -34,13 +34,15 @@ export type ConfirmOptions = {
  */
 export function useConfirm() {
   const [options, setOptions] = useState<ConfirmOptions | null>(null);
+  // Separate from the options so their texts stay while the dialog closes.
+  const [open, setOpen] = useState(false);
   const resolver = useRef<((ok: boolean) => void) | null>(null);
   const trigger = useRef<HTMLElement | null>(null);
 
   const finish = useCallback((ok: boolean) => {
     resolver.current?.(ok);
     resolver.current = null;
-    setOptions(null);
+    setOpen(false);
   }, []);
 
   const confirm = useCallback((next: ConfirmOptions) => {
@@ -50,6 +52,7 @@ export function useConfirm() {
         ? document.activeElement
         : null;
     setOptions(next);
+    setOpen(true);
     return new Promise<boolean>((resolve) => {
       resolver.current = resolve;
     });
@@ -57,9 +60,9 @@ export function useConfirm() {
 
   const dialog = (
     <Dialog
-      open={!!options}
-      onOpenChange={(open) => {
-        if (!open) finish(false);
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) finish(false);
       }}
     >
       <DialogContent

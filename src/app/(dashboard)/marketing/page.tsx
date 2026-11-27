@@ -16,11 +16,15 @@ import {
 } from "@/components/ui/table";
 import { permits } from "@/features/identity/permissions";
 import { currentIdentity } from "@/features/identity/server/context";
+import { ExcelImport } from "@/features/imports/excel-import";
+import { lastConsigneeId } from "@/features/imports/server/consignees";
+import { CustomerImport } from "@/features/sales/components/customer-import";
 import {
   DeletePartyButton,
   type PartyField,
   PartyForm,
 } from "@/features/sales/components/party-forms";
+import { lastCustomerId } from "@/features/sales/server/customer-import";
 import {
   listParties,
   type PartyKind,
@@ -72,6 +76,8 @@ export default async function Page({
     costTypes: [],
     customers: [],
   };
+  const lastId = kind === "customer" ? await lastCustomerId(actor) : 0;
+  const lastConsignee = kind === "consignee" ? await lastConsigneeId(actor) : 0;
   const [result, options] = await Promise.all([
     listParties(actor, kind, { search, page }),
     canWrite ? partyOptions(actor, kind) : Promise.resolve(empty),
@@ -193,6 +199,14 @@ export default async function Page({
         ))}
         {permits(actor, "view", "customer") && (
           <Link
+            href="/marketing/tarif"
+            className="inline-flex min-h-11 items-center border-b-2 border-transparent px-1 text-sm"
+          >
+            Tarif Customer
+          </Link>
+        )}
+        {permits(actor, "view", "customer") && (
+          <Link
             href="/marketing/revenue"
             className="inline-flex min-h-11 items-center border-b-2 border-transparent px-1 text-sm"
           >
@@ -200,6 +214,20 @@ export default async function Page({
           </Link>
         )}
       </nav>
+      {kind === "customer" && (
+        <CustomerImport
+          canImport={permits(actor, "create", "customer")}
+          lastId={lastId}
+        />
+      )}
+      {kind === "consignee" && permits(actor, "create", "consignee") && (
+        <div className="space-y-3 rounded-lg border bg-background p-4">
+          <p className="text-sm">
+            Unique terakhir: <strong>{lastConsignee}</strong>
+          </p>
+          <ExcelImport target="consignee" />
+        </div>
+      )}
       {(editing ? canUpdate : canCreate) && (
         <details
           open={!!editing}
@@ -276,6 +304,14 @@ export default async function Page({
                           })}
                         >
                           Ubah
+                        </Link>
+                      )}
+                      {kind === "customer" && (
+                        <Link
+                          className={`${link} mr-3`}
+                          href={`/marketing/tarif?customerId=${item.id}`}
+                        >
+                          Tarif
                         </Link>
                       )}
                       {canDelete && (

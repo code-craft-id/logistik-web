@@ -34,6 +34,10 @@ export async function setTicketStatusAction(formData: FormData) {
   return ticketAction(() => ticketService.setStatus(formFields(formData)));
 }
 
+export async function sendTicketMessageAction(formData: FormData) {
+  return ticketAction(() => ticketService.sendMessage(formFields(formData)));
+}
+
 export async function decideTicketAction(formData: FormData) {
   return ticketAction(() => ticketService.decide(formFields(formData)));
 }

@@ -42,6 +42,7 @@ describe("SCH-01 preservation and adapter contract", () => {
     // FIN parent-owned rows and immutable events use their audited document lifecycle.
     const parentOwned = ["FinInvoiceItem", "FinReservation", "FinLine"];
     const immutable = [
+      "TicketMessage",
       "FinReceipt",
       "FinCommand",
       "FinMapping",

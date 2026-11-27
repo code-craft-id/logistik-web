@@ -23,9 +23,25 @@ model Ticket {
   branch         Branch    @relation(fields: [branchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   createdBy      User      @relation("TicketCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
 
+  messages TicketMessage[]
+
   @@unique([createdById, idempotencyKey])
   @@index([createdById, createdAt(sort: Desc), id(sort: Desc)])
   @@index([createdAt(sort: Desc), id(sort: Desc)])
   @@index([status])
   @@map("tickets")
+}
+
+/// Chat on a ticket (provider ticket detail, OBSERVED 2026-11-27). Append-only.
+model TicketMessage {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int      @map("ticket_id")
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  authorId  Int      @map("author_id")
+  author    User     @relation("TicketMessageAuthor", fields: [authorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  body      String   @db.VarChar(2000)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([ticketId, id])
+  @@map("ticket_messages")
 }

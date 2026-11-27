@@ -20,6 +20,7 @@ import { formatRupiah } from "@/lib/format/rupiah";
 import { CASH_VOUCHERS, type CashVoucher } from "../accounting-contracts";
 import { PAGE_SIZE } from "../server/akunting-queries";
 import { akuntingQueries } from "../server/context";
+import { AccountExcelTools } from "./account-excel-tools";
 import { CommandForm } from "./command-form";
 import { FinanceField } from "./fields";
 import { JournalForm } from "./journal-form";
@@ -275,6 +276,13 @@ export async function VoucherPage({
             vendors={voucher === "VENDOR_PAYMENT" ? c.vendors : undefined}
           />
         </section>
+      )}
+      {voucher === "CASH_OUT" && canCreate && (
+        <AccountExcelTools
+          manage
+          target="cashOut"
+          branches={branchOptions(c.branches)}
+        />
       )}
       <h2 className="text-lg font-semibold">Daftar Nomor Bukti</h2>
       {list.data.items.length === 0 && (
@@ -1523,6 +1531,7 @@ export async function AssetsPage() {
           Assets).
         </p>
       )}
+      <AccountExcelTools manage={manage} target="assets" />
       {manage && categories.length > 0 && (
         <details className="rounded-lg border p-4">
           <summary className="min-h-11 cursor-pointer py-2 font-medium">

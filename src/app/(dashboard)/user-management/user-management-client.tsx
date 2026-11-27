@@ -267,10 +267,10 @@ export function UserManagementPageClient({
   const handleDelete = async (id: number) => {
     if (
       !(await confirmDialog({
-        title: "Nonaktifkan user ini?",
+        title: "Hapus user ini?",
         description:
-          "Login akan ditolak dan sesi aktif dicabut. Identitas tetap disimpan.",
-        confirmLabel: "Ya, nonaktifkan",
+          "User hilang dari daftar dan tidak bisa diaktifkan lagi; username dan emailnya tidak bisa dipakai ulang. Untuk sementara saja, pakai Edit lalu ubah Status menjadi Nonaktif.",
+        confirmLabel: "Ya, hapus",
       }))
     )
       return;
@@ -280,7 +280,7 @@ export function UserManagementPageClient({
         method: "DELETE",
       });
       if (!res.ok)
-        throw new Error((await res.json()).message || "Gagal menonaktifkan");
+        throw new Error((await res.json()).message || "Gagal menghapus");
       fetchUsers();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Terjadi kesalahan");
@@ -433,7 +433,7 @@ export function UserManagementPageClient({
                       size="icon"
                       disabled={!capabilities.delete}
                       onClick={() => handleDelete(user.id)}
-                      aria-label="Nonaktifkan user"
+                      aria-label="Hapus user"
                       className="min-h-11 min-w-11"
                     >
                       <Trash2 className="h-4 w-4" />

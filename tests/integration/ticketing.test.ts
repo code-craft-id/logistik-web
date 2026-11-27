@@ -127,6 +127,7 @@ beforeAll(async () => {
   }
 });
 afterAll(async () => {
+  await db.ticketMessage.deleteMany({ where: { authorId: { in: users } } });
   await db.ticket.deleteMany({ where: { createdById: { in: users } } });
   await db.user.deleteMany({ where: { id: { in: users } } });
   await db.userGroup.deleteMany({ where: { id: { in: groups } } });
@@ -160,6 +161,20 @@ describe("SUP-01 guarded PostgreSQL acceptance", () => {
     expect(await service(users[1]).detail(first.id)).not.toHaveProperty(
       "idempotencyKey",
     );
+  });
+  it("lets only people who can see the ticket chat on it", async () => {
+    const ticket = await service(users[1]).create(payload());
+    await service(users[1]).sendMessage({ id: ticket.id, body: "FAKE halo" });
+    await service(users[0]).sendMessage({ id: ticket.id, body: "FAKE balas" });
+    expect(
+      (await service(users[1]).detail(ticket.id))?.messages?.map((m) => m.body),
+    ).toEqual(["FAKE halo", "FAKE balas"]);
+    await expect(
+      service(users[2]).sendMessage({ id: ticket.id, body: "FAKE" }),
+    ).rejects.toMatchObject({ status: 404 });
+    await expect(
+      service(users[3]).sendMessage({ id: ticket.id, body: "FAKE" }),
+    ).rejects.toMatchObject({ status: 403 });
   });
   it("allows independent creators to finish while another creator holds its policy lock", async () => {
     const acquired = gate(),

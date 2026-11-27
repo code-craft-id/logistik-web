@@ -406,7 +406,7 @@ describe("PLT-01 persistent groups and permission inheritance", () => {
     expect(dto.group?.id).toBe(readerGroupId);
     expect(JSON.stringify(dto)).not.toMatch(/password|authAccounts|token/);
   });
-  it("retains a user's identity but blocks it and revokes sessions when disabled", async () => {
+  it("retains a user's identity but blocks it and revokes sessions when deleted", async () => {
     await db.session.create({
       data: {
         userId: memberId,
@@ -414,10 +414,25 @@ describe("PLT-01 persistent groups and permission inheritance", () => {
         expiresAt: new Date(Date.now() + 60_000),
       },
     });
-    await service(adminId).deleteUser(memberId);
+    await service(adminId).updateUser(memberId, { status: "INACTIVE" });
+    // Inactive stays listed; deleted does not.
     expect(
-      (await db.user.findUniqueOrThrow({ where: { id: memberId } })).status,
-    ).toBe("INACTIVE");
+      (await service(adminId).getUsers({ pageSize: 100 })).items.map(
+        (entry) => entry.id,
+      ),
+    ).toContain(memberId);
+    await service(adminId).deleteUser(memberId);
+    const row = await db.user.findUniqueOrThrow({ where: { id: memberId } });
+    expect(row).toMatchObject({ status: "INACTIVE", groupId: null });
+    expect(row.deletedAt).not.toBeNull();
+    expect(
+      (await service(adminId).getUsers({ pageSize: 100 })).items.map(
+        (entry) => entry.id,
+      ),
+    ).not.toContain(memberId);
+    await expect(
+      service(adminId).updateUser(memberId, { status: "ACTIVE" }),
+    ).rejects.toMatchObject({ status: 404 });
     expect(await db.session.count({ where: { userId: memberId } })).toBe(0);
     await expect(service(memberId).getUsers({})).rejects.toMatchObject({
       status: 401,

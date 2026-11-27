@@ -53,13 +53,13 @@ export const consigneeInput = z.strictObject({
 });
 
 /** Branch scope: admins see all; others see their branches and shared rows. */
-function readable(actor: AccessActor) {
+export function readable(actor: AccessActor) {
   return isAdministrator(actor)
     ? {}
     : { OR: [{ branchId: { in: actor.branchIds } }, { branchId: null }] };
 }
 /** Writes: non-admins may only touch rows owned by one of their branches. */
-function writableBranch(
+export function writableBranch(
   actor: AccessActor,
   branchId: number | null | undefined,
 ) {

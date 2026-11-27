@@ -15,6 +15,8 @@ vi.mock("@/features/finance/actions", () => ({
 }));
 vi.mock("@/features/finance/account-excel-actions", () => ({
   importAccountsAction: vi.fn(),
+  importAssetsAction: vi.fn(),
+  importCashPaymentsAction: vi.fn(),
 }));
 vi.mock("@/features/finance/voucher-attachment-actions", () => ({
   addVoucherAttachmentAction: vi.fn(),

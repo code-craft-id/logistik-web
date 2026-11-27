@@ -61,6 +61,16 @@ export const ticketStatusInput = z.strictObject({
   id: ticketId,
   status: z.enum(TICKET_STATUSES),
 });
+export const ticketMessageInput = z.strictObject({
+  id: ticketId,
+  body: z.string().trim().min(1, "Tulis pesan.").max(2000),
+});
+export type TicketMessageDTO = {
+  id: number;
+  author: string;
+  body: string;
+  createdAt: string;
+};
 export const ticketDecisionInput = z.strictObject({
   id: ticketId,
   decision: z.enum(["Approved", "Revision"]),
@@ -88,4 +98,6 @@ export type TicketDTO = {
   approvedAt: string | null;
   approvedBy: string | null;
   createdBy: string | null;
+  /** Chat, oldest first; only on the detail page. */
+  messages?: TicketMessageDTO[];
 };

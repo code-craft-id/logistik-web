@@ -32,12 +32,13 @@ model Regency {
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
 /// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model District {
-  deletedAt DateTime?    @map("deleted_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
-  createdAt DateTime     @default(now()) @map("created_at")
-  id        Int          @id @default(autoincrement())
-  name      String       @db.VarChar(100)
-  status    RecordStatus @default(ACTIVE)
+  consignees Consignee[]
+  deletedAt  DateTime?    @map("deleted_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(100)
+  status     RecordStatus @default(ACTIVE)
 
   @@index([status])
   @@index([name])
@@ -47,12 +48,13 @@ model District {
 /// Flat dictionary maintenance approved by coordinator in chat, 2026-10-25.
 /// DRAFT: Hierarchy remains TBD, D-27; no parent relationships are inferred.
 model Village {
-  deletedAt DateTime?    @map("deleted_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
-  createdAt DateTime     @default(now()) @map("created_at")
-  id        Int          @id @default(autoincrement())
-  name      String       @db.VarChar(100)
-  status    RecordStatus @default(ACTIVE)
+  consignees Consignee[]
+  deletedAt  DateTime?    @map("deleted_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(100)
+  status     RecordStatus @default(ACTIVE)
 
   @@index([status])
   @@index([name])
@@ -119,6 +121,8 @@ model Courier {
 }
 
 model TransportMode {
+  vendorTariffs    VendorTariff[]
+  customerTariffs  CustomerTariff[]
   bookings         Booking[]         @relation("BookingTransportMode")
   deletedAt        DateTime?         @map("deleted_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
@@ -150,6 +154,8 @@ model ServiceCategory {
 
 /// Service dictionary only; this is not an operational delivery model.
 model DeliveryService {
+  vendorTariffs     VendorTariff[]
+  customerTariffs   CustomerTariff[]
   bookings          Booking[]        @relation("BookingDeliveryService")
   tariffs           Tariff[]
   deletedAt         DateTime?        @map("deleted_at")
@@ -214,6 +220,13 @@ model Term {
 }
 
 model Vehicle {
+  code                   String?         @unique @db.VarChar(50)
+  bodyType               String?         @map("body_type") @db.VarChar(100)
+  brand                  String?         @db.VarChar(100)
+  plateColor             String?         @map("plate_color") @db.VarChar(50)
+  length                 Decimal?        @db.Decimal(10, 2)
+  width                  Decimal?        @db.Decimal(10, 2)
+  height                 Decimal?        @db.Decimal(10, 2)
   share                  VehicleShare?
   charterOrders          CharterOrder[]
   deliverySheets         DeliverySheet[]
@@ -263,13 +276,14 @@ model VehicleType {
 }
 
 model TruckingType {
-  deletedAt DateTime?    @map("deleted_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
-  createdAt DateTime     @default(now()) @map("created_at")
-  id        Int          @id @default(autoincrement())
-  name      String       @db.VarChar(100)
-  status    RecordStatus @default(ACTIVE)
-  vehicles  Vehicle[]
+  customerTariffs CustomerTariff[]
+  deletedAt       DateTime?        @map("deleted_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(100)
+  status          RecordStatus     @default(ACTIVE)
+  vehicles        Vehicle[]
 
   @@index([status])
   @@map("trucking_types")
@@ -291,6 +305,7 @@ model ShipmentStatus {
 }
 
 model Vendor {
+  tariffs         VendorTariff[]
   charterOrders   CharterOrder[]
   finJournals     FinJournal[]      @relation("FinJournalVendor")
   vendorProcesses VendorProcess[]
@@ -353,4 +368,31 @@ model VendorService {
   @@index([vendorId])
   @@index([status])
   @@map("vendor_services")
+}
+
+/// Vendor price list (provider pricelist import, OBSERVED 2026-11-27). A flat
+/// price uses nextPrice only. Reference data: not applied to vendor bills.
+model VendorTariff {
+  id                  Int             @id @default(autoincrement())
+  uniqueNo            Int             @unique @map("unique_no")
+  vendorId            Int             @map("vendor_id")
+  vendor              Vendor          @relation(fields: [vendorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  deliveryServiceId   Int             @map("delivery_service_id")
+  deliveryService     DeliveryService @relation(fields: [deliveryServiceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  transportModeId     Int             @map("transport_mode_id")
+  transportMode       TransportMode   @relation(fields: [transportModeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  originBranchId      Int             @map("origin_branch_id")
+  originBranch        Branch          @relation("VendorTariffOrigin", fields: [originBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  destinationBranchId Int             @map("destination_branch_id")
+  destinationBranch   Branch          @relation("VendorTariffDestination", fields: [destinationBranchId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  minWeight           Decimal?        @map("min_weight") @db.Decimal(10, 2)
+  firstPrice          Decimal?        @map("first_price") @db.Decimal(15, 2)
+  nextPrice           Decimal         @map("next_price") @db.Decimal(15, 2)
+  leadTimeDays        Int?            @map("lead_time_days")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+  deletedAt           DateTime?       @map("deleted_at")
+
+  @@index([vendorId])
+  @@map("vendor_tariffs")
 }

@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AwbImportTools } from "@/features/bookings/components/awb-import-tools";
 import { listTransactions } from "@/features/bookings/server/queries";
 import { permits } from "@/features/identity/permissions";
 import { one } from "@/features/modul/components/page-bits";
@@ -89,6 +90,8 @@ export default async function Page({
           </Button>
         </div>
       </header>
+      {direction === "outbound" &&
+        permits(current.actor, "create", "transaction") && <AwbImportTools />}
       <PageTabs label="Jenis AWB" tabs={tabs} active={direction} />
       <Form
         action="/transactions"
@@ -165,6 +168,9 @@ export default async function Page({
                   <TableHead>Tujuan</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Koli</TableHead>
+                  <TableHead className="text-right">Kilo</TableHead>
+                  <TableHead className="text-right">Volume</TableHead>
+                  <TableHead className="text-right">Biaya (Rp)</TableHead>
                   <TableHead>Aksi</TableHead>
                 </TableRow>
               </TableHeader>
@@ -193,6 +199,15 @@ export default async function Page({
                     <TableCell>{t.status}</TableCell>
                     <TableCell className="text-right tabular-nums">
                       {t.koli ?? 0}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {t.kilo?.toString() ?? "-"}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {t.volume?.toString() ?? "-"}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {t.biaya ? Number(t.biaya).toLocaleString("id-ID") : "-"}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       <Link href={`/transactions/${t.id}`} className={link}>

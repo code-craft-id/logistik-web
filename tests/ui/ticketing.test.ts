@@ -8,7 +8,10 @@ import {
 } from "../../src/features/ticketing/components/ticket-views";
 
 const { save, push } = vi.hoisted(() => ({ save: vi.fn(), push: vi.fn() }));
-vi.mock("../../src/features/ticketing/actions", () => ({ createTicket: save }));
+vi.mock("../../src/features/ticketing/actions", () => ({
+  createTicket: save,
+  sendTicketMessageAction: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push, refresh: vi.fn() }),
 }));

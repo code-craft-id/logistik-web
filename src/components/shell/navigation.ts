@@ -239,6 +239,7 @@ export const liveRoutes = [
   "/marketing?tab=customer",
   "/marketing?tab=consignee",
   "/marketing/revenue",
+  "/marketing/tarif",
   "/transactions",
   "/transactions?tab=inbound",
   "/transactions?print=1",

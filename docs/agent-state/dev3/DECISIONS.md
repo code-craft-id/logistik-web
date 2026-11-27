@@ -101,3 +101,27 @@ as-is. No new business decision is inferred from the user's feature list.
 - Unique codes / numbers listed in RUN_LOG; deleted rows keep their value (existing convention, no partial indexes). Production migration stops before any change if duplicates exist.
 - Akunting submenus live under /akunting; Master Data no longer lists Perkiraan.
 - Menu simplification: proposal only, not applied without the user's approval.
+
+## 2026-11-27 — open backlog items (owner: "keputusan ada di kita")
+
+Owner delegated these to the team after the assistant proposed them. Not a finance or provider confirmation.
+
+- Build: K3 export for Assets and Kasir (done locally); Assets template/import still to build. Kasir stays export only.
+- Keep as built: B7 aging buckets, B8 opening balance journal (finance to confirm account and cut-off before production).
+- Wait for evidence: B6 (provider export file with non-zero amounts and One Sheet).
+- Defer: B2, B5, K1, N7, E1. Not doing: B3, B4.
+
+## 2026-11-27 — AWB import and customer tariffs (provider templates pasted by the owner)
+
+- AWB Template Import / Import Data on the outbound AWB list. Codes are LMS ids. Destination Code is an LMS branch (provider: kecamatan; B3 not doing). No tariff column in the file, so Grand Total stays empty. All rows are validated first; saving is one AWB at a time and reports failed rows.
+- Customer tariffs: Tarif/Kg, Tarif/Koli, Trucking (`customer_tariffs`, migrations 000700 + 000800). "Unique" is the row key per kind: existing number = update. Import is all-or-nothing and branch scoped. Trucking `Service ID` = Trucking Type master; Kg and Koli use Delivery Service.
+- Tariffs are reference data only. They are NOT applied to AWB pricing: how Tarif Pertama / Tarif Selanjutnya / MinKg compute is not observed (owner or finance to define).
+- Customer Export / Template Import / Import (marketing, tab Customer): "Unique" is the customer id as in the provider note. Existing id = update (blank cells keep stored values); new id = create with that id and move the id sequence past it; more than 10000 above the last id is rejected. Address 2 is joined into the LMS address. Soft-deleted ids cannot be reused.
+
+## 2026-11-27 — Penerima, Kendaraan, vendor price list (templates in local TEMPLATE/, never committed)
+
+- Migration 000900 (additive): consignee district/village/postal code/fax/email; vehicle code/body type/brand/plate color/dimensions; `vendor_tariffs`.
+- Penerima: "Unique" = consignee id, same rules as the customer file.
+- Kendaraan: "Kode" is the key; Jenis ID = Trucking Type; Type and Merk stored as text (no LMS master; Type ID / Merk ID ignored). Name = Merk + No. Polisi.
+- Vendor price list: Asal / Tujuan = LMS branches, Service = Delivery Service, flat price = Next Tarif only. Export follows "TARIF - <vendor>.xls". Not applied to vendor bills.
+- New columns are import-only; the consignee and vehicle forms do not edit them (saving a form keeps them).

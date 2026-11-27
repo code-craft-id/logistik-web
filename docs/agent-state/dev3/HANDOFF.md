@@ -29,3 +29,28 @@
 - `npm run lint` PASS (562 files), `npm run typecheck` PASS, `npx next build --webpack` PASS (109 pages; compiled in 93s), and `git diff --check` PASS. No test suite run (not requested).
 - Chrome inventory showed the localhost dashboard tab, but both `cua.getTab` attempts failed before page content (`timeoutMs` undefined); visual/responsive review remains UNVERIFIED.
 - Preserve unrelated untracked `.github/workflows/ci.yml` and `docs/visualisasi-pribadi-logistik.html`; do not stage them.
+
+## 2026-11-27 — release batch 2 (local, not pushed)
+
+- Done: user delete = soft delete (migration 20261127000400), confirm dialog label flash, Assets template/import, AWB list Kilo/Volume/Biaya. Excel export (Assets, Kasir) and ticket rating were REMOVED: not in the provider (owner rule 2026-11-27: build only what the provider has).
+- Still to build (seen in provider): B5 import status codes 003-012 (M.Shipment Status lists them), B2 customer tariffs (real web Customer: Export/Template/Import Tarif, Harga/Koli, Trucking), AWB template/import (Kelola On Site), Kasir Pembayaran template/import (sandbox), ticket chat reply (real web ticket detail). K1 depreciation: not in provider, do not build.
+- Not browser-tested: the new export/import, rating and columns.
+
+## 2026-11-27 ~22:15 WIB — checkpoint (owner: release only when ALL done)
+
+- Branch dev3/ready-for-review, HEAD 406fee1 (pushed). Everything after it is LOCAL and uncommitted. Commit/push needs a fresh owner OK, without Claude attribution lines.
+- Done locally: user soft delete (migration 20261127000400), confirm dialog label, import status codes 003-012 as tracking notes, Assets template/import, AWB list Kilo/Volume/Biaya, ticket chat (migration 20261127000600).
+- Verified: before ticket chat, unit 760/760, integration 221/221, build OK. After ticket chat only typecheck, ticketing integration 12/12 and ticket UI/unit tests; full run and build still needed.
+- Remaining, in order: (1) Kasir Pembayaran Template Import / Import Data (sandbox; line columns Kode Rekening, Keterangan, Jumlah, Posisi), (2) AWB Template Import / Import Data (real web Kelola On Site), (3) customer tariffs (real web Customer: Export/Template/Import Tarif, Harga/Koli, Trucking), (4) check Customer export/template/import, (5) page-by-page comparison of the other pages.
+- Rule: build only what the provider has. Real web is strictly read-only; downloading a provider template needs the owner's OK.
+
+## 2026-11-27 ~22:55 WIB — Kasir import, AWB import, customer tariffs (local, uncommitted)
+
+- Done after the 22:15 checkpoint: Kasir Pembayaran template/import, AWB template/import, customer tariffs (Kg, Koli, Trucking) at /marketing/tarif.
+- Production would run migrations 20261127000400, 000600, 000700, 000800 (additive; 000800 also relaxes delivery_service_id on the new table).
+- Remaining: Customer Export / Template Import / Import (needs the provider's template columns), page-by-page comparison of the other pages, browser check of the new screens.
+- Data needed before use: Koli sizes as Delivery Service rows and truck types as Trucking Type rows.
+- 2026-11-27 later: Customer export/template/import built. Remaining: page-by-page comparison, full checks, browser check; then commit and push (owner approved once all is done).
+- 2026-11-27 real web button check (read-only): Driver/Kurir/Marketing import exist in LMS. Missing: Penerima (Template Import / Import Data), Vendor (Template Import / Import Data, Export Tarif vendor), Kendaraan (Template Import / Import Vehicle). Needs provider templates. Not committed/pushed yet.
+- 2026-11-27 ~23:25: Penerima, Kendaraan, vendor tariff import/export built. Migrations to run in production: 000400, 000600-000900. Next: full checks, then commit + push (owner approved), no Claude attribution.
+- AFTER this release (owner approved 2026-11-27): merge Akunting menu into one entry with in-page tabs each: Master Akunting (7 master items), Kasir Penerimaan (Lainnya + Invoice), Kasir Pembayaran (Lainnya + Vendor), Penyesuaian (4), Laporan Akunting (6). Same routes and rights (see src/components/shell/).
