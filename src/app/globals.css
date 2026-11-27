@@ -30,6 +30,15 @@
   --chart-3: #2188a5;
   --chart-4: #526176;
   --radius: 0.5rem;
+
+  /* Public RED Logistik landing surface; isolated from the LMS workbench palette. */
+  --redlogistik-red: #c9342f;
+  --redlogistik-green: #0f5c4c;
+  --redlogistik-paper: #f7f6f0;
+  --redlogistik-ink: #172334;
+  --redlogistik-line: #cbd5cf;
+  --redlogistik-tint: #e7f0eb;
+  --redlogistik-muted: #526176;
 }
 
 @theme inline {
@@ -56,6 +65,13 @@
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
+  --color-redlogistik-red: var(--redlogistik-red);
+  --color-redlogistik-green: var(--redlogistik-green);
+  --color-redlogistik-paper: var(--redlogistik-paper);
+  --color-redlogistik-ink: var(--redlogistik-ink);
+  --color-redlogistik-line: var(--redlogistik-line);
+  --color-redlogistik-tint: var(--redlogistik-tint);
+  --color-redlogistik-muted: var(--redlogistik-muted);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

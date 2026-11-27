@@ -9,6 +9,7 @@ export function applicationPreviewPath(sourcePath: string): string {
 export function isPublicPath(pathname: string): boolean {
   return (
     pathname === "/" ||
+    pathname === "/landing" ||
     pathname === "/login" ||
     pathname === "/api/auth" ||
     pathname.startsWith("/api/auth/") ||
